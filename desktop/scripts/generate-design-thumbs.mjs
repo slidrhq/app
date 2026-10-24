@@ -44,8 +44,11 @@ const out = resolve(flag('--out') ?? join(from, 'images', 'designs', 'thumbs'));
 const only = flag('--lang')?.split(',');
 const again = args.includes('--all');
 
-/** The widths of the pictures: a tile of the app's panel, and a card of Slidr Library. */
-const WIDTHS = [320, 640];
+/**
+ * The widths of the pictures: one, for a tile of the app's panel and a card of Slidr Library alike,
+ * both narrower than it (ADR-111).
+ */
+const WIDTHS = [320];
 /** How good a picture is, of a hundred: photographs and type, at a few kilobytes. */
 const QUALITY = 85;
 /** How many designs a page draws at once, and how many pages draw at once. */
@@ -75,12 +78,13 @@ const languages = Object.keys(words).filter((lang) => !only || only.includes(lan
 
 const indexFile = join(out, 'index.json');
 const before = existsSync(indexFile) ? JSON.parse(readFileSync(indexFile, 'utf8')) : {};
-const sameWidths = JSON.stringify(before.widths) === JSON.stringify(WIDTHS);
+/** Whether the pictures were made at every width: a width no longer made changes none of them. */
+const madeAtWidths = WIDTHS.every((width) => before.widths?.includes(width));
 const pictureOf = (width, lang, id) => join(out, String(width), lang, `${id}.webp`);
 /** Whether a design has its pictures already, of the design as it is. */
 const kept = (lang, id) =>
   !again &&
-  sameWidths &&
+  madeAtWidths &&
   before.designs?.[lang]?.[id] === words[lang]?.[id] &&
   WIDTHS.every((width) => existsSync(pictureOf(width, lang, id)));
 
@@ -188,7 +192,13 @@ try {
       }
     }
   }
-  const designs = { ...(sameWidths ? before.designs : {}), ...drawn };
+  // The pictures of a width no longer made go too.
+  for (const entry of existsSync(out) ? readdirSync(out, { withFileTypes: true }) : []) {
+    if (entry.isDirectory() && /^\d+$/.test(entry.name) && !WIDTHS.includes(Number(entry.name))) {
+      rmSync(join(out, entry.name), { recursive: true });
+    }
+  }
+  const designs = { ...(madeAtWidths ? before.designs : {}), ...drawn };
   writeFileSync(indexFile, `${JSON.stringify({ widths: WIDTHS, designs }, null, 2)}\n`);
   const kB = Math.round(pictures.reduce((sum, { bytes }) => sum + bytes.length, 0) / 1024);
   console.log(`${pictures.length} pictures, ${kB} kB, written to ${out}`);
