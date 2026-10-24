@@ -4,9 +4,9 @@
 //! Pages site, and kept on this machine as the app reads it.
 //!
 //! ```text
-//! https://slidr-media.pages.dev/manifest.json        every file of the library, its size and SHA-256
-//! https://slidr-media.pages.dev/icons/lucide/icon-nodes.json
-//! https://slidr-media.pages.dev/fonts/heebo/heebo-hebrew-wght-normal.woff2
+//! https://media.slidr.studio/manifest.json        every file of the library, its size and SHA-256
+//! https://media.slidr.studio/icons/lucide/icon-nodes.json
+//! https://media.slidr.studio/fonts/heebo/heebo-hebrew-wght-normal.woff2
 //! ```
 //!
 //! The pages reach it through a protocol of its own, `media` (`http://media.localhost/<path>`
@@ -47,8 +47,10 @@ use crate::net;
 /// The scheme of the protocol, and so the first label of its host in WebView2.
 pub const SCHEME: &str = "media";
 
-/// Where the library is published.
-pub const DEFAULT_URL: &str = "https://slidr-media.pages.dev/";
+/// Where the library is published: the Pages project `slidr-media`, at its own domain. Releases
+/// before it read the same project at `https://slidr-media.pages.dev/`, which still answers, and
+/// a redirect from there would not be followed (`REDIRECTS`).
+pub const DEFAULT_URL: &str = "https://media.slidr.studio/";
 
 /// A development build may be pointed at another copy of the library: a preview deployment of
 /// the site (HTTPS), or a stand-in on this machine.

@@ -78,7 +78,7 @@ Prerequisites:
 - Microsoft Edge, for the end-to-end tests.
 - One of Claude Code CLI, Codex CLI, GitHub Copilot CLI, Gemini CLI or Grok CLI for the AI chat and HTML import. Select it in Settings → Agent: Slidr checks the connection, offers installation through Windows App Installer with your approval if missing (Gemini CLI through npm, with Node.js from Windows App Installer if needed), and opens sign-in if needed. It then reads the available models and each model's supported effort levels from the CLI. Choose a model and effort explicitly; the chat shows that choice. The rest of the editor works without a CLI.
 - Optional: Codex CLI, logged in, for image generation with the default provider; an OpenAI, Unsplash or Pexels key, entered in the settings, for the other image provider and for stock photos.
-- The network, the first time the app or the dev server runs: templates, Elements content, pictures, icons and deck fonts come from the media library at https://slidr-media.pages.dev; what the app uses is kept on the machine, the rest stays on the site. See [media library](docs/media-library.md).
+- The network, the first time the app or the dev server runs: templates, Elements content, pictures, icons and deck fonts come from the media library at https://media.slidr.studio; what the app uses is kept on the machine, the rest stays on the site. See [media library](docs/media-library.md).
 
 ```sh
 pnpm install
@@ -296,7 +296,7 @@ Every member of the team uses multi-factor authentication on GitHub.
 Slidr has no account, collects no telemetry, and sends nothing to its authors. It connects to other systems only for what the user asks of it:
 
 - **Updates** — it asks [GitHub](https://github.com) whether a newer release exists ([GitHub's privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)).
-- **Media library** — templates, designs, fonts and pictures are downloaded from `slidr-media.pages.dev`, hosted by Cloudflare ([Cloudflare's privacy policy](https://www.cloudflare.com/privacypolicy/)), or from the address the installation names ([a library of your own](docs/media-library.md#a-library-of-your-own)).
+- **Media library** — templates, designs, fonts and pictures are downloaded from `media.slidr.studio` (`slidr-media.pages.dev` in releases before it), hosted by Cloudflare ([Cloudflare's privacy policy](https://www.cloudflare.com/privacypolicy/)), or from the address the installation names ([a library of your own](docs/media-library.md#a-library-of-your-own)).
 - **Stock photos** — a search sends its words to [Unsplash](https://unsplash.com/privacy) or [Pexels](https://www.pexels.com/privacy-policy/), with the user's own key.
 - **Images by AI** — the prompt goes to [OpenAI](https://openai.com/policies/privacy-policy/), with the user's own key.
 - **The AI chat** — the deck and the messages go to the agent CLI the user picked (Claude Code, Codex or GitHub Copilot CLI), under that service's terms and privacy policy.

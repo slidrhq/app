@@ -138,7 +138,7 @@ const server = await createServer({
           const saved = join(cache, path);
           const existing = [saved, join(priorCache, path), join(media, path)].find(existsSync);
           if (existing) return answer(readFileSync(existing));
-          void fetch(`https://slidr-media.pages.dev/${path}`, {
+          void fetch(`https://media.slidr.studio/${path}`, {
             signal: AbortSignal.timeout(30_000),
           })
             .then(async (response) => {

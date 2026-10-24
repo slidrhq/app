@@ -45,7 +45,7 @@ const work = resolve(
   ),
 );
 // The published library, read when there is no copy: the site, unless --site names another.
-const site = option('--site', 'https://slidr-media.pages.dev/').replace(/\/*$/, '/');
+const site = option('--site', 'https://media.slidr.studio/').replace(/\/*$/, '/');
 const published = async (path) => {
   const url = site + path.split('/').map(encodeURIComponent).join('/');
   const answer = await fetch(url, { headers: { 'Cache-Control': 'no-cache' } });

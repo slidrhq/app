@@ -8,7 +8,7 @@ import { designFiles } from '../../build/media';
  * publisher's own `designFiles` wrote: what it writes is what the app reads.
  */
 
-const MEDIA = 'https://slidr-media.pages.dev/';
+const MEDIA = 'https://media.slidr.studio/';
 const sha256 = (text: string) => createHash('sha256').update(text).digest('hex');
 const slide = (id: string) => ({ ...createSlide(), id });
 
