@@ -47,13 +47,13 @@ use crate::net;
 /// The scheme of the protocol, and so the first label of its host in WebView2.
 pub const SCHEME: &str = "media";
 
-/// Where the library is published: the Pages project `slidr-media`, at its own domain. Releases
-/// before it read the same project at `https://slidr-media.pages.dev/`, which still answers, and
-/// a redirect from there would not be followed (`REDIRECTS`).
+/// Where the library is published: Slidr Library's bucket at its own domain, through Cloudflare's
+/// cache (ADR-113). Releases before it read the Pages project `slidr-media` at
+/// `https://slidr-media.pages.dev/`, which no longer answers.
 pub const DEFAULT_URL: &str = "https://media.slidr.studio/";
 
-/// A development build may be pointed at another copy of the library: a preview deployment of
-/// the site (HTTPS), or a stand-in on this machine.
+/// A development build may be pointed at another copy of the library: a dev server of Slidr
+/// Library, another site (HTTPS), or a stand-in on this machine.
 const VARIABLE: &str = "SLIDR_MEDIA_URL";
 
 /// An installed app may be pointed at another copy of the library, one its users serve

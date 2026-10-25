@@ -19,8 +19,9 @@ import type { Plugin } from 'vite';
 /*
  * The media library on the side of Node (docs/media-library.md): the icon sets, the built-in
  * fonts of decks, the built-in templates and their photographs, and the content of Elements. It
- * is a site of its own on Cloudflare Pages, read by the app while it runs; none of it is built
- * into the app.
+ * is a site of its own (media.slidr.studio, Slidr Library's bucket through Cloudflare's cache,
+ * ADR-113), read by the app while it runs; none of it is built into the app. A copy of it is
+ * staged here as a static site, for a library of one's own.
  *
  *   manifest.json                  every file below: its size and SHA-256 (written here)
  *   icons/lucide/*.json            the Lucide set: its drawings and its search words
@@ -205,7 +206,7 @@ export const PUBLISHED_FOLDERS = [
   'templates',
 ] as const;
 
-/** The largest file Cloudflare Pages takes. */
+/** The largest file Cloudflare Pages takes, for a staged site served there. */
 export const MAX_FILE_BYTES = 25 * 1024 * 1024;
 
 /** The fields of the templates catalog the published template files come from. */

@@ -1,6 +1,6 @@
 # ADR-112 — The library is read at media.slidr.studio
 
-Status: Implemented in the 2026-10-25 working trees of the app, Slidr Library and Slidr Studio; not committed at the time of this record. The domain has served the Pages project since that day (below). It changes the address of [ADR-090](ADR-090-media-library-on-the-web.md)'s site; [ADR-110](ADR-110-library-published-through-its-api.md)'s forwarding is unchanged.
+Status: Implemented in the 2026-10-25 working trees of the app, Slidr Library and Slidr Studio; not committed at the time of this record. The domain has served the Pages project since that day (below). It changes the address of [ADR-090](ADR-090-media-library-on-the-web.md)'s site; [ADR-110](ADR-110-library-published-through-its-api.md)'s forwarding is unchanged. Superseded in part by [ADR-113](ADR-113-the-library-served-from-its-bucket.md) the same day: the domain is the library's bucket's, not the Pages project's, and `slidr-media.pages.dev` was given up with the project.
 
 ## Request
 

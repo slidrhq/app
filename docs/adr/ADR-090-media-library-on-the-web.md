@@ -1,6 +1,6 @@
 # ADR-090 — The media library is a site on the web, kept on the machine by the app
 
-Status: Implemented on 2026-10-15 in the working tree; not committed at the time of this record. It supersedes the packaging of [ADR-074](ADR-074-packaged-media-library.md): nothing of the library is built into the app or installed beside it.
+Status: Implemented on 2026-10-15 in the working tree; not committed at the time of this record. It supersedes the packaging of [ADR-074](ADR-074-packaged-media-library.md): nothing of the library is built into the app or installed beside it. The site is no longer a Pages project: it is written through Slidr Library's API ([ADR-110](ADR-110-library-published-through-its-api.md)) and served from its bucket ([ADR-113](ADR-113-the-library-served-from-its-bucket.md)).
 
 ## Context
 

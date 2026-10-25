@@ -1,6 +1,6 @@
 # Media library
 
-The content the app offers is a library published apart from the app: the built-in templates and their photographs, the designs, card sets, shapes, graphics, frames, emoji and art of Elements, the icon sets and the fonts of decks. It is a site on the web, **https://media.slidr.studio** (the Pages project `slidr-media`, at its own domain; releases before [ADR-112](adr/ADR-112-the-library-at-media-slidr-studio.md) read it at `https://slidr-media.pages.dev`, which still answers), and the app reads it while it runs. Nothing of it is built into the app or installed with it ([ADR-090](adr/ADR-090-media-library-on-the-web.md)). It lives in the R2 bucket of [Slidr Library](https://github.com/slidrhq/library)'s Worker, which serves it at `/media/`, and the Pages project forwards every request there; everything published reaches it through the library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md); the library's README, "Publishing the uploads"). Until that is set up, the Pages project is the static site it was.
+The content the app offers is a library published apart from the app: the built-in templates and their photographs, the designs, card sets, shapes, graphics, frames, emoji and art of Elements, the icon sets and the fonts of decks. It is a site on the web, **https://media.slidr.studio**, and the app reads it while it runs. Nothing of it is built into the app or installed with it ([ADR-090](adr/ADR-090-media-library-on-the-web.md)). It lives in the R2 bucket of [Slidr Library](https://github.com/slidrhq/library)'s Worker, and media.slidr.studio is that bucket itself, through Cloudflare's cache, with no Worker on the way ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md); the library's README, "Serving the library"). Everything published reaches it through the library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md); the library's README, "Publishing the uploads"), and a publication empties the cache of the files it wrote. Releases before [ADR-112](adr/ADR-112-the-library-at-media-slidr-studio.md) read `https://slidr-media.pages.dev`, which no longer answers.
 
 ```text
 manifest.json                  every file below: its size and SHA-256
@@ -87,18 +87,18 @@ pnpm media:publish --dry-run         # say what would change
 pnpm media:publish                   # publish it (--from <dir>)
 ```
 
-Publishing reads the published folders of the copy and writes the files `templates/` takes from its catalog (and those of the designs, ADR-109). Once the library lives in the Worker's bucket (the site answers `X-Slidr-Library: live`), it publishes through Slidr Library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md)): it sends only the files the author changed since the copy was pulled, each with the hash it was changed from, and the library writes them unless it changed one of them meanwhile (a published upload), which is a conflict: pull, and publish again. Every file the author did not change stays as the library has it. `pnpm media:pull` keeps the manifest it pulled in the copy (`.published-manifest.json`) for this; a copy without it is published only with `--force`, as a whole. It needs `LIBRARY_KEY`, a key of the Worker's `LIBRARY_KEYS`; `--library <url>` and `--site <url>` name a dev server of the library. Nothing is deployed.
+Publishing reads the published folders of the copy and writes the files `templates/` takes from its catalog (and those of the designs, ADR-109). The library lives in the Worker's bucket (the site answers `X-Slidr-Library: live`), so it publishes through Slidr Library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md)): it sends only the files the author changed since the copy was pulled, each with the hash it was changed from, and the library writes them unless it changed one of them meanwhile (a published upload), which is a conflict: pull, and publish again. Every file the author did not change stays as the library has it. `pnpm media:pull` keeps the manifest it pulled in the copy (`.published-manifest.json`) for this; a copy without it is published only with `--force`, as a whole. It needs `LIBRARY_KEY`, a key of the Worker's `LIBRARY_KEYS`; `--library <url>` and `--site <url>` name a dev server of the library. Nothing is deployed: there is no Pages project to deploy to ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md)). The library empties Cloudflare's cache of the files written, so every app reads them at its next start.
 
-Before that, publishing stages the site, writes the manifest, compares it with the published one and deploys with wrangler (`--branch <name>` for a preview); it needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in the environment. Either way it stops when the copy is empty, or would take away more than half of the published files, unless `--force` is given: a copy that is not all there would otherwise empty the library of every installed app.
+Against a site that is not a library's bucket (it answers no `X-Slidr-Library: live`), or with `--out`, publishing only stages the copy as a static site, writes its manifest and compares it with the published one ([A library of your own](#a-library-of-your-own)); it publishes nothing. Either way it stops when the copy is empty, or would take away more than half of the published files, unless `--force` is given: a copy that is not all there would otherwise empty the library of every installed app.
 
-Static assets of Pages are at most 25 MiB. A JSON catalog above that
+The bucket holds every catalog whole. A site staged for Cloudflare Pages takes static files of at most 25 MiB, so a JSON catalog above that
 limit is staged as 10 MiB parts and a narrowly routed
 [Pages Function](https://developers.cloudflare.com/pages/functions/advanced-mode/). The Function
 streams the exact original bytes at the original catalog URL; its manifest entry,
 hash, client format and offline cache are unchanged. Other media requests stay
 static. The authoring copy still holds the ordinary complete JSON file.
 
-A development build and the dev server read another copy when `SLIDR_MEDIA_URL` names one: a preview deployment, or a server on this machine. A release build reads the published library, unless its installation names another (below).
+A development build and the dev server read another copy when `SLIDR_MEDIA_URL` names one: a dev server of Slidr Library (`http://127.0.0.1:5176/media/`), or another server on this machine. A release build reads the published library, unless its installation names another (below).
 
 ## A library of your own
 
@@ -135,7 +135,7 @@ pnpm media:pull --to ../my-media                                        # the pu
 pnpm media:publish --from ../my-media --out ../my-media-site --dry-run  # staged as a site; nothing is deployed
 ```
 
-Then upload `../my-media-site` to the server. A copy changed as above is staged the same way. The dry run still compares the copy with the published library: a copy that holds less than half of it is reported as blocked, which does not matter here, since nothing is deployed. Publishing (`pnpm media:publish`, the studio) deploys only to Pages. The dev server and the studio read such a copy with `SLIDR_MEDIA_URL`.
+Then upload `../my-media-site` to the server. A copy changed as above is staged the same way. The dry run still compares the copy with the published library: a copy that holds less than half of it is reported as blocked, which does not matter here, since nothing is deployed. Publishing (`pnpm media:publish`, the studio) writes only into the published library, through its API. The dev server and the studio read such a copy with `SLIDR_MEDIA_URL`.
 
 On a machine that ran Slidr before, the manifest of the old address stands until the new one is read, when the app starts online. What is cached is kept by its hash, so a file both libraries have is not fetched again.
 

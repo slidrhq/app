@@ -1,6 +1,6 @@
 # ADR-110 — The library is published through its API, from the Worker's bucket
 
-Status: Implemented on 2026-10-21 in the working trees of the app, Slidr Library and Slidr Studio; not committed at the time of this record, and not yet set up on Cloudflare (below). It changes how [ADR-090](ADR-090-media-library-on-the-web.md)'s site is written, and completes the publication of [ADR-108](ADR-108-search-tags.md)'s tags.
+Status: Implemented on 2026-10-21 in the working trees of the app, Slidr Library and Slidr Studio; not committed at the time of this record, and not yet set up on Cloudflare (below). It changes how [ADR-090](ADR-090-media-library-on-the-web.md)'s site is written, and completes the publication of [ADR-108](ADR-108-search-tags.md)'s tags. Set up on 2026-10-25, without its forwarding: [ADR-113](ADR-113-the-library-served-from-its-bucket.md) serves the bucket at media.slidr.studio itself, through Cloudflare's cache, and the Pages project is deleted.
 
 ## Request
 

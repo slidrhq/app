@@ -8,8 +8,8 @@
 //   pnpm media:publish --site <url>         the library as another site serves it, as a dev server
 //                                           of Slidr Library does at http://127.0.0.1:5176/media/
 //
-// Once the library lives in the bucket of Slidr Library's Worker (its README, "Publishing the
-// uploads"; the site says so in every answer), a publication goes through that library's API: it
+// The library lives in the bucket of Slidr Library's Worker (its README, "Publishing the
+// uploads"; the site says so in every answer), and a publication goes through that library's API: it
 // sends only the files the author changed since the copy was pulled (`pnpm media:pull`, which
 // keeps the manifest it pulled in the copy), each with the hash it was changed from, and the
 // library writes them unless it changed one of them meanwhile, as a published upload. Nothing is
@@ -18,21 +18,18 @@
 // pulled with is published only with --force, as a whole: then every file it has that differs
 // from the library's is written.
 //
-// Before that, the copy is staged as a site and deployed to Cloudflare Pages, as it always was:
+// Nothing is deployed: the Pages project the library was once deployed to is gone
+// (docs/adr/ADR-113). With --out, or against a site that is not a library's bucket, the copy is
+// only staged as a static site, and nothing is published:
 //
-//   pnpm media:publish --branch preview     a preview deployment, not the published library
 //   pnpm media:publish --out <dir>          stage the site there (with --dry-run, a library of
 //                                           your own, served by any static server)
-//
-// with CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID from the environment; wrangler is run
-// through npx at a fixed version.
 //
 // The report is written once the changes are known, before anything below can stop the
 // publication: the files and bytes staged, the paths added, changed and removed, and `blocked`,
 // the reason it stops without --force (else null). A publication that would leave the library
 // empty, or take away most of it, stops unless --force is given: a copy that is not all there
 // (another machine, a folder not yet pulled) would otherwise empty the app's library.
-import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -47,9 +44,6 @@ import {
   summary,
 } from '../build/mediaApi.ts';
 
-const PROJECT = 'slidr-media';
-const WRANGLER = 'wrangler@4.151.0';
-
 const args = process.argv.slice(2);
 const option = (name) => {
   const at = args.indexOf(name);
@@ -60,7 +54,6 @@ const flag = (name) => args.includes(name);
 const source = resolve(
   option('--from') ?? fileURLToPath(new URL('../../../Slidr-media/', import.meta.url)),
 );
-const branch = option('--branch') ?? 'main';
 // The site the library is read at: the published one, unless named (a dev server of the library).
 const site = option('--site');
 const siteUrl = (path) => (site ? publishedUrl(path, site) : publishedUrl(path));
@@ -70,11 +63,11 @@ if (!existsSync(source)) {
   process.exit(1);
 }
 
-// What is published now, and where: from the bucket of the library's Worker, or a Pages site.
+// What is published now, and where: the bucket of the library's Worker, or a static site.
 const answer = await fetch(siteUrl('manifest.json'), {
   headers: { 'Cache-Control': 'no-cache' },
 }).catch(() => undefined);
-const live = answer?.headers.get(LIVE_HEADER) === 'live' && branch === 'main';
+const live = answer?.headers.get(LIVE_HEADER) === 'live';
 const before = answer?.ok ? await answer.json().catch(() => undefined) : undefined;
 const published = Object.keys(before?.files ?? {}).length;
 
@@ -104,7 +97,7 @@ function list({ added, changed, removed }) {
 // From here on the script sets its exit code and ends rather than calling process.exit(): after
 // a fetch, process.exit() aborts Node 24 on Windows while the connection is closing
 // ("Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)", exit code 0xC0000409).
-process.exitCode = live && !option('--out') ? await throughTheApi() : toPages();
+process.exitCode = live && !option('--out') ? await throughTheApi() : stageSite();
 
 /* ---------------------------------------------------------------- through the library's API */
 
@@ -211,9 +204,9 @@ async function throughTheApi() {
   return 0;
 }
 
-/* ---------------------------------------------------------------- to Cloudflare Pages */
+/* ---------------------------------------------------------------- as a static site */
 
-function toPages() {
+function stageSite() {
   if (live && option('--out')) {
     console.log(
       'The library is published through its API: this stages a site of the copy, and deploys nothing.',
@@ -252,39 +245,14 @@ function toPages() {
     console.error(blocked);
     return 1;
   }
-  if (flag('--dry-run') || live) {
-    console.log('Dry run: nothing is published.');
+  if (flag('--dry-run') || option('--out')) {
+    console.log('Nothing is published: the copy is staged as a site.');
     return 0;
   }
-
-  for (const name of ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID']) {
-    if (!process.env[name]) {
-      console.error(`${name} is not set: Cloudflare cannot be reached.`);
-      return 1;
-    }
-  }
-
-  // npx is a script on Windows, which only a shell runs; the shell takes the words apart again.
-  const windows = process.platform === 'win32';
-  const quoted = (arg) =>
-    windows && /[\s"&|<>^]/.test(arg) ? `"${arg.replaceAll('"', '""')}"` : arg;
-  const deploy = spawnSync(
-    'npx',
-    [
-      '--yes',
-      WRANGLER,
-      'pages',
-      'deploy',
-      target,
-      '--project-name',
-      PROJECT,
-      '--branch',
-      branch,
-      '--commit-dirty=true',
-      '--commit-message',
-      `Media library ${manifest.published}`,
-    ].map(quoted),
-    { stdio: 'inherit', shell: windows },
+  console.error(
+    `${siteUrl('manifest.json')} is not a library's bucket (it answers no ${LIVE_HEADER}: live), ` +
+      'and nothing is deployed any more: nothing is published. Name a dev server of the library ' +
+      'with --site and --library, or stage a site of your own with --out.',
   );
-  return deploy.status ?? 1;
+  return 1;
 }
