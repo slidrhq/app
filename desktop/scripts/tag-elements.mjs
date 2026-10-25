@@ -27,7 +27,8 @@
 // `--upload https://library.slidr.workers.dev` (or `http://127.0.0.1:5176`, the page's dev server)
 // sends each kind's tags as one upload of `tag`, which the library checks against what it
 // publishes and keeps until an editor accepts it (the library's README, "Search tags").
-// LIBRARY_KEY is the program's key, as the Worker's `LIBRARY_KEYS` names it. With nothing left to
+// LIBRARY_TOKEN is a person's token (`slk_…`), of the `upload` scope, made in the library's
+// profile; the library takes no program's key any more. With nothing left to
 // tag, `--upload` only sends what the folder has. Once accepted, the tags are published through
 // the library's API too (its README, "Publishing the uploads").
 //
@@ -72,11 +73,13 @@ const LIMIT = Number(flag('--limit') ?? Infinity);
 const DRY = args.includes('--dry-run');
 const AGAIN_ALL = args.includes('--again-all');
 const AGAIN = new Set(list(flag('--again')));
-/** The library's page, whose API takes the tags (`--upload`), and the program's key to it. */
+/** The library's page, whose API takes the tags (`--upload`), and a person's token to it. */
 const UPLOAD = flag('--upload');
-const KEY = process.env.LIBRARY_KEY;
+const KEY = process.env.LIBRARY_TOKEN;
 if (UPLOAD && !KEY && !DRY) {
-  throw new Error("--upload sends the tags with the library's key for programs: set LIBRARY_KEY.");
+  throw new Error(
+    "--upload sends the tags with a person's token, made in the library's profile: set LIBRARY_TOKEN.",
+  );
 }
 /** The kinds in the order a run tags them: the fewest and most looked for first. */
 const KINDS = ['designs', 'cards', 'shapes', 'frames', 'graphics', 'emoji', 'icons'];
