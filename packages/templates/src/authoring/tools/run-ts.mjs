@@ -1,4 +1,4 @@
-// Runs a TypeScript module of `packages/templates` through Vite (as export-designs.mjs does),
+// Runs a TypeScript module of `packages/templates` through Vite,
 // calling its default export with the remaining arguments:
 //   node tools/run-ts.mjs src/authoring/catalog.ts <out>        (from packages/templates)
 import { createRequire } from 'node:module';

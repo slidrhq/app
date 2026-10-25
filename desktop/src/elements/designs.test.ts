@@ -1,5 +1,3 @@
-import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import {
   CommandBus,
   CONTENT_LANGUAGES,
@@ -199,14 +197,6 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
     }
   });
 
-  it.skipIf(AUTHORED.length === 0)('keeps sizes.json in step with the authored pictures', () => {
-    // Fails when a picture was added or replaced without `node scripts/design-asset-sizes.mjs`.
-    const script = fileURLToPath(new URL('../../scripts/design-asset-sizes.mjs', import.meta.url));
-    expect(() =>
-      execFileSync(process.execPath, [script, '--check'], { stdio: 'pipe' }),
-    ).not.toThrow();
-  });
-
   it.skipIf(!has('webinar'))(
     'adds a fresh slide after the current one and undoes it in one step',
     () => {
@@ -265,8 +255,8 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
   it.skipIf(builtinFamilies.length === 0)(
     'sets each language but Hebrew and English in families of its own letters',
     () => {
-      // What `scripts/design-fonts.mjs` leaves as it is: a family of the language, or a Latin one
-      // for a text without the language's letters.
+      // What is right as it is: a family of the language, or a Latin one for a text without the
+      // language's letters.
       const shelf = fontShelf({ families: builtinFamilies, faces: builtinFaces });
       for (const [lang, id] of DRAWN) {
         if (lang === 'he' || lang === 'en') continue;

@@ -161,7 +161,7 @@ describe.skipIf(!builtInAvailable)('the covers of the built-in templates', () =>
       ['he', 'rtl', heading.he, 'he'],
       ['en', 'ltr', heading.latin, 'latin'],
     ] as const) {
-      // A family the table does not have: `node desktop/scripts/gen-letter-heights.mjs`.
+      // A family the table does not have (`letters.generated.ts`).
       expect(LETTERS[family]?.[script]).toBeDefined();
       const { slide } = templateCover(template, { lang, dir, name: id });
       expect(sizeOf(slide) * lettersAt(family, script, weight)).toBeCloseTo(height(script));

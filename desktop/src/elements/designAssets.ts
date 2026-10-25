@@ -26,8 +26,8 @@ type Size = readonly [number, number];
 
 /**
  * The record of a bundled picture, for the gallery. It carries the picture's size in pixels
- * (`scripts/design-asset-sizes.mjs`; a managed design's, which `managed.json` gives, from the
- * caller): a cropped picture cannot be drawn without it.
+ * (`images/designs/sizes.json` of the library; a managed design's, which `managed.json` gives,
+ * from the caller): a cropped picture cannot be drawn without it.
  */
 function meta(id: string, name: string, managed?: Size): AssetMeta {
   const size = sizes[name] ?? managed;

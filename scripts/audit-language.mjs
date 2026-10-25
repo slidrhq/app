@@ -17,13 +17,10 @@ const decoder = new TextDecoder('utf-8', { fatal: true });
 // Documentation is deliberately not covered by content-directory exceptions.
 const groups = [
   ['Translations', /(?:^|\/)i18n\/|\/messages\.ts$/],
-  [
-    'Multilingual presentation content',
-    /^(?:packages\/templates\/src\/authoring\/(?:.*\.(?:ts|html)|tools\/merge-into-library\.mjs)|desktop\/scripts\/(?:frames-magnets\/.*|generate-frames-catalog\.mjs|export-templates\.mjs))$/,
-  ],
+  ['Multilingual presentation content', /^packages\/templates\/src\/authoring\/.*\.(?:ts|html)$/],
   [
     'Language, RTL and UI test data',
-    /(?:\.(?:test|spec)\.[cm]?[jt]sx?$|\.(?:fixture|cases)\.json$|\/(?:fixtures\.[jt]s|tests\.rs)$|^(?:desktop\/(?:e2e|packaged)\/|desktop\/eval\/(?:conversion-cases\/|.*\.json$)|docs\/reference-decks\/scripts\/)|\/fixtures\/)/,
+    /(?:\.(?:test|spec)\.[cm]?[jt]sx?$|\.(?:fixture|cases)\.json$|\/(?:fixtures\.[jt]s|tests\.rs)$|^(?:desktop\/(?:e2e|packaged)\/|desktop\/eval\/(?:conversion-cases\/|.*\.json$))|\/fixtures\/)/,
   ],
   ['Recorded harness fixtures', /^desktop\/src-tauri\/src\/harness\/claude_code\/.*\.jsonl$/],
   ['Generated runtime and chart dependencies', /\.generated\.ts$/],

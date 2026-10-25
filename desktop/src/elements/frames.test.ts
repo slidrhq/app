@@ -763,8 +763,8 @@ describe.skipIf(!catalog)('the small pictures of the magnets', () => {
     expect(frameRev({ ...summer, label: { en: 'Another', he: 'אחר' } })).toBe(frameRev(summer));
   });
 
-  // Fails when the catalogue was written again and the pictures were not: until
-  // `node scripts/generate-frames-thumbs.mjs` runs, the panel draws those magnets live.
+  // Fails when the catalogue was written again and the pictures were not: until they are made
+  // again, the panel draws those magnets live.
   it('are in the media library for every such magnet, of the drawing it has now', async () => {
     const index = (await readMediaJson<{
       scale: number;

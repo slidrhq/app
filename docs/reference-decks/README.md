@@ -28,8 +28,8 @@ One HTML file per deck, with no scripts and no external URLs. Its `<head>` holds
 - `<style data-part="theme">`: the theme as CSS variables (`--color-*`, `--font-heading`,
   `--font-body`, `--radius`, `--shadow`) and the body text style. In the app these come from the
   deck's theme; a test keeps them equal to the template's.
-- `<style data-part="fonts">`: `@font-face` rules with the font files embedded, written by
-  `scripts/build.mjs` from the font stacks of the theme block. Only fonts of the built-in library.
+- `<style data-part="fonts">`: `@font-face` rules with the font files embedded, from the font
+  stacks of the theme block. Only fonts of the built-in library.
 - `<style data-part="page">`: the page around the slides (stacking, scaling to the window). Not
   part of any slide.
 - `<style data-part="deck">`: what the slides share. It goes with every slide that is handed to
@@ -85,22 +85,13 @@ And what writing the first deck taught, each of them measured (ADR-039):
 - No pseudo-elements, no clipping containers, no transforms, no Unicode arrows (the Latin
   subsets of the fonts do not hold them; draw them in SVG).
 
-## Scripts
+## Where they are
 
-Run from the repository root.
-
-- `node docs/reference-decks/scripts/build.mjs [deck …]` embeds the fonts, writes the asset ids
-  and rebuilds `index.html`.
-- `node docs/reference-decks/scripts/shots.mjs [deck …]` takes a picture of every slide and a
-  contact sheet per deck into `desktop/test-results/templates/reference/` (not in git).
-- `pnpm test:browser` runs the decks through the conversion engine and the lint and writes
-  `desktop/test-results/templates/reference-report.json`;
-  `node docs/reference-decks/scripts/report.mjs` prints it. The same run writes
-  `rebuilt-report.json` beside it: the sample deck of every template as the renderer draws it,
-  which is what `index.html` is built from.
-- `node docs/reference-decks/scripts/picture.mjs <name> "<what it shows>" [--grid CxR]` generates
-  a picture through Codex CLI, cuts it and stores it as WebP in `images/`; with `--from <file>` it
-  cuts a picture that already exists. Every generation uses a paid quota.
+The decks are files of the media library, `templates/reference-decks/`: their index is
+https://media.slidr.studio/templates/reference-decks/index.html. The scripts that built them,
+embedded their fonts and made their pictures are gone with the library's local copy
+(docs/adr/ADR-114). `pnpm test:browser` still runs them through the conversion engine and the lint
+and writes `desktop/test-results/templates/reference-report.json`.
 
 ## Revising a template
 
@@ -116,4 +107,4 @@ A template is one file. To change one, or to draw a new one:
 3. Each run leaves pictures under `desktop/test-results/design/templates/` (not in git): a
    contact sheet of the sample in each language, every slide at full size, each library deck on
    the template, and `<id>.findings.json` with every finding, warnings and notes included.
-4. `pnpm test:browser` and the build script then refresh `index.html`.
+4. `pnpm test:browser` then writes the report of every deck.

@@ -5,8 +5,8 @@ import { frameRev, picturedAhead, type PhotoFrame } from './frames';
  * The small pictures of the event magnets. A magnet is a whole design: a card, stickers with
  * photographs in them, lines of words. Drawn by the renderer, the hundred of them were built
  * again each time the group was opened, behind a loading state of seconds. So each has a picture
- * that was made ahead, of the renderer's own drawing, in Hebrew and in English
- * (`scripts/generate-frames-thumbs.mjs`), and the panel shows that.
+ * that was made ahead, of the renderer's own drawing, in Hebrew and in English, and the panel
+ * shows that.
  *
  * The pictures are in the media library, `images/frames/<language>/<frame>.webp`, with an index
  * that says for each the word of what it was drawn from (`frameRev`). A frame that has no

@@ -1,5 +1,5 @@
 /*
- * The artwork of a decorated photo frame (`generate-frames-catalog.mjs`), as an SVG that lays
+ * The artwork of a decorated photo frame (`desktop/src/elements/frames.ts`), as an SVG that lays
  * itself out. A frame on a slide is made larger and given other proportions, and its artwork
  * keeps its size: a border stays as thick as it is, a corner as round, a sticker as large, and
  * the opening for the photograph takes up the change. So the artwork is not a picture of one

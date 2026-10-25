@@ -37,9 +37,8 @@ import type { Plugin } from 'vite';
  *   templates/<id>/template.json   each of them as a deck takes it (written here)
  *   templates/pictures.json        the pictures of their samples, by id (written here)
  *
- * Here are the two things Node does with it: a dev server serves it to a page in a plain
- * browser, as the core's `media` protocol does in the app; and an author's copy of it is staged
- * as a site that a dev server reads (`SLIDR_MEDIA_URL`).
+ * What Node does with it: a dev server serves it to a page in a plain browser, as the core's
+ * `media` protocol does in the app.
  */
 
 /** Where a dev server serves the library to a page in a plain browser. */
@@ -235,9 +234,8 @@ export function templateFiles(catalog: TemplateCatalog): Map<string, string> {
 export const DESIGN_CATALOGS = ['index.json', 'managed.json'] as const;
 
 /**
- * How the pictures of the designs made ahead are drawn (`scripts/generate-design-thumbs.mjs`): a
- * new number puts every one of them out of date, and the galleries draw the designs again until
- * the script has run.
+ * How the pictures of the designs made ahead are drawn: a new number puts every one of them out
+ * of date, and the galleries draw the designs again until they are drawn anew.
  */
 export const DESIGN_DRAWING = 1;
 
@@ -371,7 +369,7 @@ const SITE_FILES: Record<string, string> = {
 };
 
 /**
- * The files of the library as an author's copy (`source`) publishes them, by their place in it:
+ * The files of the library as a folder of it (`source`) holds them, by their place in it:
  * the published folders, and the files made from the catalogs of the templates and the designs.
  */
 export function libraryFiles(source: string): Map<string, Buffer> {
@@ -396,7 +394,7 @@ export function libraryFiles(source: string): Map<string, Buffer> {
 }
 
 /**
- * Writes the site of the library from an author's copy (`source`) into `target`, which is
+ * Writes the site of the library from a folder of it (`source`) into `target`, which is
  * emptied first: the files it publishes (`libraryFiles`), the manifest of them all, and the files
  * of the site. Returns the manifest.
  */

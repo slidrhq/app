@@ -47,8 +47,8 @@ import {
  * so a deck shows it wherever it is opened. The magnet of an event comes with stickers, captions
  * and labels beside its picture: on a slide it is a group, the picture and those around it.
  *
- * The catalogue says what is offered, group by group; `scripts/generate-frames-catalog.mjs`
- * writes it. It is read as text and parsed the first time the frames are shown.
+ * The catalogue says what is offered, group by group (`elements/catalogs/frames-catalog.json` of
+ * the library). It is read as text and parsed the first time the frames are shown.
  */
 
 /** The groups of frames, in the order the panel shows them. */
@@ -73,7 +73,7 @@ export type FrameGroup = (typeof FRAME_GROUPS)[number];
 
 /**
  * The sets of the magnets, in the order the panel shows them: what the event is, or that the
- * magnet is a style with no event (`MAGNET_SETS` in `scripts/frames-magnets.mjs`).
+ * magnet is a style with no event.
  */
 export const MAGNET_SETS = [
   'family',
@@ -521,8 +521,7 @@ export function frameSizeOn(frame: PhotoFrame, slide: Size): Size {
 
 /*
  * A magnet's card and its photograph are two elements (ADR-095). The card's drawing has a window
- * for the photograph, cut by its mask `border`: the card in white, the window in black
- * (`frames-magnets/kit.mjs`). On a slide the card lies under the photograph with its window
+ * for the photograph, cut by its mask `border`: the card in white, the window in black. On a slide the card lies under the photograph with its window
  * filled, so the photograph can be moved and sized on it like any picture. The photograph is cut
  * by the card as it was drawn, window and all: it shows wherever that card does not paint, as it
  * did when the card lay over it, and the window goes where the photograph goes.
@@ -953,7 +952,7 @@ export function followsTheme(frame: PhotoFrame): boolean {
 
 /**
  * Whether the panel shows a frame from a small picture that was made ahead
- * (`scripts/generate-frames-thumbs.mjs`), not from a drawing of the renderer: a whole design,
+ * (`images/frames/` of the library), not from a drawing of the renderer: a whole design,
  * with its stickers and its words, that looks the same in every deck. A hundred of those drawn
  * live are tens of thousands of nodes, and megabytes of pictures to clean, each time they are
  * shown.

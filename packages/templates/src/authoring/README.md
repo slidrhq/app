@@ -3,14 +3,12 @@
 The sources of three technology templates (Anan, Shvav and Mutzar), of Atlas, a template written
 in every language of the app, and of the ready-made slides of Elements → Designs, the pictures of their samples, and the scripts that
 render, check and package them. The app does not read this folder. It reads the media library
-(docs/media-library.md). What is authored here is merged into a copy of the library by
-`tools/merge-into-library.mjs`; since `pnpm media:publish` is gone (docs/adr/ADR-114), nothing
-carries that copy into the library yet.
+(docs/media-library.md). Nothing carries what is authored here into the library now: its local
+copy, `tools/merge-into-library.mjs` and `pnpm media:publish` are gone (docs/adr/ADR-114).
 
-Kod and Magen, the other technology templates of the library, are written in the author's copy
-of the library (`archive/templates-source/`) and put into its catalog by
-`desktop/scripts/export-templates.mjs`, not here: a template of that id authored here would
-take their place when merged.
+Kod and Magen, the other technology templates of the library, have no sources any more: the
+library's catalog is what they are. A template of that id authored here would take their place
+when merged.
 
 | Path                                   | What it is                                                                                                                               |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -56,12 +54,10 @@ sample is drawn, draws a scene as its parts rather than as one drawing the size 
 keeps its drawings clear of the foot. The check fails a template whose layouts keep their drawings,
 and lists the grounds that stay, to look at.
 
-To look at it, stage a copy of the library and bring up the servers, then take screenshots of the
-review page (`desktop/dev/review.html`):
+To look at it, bring up the dev server (`pnpm dev`, on port 1420, which reads the published
+library), then take screenshots of the review page (`desktop/dev/review.html`):
 
 ```sh
-node src/authoring/tools/stage.mjs ../../../Slidr-media /tmp/slidr-site
-SITE=/tmp/slidr-site src/authoring/tools/up.sh
 SLIDR_CHECK=1 node src/authoring/tools/shot.mjs /tmp/anan-he.png "t=anan&lang=he&w=470&cols=4"
 SLIDR_CHECK=1 node src/authoring/tools/shot.mjs /tmp/anan-en-1.png "t=anan&lang=en&slide=0&w=1280"
 SLIDR_CHECK=1 node src/authoring/tools/shot.mjs /tmp/designs.png "d=group:hitech&src=new&lang=he&w=460"
@@ -73,13 +69,4 @@ then record it with `tools/pictures.py <id>-<name> <out.png>` for a template, or
 with `tools/tone.py`.
 
 The acceptance tests of the app (`desktop/src/templates/acceptance.ts`, `acceptDraft`) are the
-final word on a template: run them against the library with the template merged into it.
-
-## Into the library
-
-```sh
-src/authoring/tools/package.sh /tmp/slidr-tech            # the catalog fragments, pictures, merge script, sources
-node /tmp/slidr-tech/merge-into-library.mjs ../../../Slidr-media
-```
-
-The merged copy is not published: `pnpm media:publish` is gone (docs/adr/ADR-114).
+final word on a template.

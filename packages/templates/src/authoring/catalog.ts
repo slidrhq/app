@@ -1,6 +1,6 @@
 /**
  * Writes what is authored here as the media library holds it, into a folder laid out like the
- * library (docs/media-library.md), for `merge-into-library.mjs` to add to an author's copy:
+ * library (docs/media-library.md):
  *
  *   templates/catalog.tech.json      { templates, samples, pictures } of the templates authored here
  *   images/templates/<name>.webp     the pictures of their samples

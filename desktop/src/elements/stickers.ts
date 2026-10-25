@@ -14,8 +14,8 @@ import {
  * The colour art of the Elements panel: graphics in four styles, and every emoji. Each is a
  * drawing of an art set, and goes onto a slide as an `svg` element with the drawing's own
  * markup, so a deck carries it wherever it is opened. A set is a package of the app's, or the
- * drawings taken from a far larger set, copied into `art/` by the script that writes the
- * graphics catalogue (`scripts/generate-graphics-catalog.mjs`).
+ * drawings taken from a far larger set, in `elements/art/` of the library beside the graphics
+ * catalogue.
  *
  * Nothing of it is loaded when the app starts. The two catalogues say what is offered, in what
  * order and under which words; a set's drawings are megabytes of JSON, read as text and parsed

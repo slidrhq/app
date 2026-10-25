@@ -3,7 +3,7 @@ import type { FontFamilyEntry } from '@slidr/model';
 
 /*
  * The built-in fonts of decks (SPEC appendix B): the catalog of the media library
- * (`fonts/catalog.json`, written by `scripts/gen-builtin-fonts.mjs`) and its files, read as the
+ * (`fonts/catalog.json`) and its files, read as the
  * app starts. Without the library there are none: text is set in the fonts of the system, and
  * the font lists offer those and the user's own.
  */

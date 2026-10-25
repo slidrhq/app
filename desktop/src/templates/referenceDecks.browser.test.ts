@@ -3,8 +3,7 @@
  * WebView2 uses. This is a measurement more than a test: IMP-06 asks for 95% editability for
  * HTML written by the conventions, and these decks are the first HTML of that kind that was
  * designed rather than written to exercise the engine. What is asserted is only what must hold
- * whatever the numbers are; the numbers go to `test-results/templates/reference-report.json`,
- * from which `docs/reference-decks/scripts/build.mjs` writes the index page.
+ * whatever the numbers are; the numbers go to `test-results/templates/reference-report.json`.
  */
 import type { LintFinding } from '@slidr/agent-tools';
 import { createConversionService } from '@slidr/html-import';

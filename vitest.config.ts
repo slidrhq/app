@@ -2,15 +2,11 @@ import { fileURLToPath } from 'node:url';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  // The template catalog and its pictures live in the media library beside the repository
-  // (docs/media-library.md). Tests in a DOM environment load modules as a browser would, and
-  // those may only read files the server allows.
+  // Tests in a DOM environment load modules as a browser would, and those may only read files
+  // the server allows: the repository's. The media library is read from its site.
   server: {
     fs: {
-      allow: [
-        fileURLToPath(new URL('./', import.meta.url)),
-        fileURLToPath(new URL('../Slidr-media/', import.meta.url)),
-      ],
+      allow: [fileURLToPath(new URL('./', import.meta.url))],
     },
   },
   test: {
