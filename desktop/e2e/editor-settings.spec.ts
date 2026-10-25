@@ -43,7 +43,7 @@ test('the settings are a tab for each topic, and a tab shows only its own sectio
   await openApp(page);
   await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
   const tabs = page.getByRole('tablist', { name: 'נושאי ההגדרות' }).getByRole('tab');
-  await expect(tabs).toHaveText(['כללי', 'Agent', 'תמונות', 'גופנים', 'אודות']);
+  await expect(tabs).toHaveText(['כללי', 'סוכן', 'תמונות', 'גופנים', 'אודות']);
   // The screen opens on its first topic: the theme and the language.
   await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
   expect(await shown(page)).toEqual(['appearance', 'language']);

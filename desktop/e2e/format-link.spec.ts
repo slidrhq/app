@@ -107,12 +107,21 @@ test.describe('a table', () => {
     expect(cells[1]?.[0]?.content.paragraphs[0]?.runs).toEqual([{ text: 'Our site' }]);
   });
 
-  test('at 1366 the row of a table has no room for the button, and Ctrl+K still opens the link', async ({
+  test('at 1366 with a wide Tool Panel the row of a table has no room for the button, and Ctrl+K still opens the link', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     for (const lang of ['he', 'en'] as const) {
       await openApp(page, { lang });
+      // With the panel at its default width the row of a table holds all its tools at 1366, and
+      // at its widest (UI-01) even the compact ones scroll. Between, at 518 px, the compact
+      // tools fit: the widest, then six steps of the keyboard back.
+      const splitter = page.getByTestId('panel-splitter');
+      await splitter.focus();
+      await page.keyboard.press('End');
+      for (let i = 0; i < 6; i++)
+        await page.keyboard.press(lang === 'he' ? 'ArrowRight' : 'ArrowLeft');
+      await expect(splitter).toHaveAttribute('aria-valuenow', '518');
       await addTable(page, { texts });
       await selectTable(page);
       await expect(row(page).getByTestId('link-anchor')).toHaveCount(1);

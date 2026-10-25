@@ -37,13 +37,14 @@ test('FHD: the refreshed regions and the slide fitted below its floating tools',
   expect((await box(page, 'title-bar')).height).toBe(56);
   await expect(page.getByTestId('top-tools-a')).toHaveCount(0);
   expect((await box(page, 'top-tools-b')).height).toBe(44);
-  expect((await box(page, 'filmstrip')).height).toBe(132);
+  // The strip of 160 × 90 thumbnails, as `a11y-filmstrip.spec.ts` measures it.
+  expect((await box(page, 'filmstrip')).height).toBe(96);
   expect((await box(page, 'status-bar')).height).toBe(32);
   expect((await box(page, 'activity-bar')).width).toBe(76);
   expect((await box(page, 'tool-panel')).width).toBe(360);
 
   const stage = await box(page, 'stage');
-  expect([stage.width, stage.height]).toEqual([1484, 812]);
+  expect([stage.width, stage.height]).toEqual([1484, 848]);
   const surface = await box(page, 'stage-surface');
   const tools = await box(page, 'top-tools-b');
   expect(surface.y).toBeGreaterThanOrEqual(tools.y + tools.height);
@@ -185,7 +186,7 @@ test('an old saved panel width resets to the compact default once', async ({ pag
       };
       return { version: saved.version, share: saved.state.panelShare };
     }),
-  ).toEqual({ version: 4, share: null });
+  ).toEqual({ version: 6, share: null });
 
   const splitter = page.getByTestId('panel-splitter');
   await splitter.focus();

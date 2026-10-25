@@ -71,8 +71,8 @@ for (const lang of ['he', 'en'] as const) {
     await expect(more(page, 'end')).toBeVisible();
     await expect(more(page, 'start')).toHaveCount(0);
     expect(await inView(page, 'arrange-menu')).toBe(false);
-    // The "AI" button is not one of the tools that scroll: it is where it always is.
-    await expect(rowB(page).getByRole('button').last()).toBeInViewport({ ratio: 1 });
+    // The row itself stays within the window: only its tools scroll, inside it.
+    await expect(rowB(page)).toBeInViewport({ ratio: 1 });
 
     // The arrow brings the rest of the row into view, to its very end.
     await press(page, 'end');
@@ -130,39 +130,41 @@ test('another selection starts its row from the first tool', async ({ page }) =>
 });
 
 for (const lang of ['he', 'en'] as const) {
-  test(`slide insertion tools scroll while document actions stay in view, ${lang}`, async ({
+  test(`slide insertion tools fit while document actions stay in view, ${lang}`, async ({
     page,
   }) => {
     await open(page, lang);
     await select(page, []);
     const row = rowB(page);
-    const arrow = (side: 'start' | 'end') => more(page, side);
-    const names = lang === 'he' ? { file: 'קובץ', icon: 'אייקון' } : { file: 'File', icon: 'Icon' };
-    await widen(page);
+    const names =
+      lang === 'he'
+        ? { file: 'קובץ', last: 'וידאו או אודיו' }
+        : { file: 'File', last: 'Video or audio' };
+    // The panel at its widest: the row of no selection is short (the icons are in Elements now),
+    // so it holds all its tools there, and nothing of it scrolls.
+    await page.getByTestId('panel-splitter').focus();
+    await page.keyboard.press('End');
+    // 45% of the window (UI-01).
+    await expect
+      .poll(async () => Math.round((await page.getByTestId('tool-panel').boundingBox())!.width))
+      .toBeGreaterThan(600);
 
-    // The ends of the row are where they were: the File menu, undo, the zoom, and the three
-    // buttons at the end, "Present" last. Before, the row ran out of the window with them.
+    // The ends of the window are where they were: the File menu, and "Present" last.
     await expect(page.getByTestId('present-button')).toBeInViewport({ ratio: 1 });
     await expect(
       page.getByTestId('title-bar').getByRole('button', { name: names.file }),
     ).toBeInViewport({ ratio: 1 });
-    // What gave way is the insert buttons: the last of them is reached by the arrow.
-    const last = row.getByRole('button', { name: names.icon, exact: true });
-    const seen = () =>
-      last.evaluate((button) => {
+    expect(await hidden(page)).toBe(0);
+    await expect(more(page, 'start')).toHaveCount(0);
+    await expect(more(page, 'end')).toHaveCount(0);
+    const last = row.getByRole('button', { name: names.last, exact: true });
+    expect(
+      await last.evaluate((button) => {
         const room = button.closest('[data-row-tools]')!.getBoundingClientRect();
         const box = button.getBoundingClientRect();
         return box.left >= room.left - 0.5 && box.right <= room.right + 0.5;
-      });
-    expect(await seen()).toBe(false);
-    // The strip is short here, and a press brings a part of it: as many presses as it takes.
-    for (let i = 0; i < 6 && (await arrow('end').count()) > 0; i++) {
-      await arrow('end').locator('button').click();
-      await page.waitForTimeout(100);
-    }
-    await expect.poll(seen).toBe(true);
-    await expect(arrow('end')).toHaveCount(0);
-    await expect(arrow('start')).toBeVisible();
+      }),
+    ).toBe(true);
   });
 }
 

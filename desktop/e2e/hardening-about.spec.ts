@@ -62,9 +62,9 @@ test('the diagnostics log opens from its end, an entry opens in full, and the lo
   await expect(entries.last()).toContainText('idle');
   await expect(entries.last()).toBeInViewport();
 
-  // An entry in full: the data as it was logged, Hebrew and all.
+  // An entry in full: the data as it was logged.
   await entries.nth(3).getByRole('button').click();
-  await expect(entries.nth(3).locator('pre')).toContainText('"name": "פתיחה"');
+  await expect(entries.nth(3).locator('pre')).toContainText('"name": "Opening"');
   await entries.nth(3).getByRole('button').click();
   await expect(entries.nth(3).locator('pre')).toHaveCount(0);
 

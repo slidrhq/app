@@ -39,6 +39,24 @@ describe('cleaning an SVG file', () => {
     expect(new XMLSerializer().serializeToString(root)).not.toMatch(/alert|javascript:|onerror/);
   });
 
+  it('takes handler attributes out before parsing, and leaves text that only looks like one', () => {
+    // A handler that is parsed is reported against the page's content policy, though it never runs.
+    const root = cleaned(
+      svg(
+        `<!-- <rect onclick="x"/> --><rect width="5" height="5"
+           ONMOUSEOVER = 'alert(1)' title="a onclick='b'" onclick="alert(2)"/>
+         <text x="1" y="9"> click on="this"</text>`,
+      ),
+    );
+    expect(root.querySelector('rect')?.getAttributeNames().sort()).toEqual([
+      'height',
+      'title',
+      'width',
+    ]);
+    expect(root.querySelector('rect')?.getAttribute('title')).toBe("a onclick='b'");
+    expect(root.querySelector('text')?.textContent).toBe(' click on="this"');
+  });
+
   it('keeps references inside the file, and drops every one that leaves it', () => {
     const root = cleaned(
       svg(

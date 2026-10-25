@@ -87,6 +87,8 @@ test.describe('shell states', () => {
   test('object AI with a selection, collapsed afterwards, Hebrew dark', async ({ page }) => {
     await prepare(page, 'dark', 'he');
     await page.goto('/');
+    // The load event comes before the modules that wait for the media library have run.
+    await expect(page.getByTestId('stage-frame')).toBeVisible();
     await page.evaluate(() => {
       const editor = window.slidr;
       if (!editor) throw new Error('window.slidr is missing');

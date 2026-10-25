@@ -6,6 +6,7 @@ import {
   markerWidthEm,
   readsAsNumber,
   runStyle,
+  withoutEventHandlers,
 } from '@slidr/renderer';
 import type { JSONContent } from '@tiptap/core';
 import { Slice, type Node as PmNode } from '@tiptap/pm/model';
@@ -420,6 +421,9 @@ export function clipboardPlugin(context: PasteContext): Plugin {
           plainUntil = event.shiftKey ? performance.now() + ARMED_MS : 0;
         return false;
       },
+      // ProseMirror parses the clipboard's HTML before `handlePaste` reads it: without its event
+      // handlers, which the page's content policy would report as they are parsed.
+      transformPastedHTML: (html) => withoutEventHandlers(html),
       handlePaste(view, event) {
         const data = event.clipboardData;
         const plain = performance.now() < plainUntil;

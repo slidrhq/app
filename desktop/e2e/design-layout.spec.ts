@@ -42,7 +42,7 @@ test('moves the slide to another layout with its content, as one step', async ({
   await tool(page).click();
   // Every layout of the deck, each drawn with this slide on it; the slide's own is marked.
   await expect(page.getByTestId('layout-tool-choices').locator('[data-layout-choice]')).toHaveCount(
-    14,
+    before.layouts.length,
   );
   await expect(choice(page, 'l_zerem_cards')).toHaveAttribute('aria-pressed', 'true');
   await expect(choice(page, 'l_zerem_timeline')).toContainText('ציר זמן');
@@ -77,10 +77,14 @@ test('a slide without a layout takes one; a deck without layouts says so', async
   await expect(tzuk).toHaveAttribute('data-current', 'true');
   await tool(page).click();
   await choice(page, 'l_tzuk_quote').click();
-  const slide = (await deck(page)).slides[0]!;
+  const after = await deck(page);
+  const slide = after.slides[0]!;
   expect(slide.layoutId).toBe('l_tzuk_quote');
-  // The empty slide got what "new slide" would have given it.
-  expect(slide.elements.map((e) => e.role)).toEqual(['quote', 'attribution', 'caption', 'footer']);
+  // The empty slide got what "new slide" would have given it: after the layout's objects
+  // (ADR-094), an element for each placeholder.
+  const quote = after.layouts.find((l) => l.id === 'l_tzuk_quote')!;
+  const seated = slide.elements.slice(quote.objects?.length ?? 0);
+  expect(seated.map((e) => e.role)).toEqual(['quote', 'attribution', 'caption', 'footer']);
 });
 
 for (const { lang, theme, viewport, name } of [

@@ -1,5 +1,5 @@
 import type { AssetMeta } from '@slidr/model';
-import { cleanPicture, normalizeColor, SVG_NAMESPACE } from '@slidr/renderer';
+import { cleanPicture, normalizeColor, SVG_NAMESPACE, withoutEventHandlers } from '@slidr/renderer';
 
 /*
  * Importing an SVG file (SHP-06, SEC-06). A small SVG becomes an `svg` element that holds its
@@ -83,7 +83,9 @@ function inlineStylesheets(root: Element): void {
  */
 export function cleanSvg(text: string): string | undefined {
   if (text.length > MAX_INLINE_SVG) return undefined;
-  const parsed = new DOMParser().parseFromString(text, 'image/svg+xml');
+  // Handlers out before parsing: each one parsed is reported against the page's content
+  // policy, though none runs. `cleanPicture` is what makes the markup safe.
+  const parsed = new DOMParser().parseFromString(withoutEventHandlers(text), 'image/svg+xml');
   const root = parsed.documentElement;
   if (
     root.localName !== 'svg' ||

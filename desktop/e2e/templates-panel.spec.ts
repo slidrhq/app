@@ -69,8 +69,9 @@ test('a new deck opens on the default template, and File > New does too', async 
     localStorage.setItem('slidr.templates', JSON.stringify({ defaultId: 'zerem' })),
   );
 
-  // The next start of the app.
+  // The next start of the app, once its editor is up.
   await page.reload();
+  await page.waitForFunction(() => 'slidr' in window && window.slidr !== undefined);
   const started = await deck(page);
   expect(started.theme.id).toBe('zerem');
   expect(started.slides).toHaveLength(1);
@@ -244,7 +245,9 @@ test('the panel reads in English, with no missing string', async ({ page }) => {
   const errors = collectErrors(page);
   await openTemplates(page, { lang: 'en', defaultTemplate: 'zerem' });
   await expect(
-    panel(page).getByRole('button', { name: /^Show the slides of the template "/ }).first(),
+    panel(page)
+      .getByRole('button', { name: /^Show the slides of the template "/ })
+      .first(),
   ).toBeVisible();
   await expect(await openProperties(page)).toContainText('Save as a personal template');
   expect((await deck(page)).meta.dir).toBe('ltr');
@@ -380,6 +383,14 @@ test('a language offers the templates written in it: in the panel, on the welcom
   page,
 }) => {
   const errors = collectErrors(page);
+  // The library's catalog has every template written in German by now, so the app is served one
+  // where the last two are not: the test is of the choice, not of what has been written.
+  await page.route('**/media-library/templates/catalog.json', async (route) => {
+    const response = await route.fetch();
+    const catalog = (await response.json()) as { samples: Record<string, Record<string, unknown>> };
+    for (const id of Object.keys(catalog.samples).slice(-2)) delete catalog.samples[id]!.de;
+    await route.fulfill({ response, json: catalog });
+  });
   await openTemplates(page);
   const cards = panel(page).getByTestId('template-library').locator('[data-template]');
   const idsOf = (shown: Locator, mark: string): Promise<string[]> =>

@@ -19,6 +19,7 @@ import {
   type Slide,
   type Stroke,
 } from '@slidr/model';
+import { extraShapes } from '../extraShapes';
 import { shapePresets } from '../geometry';
 
 export { chartDeck } from './chartDeck';
@@ -129,7 +130,10 @@ const STROKES: (Stroke | undefined)[] = [
 
 function shapesSlide(): Slide {
   const elements: Element[] = [];
-  shapePresets.forEach((preset, i) => {
+  // The renderer's own presets, five rows of eight. The shapes of the library added later
+  // (`extraShapes`) are plain paths, drawn as a path geometry is; they would run off the slide.
+  const presets = shapePresets.filter((preset) => !(preset in extraShapes));
+  presets.forEach((preset, i) => {
     const col = i % 8;
     const row = Math.floor(i / 8);
     const x = 60 + col * 228;

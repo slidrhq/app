@@ -150,7 +150,10 @@ export function MaskEditor({ target }: { target: ImageTarget }) {
         />
       )}
       <Field label={t('image.maskShapes')}>
-        <div className="grid grid-cols-8">
+        {/* The library has hundreds of shapes: they scroll, so that the popover fits the window
+            above a trigger low in the panel as well as below row B. The list reaches into the
+            popover's padding, where its scrollbar goes. */}
+        <div className="-me-3 grid max-h-72 grid-cols-8 overflow-y-auto overscroll-contain [scrollbar-width:thin]">
           {maskShapes().map((preset) => (
             <MaskChoiceButton
               key={preset}

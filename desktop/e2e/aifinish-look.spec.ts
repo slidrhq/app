@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { collectErrors, input, openTool, panel } from './aitools-helpers';
-import { closeProperties, openProperties } from './templates-helpers';
+import { builtInCount, closeProperties, openProperties } from './templates-helpers';
 import {
   deck,
   fontCard,
@@ -24,6 +24,26 @@ import {
 /** The curated pair with a serif for headings and a sans for the body. */
 const SERIF = 'Noto Serif Hebrew|Playfair Display|Noto Sans Hebrew|DM Sans';
 
+/** The curated palettes and font pairs, offered after those of the templates. */
+const CURATED = 7;
+
+/**
+ * How many font pairs the built-in templates have between them: templates that share a pair offer
+ * it once. Counted from the library's catalog, as templates reach it without a release.
+ */
+async function builtInFontPairs(page: Page): Promise<number> {
+  return page.evaluate(async () => {
+    const answer = await fetch('/media-library/templates/catalog.json');
+    const catalog = (await answer.json()) as {
+      templates: { theme: { fonts: Record<'heading' | 'body', { he: string; latin: string }> } }[];
+    };
+    const pairs = catalog.templates.map(({ theme: { fonts: f } }) =>
+      [f.heading.he, f.heading.latin, f.body.he, f.body.latin].join('|'),
+    );
+    return new Set(pairs).size;
+  });
+}
+
 const PNG_1X1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAQAAAABCAYAAAD5PA/NAAAAEElEQVR42mNk+M9QzwAEAAmGAYCF+yOnAAAAAElFTkSuQmCC',
   'base64',
@@ -38,7 +58,9 @@ test('the template gallery: a hover shows the deck on the template, a click swit
   const depth = await undoDepth(page);
   expect(before.theme.id).toBe('zerem');
   expect(before.slides).toHaveLength(3);
-  await expect(look(page, 'template').locator('[data-template]')).toHaveCount(21);
+  await expect(look(page, 'template').locator('[data-template]')).toHaveCount(
+    await builtInCount(page),
+  );
   await expect(templateCard(page, 'zerem')).toHaveAttribute('data-current', 'true');
   await expect(templateCard(page, 'zerem')).toHaveAttribute('aria-pressed', 'true');
   // A cover is the template's opening slide, with the photograph of one that opens with one.
@@ -95,8 +117,10 @@ test('the palettes: a hover shows the colours on the slide, a click sets them in
   await openLook(page);
   const before = await deck(page);
   const depth = await undoDepth(page);
-  // The palettes of the twenty-one templates, then the seven curated ones; the deck's own is marked.
-  await expect(look(page, 'palette').locator('[data-palette]')).toHaveCount(28);
+  // The palettes of the templates, then the seven curated ones; the deck's own is marked.
+  await expect(look(page, 'palette').locator('[data-palette]')).toHaveCount(
+    (await builtInCount(page)) + CURATED,
+  );
   await expect(paletteCard(page, 'template:zerem')).toHaveAttribute('data-current', 'true');
   await expect(look(page, 'palette').locator('[data-current]')).toHaveCount(1);
 
@@ -143,8 +167,10 @@ test('the font pairs: a hover shows the fonts on the slide, a click sets them in
   await openLook(page);
   const before = await deck(page);
   const depth = await undoDepth(page);
-  // The font pairs of the twenty-one templates, two of which share one, then the seven curated ones.
-  await expect(look(page, 'fonts').locator('[data-fonts]')).toHaveCount(27);
+  // The font pairs of the templates, one for those that share one, then the seven curated ones.
+  await expect(look(page, 'fonts').locator('[data-fonts]')).toHaveCount(
+    (await builtInFontPairs(page)) + CURATED,
+  );
   await expect(look(page, 'fonts').locator('[data-current]')).toHaveCount(1);
   await expect(look(page, 'fonts').locator('[data-current]')).toHaveAttribute(
     'data-fonts',
@@ -276,13 +302,16 @@ test('a personal template is offered with its colours, and trying it shows its l
 
   // The Actions panel offers it after the built-in ones, with its palette; its fonts are Zerem's.
   await openTool(page, 'actions');
-  await expect(look(page, 'template').locator('[data-template]')).toHaveCount(22);
+  const builtIn = await builtInCount(page);
+  await expect(look(page, 'template').locator('[data-template]')).toHaveCount(builtIn + 1);
   await expect(templateCard(page, mine)).toHaveAttribute('data-current', 'true');
   await expect(templateCard(page, mine)).toContainText('המותג שלנו');
   await expect(templateCard(page, mine)).toContainText('אישית');
-  await expect(look(page, 'palette').locator('[data-palette]')).toHaveCount(29);
+  await expect(look(page, 'palette').locator('[data-palette]')).toHaveCount(builtIn + 1 + CURATED);
   await expect(paletteCard(page, `template:${mine}`)).toHaveAttribute('data-current', 'true');
-  await expect(look(page, 'fonts').locator('[data-fonts]')).toHaveCount(27);
+  await expect(look(page, 'fonts').locator('[data-fonts]')).toHaveCount(
+    (await builtInFontPairs(page)) + CURATED,
+  );
 
   await templateCard(page, 'tzuk').click();
   await expect(templateCard(page, 'tzuk')).toHaveAttribute('data-current', 'true');
@@ -341,8 +370,9 @@ test('in English, with no string missing', async ({ page }) => {
   await expect(look(page, 'template')).toContainText('Hover to see it on the slide');
   await expect(templateCard(page, 'zerem')).toContainText('Built-in');
   await expect(templateCard(page, 'zerem')).toContainText('In use in the deck');
-  // A template's palette is named after the template; a curated one in the UI's language.
-  await expect(deckPanel.getByRole('button', { name: 'Shvil', exact: true })).toHaveCount(2);
+  // A template and its palette are called what the template is in the UI's language (Shvil is
+  // Trail); a curated palette is named in it too.
+  await expect(deckPanel.getByRole('button', { name: 'Trail', exact: true })).toHaveCount(2);
   await expect(deckPanel.getByRole('button', { name: 'Forest', exact: true })).toBeVisible();
   await expect(
     deckPanel.getByRole('button', {

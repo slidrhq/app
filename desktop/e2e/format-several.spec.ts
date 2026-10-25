@@ -36,6 +36,15 @@ const boxes = [
 ];
 const ids = boxes.map((b) => b.id);
 
+/** Drags the Tool Panel to its widest, as the splitter allows (UI-01): row B is narrower. */
+async function widestPanel(page: Page): Promise<void> {
+  await page.getByTestId('panel-splitter').focus();
+  await page.keyboard.press('End');
+  await expect
+    .poll(async () => (await page.getByTestId('tool-panel').boundingBox())?.width ?? 0)
+    .toBeGreaterThan(0.44 * (page.viewportSize()?.width ?? 0));
+}
+
 async function open(page: Page, name: string): Promise<Locator> {
   await tool(page, name).click();
   await expect(page.getByRole('dialog')).toHaveCount(1);
@@ -114,15 +123,24 @@ test.describe('several text boxes', () => {
       for (const run of await runs(page, id)) expect(run.marks?.color).toEqual({ token: 'accent' });
     }
 
-    // Two boxes start at the side and one is centred: no alignment button is pressed.
-    const centre = tool(page, 'יישור הטקסט למרכז');
-    await expect(centre).toHaveAttribute('aria-pressed', 'false');
-    await expect(tool(page, 'יישור הטקסט לימין')).toHaveAttribute('aria-pressed', 'false');
+    // Two boxes start at the side and one is centred: no alignment of the menu is checked
+    // (ADR-078: the alignment is a menu in every layout).
+    const alignment = tool(page, 'יישור הטקסט');
+    const centre = page.getByRole('menuitemradio', { name: 'יישור הטקסט למרכז', exact: true });
+    await expect(alignment).toHaveAttribute('data-align', 'mixed');
+    await alignment.click();
+    await expect(centre).toHaveAttribute('aria-checked', 'false');
+    await expect(
+      page.getByRole('menuitemradio', { name: 'יישור הטקסט לימין', exact: true }),
+    ).toHaveAttribute('aria-checked', 'false');
     expect(await steps(page, () => centre.click())).toBe(1);
     for (const id of ids) {
       expect((await text(page, id)).content.paragraphs.map((p) => p.align)).toEqual(['center']);
     }
-    await expect(centre).toHaveAttribute('aria-pressed', 'true');
+    await expect(alignment).toHaveAttribute('data-align', 'center');
+    await alignment.click();
+    await expect(centre).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('Escape');
 
     await tool(page, 'סגנון טקסט: גוף הטקסט').click();
     expect(
@@ -383,9 +401,9 @@ test.describe('the row', () => {
   test('a row with no room for all the text tools holds them compact before it folds them', async ({
     page,
   }) => {
-    // At 1800 the row is about 1170 wide: the roomy tools take 1240 and more, the compact ones
-    // under 1100.
-    await page.setViewportSize({ width: 1800, height: 1032 });
+    // At 1366 the row is about 900 wide: the roomy tools take about 1030, the compact ones
+    // under 900.
+    await page.setViewportSize({ width: 1366, height: 768 });
     for (const lang of ['he', 'en'] as const) {
       await openApp(page, { lang });
       await addSelected(page, boxes);
@@ -397,12 +415,14 @@ test.describe('the row', () => {
     }
   });
 
-  test('at 1366 the text tools fold into one button, and work from its popover', async ({
+  test('at 1366 with the Tool Panel at its widest the text tools fold into one button, and work from its popover', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     for (const lang of ['he', 'en'] as const) {
       await openApp(page, { lang });
+      // The row is about 650 wide then: the compact tools do not fit either.
+      await widestPanel(page);
       await addSelected(page, boxes);
       await expect(row(page).getByTestId('text-fold').getByRole('button')).toBeVisible();
       await expect(row(page).getByRole('textbox')).toHaveCount(0);
@@ -418,9 +438,11 @@ test.describe('the row', () => {
     for (const id of ids) {
       for (const run of await runs(page, id)) expect(run.marks).toMatchObject({ weight: 700 });
     }
-    // All four alignments are there as buttons, as in a roomy row.
-    await expect(fold.getByRole('button', { name: 'Align text centre' })).toBeVisible();
-    await expect(fold.getByRole('button', { name: 'Justify text' })).toBeVisible();
+    // The alignment is its menu, as in the row (ADR-078), with all four alignments.
+    await fold.getByRole('button', { name: 'Text alignment', exact: true }).click();
+    await expect(page.getByRole('menuitemradio', { name: 'Align text centre' })).toBeVisible();
+    await expect(page.getByRole('menuitemradio', { name: 'Justify text' })).toBeVisible();
+    await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('stage-surface')).toBeFocused();
   });

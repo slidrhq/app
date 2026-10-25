@@ -175,7 +175,10 @@ for (const motion of ['reduce', 'no-preference'] as const) {
     });
     const strip = page.locator('[data-filmstrip]');
     // The strip has room for the new slides before the current one changes.
-    await expect.poll(() => strip.evaluate((el) => el.scrollWidth)).toBeGreaterThan(5000);
+    // (Thumbnails take the strip's height, so what fits is measured, not a width in pixels.)
+    await expect
+      .poll(() => strip.evaluate((el) => el.scrollWidth - el.clientWidth))
+      .toBeGreaterThan(3000);
     // Two frames after the change, and a second after it.
     const soon = await page.evaluate(async () => {
       window.slidr!.selection.getState().setCurrentSlide('s_far_25');

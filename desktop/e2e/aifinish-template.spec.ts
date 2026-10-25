@@ -45,9 +45,10 @@ test('a template from a description and a logo is previewed, saved, and a new de
   await expect(sent.getByTestId('attachment')).toHaveAttribute('data-kind', 'image');
   await turnEnds(page, 1);
 
-  // The draft, before anything is saved: every layout drawn, with its sample on it.
+  // The draft, before anything is saved: every layout drawn, with its sample on it: the three
+  // the agent made, and the text layout every template offers.
   await expect(draft(page)).toBeVisible();
-  await expect(draft(page).getByTestId('draft-layout')).toHaveCount(3);
+  await expect(draft(page).getByTestId('draft-layout')).toHaveCount(4);
   await expect(draft(page).getByTestId('draft-layout').first()).toContainText('פתיחה');
   await expect(draft(page).getByTestId('draft-name')).toHaveValue('חימר');
   await expect(draft(page)).not.toHaveAttribute('data-saved', /.+/);
@@ -65,7 +66,9 @@ test('a template from a description and a logo is previewed, saved, and a new de
   expect(during.slides).toEqual(before.slides);
   expect(Object.keys(during.assets)).toEqual([LOGO.assetId]);
   await page.getByTestId('activity-bar').locator('[data-panel="templates"]').click();
-  await expect(page.getByTestId('template-library').locator('[data-template^="personal_"]')).toHaveCount(0);
+  await expect(
+    page.getByTestId('template-library').locator('[data-template^="personal_"]'),
+  ).toHaveCount(0);
   await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
   await tab(page, 'chat');
 
@@ -75,11 +78,19 @@ test('a template from a description and a logo is previewed, saved, and a new de
   await expect(draft(page)).toHaveAttribute('data-saved', /^personal_/);
   const id = (await draft(page).getAttribute('data-saved'))!;
 
-  // It is in the library, under its name, with a cover.
+  // It is in the library, under its name, with a cover; the card of the panel is its picture
+  // alone, and the default is a preference of this machine.
   await page.getByTestId('activity-bar').locator('[data-panel="templates"]').click();
   const card = page.getByTestId('template-library').locator(`[data-template="${id}"]`);
   await expect(card).toContainText('חימר');
-  await expect(card).toContainText('ברירת מחדל');
+  await expect(card.getByTestId('template-cover')).toHaveAccessibleName(/חימר/);
+  expect(
+    await page.evaluate(
+      () =>
+        (JSON.parse(localStorage.getItem('slidr.templates') ?? '{}') as { defaultId?: string })
+          .defaultId,
+    ),
+  ).toBe(id);
 
   // File > New opens a deck on it: its theme, its layouts, an opening slide, and its logo.
   await page.getByTestId('title-bar').getByRole('button', { name: 'קובץ' }).click();
@@ -90,7 +101,12 @@ test('a template from a description and a logo is previewed, saved, and a new de
   const fresh = await deck(page);
   expect(fresh.theme.name).toBe('חימר');
   expect(fresh.theme.colors.primary).toBe('#b4552d');
-  expect(fresh.layouts.map((layout) => layout.archetype)).toEqual(['hero', 'cards', 'closing']);
+  expect(fresh.layouts.map((layout) => layout.archetype)).toEqual([
+    'hero',
+    'cards',
+    'closing',
+    'text',
+  ]);
   expect(fresh.slides).toHaveLength(1);
   expect(fresh.slides[0]!.layoutId).toBe(fresh.layouts[0]!.id);
   expect(Object.keys(fresh.assets)).toEqual([LOGO.assetId]);
@@ -112,7 +128,7 @@ test('a draft is improved in the chat, and saved when the user asks for it in wo
 
   // "Warmer": the next draft is the first with another palette, and takes its place.
   await say(page, 'הפוך את הפלטה לחמה יותר');
-  await expect(draft(page).getByTestId('draft-layout')).toHaveCount(3);
+  await expect(draft(page).getByTestId('draft-layout')).toHaveCount(4);
   const colours = await draftColours(page);
   expect(colours).toEqual({ count: 2, shown: '#c2410c', first: '#b4552d' });
 
@@ -151,7 +167,8 @@ test('the draft can be closed, and the form asks for a source', async ({ page })
   await turnEnds(page, 1);
   await expect(messages(page).first()).toContainText('Make a template with AI');
   await expect(draft(page)).toContainText('Template draft');
-  await expect(draft(page)).toContainText('3 layouts');
+  // The three layouts the agent made, and the text layout every template offers.
+  await expect(draft(page)).toContainText('4 layouts');
   await draft(page).getByTestId('draft-close').click();
   await expect(draft(page)).toHaveCount(0);
   expect(errors).toEqual([]);

@@ -144,9 +144,11 @@ function CurrentMark() {
 /* ---------------------------------------------------------------- the template gallery */
 
 function TemplateCard({ entry, trying }: { entry: LibraryEntry; trying: Trying }) {
-  const { t } = useTranslation('ai');
+  const { t, i18n } = useTranslation('ai');
   const { template, personal } = entry;
-  const { id, name } = template.theme;
+  const { id } = template.theme;
+  // A built-in template is called what it is in the UI's language, as its palette is.
+  const name = templateName(template.theme, i18n.language);
   const current = useDeck((s) => s.deck.theme.id === id);
   const look = useMemo<Look>(() => ({ kind: 'template', id }), [id]);
   // The cover is in the UI language and its direction, as in the Templates panel, and an edit

@@ -154,8 +154,11 @@ test.beforeEach(async ({ page }) => {
 test('a click picks the group; a double-click goes in; Esc and a click outside come out', async ({
   page,
 }) => {
+  // g_plain is a card (ADR-073): its first child is a box that fills it. A click on its
+  // background picks the group; one on an object lying on it goes straight to that object.
   const dot = await center(page, el('g_plain_dot'));
-  await page.mouse.click(dot.x, dot.y);
+  const bg = { x: dot.x, y: dot.y + 130 * (await stageScale(page)) };
+  await page.mouse.click(bg.x, bg.y);
   expect((await state(page)).selected).toEqual(['g_plain']);
   await expect(surface(page)).not.toHaveAttribute('data-entered', /./);
 
@@ -194,7 +197,7 @@ test('a click picks the group; a double-click goes in; Esc and a click outside c
   await expect(surface(page)).not.toHaveAttribute('data-entered', /./);
 
   // Enter on a selected group goes in and selects what is in it.
-  await page.mouse.click(dot.x, dot.y);
+  await page.mouse.click(bg.x, bg.y);
   await page.keyboard.press('Enter');
   expect((await state(page)).selected).toEqual([
     'g_plain_card',
@@ -528,8 +531,9 @@ test('a marquee inside an entered group that takes none of its children takes th
 test('resizing a group stretches everything in it, as one undo step', async ({ page }) => {
   const before = await element(page, 'g_plain');
   const scale = await stageScale(page);
+  // A click on the background of the card, beside the objects on it, picks the group.
   const dot = await center(page, el('g_plain_dot'));
-  await page.mouse.click(dot.x, dot.y);
+  await page.mouse.click(dot.x, dot.y + 130 * scale);
   expect((await state(page)).selected).toEqual(['g_plain']);
   const { steps } = await state(page);
   // From 640 x 380 to 768 x 456: one fifth more each way.

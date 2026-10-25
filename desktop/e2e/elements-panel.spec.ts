@@ -91,11 +91,21 @@ test('the first screen offers the collections by kind, each with a name', async 
 test('designs are shown by group, found by name, and add an editable slide', async ({ page }) => {
   const panel = await openDesigns(page);
   await expect(page.locator('[data-panel="designs"] h2')).toHaveText('Ready slides');
-  // The first screen: the nineteen groups, each with its first four designs, as finished slides:
-  // the picture made of each ahead, or the slide drawn live where it has none (ADR-109).
+  // The first screen: the twenty-one groups, each with its first four designs (or all of a
+  // smaller one), as finished slides: the picture made of each ahead, or the slide drawn live
+  // where it has none (ADR-109).
   const designs = panel.locator('[data-design]');
-  await expect(panel.locator('[data-group]')).toHaveCount(19);
-  await expect(designs).toHaveCount(76);
+  await expect(panel.locator('[data-group]')).toHaveCount(21);
+  const firsts = await panel
+    .locator('[data-group]')
+    .evaluateAll((groups) => groups.map((group) => group.querySelectorAll('[data-design]').length));
+  expect(
+    firsts.every((count) => count >= 1 && count <= 4),
+    String(firsts),
+  ).toBe(true);
+  expect(firsts.filter((count) => count === 4).length).toBeGreaterThan(firsts.length / 2);
+  const first = firsts.reduce((sum, count) => sum + count, 0);
+  await expect(designs).toHaveCount(first);
   await expect(designs.first().locator('[data-slide-id], [data-design-picture]')).toBeVisible();
 
   // One group in full, under its own name alone, and back to all of them.
@@ -104,7 +114,7 @@ test('designs are shown by group, found by name, and add an editable slide', asy
   await expect(panel.getByRole('heading', { level: 3 })).toHaveText('Presentation slides');
   await panel.getByRole('button', { name: 'Back to Ready slides' }).click();
   await expect(panel.getByRole('heading', { level: 3 })).toHaveCount(0);
-  await expect(designs).toHaveCount(76);
+  await expect(designs).toHaveCount(first);
 
   // A search of the names, in every group at once.
   await panel.getByTestId('designs-query').fill('invitation');

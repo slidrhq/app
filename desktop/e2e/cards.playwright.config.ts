@@ -35,6 +35,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     channel: 'msedge',
+    // As on a Hebrew system (../playwright.config.ts); a test that wants another one sets it.
+    locale: 'he-IL',
     trace: 'retain-on-failure',
   },
   projects: [

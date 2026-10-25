@@ -85,11 +85,17 @@ test('the Edit data button opens the data of the chart as a grid', async ({ page
   // Opening it changes nothing, and the chart is still selected and in sight.
   expect(await steps(page)).toBe(before);
   expect(await selectedIds(page)).toEqual(['e_chart']);
-  await expect(chartOnStage(page)).toBeInViewport({ ratio: 1 });
-  // The editor opens away from the chart: it does not cover it.
+  // Nearly 1: the observer reports a whole chart as 0.9999998 when its box falls on a fraction of
+  // a pixel.
+  await expect(chartOnStage(page)).toBeInViewport({ ratio: 0.99 });
+  // The editor hangs from its button in the floating toolbar over the Stage (design refresh), its
+  // end at the button's end, and leaves the body of the chart in sight: it ends above the middle.
   const editorBox = (await dataEditor(page).boundingBox())!;
+  const buttonBox = (await tool(page, en.data).boundingBox())!;
   const chartBox = (await chartOnStage(page).boundingBox())!;
-  expect(editorBox.x + editorBox.width).toBeLessThanOrEqual(chartBox.x);
+  expect(editorBox.y).toBeGreaterThanOrEqual(buttonBox.y + buttonBox.height);
+  expect(Math.abs(editorBox.x + editorBox.width - (buttonBox.x + buttonBox.width))).toBeLessThan(2);
+  expect(editorBox.y + editorBox.height).toBeLessThan(chartBox.y + chartBox.height / 2);
 });
 
 test('typing on a cell replaces its value: one undo step, and the chart follows', async ({

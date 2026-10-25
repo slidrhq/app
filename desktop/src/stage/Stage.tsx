@@ -1608,6 +1608,11 @@ export function Stage({
       if (g.pendingSelection) selection.getState().selectElements([g.pendingSelection]);
       return;
     }
+    // A click on an object of a card that is already the selection goes nowhere new: the
+    // double-click it may begin is that object's own, as on an object in no group (a table types
+    // in the cell under the pointer).
+    const now = selection.getState().selectedElementIds;
+    if (!g.inside.edit && now.length === 1 && now[0] === g.inside.id) return;
     goInside(g.inside, { x: e.clientX, y: e.clientY });
   };
 

@@ -113,7 +113,8 @@ for (const theme of themes) {
 
         await page.getByTestId('template-create').click();
         await turnEnds(page, 1);
-        await expect(draft(page).getByTestId('draft-layout')).toHaveCount(3);
+        // The three layouts the agent made, and the text layout every template offers.
+        await expect(draft(page).getByTestId('draft-layout')).toHaveCount(4);
         await draft(page).scrollIntoViewIfNeeded();
         await settle(page);
         await page.screenshot({ path: out(`template-${name}-draft`) });

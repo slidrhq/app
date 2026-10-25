@@ -84,7 +84,13 @@ test('mask: a circle, rounded corners with a radius, a shape of the library, and
   );
   expect(await clip(page).evaluate((box) => getComputedStyle(box).clipPath)).toContain('path(');
   // With a mask the corners of the picture are the mask's: row B offers no corner radius.
+  // The radius slider went away with the star, so the list moved up under the pointer and the
+  // hint of the shape now under it is open; Escape would close that hint first. Off the popover,
+  // Escape closes the popover.
+  const slide = (await page.getByTestId('stage-frame').boundingBox())!;
+  await page.mouse.move(slide.x + 10, slide.y + 10);
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(row(page).getByRole('button', { name: 'Corners', exact: true })).toHaveCount(0);
 
   await undo(page);

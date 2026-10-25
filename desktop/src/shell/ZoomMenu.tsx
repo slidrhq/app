@@ -24,14 +24,13 @@ export function ZoomMenu() {
     <div ref={tools} className="flex shrink-0 items-center">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            iconEnd={ChevronDown}
-            aria-label={t('tools.zoom')}
-            className="tabular-nums"
-          >
-            <span data-testid="status-zoom">{Math.round(viewScale * 100)}%</span>
+          <Button variant="ghost" size="sm" iconEnd={ChevronDown} className="tabular-nums">
+            {/* The word is for a screen reader: a number alone does not say what it measures,
+                and a label in its place would hide the number. */}
+            <span>
+              <span className="sr-only">{t('tools.zoom')} </span>
+              <span data-testid="status-zoom">{Math.round(viewScale * 100)}%</span>
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

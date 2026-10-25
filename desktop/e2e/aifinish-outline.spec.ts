@@ -154,12 +154,14 @@ test('the outline is edited in its card, and approved as the user left it', asyn
   await page.keyboard.insertText('מה מבקשים מההנהלה');
   await expect(card).toContainText('שקפים: 4');
 
-  // What was edited is not lost when the panel shows something else for a moment.
+  // What was edited is not lost when the panel shows something else for a moment: the panel is
+  // kept, hidden, and the card is still being edited when it is shown again.
   await tab(page, 'actions');
   await tab(page, 'chat');
   await expect(outline(page)).toHaveAttribute('data-edited', 'true');
-  await outline(page).getByTestId('outline-edit').click();
+  await expect(outline(page).getByTestId('outline-edit')).toHaveAttribute('aria-pressed', 'true');
   const edited = [PROPOSED[3], 'איפה אנחנו עומדים', PROPOSED[2], 'מה מבקשים מההנהלה'];
+  await expect(titles(page)).toHaveCount(edited.length);
   expect(await typed(page)).toEqual(edited);
   await outline(page).getByTestId('outline-edit').click();
   await expect(titles(page)).toHaveCount(0);

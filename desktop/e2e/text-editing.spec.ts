@@ -108,9 +108,21 @@ test('Enter on a selected text box edits it; a click outside ends editing', asyn
     .getByTestId('stage-surface')
     .locator('[data-element-id="e_en_goals_body"]')
     .boundingBox();
+  // A click in the box away from its text selects the box, as in PowerPoint: the text is typed
+  // in only where it stands.
   await page.mouse.click(box!.x + box!.width - 20, box!.y + box!.height - 20);
-  await expect(page.locator('[data-text-editor]')).toBeFocused();
-  await page.keyboard.press('Escape');
+  expect(await editing(page)).toBeNull();
+  await expect(page.locator('[data-text-editor]')).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          window as unknown as {
+            slidr: { selection: { getState(): { selectedElementIds: string[] } } };
+          }
+        ).slidr.selection.getState().selectedElementIds,
+    ),
+  ).toEqual(['e_en_goals_body']);
   await page.keyboard.press('Enter');
   expect(await editing(page)).toBe('e_en_goals_body');
   await expect(page.locator('[data-text-editor]')).toBeFocused();

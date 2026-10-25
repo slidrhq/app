@@ -401,8 +401,21 @@ function measureRow(toolbar: HTMLElement, drawn: Density): void {
     .filter((box) => box.width > 0);
   if (boxes.length === 0) return;
   const style = getComputedStyle(toolbar);
+  // The room is what the row may take, not what it takes: the row is as wide as its tools
+  // (`w-max`) up to the width of what holds it. Measured by the row's own width, a row that had
+  // gone compact was always just wide enough for that, and never roomy again once the editor
+  // was wider again.
+  const room = toolbar.parentElement;
+  const roomStyle = room ? getComputedStyle(room) : null;
+  const widest = room
+    ? room.clientWidth -
+      parseFloat(roomStyle!.paddingInlineStart) -
+      parseFloat(roomStyle!.paddingInlineEnd) -
+      parseFloat(style.borderInlineStartWidth) -
+      parseFloat(style.borderInlineEndWidth)
+    : toolbar.clientWidth;
   const available =
-    toolbar.clientWidth - parseFloat(style.paddingInlineStart) - parseFloat(style.paddingInlineEnd);
+    widest - parseFloat(style.paddingInlineStart) - parseFloat(style.paddingInlineEnd);
   // The tools sit in a strip that scrolls when the row has no room for them all
   // (`shell/TopTools.tsx`): what is scrolled out of sight is part of what the row has to hold.
   const strip = toolbar.querySelector<HTMLElement>('[data-row-tools]');
@@ -455,6 +468,8 @@ export function useMeasuredDensity(anchor: RefObject<HTMLElement | null>): void 
     if (!toolbar) return;
     const observer = new ResizeObserver(() => measureRow(toolbar, drawn.current));
     observer.observe(toolbar);
+    // The room can grow while the row keeps its width: what holds it is watched too.
+    if (toolbar.parentElement) observer.observe(toolbar.parentElement);
     return () => observer.disconnect();
   }, [anchor]);
 }

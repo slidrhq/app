@@ -199,10 +199,9 @@ export async function openWeights(
   const words = WEIGHT_WORDS[lang];
   await row(page).getByRole('button', { name: words.font, exact: true }).click();
   await page.getByRole('combobox', { name: words.search }).fill(font);
-  await page
-    .getByRole('button', { name: words.weights(font) })
-    .first()
-    .click();
+  // The arrow of the font's line: the pointer's way to its weights (no button, being inside an
+  // option; the keyboard's way is the arrow key from the search).
+  await page.locator(`[data-font-weights="${font}"]`).first().click();
   const list = page.getByRole('listbox', { name: words.weights(font) });
   await expect(list).toBeVisible();
   return list;

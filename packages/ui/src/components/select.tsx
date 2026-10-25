@@ -75,9 +75,14 @@ export function Select<T extends string>({
           sideOffset={6}
           collisionPadding={8}
           onCloseAutoFocus={onCloseAutoFocus}
-          className="z-50 max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) animate-overlay-in overflow-hidden rounded-panel border border-ui-line bg-ui-raised text-sm text-ui-fg shadow-overlay"
+          className="z-50 max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) animate-overlay-in overflow-y-auto rounded-panel border border-ui-line bg-ui-raised text-sm text-ui-fg shadow-overlay"
         >
-          <RadixSelect.Viewport className="p-1">
+          {/* A long list scrolls in the list itself, not in Radix's viewport inside it: the list
+              is the combobox's, and its options are walked by the arrows, while a viewport that
+              scrolls is a region the keyboard cannot be on (axe-core's
+              scrollable-region-focusable), and made focusable it is no longer a part of the list
+              (aria-required-children). */}
+          <RadixSelect.Viewport className="p-1 overflow-visible!">
             {options.map((option) => (
               <RadixSelect.Item
                 key={option.value}

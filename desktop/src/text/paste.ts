@@ -7,6 +7,7 @@ import {
   type Paragraph,
   type Run,
 } from '@slidr/model';
+import { withoutEventHandlers } from '@slidr/renderer';
 import { resolveDirection } from './bidi';
 import { BOLD_FROM, MAX_LIST_LEVEL, type ParagraphProps } from './format';
 import { cleanMarks, normalizeRichText } from './richTextDoc';
@@ -484,7 +485,8 @@ interface Draft {
  * document and only read. With `source`, what the source states of its formatting is read too.
  */
 function readHtml(html: string, source?: SourceContext): Draft[] {
-  const body = new DOMParser().parseFromString(html, 'text/html').body;
+  // Without its event handlers: the page's content policy would report each one as it parses.
+  const body = new DOMParser().parseFromString(withoutEventHandlers(html), 'text/html').body;
   const rules = source ? sourceRules(body) : [];
   const paragraphs: Draft[] = [];
   let current: Draft | null = null;

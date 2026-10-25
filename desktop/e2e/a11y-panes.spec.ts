@@ -183,7 +183,8 @@ test('in a layer of its own the key does nothing: a dialog, a popover, the show'
   await expect(show).toHaveCount(0);
 
   // A popover does not hold the keyboard itself: without the rule the key would walk out of it.
-  await page.getByTestId('top-tools-b').getByRole('button', { name: 'Shape' }).focus();
+  // (Shapes moved to the Elements panel, ADR-075; the line library is still a popover.)
+  await page.getByTestId('top-tools-b').getByRole('button', { name: 'Line', exact: true }).focus();
   await page.keyboard.press('Enter');
   const popover = page.getByRole('dialog');
   await expect(popover).toBeVisible();

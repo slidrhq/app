@@ -162,12 +162,29 @@ for (const lang of ['he', 'en'] as const) {
       .locator('[data-template]')
       .evaluateAll((cards) => cards.map((element) => element.getAttribute('data-template')!));
     expect(ids.length).toBeGreaterThan(10);
+    // The layouts of each template, by archetype, as the library's catalog has them: how many
+    // slides a sample has is its author's, and grows as the library does.
+    const layouts = await page.evaluate(async () => {
+      const answer = await fetch('/media-library/templates/catalog.json');
+      const catalog = (await answer.json()) as {
+        templates: { theme: { id: string }; layouts: { archetype: string }[] }[];
+      };
+      return Object.fromEntries(
+        catalog.templates.map((t) => [t.theme.id, new Set(t.layouts.map((l) => l.archetype)).size]),
+      );
+    });
+    const names = () =>
+      shown(page)
+        .locator('figcaption span[dir="auto"]')
+        .allInnerTexts()
+        .then((all) => new Set(all).size);
     for (const id of ids) {
       await cover(page, id).click();
       await expect(slides(page)).toHaveCount(1);
-      // Sixteen slides: one for each layout of the template and one more section divider, the
-      // text slide among them.
-      await expect.poll(() => shown(page).count(), { message: id }).toBe(16);
+      // A slide for each layout of the template, the text slide among them, and perhaps more of
+      // one (a second section divider): a slide is named by its layout.
+      expect(layouts[id], id).toBeGreaterThan(10);
+      await expect.poll(names, { message: id }).toBe(layouts[id]);
       await expect(
         shown(page)
           .locator('figcaption')

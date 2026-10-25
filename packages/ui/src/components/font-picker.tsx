@@ -309,8 +309,9 @@ export function FontPicker({
         aria-setsize={rows.length}
         aria-posinset={line.row + 1}
         data-active={line.row === activeRow || undefined}
+        // An option takes no aria-expanded: that the weights are open is told by the search, whose
+        // active descendant moves into them.
         aria-haspopup={weights ? 'listbox' : undefined}
-        aria-expanded={weights ? opened : undefined}
         onPointerMove={() => {
           setActive(line.row);
           // Another font: the weights of the last one go.
@@ -350,10 +351,12 @@ export function FontPicker({
           </span>
         )}
         {weights && (
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-label={labels.weights?.(family) ?? family}
+          // The arrow is the pointer's way to the weights; the keyboard's is the arrow key from
+          // the search. It is no button: a control inside an option is not allowed, and is read
+          // as a second stop in the line (axe-core's nested-interactive).
+          <span
+            aria-hidden="true"
+            data-font-weights={family}
             // The search keeps the focus.
             onMouseDown={(event) => event.preventDefault()}
             onPointerEnter={(event) => openSub(family, line.row, event.currentTarget.parentElement)}
@@ -368,7 +371,7 @@ export function FontPicker({
             )}
           >
             <Icon icon={ChevronRight} mirror />
-          </button>
+          </span>
         )}
       </li>
     );

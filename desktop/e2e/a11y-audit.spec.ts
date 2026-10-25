@@ -119,7 +119,13 @@ function conclude(survey: Survey, name: string, expectAtLeast: number): void {
 }
 
 const PANEL = '[data-testid="tool-panel"]';
-const ROW_A = '[data-pane="tools"]';
+/*
+ * Row A, the row of insertion tools, is gone: its tools are in the one toolbar with nothing
+ * selected (row B, "nothing selected"), and the menus above and below the editor took its place
+ * as the shell's other row of tools (the design refresh, docs/design-refresh/SPEC.md).
+ */
+const TITLE_BAR = '[data-testid="title-bar"]';
+const STATUS_BAR = '[data-testid="status-bar"]';
 const ROW_B = '[data-pane="context"]';
 
 /** Opens a panel from the Activity Bar by its id. */
@@ -249,7 +255,8 @@ test('every panel of the Activity Bar, tab by tab, on a slide with every kind of
   expect(ids.length).toBeGreaterThanOrEqual(10);
   for (const id of ids) {
     await openPanel(page, id);
-    const tabs = page.locator(`${PANEL} [role="tab"]`);
+    // The tabs of this panel: the panels not shown are drawn too, hidden, with their tabs.
+    const tabs = page.locator(`${PANEL} [data-panel="${id}"] [role="tab"]`);
     const count = await tabs.count();
     if (count === 0) {
       await survey.audit(`panel ${id}`, { within: PANEL });
@@ -267,13 +274,16 @@ test('every panel of the Activity Bar, tab by tab, on a slide with every kind of
   conclude(survey, 'panels', 13);
 });
 
-test('row A, and what it opens', async ({ page }) => {
+test('the title bar and the status bar, and what they open', async ({ page }) => {
   test.setTimeout(3 * 60_000);
   await open(page);
   const survey = new Survey(page, IN_ALL);
-  await survey.audit('row A', { within: ROW_A });
-  await survey.popups(ROW_A, 'row A');
-  conclude(survey, 'row-a', 6);
+  await survey.audit('the title bar', { within: TITLE_BAR });
+  await survey.popups(TITLE_BAR, 'the title bar');
+  await survey.audit('the status bar', { within: STATUS_BAR });
+  await survey.popups(STATUS_BAR, 'the status bar');
+  // The two bars, the File menu, where the show starts, zoom, and the design check.
+  conclude(survey, 'bars', 6);
 });
 
 test('row B for every kind of selection, and what its tools open', async ({ page }) => {
@@ -652,9 +662,10 @@ test('the tools of an image at work: a crop, and an upscale that is running', as
     Object.assign(module.pageUpscaling, { installed: true, tiles: 40, tileMs: 1000 });
   }, '/src/images/upscaler.ts');
   await select(page, ['e_picture']);
-  await page.getByTestId('image-upscale').click();
+  // Row B's: the panel of the actions, drawn hidden ahead of time, has the same button.
+  await page.locator(ROW_B).getByTestId('image-upscale').click();
   await page.getByRole('menuitem').first().click();
-  await expect(page.getByTestId('image-upscale-work')).toBeVisible();
+  await expect(page.locator(ROW_B).getByTestId('image-upscale-work')).toBeVisible();
   await survey.audit('row B, an image being upscaled', { within: ROW_B });
   await survey.popups(ROW_B, 'row B, an image being upscaled');
   conclude(survey, 'image-work', 2);

@@ -321,7 +321,12 @@ test.describe('a selected text box: the tools format all of its text', () => {
     expect((await paragraphs(page, ID))[0]).not.toHaveProperty('spaceBefore');
   });
 
-  test('lists: bullets, numbers, levels, a custom bullet and a marker colour', async ({ page }) => {
+  test('lists: bullets, numbers, a style from the gallery, a custom bullet and a marker colour', async ({
+    page,
+  }) => {
+    // Lists are split buttons, as in PowerPoint: the button turns the list on and off, its arrow
+    // opens a gallery of styles and "Bullets and Numbering…" (the levels are Tab and Shift+Tab
+    // in the text).
     await oneUndoStep(page, ID, () => tool(page, 'רשימת תבליטים').click());
     expect((await paragraphs(page, ID)).map((p) => p.list)).toEqual([
       { kind: 'bullet', level: 0 },
@@ -329,51 +334,55 @@ test.describe('a selected text box: the tools format all of its text', () => {
     ]);
     await expect(tool(page, 'רשימת תבליטים')).toHaveAttribute('aria-pressed', 'true');
 
-    const option = async (act: () => Promise<void>) => {
-      await tool(page, 'אפשרויות רשימה').click();
+    const gallery = page.getByTestId('list-gallery-bullet');
+    const dialog = page.getByTestId('list-dialog');
+    /** "Bullets and Numbering…", from the arrow of the bullets; OK applies it. */
+    const inDialog = async (act: () => Promise<void>) => {
+      await tool(page, 'אפשרויות תבליטים').click();
+      await page.getByRole('button', { name: 'תבליטים ומספור…' }).click();
+      await expect(dialog).toBeVisible();
       await act();
-      await page.keyboard.press('Escape');
+      await dialog.getByTestId('list-dialog-ok').click();
+      await expect(dialog).toHaveCount(0);
     };
+    await oneUndoStep(page, ID, async () => {
+      await tool(page, 'אפשרויות תבליטים').click();
+      await gallery.getByRole('button', { name: 'תבליטי כוכב', exact: true }).click();
+      await expect(gallery).toHaveCount(0);
+    });
     await oneUndoStep(page, ID, () =>
-      option(() => page.getByRole('button', { name: 'רמה אחת פנימה' }).click()),
-    );
-    await oneUndoStep(page, ID, () =>
-      option(() => page.getByRole('button', { name: '★', exact: true }).click()),
-    );
-    await oneUndoStep(page, ID, () =>
-      option(async () => {
-        await page.getByRole('button', { name: 'צבע הסימון' }).click();
+      inDialog(async () => {
+        await dialog.getByRole('button', { name: 'צבע', exact: true }).click();
         await page.getByRole('button', { name: 'ראשי', exact: true }).click();
         await closePicker(page);
       }),
     );
     expect((await paragraphs(page, ID))[0]?.list).toEqual({
       kind: 'bullet',
-      level: 1,
-      glyph: '★',
+      level: 0,
+      glyph: '❖',
       color: { token: 'primary' },
     });
-    // The Stage draws it: the marker of the first item is the star.
+    // The Stage draws it: the marker of every item is the star.
     await expect(
       page.getByTestId('stage-surface').locator(`[data-element-id="${ID}"] [data-slidr-marker]`),
-    ).toHaveText(['★', '★']);
+    ).toHaveText(['❖', '❖']);
 
-    await option(async () => {
-      const custom = page.getByRole('textbox', { name: 'תבליט אחר' });
-      await custom.fill('»');
-      await custom.press('Enter');
+    await inDialog(() => dialog.getByRole('textbox', { name: 'תבליט אחר' }).fill('»'));
+    expect((await paragraphs(page, ID))[0]?.list).toEqual({
+      kind: 'bullet',
+      level: 0,
+      glyph: '»',
+      color: { token: 'primary' },
     });
-    expect((await paragraphs(page, ID))[0]?.list?.glyph).toBe('»');
 
-    // Numbers keep the level and the colour, and drop the bullet that would replace the numbers.
+    // Numbers keep the colour, and drop the bullet that would replace the numbers.
     await oneUndoStep(page, ID, () => tool(page, 'רשימה ממוספרת').click());
     expect((await paragraphs(page, ID))[1]?.list).toEqual({
       kind: 'number',
-      level: 1,
+      level: 0,
       color: { token: 'primary' },
     });
-    await option(() => page.getByRole('button', { name: 'רמה אחת החוצה' }).click());
-    expect((await paragraphs(page, ID))[1]?.list?.level).toBe(0);
     await tool(page, 'רשימה ממוספרת').click();
     expect((await paragraphs(page, ID)).map((p) => p.list)).toEqual([undefined, undefined]);
   });
@@ -566,15 +575,27 @@ test.describe('inside the text editor: the tools format the selection', () => {
     await oneUndoStep(page, ID, () => inPopover('ריווח', () => field('רווח אחרי הפסקה', '16')));
     await oneUndoStep(page, ID, () => inPopover('ריווח', () => field('הזחת שורה ראשונה', '48')));
     await oneUndoStep(page, ID, () => tool(page, 'רשימת תבליטים').click());
-    await oneUndoStep(page, ID, () => inPopover('אפשרויות רשימה', () => press('רמה אחת פנימה')));
-    await oneUndoStep(page, ID, () => inPopover('אפשרויות רשימה', () => press('✓')));
-    await oneUndoStep(page, ID, () =>
-      inPopover('אפשרויות רשימה', async () => {
-        await press('צבע הסימון');
-        await press('הדגשה');
-        await closePicker(page);
-      }),
-    );
+    // A level in is Tab in the text; the bullet's style is a tile of the gallery, which closes as
+    // it is chosen; the marker's colour is in "Bullets and Numbering…".
+    await oneUndoStep(page, ID, () => page.keyboard.press('Tab'));
+    await expectStillEditing(page);
+    await oneUndoStep(page, ID, async () => {
+      await tool(page, 'אפשרויות תבליטים').click();
+      await press('תבליטי סימן ביקורת');
+      await expect(page.getByTestId('list-gallery-bullet')).toHaveCount(0);
+    });
+    await expectStillEditing(page);
+    await oneUndoStep(page, ID, async () => {
+      await tool(page, 'אפשרויות תבליטים').click();
+      await press('תבליטים ומספור…');
+      const dialog = page.getByTestId('list-dialog');
+      await dialog.getByRole('button', { name: 'צבע', exact: true }).click();
+      await press('הדגשה');
+      await closePicker(page);
+      await dialog.getByTestId('list-dialog-ok').click();
+      await expect(dialog).toHaveCount(0);
+    });
+    await expectStillEditing(page);
     await oneUndoStep(page, ID, () => inPopover('תיבת הטקסט', () => press('למטה')));
 
     const [first, second] = await paragraphs(page, ID);
@@ -845,6 +866,10 @@ test.describe('inserting a text box', () => {
     expect(await texts(page)).toHaveLength(2);
     await page.keyboard.press('Backspace');
     await page.keyboard.press('Backspace');
+    // As in PowerPoint, Esc ends the typing and the empty box stays while it is selected; a
+    // second Esc lets it go, and it goes.
+    await page.keyboard.press('Escape');
+    expect(await texts(page)).toHaveLength(2);
     await page.keyboard.press('Escape');
     expect(await texts(page)).toEqual([ID]);
     // The box leaves no trace in the history, and neither does what was typed into it and
@@ -854,6 +879,7 @@ test.describe('inserting a text box', () => {
     // The same with nothing typed at all.
     await page.keyboard.press('t');
     await expect(editor(page)).toBeFocused();
+    await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
     expect(await texts(page)).toEqual([ID]);
     expect(await steps(page)).toBe(before);

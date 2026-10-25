@@ -111,6 +111,13 @@ for (const look of [HE_DARK, EN_LIGHT]) {
   test(`several text boxes: folded at 1366 (${look.lang}, ${look.theme})`, async ({ page }) => {
     await page.setViewportSize(LAPTOP);
     await openApp(page, look);
+    // The row folds its text tools when it is narrower than the compact ones: at 1366 that is
+    // with the Tool Panel at its widest (UI-01).
+    await page.getByTestId('panel-splitter').focus();
+    await page.keyboard.press('End');
+    await expect
+      .poll(async () => (await page.getByTestId('tool-panel').boundingBox())?.width ?? 0)
+      .toBeGreaterThan(600);
     await addSelected(page, texts(look.lang));
     await tool(page, WORDS[look.lang].fold).click();
     await expect(page.getByRole('dialog')).toBeVisible();
