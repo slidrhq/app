@@ -6,17 +6,9 @@
  * deck shows, from the media library (`images/templates`). Without the library, or without the
  * photograph in it, the cover is the template's opening layout without a picture.
  */
-import {
-  createDeck,
-  createElement,
-  createSlide as blankSlide,
-  richText,
-  type AssetMeta,
-  type Deck,
-  type Slide,
-} from '@slidr/model';
+import type { AssetMeta, Deck, Slide } from '@slidr/model';
 import { mediaFiles, mediaUrl } from '@slidr/media-library';
-import { createSlide, deckFromTemplate, type Template } from '@slidr/templates';
+import { templateCover, type Template } from '@slidr/templates';
 // The pictures alone: the templates' own code is not part of a packaged app (see `./builtIn`).
 import { pictures } from '@slidr/templates/builtin/pictures';
 import { library } from './app';
@@ -57,42 +49,21 @@ export function coverUrl(asset: AssetMeta): string | undefined {
 export const coverAsset = (asset: AssetMeta) => coverUrl(asset) ?? library.assetUrl(asset);
 
 /**
- * One slide that shows a template: its opening layout with the template's name on it, in the
- * language of the deck, and the photograph of a built-in template that opens with one.
+ * One slide that shows a template (`templateCover`): its opening layout with the template's name
+ * on it, in the language of the deck, and the photograph of a built-in template that opens with
+ * one.
  */
 export function coverOf(
   template: Template,
   like: { meta: Pick<Deck['meta'], 'lang' | 'dir'> },
 ): { deck: Deck; slide: Slide } {
-  const deck = deckFromTemplate(template, { lang: like.meta.lang, dir: like.meta.dir });
-  const name = templateName(template.theme, like.meta.lang);
-  const first = deck.layouts[0];
-  if (first) {
-    const has = (role: string) => first.placeholders.some((p) => p.role === role);
-    const title = richText(name, { dir: 'auto' });
-    const picture = has('image') ? coverPicture(template.theme.id) : undefined;
-    if (picture) deck.assets[picture.id] = picture;
-    const { slide } = createSlide(deck, {
-      layoutId: first.id,
-      content: {
-        ...(has('title') ? { title } : {}),
-        ...(picture ? { image: { assetId: picture.id } } : {}),
-      },
-    });
-    return { deck, slide };
-  }
-  // A template without layouts (saved from a plain deck): its name in its own display style.
-  const plain = createDeck({ lang: like.meta.lang, dir: like.meta.dir, theme: template.theme });
-  const slide = blankSlide({
-    elements: [
-      createElement.text({
-        frame: { x: 160, y: 380, w: 1600, h: 320 },
-        vAlign: 'middle',
-        content: richText(name, { align: 'center', styleRef: 'display' }),
-      }),
-    ],
+  const { lang, dir } = like.meta;
+  return templateCover(template, {
+    lang,
+    dir,
+    name: templateName(template.theme, lang),
+    picture: coverPicture(template.theme.id),
   });
-  return { deck: plain, slide };
 }
 
 type Cover = { deck: Deck; slide: Slide };

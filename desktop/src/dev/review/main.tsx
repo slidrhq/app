@@ -3,6 +3,8 @@
  *   ?t=<template>&lang=<code>[&slide=<n>][&w=1920]     a template's sample deck, or one slide of it
  *   &src=library                                      the library's template, not one authored here
  *   ?d=<id,id,...>|all&src=managed|new&lang=<code>[&w=] ready-made slides
+ *   ?covers&lang=<code>[&only=<id,id,...>][&w=]       the covers of the built-in templates, as the
+ *                                                     galleries draw them (`templateCover`)
  * Only what is written in the language: a design not written in it is left out, and a template
  * whose sample is not written in it is not drawn, as the app offers them (ADR-103, ADR-104).
  *   &cols=<n>                                         columns of a sheet
@@ -23,6 +25,7 @@ import {
   type Slide,
 } from '@slidr/model';
 import { ScaledSlide, setFontCounterparts } from '@slidr/renderer';
+import { templateCover, withStandardLayouts } from '@slidr/templates';
 import { builtInSamples, builtInTemplates, sampleDeck } from '@slidr/templates/builtin';
 import { authored } from '../../../../packages/templates/src/authoring/registry';
 import { newDesigns } from '../../../../packages/templates/src/authoring/designs/registry';
@@ -31,7 +34,8 @@ import { createRoot } from 'react-dom/client';
 import { settle } from '../../capture/settle';
 import { registerBuiltinFonts } from '../../fonts';
 import { lintSlides } from '../../lint/deckLint';
-import { pictureUrl } from '../../templates/pictures';
+import * as templateMessages from '../../templates/messages';
+import { pictureAssets, pictureUrl } from '../../templates/pictures';
 
 const query = new URLSearchParams(location.search);
 const lang = query.get('lang') ?? 'he';
@@ -65,7 +69,44 @@ type ManagedCatalog = {
   subjects?: Record<string, [number, number]>;
 };
 
+/** The names of the built-in templates in a language, as the app has them. */
+const LOCALES = import.meta.glob<{ templates?: { name?: Record<string, string> } }>(
+  '../../i18n/locales/*.json',
+  { eager: true, import: 'default' },
+);
+const templateNames = (code: string): Record<string, string> =>
+  code === 'he'
+    ? templateMessages.he.name
+    : code === 'en'
+      ? templateMessages.en.name
+      : (LOCALES[`../../i18n/locales/${code}.json`]?.templates?.name ?? templateMessages.en.name);
+
+function covers(): Drawn[] {
+  resolve = pictureUrl;
+  const names = templateNames(lang);
+  const only = query.get('only')?.split(',');
+  const templates = builtInTemplates().filter((t) => !only || only.includes(t.theme.id));
+  return templates.map((template) => {
+    const id = template.theme.id;
+    // The photograph its sample opens with, as `covers.ts` names it.
+    const opening = builtInSamples[id]?.he[0]?.content.image;
+    const picture =
+      opening && !Array.isArray(opening) && 'assetId' in opening
+        ? pictureAssets[opening.assetId]
+        : undefined;
+    const name = names[id] ?? template.theme.name;
+    const cover = templateCover(withStandardLayouts(template), {
+      lang,
+      dir: languageDir(lang),
+      name,
+      picture,
+    });
+    return { key: id, ...cover };
+  });
+}
+
 async function load(): Promise<Drawn[]> {
+  if (query.has('covers')) return covers();
   const t = query.get('t');
   if (t) {
     const own = query.get('src') === 'library' ? undefined : authored[t];
