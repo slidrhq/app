@@ -97,7 +97,7 @@ With the dev server running, a few pages are useful on their own:
 | `/dev/stage.html?deck=reference` | The stage and filmstrip on a real deck                                     |
 | `/dev/runtime.html`              | The runtime player and the HTML export; `?deck=charts` for charts          |
 
-The reference decks are part of the media library (`templates/reference-decks/`); `pnpm media:pull` copies them into `../Slidr-media`, where their index opens by double-click, with no server.
+The reference decks are part of the media library (`templates/reference-decks/`): their index is https://media.slidr.studio/templates/reference-decks/index.html.
 
 ## Checks
 
@@ -183,7 +183,7 @@ The repository's settings hold what the workflow needs:
 
 The updater (`src-tauri/src/updates.rs`) looks for `latest.json` of the newest release when the app starts, downloads the installer in the background, checks its signature, and installs it quietly when the app closes. A debug build and a build under another identifier never look.
 
-The installer carries no media. Before a release whose templates, designs or fonts changed, publish the library first (`pnpm media:publish`, [docs/media-library.md](docs/media-library.md)).
+The installer carries no media. Before a release whose templates, designs or fonts changed, the library must have them first: everything reaches it through Slidr Library's API ([docs/media-library.md](docs/media-library.md)).
 
 ### The evaluation set
 

@@ -38,8 +38,8 @@ import type { Plugin } from 'vite';
  *   templates/pictures.json        the pictures of their samples, by id (written here)
  *
  * Here are the two things Node does with it: a dev server serves it to a page in a plain
- * browser, as the core's `media` protocol does in the app; and `pnpm media:publish` stages an
- * author's copy of it for the site.
+ * browser, as the core's `media` protocol does in the app; and an author's copy of it is staged
+ * as a site that a dev server reads (`SLIDR_MEDIA_URL`).
  */
 
 /** Where a dev server serves the library to a page in a plain browser. */
@@ -430,7 +430,3 @@ export function changes(before: Manifest | undefined, after: Manifest) {
     removed: Object.keys(old).filter((path) => !after.files[path]),
   };
 }
-
-/** The address of a file of the published library. */
-export const publishedUrl = (path: string, upstream = MEDIA_LIBRARY_URL) =>
-  withSlash(upstream) + encoded(path);

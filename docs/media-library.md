@@ -54,7 +54,7 @@ The unit tests that check the library's content (templates, designs, card sets, 
 
 What comes from outside the app comes through Slidr Library's upload API, and nothing of it needs a copy: Slidr Studio's designs and samples, and the search tags (below). An editor accepts each upload on the library's page, and a publication writes it into the library (`POST /api/publish`).
 
-What the app's generators make is written in an author's copy of the library, by default `../Slidr-media` beside the repository, with two more folders that are not published: `elements/source` (the inputs of the generators) and `archive`. The generators in `desktop/scripts` write into that copy, and `pnpm media:publish` publishes it (below).
+What the app's generators make (the scripts in `desktop/scripts` that write catalogs, pictures and fonts; [ADR-114](adr/ADR-114-no-copy-of-the-library.md) lists them) is still written into a folder on this machine, `../Slidr-media` by default. `pnpm media:pull` and `pnpm media:publish` are gone (ADR-114): nothing carries that folder into the library any more, so what a generator writes reaches no installed app until the scripts publish through Slidr Library's API themselves.
 
 A ready-made slide is written in a pack file under `elements/source/design-packs/` and put into `elements/designs/index.json` by `desktop/scripts/export-designs.mjs`. A built-in template is written as `archive/templates-source/<id>.ts`, beside the files the first eighteen were made from, and put into `templates/catalog.json` (with `templates/index.json` and `templates/<id>/template.json`) by `desktop/scripts/export-templates.mjs`. Each script's header lists the steps for adding one.
 
@@ -81,17 +81,9 @@ The search also reads tags in all the other `CONTENT_LANGUAGES`. Run `node deskt
 
 The tags reach the library through the upload API of [Slidr Library](https://github.com/slidrhq/library) (its README, "Uploading"), not by publishing the author copy: `--upload <the library's page>` with `LIBRARY_KEY`, the program's key, sends each kind's tags as one upload of `tag`. The library checks each against what it publishes (every key an item of the kind, every list of tags in its language's letters) and keeps it until an editor accepts it. A publication (`POST /api/publish`, from the library's page or Slidr Studio's Publish panel) merges each accepted one into `tags/<kind>.json` of the library itself, where an item named takes these tags and the others keep theirs, and marks the upload published. A new design comes with its tags in its own upload (`designs: add` takes them, and refuses a design without them), as Slidr Studio sends its designs; publishing writes them into `managed.json` (below). `src/media/icons/tags.test.ts` fails while an item of a kind the library tags has none. Without the files, the app finds everything by its names, as before.
 
-```sh
-pnpm media:pull                      # the published library into ../Slidr-media (--to <dir>)
-pnpm media:publish --dry-run         # say what would change
-pnpm media:publish                   # publish it (--from <dir>)
-```
+A publication writes into the library's bucket and empties Cloudflare's cache of the files written, so every app reads them at its next start ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md)). Slidr Library takes an author's files through the same API, `PUT /api/library/staged/<sha256>` and `POST /api/library/files`, each file with the hash it was changed from (its README, "Publishing the uploads"): what the generators will publish through.
 
-Publishing reads the published folders of the copy and writes the files `templates/` takes from its catalog (and those of the designs, ADR-109). The library lives in the Worker's bucket (the site answers `X-Slidr-Library: live`), so it publishes through Slidr Library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md)): it sends only the files the author changed since the copy was pulled, each with the hash it was changed from, and the library writes them unless it changed one of them meanwhile (a published upload), which is a conflict: pull, and publish again. Every file the author did not change stays as the library has it. `pnpm media:pull` keeps the manifest it pulled in the copy (`.published-manifest.json`) for this; a copy without it is published only with `--force`, as a whole. It needs `LIBRARY_KEY`, a key of the Worker's `LIBRARY_KEYS`; `--library <url>` and `--site <url>` name a dev server of the library. Nothing is deployed: there is no Pages project to deploy to ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md)). The library empties Cloudflare's cache of the files written, so every app reads them at its next start.
-
-Against a site that is not a library's bucket (it answers no `X-Slidr-Library: live`), or with `--out`, publishing only stages the copy as a static site, writes its manifest and compares it with the published one ([A library of your own](#a-library-of-your-own)); it publishes nothing. Either way it stops when the copy is empty, or would take away more than half of the published files, unless `--force` is given: a copy that is not all there would otherwise empty the library of every installed app.
-
-The bucket holds every catalog whole. A site staged for Cloudflare Pages takes static files of at most 25 MiB, so a JSON catalog above that
+The bucket holds every catalog whole. A folder staged as a site for Cloudflare Pages (`stageLibrary` of `build/media.ts`, `packages/templates/src/authoring/tools/stage.mjs`) takes static files of at most 25 MiB, so a JSON catalog above that
 limit is staged as 10 MiB parts and a narrowly routed
 [Pages Function](https://developers.cloudflare.com/pages/functions/advanced-mode/). The Function
 streams the exact original bytes at the original catalog URL; its manifest entry,
@@ -128,14 +120,7 @@ A policy or a file that names no address the app may read leaves it with no libr
 
 Keep the address in quotes. Unquoted, a part of its path that begins like one of the installer's own options turns that option on too (`/public/` is `/P`, passive; `/reports/` is `/R`, restart). cmd.exe and deployment tools pass the quotes on. PowerShell keeps them only inside one string: `Start-Process .\Slidr_0.1.0_x64-setup.exe -ArgumentList '/S /MEDIA="https://media.example.org/slidr/"'`.
 
-The copy is any static site with the layout above, over HTTPS (plain HTTP only on `localhost`). It needs `manifest.json` at its root and every file at its path. A file it does not have is answered 404, not a page with 200, and a redirect stays on its host. The app reads it from Rust, so it needs no CORS. `_headers` and `404.html` are for Pages, and another server may ignore them. To make one from the published library:
-
-```sh
-pnpm media:pull --to ../my-media                                        # the published library
-pnpm media:publish --from ../my-media --out ../my-media-site --dry-run  # staged as a site; nothing is deployed
-```
-
-Then upload `../my-media-site` to the server. A copy changed as above is staged the same way. The dry run still compares the copy with the published library: a copy that holds less than half of it is reported as blocked, which does not matter here, since nothing is deployed. Publishing (`pnpm media:publish`, the studio) writes only into the published library, through its API. The dev server and the studio read such a copy with `SLIDR_MEDIA_URL`.
+The copy is any static site with the layout above, over HTTPS (plain HTTP only on `localhost`). It needs `manifest.json` at its root and every file at its path. A file it does not have is answered 404, not a page with 200, and a redirect stays on its host. The app reads it from Rust, so it needs no CORS. To make one from the published library, copy `manifest.json` and every file it names, at its path, from https://media.slidr.studio/ (any tool that downloads a list of addresses will do), and check each against its SHA-256. Publishing (Slidr Library, the studio) writes only into the published library. The dev server and the studio read such a copy with `SLIDR_MEDIA_URL`.
 
 On a machine that ran Slidr before, the manifest of the old address stands until the new one is read, when the app starts online. What is cached is kept by its hash, so a file both libraries have is not fetched again.
 

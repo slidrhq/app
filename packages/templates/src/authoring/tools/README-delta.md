@@ -23,9 +23,9 @@ From the repository, with your copy of the library at `../Slidr-media`:
 ```sh
 node <this folder>/merge-into-library.mjs ../Slidr-media --dry-run   # what would change
 node <this folder>/merge-into-library.mjs ../Slidr-media             # merge
-pnpm media:publish --dry-run
-pnpm media:publish
 ```
+
+The merged copy is not published: `pnpm media:publish` is gone (docs/adr/ADR-114 of the app).
 
 The script adds the templates to `templates/catalog.json` after the ones already there, together
 with their samples and the pictures of the samples. It adds the slides to

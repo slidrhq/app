@@ -192,7 +192,8 @@ describe('the designs as files of the media library', () => {
   it('are made again on publishing, in place of those a pulled copy holds', () => {
     const source = tempDir();
     write(source, 'elements/designs/index.json', JSON.stringify(authored));
-    // As `pnpm media:pull` leaves them: of an earlier catalog, and of a language it no longer has.
+    // As a copy of the published library holds them: of an earlier catalog, and of a language it
+    // no longer has.
     write(source, 'elements/designs/he/index.json', '{"from":{}}');
     write(source, 'elements/designs/fr/index.json', '{"from":{}}');
     write(source, 'elements/designs/revs.json', '{"from":{}}');

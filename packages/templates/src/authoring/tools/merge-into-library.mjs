@@ -1,5 +1,6 @@
 // Adds the technology templates and ready-made slides of this package to an author's copy of the
-// media library (docs/media-library.md), as `pnpm media:publish` then publishes it:
+// media library (docs/media-library.md), which nothing publishes since `pnpm media:publish` is
+// gone (docs/adr/ADR-114):
 //
 //   node merge-into-library.mjs <library> [--dry-run]       e.g. node merge-into-library.mjs ../Slidr-media
 //
@@ -129,4 +130,4 @@ if (designs) {
   );
 }
 
-console.log(dry ? 'Dry run: nothing was written.' : 'Done. Publish with: pnpm media:publish');
+console.log(dry ? 'Dry run: nothing was written.' : 'Done: merged into the copy, not published.');

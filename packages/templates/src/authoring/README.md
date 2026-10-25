@@ -3,8 +3,9 @@
 The sources of three technology templates (Anan, Shvav and Mutzar), of Atlas, a template written
 in every language of the app, and of the ready-made slides of Elements → Designs, the pictures of their samples, and the scripts that
 render, check and package them. The app does not read this folder. It reads the media library
-(docs/media-library.md); what is authored here reaches the library through
-`tools/merge-into-library.mjs` and `pnpm media:publish`.
+(docs/media-library.md). What is authored here is merged into a copy of the library by
+`tools/merge-into-library.mjs`; since `pnpm media:publish` is gone (docs/adr/ADR-114), nothing
+carries that copy into the library yet.
 
 Kod and Magen, the other technology templates of the library, are written in the author's copy
 of the library (`archive/templates-source/`) and put into its catalog by
@@ -79,5 +80,6 @@ final word on a template: run them against the library with the template merged 
 ```sh
 src/authoring/tools/package.sh /tmp/slidr-tech            # the catalog fragments, pictures, merge script, sources
 node /tmp/slidr-tech/merge-into-library.mjs ../../../Slidr-media
-pnpm media:publish
 ```
+
+The merged copy is not published: `pnpm media:publish` is gone (docs/adr/ADR-114).

@@ -100,7 +100,9 @@ const NEEDS = {
 };
 if (media) {
   if (!existsSync(join(media, 'manifest.json')) && !existsSync(join(media, 'elements'))) {
-    throw new Error(`${media} is not an author copy of the library: run pnpm media:pull first.`);
+    throw new Error(
+      `${media} is not an author copy of the library; leave out --from to read the published one.`,
+    );
   }
 } else {
   const fetchJson = async (path) => {
