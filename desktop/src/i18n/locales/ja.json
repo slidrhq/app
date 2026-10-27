@@ -51,6 +51,8 @@
     "setup": {
       "welcome": "Slidr チャットへようこそ",
       "intro": "まず、使用するサービスを選んでください。次に、モデルと推論レベルを選びます。",
+      "finish": "設定を完了しましょう",
+      "finishIntro": "エージェントが作業を続けるには、まだいくつか選ぶ項目があります。",
       "steps": "セットアップの手順",
       "steps_harness": "サービス",
       "steps_model": "モデル",
@@ -2521,7 +2523,6 @@
       "not_logged_in": "CLI はインストールされています。続行するにはアカウントにサインインしてください。",
       "install": "インストール…",
       "signIn": "サインイン",
-      "refresh": "接続とモデルを更新",
       "installTitle": "{{name}} をインストールしますか？",
       "installDescription": "Windows App Installer を使用して {{name}} をダウンロードし、インストールします。その後、接続を確認し、必要に応じてサインインをお願いします。",
       "installDescriptionNpm": "npm を使用して {{name}} をインストールします。Node.js がない場合は、先に Windows App Installer でインストールします。その後、接続を確認し、必要に応じてサインインをお願いします。",

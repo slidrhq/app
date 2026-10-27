@@ -21,6 +21,7 @@ import {
 import { SlideRenderer, type AssetResolver, type HtmlSlot, type TextSlot } from '@slidr/renderer';
 import { keyboardInUse, useKeyboardInUse } from '@slidr/ui';
 import { freshFrame, freshTextBackground } from '../elements/frames';
+import { cardGround } from '../objects/card';
 import { fitRows } from '../table/fit';
 import { useTableStage } from '../table/stage';
 import { syncGrowHeights } from '../text/actions';
@@ -440,8 +441,12 @@ export function Stage({
   const [overCrop, setOverCrop] = useState(false);
   /** The pointer is over text that a click goes straight into. */
   const [overText, setOverText] = useState(false);
-  /** The pointer is over a child reached by a direct click through its group. */
-  const [overGroupChild, setOverGroupChild] = useState(false);
+  /**
+   * The pointer is over a child of a group, which has the hover frame: the group the press takes
+   * there, at the depth the user is working at, which a drag moves. Over an icon on a circle on
+   * a card, the card, not the circle.
+   */
+  const [overGroup, setOverGroup] = useState<string | undefined>();
   /** While several elements are turned together: the box they started in, and how far it turned. */
   const [turn, setTurn] = useState<{ frame: Frame; angle: number } | undefined>();
   /** The groups the user went into by a click or a double-click, outermost first (ARR-01). */
@@ -928,10 +933,10 @@ export function Stage({
 
   /**
    * What a press at a point means (`resolvePress`). Over a preview, where the picture is not
-   * the slide's own, and while an image is cropped, a press is only what it always was.
+   * the slide's own, and while an image is cropped, a press is only what it always was. `chain`:
+   * what is under the point (`pickAt`), when the caller has it already.
    */
-  const pressAt = (clientX: number, clientY: number): Press => {
-    const chain = pickAt(clientX, clientY);
+  const pressAt = (clientX: number, clientY: number, chain = pickAt(clientX, clientY)): Press => {
     if (previewing || crop) return resolveHit(chain, scope);
     const p = toSlide(clientX, clientY);
     const hit = resolvePress(chain, scope, index, selected, (shape) => onTextOf(shape, p));
@@ -946,10 +951,11 @@ export function Stage({
       parent &&
       fromText.scope.includes(parent.id) &&
       parent.children[0]?.id === top.element.id &&
-      top.element.type === 'shape'
+      (top.element.type === 'shape' || cardGround(parent)?.id === top.element.id)
     ) {
-      // The first shape is the group's background. After entering its text directly, a click
-      // back on that background selects the whole group, just as it did before editing text.
+      // The first shape is the group's background, as the HTML a card lies on is. After entering
+      // its text directly, a click back on that background selects the whole group, just as it
+      // did before editing text.
       return { scope: pathIds(index.get(parent.id)!), id: parent.id };
     }
     return hit;
@@ -1279,7 +1285,7 @@ export function Stage({
     if (!slide) return false;
     setHover(undefined);
     setOverText(false);
-    setOverGroupChild(false);
+    setOverGroup(undefined);
     if (g.pendingSelection) selection.getState().selectElements([g.pendingSelection]);
     // A box that is typed in is moved, not copied: the copy would be of a text half written.
     g.duplicate ||= alt && !typing && !g.noCopy;
@@ -1328,7 +1334,7 @@ export function Stage({
       const p = toSlide(clientX, clientY);
       setOverCrop(inCropFrame(p) || onCropPicture(crop.box, crop.view, p));
       setHover(undefined);
-      setOverGroupChild(false);
+      setOverGroup(undefined);
       return;
     }
     const frameId = dataOf(target, 'move-frame');
@@ -1336,16 +1342,24 @@ export function Stage({
     if (frame && !frame.locked && !frame.hidden) {
       setHover(frame.element.id);
       setOverText(false);
-      setOverGroupChild(false);
+      setOverGroup(undefined);
       return;
     }
-    const press = pressAt(clientX, clientY);
-    // Hover follows directly reached text and foreground objects.
+    const chain = pickAt(clientX, clientY);
+    const press = pressAt(clientX, clientY, chain);
+    // Hover follows directly reached text and foreground objects, and in a group whatever else
+    // the pointer is on, the box a card lies on too: each has its own frame there, inside the
+    // frame of the group the press takes, which stands clear of it.
     const text = press.inside?.edit ? press.inside.id : undefined;
-    const id = press.inside?.id ?? press.id;
+    const top = index.get(chain.at(-1) ?? '');
+    const under =
+      top && !top.locked && !top.hidden && top.path.some((group) => group.id === press.id)
+        ? top.element.id
+        : undefined;
+    const id = press.inside?.id ?? under ?? press.id;
     setHover(id && !index.get(id)?.locked ? id : undefined);
     setOverText(text !== undefined);
-    setOverGroupChild(Boolean(press.inside && press.inside.id !== press.id));
+    setOverGroup(id !== undefined && id !== press.id ? press.id : undefined);
   };
 
   const onPointerMove = (e: PointerEvent) => {
@@ -1594,7 +1608,7 @@ export function Stage({
         if (click) {
           setHover(g.group);
           setOverText(false);
-          setOverGroupChild(false);
+          setOverGroup(undefined);
         }
       }
       return;
@@ -2312,10 +2326,9 @@ export function Stage({
   const textCursor = overText && hover !== undefined && !active && !previewing;
   const overObject = hover !== undefined && !previewing;
   const enteredGroup = scope.length ? index.get(scope[scope.length - 1] as string) : undefined;
-  const childGroup = overGroupChild && hover ? index.get(hover)?.path.at(-1) : undefined;
   const hoveredGroup =
-    childGroup && childGroup.id !== enteredGroup?.element.id && (!active || active === 'move')
-      ? index.get(childGroup.id)
+    overGroup && hover && overGroup !== enteredGroup?.element.id && (!active || active === 'move')
+      ? index.get(overGroup)
       : undefined;
 
   // The size or the angle, next to what a handle is changing.
@@ -2524,7 +2537,7 @@ export function Stage({
         }
         setHover(undefined);
         setOverText(false);
-        setOverGroupChild(false);
+        setOverGroup(undefined);
       }}
       onFocus={(e) => {
         if (e.target !== e.currentTarget) return;

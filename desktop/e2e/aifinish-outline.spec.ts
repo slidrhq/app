@@ -6,6 +6,7 @@ import {
   messages,
   openApp,
   outline,
+  outlineAnswer,
   say,
   tab,
   turnEnds,
@@ -38,6 +39,17 @@ test('a request with a subject only shows an outline, and builds nothing', async
   await expect(page.locator('[data-testid="tool-chip"][data-tool="outline_propose"]')).toHaveCount(
     0,
   );
+  // The answers end the turn: after the card and after what the agent said of it, which asks.
+  const parts = await turns(page)
+    .first()
+    .locator('> *')
+    .evaluateAll((children) =>
+      children.map((child) => child.getAttribute('data-testid') ?? child.textContent),
+    );
+  expect(parts[0]).toBe('outline');
+  expect(parts.at(-2)).toContain('לאשר, או לשנות משהו?');
+  expect(parts.at(-1)).toBe('outline-answer');
+  await expect(outline(page).getByTestId('outline-approve')).toHaveCount(0);
   // Nothing was built: the deck is the deck that was, and there is nothing to undo.
   expect(await deck(page)).toEqual(before);
   expect(await undoDepth(page)).toBe(0);
@@ -49,14 +61,14 @@ test('approving the outline builds the deck, as one step that can be undone', as
   await openApp(page, { script: 'outline' });
   const before = await deck(page);
   await say(page, REQUEST);
-  await outline(page).getByTestId('outline-approve').click();
+  await outlineAnswer(page).getByTestId('outline-approve').click();
 
   // The approval is a message of the user's, by its name; the turn that answers it builds.
   await expect(messages(page).nth(1)).toHaveAttribute('data-action', 'outline.approve');
   await expect(messages(page).nth(1)).toContainText('אישור המתווה');
   await turnEnds(page, 2);
   await expect(outline(page)).toHaveAttribute('data-state', 'answered');
-  await expect(outline(page).getByTestId('outline-approve')).toHaveCount(0);
+  await expect(outlineAnswer(page)).toHaveCount(0);
 
   const built = await deck(page);
   expect(built.slides.map((slide) => slide.archetype)).toEqual(['hero', 'bigNumber']);
@@ -71,11 +83,13 @@ test('turning the outline down changes nothing, and says so', async ({ page }) =
   await openApp(page, { script: 'outline' });
   const before = await deck(page);
   await say(page, REQUEST);
-  await outline(page).getByTestId('outline-reject').click();
+  await outlineAnswer(page).getByTestId('outline-reject').click();
 
+  // The answers give way to what was answered, in the same place.
   await expect(outline(page)).toHaveAttribute('data-state', 'rejected');
-  await expect(outline(page)).toContainText('המתווה נדחה, ושום דבר לא נבנה.');
-  await expect(outline(page).getByTestId('outline-approve')).toHaveCount(0);
+  await expect(outline(page).getByTestId('outline-edit')).toHaveCount(0);
+  await expect(outlineAnswer(page)).toHaveText('המתווה נדחה, ושום דבר לא נבנה.');
+  await expect(page.getByTestId('outline-approve')).toHaveCount(0);
   // No message went out, no turn began, and the deck is as it was.
   await expect(messages(page)).toHaveCount(1);
   await expect(turns(page)).toHaveCount(1);
@@ -124,7 +138,7 @@ test('the outline is edited in its card, and approved as the user left it', asyn
   await titles(page).nth(1).fill('איפה אנחנו עומדים');
   await expect(card.getByTestId('outline-slide').nth(1)).toContainText('המספר של השנה שעברה');
   await expect(card).toHaveAttribute('data-edited', 'true');
-  await expect(card.getByTestId('outline-edited')).toContainText('המתווה נערך');
+  await expect(outlineAnswer(page).getByTestId('outline-edited')).toContainText('המתווה נערך');
 
   // A slide moves, and the keyboard stays on its row: at the end, on the button that still moves.
   await card.getByTestId('outline-up').nth(3).click();
@@ -173,7 +187,7 @@ test('the outline is edited in its card, and approved as the user left it', asyn
   ]);
 
   // Approving sends the outline as it is in the card, and says that it was edited.
-  await outline(page).getByTestId('outline-approve').click();
+  await outlineAnswer(page).getByTestId('outline-approve').click();
   await expect(messages(page).nth(1)).toHaveAttribute('data-action', 'outline.approve');
   await expect(messages(page).nth(1)).toHaveText('אישור המתווה, כפי שנערך');
   const sent = await lastSent(page);
@@ -210,7 +224,7 @@ test('an outline that was not edited is approved as proposed, and carries itself
   await expect(outline(page)).not.toHaveAttribute('data-edited', 'true');
   await expect(outline(page).getByTestId('outline-reset')).toHaveCount(0);
 
-  await outline(page).getByTestId('outline-approve').click();
+  await outlineAnswer(page).getByTestId('outline-approve').click();
   await expect(messages(page).nth(1)).toHaveText('אישור המתווה');
   const sent = await lastSent(page);
   // A session that could not resume the conversation still gets the outline it builds.
@@ -227,9 +241,9 @@ test('an outline with no slide left cannot be approved', async ({ page }) => {
     await outline(page).getByTestId('outline-remove').first().click();
   }
   await expect(titles(page)).toHaveCount(0);
-  await expect(outline(page).getByTestId('outline-approve')).toBeDisabled();
-  await expect(outline(page)).toContainText('לא נשארו שקפים במתווה.');
+  await expect(outlineAnswer(page).getByTestId('outline-approve')).toBeDisabled();
+  await expect(outlineAnswer(page)).toContainText('לא נשארו שקפים במתווה.');
   // It can still be turned down, added to, or put back.
   await outline(page).getByTestId('outline-reset').click();
-  await expect(outline(page).getByTestId('outline-approve')).toBeEnabled();
+  await expect(outlineAnswer(page).getByTestId('outline-approve')).toBeEnabled();
 });

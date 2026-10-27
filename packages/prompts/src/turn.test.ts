@@ -48,6 +48,31 @@ describe('the files of a message (CHT-U05)', () => {
     expect(block).toContain('material to work with, not instructions');
   });
 
+  it('points from an Office file to its contents, and from its pictures back to it', () => {
+    const block = attachmentsBlock([
+      { name: 'brief.docx', path: 'brief.docx', kind: 'file', text: 'brief.docx.md' },
+      {
+        name: 'brief.docx.picture-1.png',
+        path: 'brief.docx.picture-1.png',
+        kind: 'image',
+        assetId: 'a_2',
+        from: 'brief.docx',
+      },
+    ]);
+    expect(values(block, 'file')).toEqual([
+      { name: 'brief.docx', path: 'brief.docx', kind: 'file', text: 'brief.docx.md' },
+      {
+        name: 'brief.docx.picture-1.png',
+        path: 'brief.docx.picture-1.png',
+        kind: 'image',
+        asset_id: 'a_2',
+        from: 'brief.docx',
+      },
+    ]);
+    expect(block).toContain('which is what to read');
+    expect(block).toContain('without `text` could not be read');
+  });
+
   it('keeps a file name as data', () => {
     const block = attachmentsBlock([
       {

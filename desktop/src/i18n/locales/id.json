@@ -51,6 +51,8 @@
     "setup": {
       "welcome": "Selamat datang di obrolan Slidr",
       "intro": "Pilih layanan untuk memulai. Selanjutnya, kita akan memilih model dan tingkat upaya.",
+      "finish": "Mari selesaikan penyiapan",
+      "finishIntro": "Masih ada beberapa pilihan yang diperlukan agar agen dapat melanjutkan.",
       "steps": "Langkah penyiapan",
       "steps_harness": "Layanan",
       "steps_model": "Model",
@@ -2521,7 +2523,6 @@
       "not_logged_in": "CLI sudah terinstal. Masuk ke akun Anda untuk melanjutkan.",
       "install": "Instal…",
       "signIn": "Masuk",
-      "refresh": "Segarkan koneksi dan model",
       "installTitle": "Instal {{name}}?",
       "installDescription": "Aplikasi akan mengunduh dan menginstal {{name}} menggunakan Windows App Installer. Setelah itu, kami akan memeriksa koneksi dan meminta Anda masuk jika diperlukan.",
       "installDescriptionNpm": "Aplikasi akan menginstal {{name}} menggunakan npm, dan jika Node.js belum ada, aplikasi akan menginstalnya terlebih dahulu menggunakan Windows App Installer. Setelah itu, kami akan memeriksa koneksi dan meminta Anda masuk jika diperlukan.",

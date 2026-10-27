@@ -47,6 +47,8 @@ export const turns = (page: Page): Locator => page.getByTestId('chat-assistant')
 export const messages = (page: Page): Locator => page.getByTestId('chat-user');
 export const draft = (page: Page): Locator => page.getByTestId('template-draft');
 export const outline = (page: Page): Locator => page.getByTestId('outline');
+/** The answers to the outline, at the end of its turn. */
+export const outlineAnswer = (page: Page): Locator => page.getByTestId('outline-answer');
 
 /** Shows the AI chat, or the panel of its actions, from the Activity Bar. */
 export async function tab(page: Page, name: 'chat' | 'actions'): Promise<void> {

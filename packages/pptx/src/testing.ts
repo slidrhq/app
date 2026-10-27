@@ -1,5 +1,6 @@
 import type { AssetMeta } from '@slidr/model';
 import { drawPng } from './png';
+import { writeZip } from './zip';
 
 /*
  * For the tests: a store of assets in memory, as the app's own keeps them (content-addressed),
@@ -53,4 +54,25 @@ export function markedPicture(w: number, h: number): Promise<Uint8Array<ArrayBuf
     if (x > w * 0.9 && y < h * 0.1) return { color: [40, 160, 40], alpha: 1 };
     return { color: [120, 170, Math.round(255 - (y / h) * 120)], alpha: 1 };
   });
+}
+
+/**
+ * An Office file of the parts given, its main part the one the package points at: a Word
+ * document, a presentation or a workbook made in a test, without Office.
+ */
+export function officeFile(
+  main: string,
+  parts: Record<string, string | Uint8Array>,
+): Promise<Uint8Array<ArrayBuffer>> {
+  const encoder = new TextEncoder();
+  const rels =
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    `<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="${main}"/>` +
+    '</Relationships>';
+  return writeZip(
+    Object.entries({ '_rels/.rels': rels, ...parts }).map(([name, data]) => ({
+      name,
+      data: typeof data === 'string' ? encoder.encode(data) : data,
+    })),
+  );
 }

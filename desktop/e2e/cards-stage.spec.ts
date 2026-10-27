@@ -168,10 +168,13 @@ test('over text inside a group the frame is the text own, and the cursor is the 
     'g_card_title',
     'move',
   );
-  // Bare background belongs to the card; foreground objects have their own hover frame.
-  await expectOver(page, await bare(page), 'g_card', 'move');
+  // Every object of the card has its own hover frame, its box too, in the frame of the card.
+  await expectOver(page, await bare(page), 'g_card_bg', 'move');
+  await expect(surface(page).locator('[data-hovered-group="g_card"]')).toBeVisible();
+  // In a group of its own on the card, the frame around it is the card's, which a drag moves.
   await expectOver(page, await center(page, el('g_card_icon')), 'g_card_icon', 'move');
-  await expect(surface(page).locator('[data-hovered-group="g_card_row"]')).toBeVisible();
+  await expect(surface(page).locator('[data-hovered-group="g_card"]')).toBeVisible();
+  await expect(surface(page).locator('[data-hovered-group="g_card_row"]')).toHaveCount(0);
 
   // A shape has a text cursor on its words and a move cursor elsewhere on its own frame.
   await expectOver(page, await center(page, el('g_card_chip')), 'g_card_chip', 'text');

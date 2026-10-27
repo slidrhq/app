@@ -17,6 +17,7 @@ import {
   findSlide,
   richText,
 } from '@slidr/model';
+import { officeFile } from '@slidr/pptx/testing';
 import { describe, expect, it, vi } from 'vitest';
 import errorsScript from '../../src-tauri/src/harness/fixtures/scripts/errors.json';
 import {
@@ -1686,6 +1687,31 @@ describe('a session that cannot remember its conversation (AGT-06)', () => {
     expect(again.seen.sends.at(-1)!.context).not.toContain('<slidr_conversation>');
   });
 
+  it('is told where the text of an attached Word file is (ADR-115)', async () => {
+    const reading = script([say('Read it.'), done()], [say('Sure.'), done()]);
+    const first = setup({ reading });
+    const brief = {
+      name: 'brief.docx',
+      mime: '',
+      bytes: await officeFile('word/document.xml', {
+        'word/document.xml':
+          '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Hi</w:t></w:r></w:p></w:body></w:document>',
+      }),
+    };
+    await first.thread.send('Read this', { attachments: [brief] });
+    await settled(first.thread);
+
+    const again = setup(
+      { reading },
+      { files: new Map(first.transcripts.files), wrap: forgetful() },
+    );
+    await again.thread.load();
+    await ask(again.thread, 'Thanks');
+    expect(again.seen.sends.at(-1)!.context).toContain(
+      'user: "Read this [attached: brief.docx (its text: brief.docx.md)]"',
+    );
+  });
+
   it('is told the outline that was proposed, so that a typed answer to it has its subject', async () => {
     const slides = [
       { title: 'פתיחה', archetype: 'hero' },
@@ -1920,17 +1946,77 @@ describe('the files of a message (CHT-U05)', () => {
 
   function attaching(extra: { fail?: boolean } = {}) {
     const attached: { thread: string; name: string; bytes: number }[] = [];
+    const stored = new Map<string, Uint8Array>();
     const wrap = (client: AgentClient): AgentClient => ({
       ...client,
       attach: (thread, file) => {
         if (extra.fail) return Promise.reject(new AgentError('io', 'the disk is full'));
         attached.push({ thread, name: file.name, bytes: file.bytes.length });
+        stored.set(file.name, file.bytes);
         return Promise.resolve(file.name);
       },
     });
     const made = setup({ talk }, { wrap, storeImage: () => Promise.resolve(asset) });
-    return { ...made, attached };
+    return { ...made, attached, stored };
   }
+
+  /** A Word document of one paragraph with a picture in it. */
+  const briefDocx = async () => ({
+    name: 'brief.docx',
+    mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    bytes: await officeFile('word/document.xml', {
+      'word/document.xml':
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+        '<w:body><w:p><w:r><w:t>The brief</w:t></w:r><w:r><w:drawing><a:graphic><a:graphicData><pic:pic><pic:blipFill><a:blip r:embed="rPic"/></pic:blipFill></pic:pic></a:graphicData></a:graphic></w:drawing></w:r></w:p></w:body></w:document>',
+      'word/_rels/document.xml.rels':
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rPic" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/></Relationships>',
+      'word/media/image1.png': new Uint8Array(2048).fill(7),
+    }),
+  });
+
+  it('of Word, PowerPoint or Excel are read into Markdown beside them, with their pictures (ADR-115)', async () => {
+    const { bus, thread, seen, attached, stored } = attaching();
+    await thread.send('Make a deck of this', { attachments: [await briefDocx()] });
+    await settled(thread);
+
+    // The file, then its picture, then its text, which names the picture where it stands.
+    expect(attached.map((file) => file.name)).toEqual([
+      'brief.docx',
+      'brief.docx.picture-1.png',
+      'brief.docx.md',
+    ]);
+    expect(new TextDecoder().decode(stored.get('brief.docx.md'))).toBe(
+      'The brief![picture 1](<brief.docx.picture-1.png>)\n',
+    );
+    const [turn] = seen.sends;
+    const block = turn!.context!.slice(turn!.context!.indexOf('<slidr_attachments>'));
+    expect(block.split('\n').slice(1, 3)).toEqual([
+      'file: {"name":"brief.docx","path":"brief.docx","kind":"file","text":"brief.docx.md"}',
+      `file: {"name":"brief.docx.picture-1.png","path":"brief.docx.picture-1.png","kind":"image","asset_id":"${asset.id}","from":"brief.docx"}`,
+    ]);
+    // The picture is shown with the message and is among the deck's assets, as one attached.
+    expect(turn!.images).toMatchObject([{ mediaType: 'image/png' }]);
+    expect(bus.deck.assets[asset.id]).toEqual(asset);
+    // The chat shows the file the user attached, and nothing the app made of it.
+    expect(thread.store.getState().entries[0]).toMatchObject({
+      attachments: [{ name: 'brief.docx', kind: 'file', text: 'brief.docx.md' }],
+    });
+    expect(
+      (thread.store.getState().entries[0] as { attachments: unknown[] }).attachments,
+    ).toHaveLength(1);
+  });
+
+  it('of Word that cannot be read go as they are, and the turn goes on', async () => {
+    const { thread, seen, attached } = attaching();
+    const broken = { name: 'broken.docx', mime: '', bytes: new Uint8Array([1, 2, 3]) };
+    await thread.send('Use this', { attachments: [broken] });
+    await settled(thread);
+    expect(attached.map((file) => file.name)).toEqual(['broken.docx']);
+    const block = seen.sends[0]!.context!;
+    // Without `text`, which the block says means it could not be read.
+    expect(block).toContain('file: {"name":"broken.docx","path":"broken.docx","kind":"file"}');
+    expect(block).toContain('without `text` could not be read');
+  });
 
   it('go to the conversation and, a picture, to the deck; the turn is told where each is', async () => {
     const { bus, thread, seen, attached } = attaching();

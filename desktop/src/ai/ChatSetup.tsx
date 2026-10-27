@@ -7,7 +7,7 @@ import type { HarnessDescriptor } from '../agent/agent';
 import type { ChatProblem } from '../agent/transcript';
 import { latestModels, modelEfforts, selectionIssue } from '../agent/harnessSetup';
 import { harnessLook, harnessName, installsWithNpm } from '../agent/harnessLook';
-import { setAgentSettings, useAgentSettings } from '../settings';
+import { chooseHarness, chosenHarness, setAgentSettings, useAgentSettings } from '../settings';
 import { useEditor } from '../shell';
 import { agentOf } from './runtime';
 
@@ -17,7 +17,8 @@ export function useChatSetup(problem?: ChatProblem) {
   const [harnesses, setHarnesses] = useState<HarnessDescriptor[]>();
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  // An old/default harness id alone is not a completed user choice.
+  // An old/default harness id alone is not a completed user choice; one chosen here or in
+  // Settings is (`chosenHarness`), and the setup goes on from its model.
   const [confirmedHarness, setConfirmedHarness] = useState<string>();
   const state = useStore(agent.setup.store, (states) =>
     settings.harnessId ? states[settings.harnessId] : undefined,
@@ -64,14 +65,17 @@ export function useChatSetup(problem?: ChatProblem) {
       current = false;
     };
   }, [agent, attempt, needed]);
+  // Chosen before this setup: in Settings, or in a setup of an earlier run.
+  const chosenBefore =
+    !!descriptor && confirmedHarness !== descriptor.id && chosenHarness() === descriptor.id;
+  const chosen = chosenBefore || (!!descriptor && confirmedHarness === descriptor.id);
   // Asked for from a problem in the conversation: the agent is chosen again, here.
-  const choosingHarness =
-    reselecting || !descriptor || (!settings.model && confirmedHarness !== descriptor.id);
+  const choosingHarness = reselecting || !descriptor || (!settings.model && !chosen);
   useEffect(() => {
-    // Continuing the first-time setup is an explicit request to load this agent's models.
-    if (descriptor && !mock && !choosingHarness && confirmedHarness === descriptor.id)
+    // Going on from the model of an agent chosen is an explicit request to load its models.
+    if (needed && descriptor && !mock && !choosingHarness && chosen)
       void agent.setup.connect(descriptor.id).catch(() => undefined);
-  }, [agent, descriptor, mock, choosingHarness, confirmedHarness]);
+  }, [agent, needed, descriptor, mock, choosingHarness, chosen]);
   const checking = needed && !harnesses && !failed && !descriptor;
   return {
     agent,
@@ -83,6 +87,7 @@ export function useChatSetup(problem?: ChatProblem) {
     needed,
     failed,
     choosingHarness,
+    chosenBefore,
     reselecting,
     reselect: setReselecting,
     confirmHarness: (id: string) => {
@@ -94,9 +99,22 @@ export function useChatSetup(problem?: ChatProblem) {
 }
 
 /** Setup is local conversation UI; it never sends a prompt or starts an agent session. */
-export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> }) {
+export function ChatSetup({
+  setup,
+  midway = false,
+}: {
+  setup: ReturnType<typeof useChatSetup>;
+  /** Shown under a conversation that has begun. */
+  midway?: boolean;
+}) {
   const { t } = useTranslation('ai');
   const { agent, settings, harnesses, descriptor, state, failed } = setup;
+  // The welcome is for a setup that starts at the agent. Under a conversation, or going on from
+  // the model of an agent chosen before (another agent chosen in Settings comes without a model
+  // or an effort), it is a setup to finish, and stays one whatever its questions are answered.
+  const [finishing, setFinishing] = useState(midway);
+  if (!finishing && (midway || setup.chosenBefore)) setFinishing(true);
+  const welcome = !finishing;
   const [choice, setChoice] = useState('');
   const formId = useId();
   const [editingHarness, setEditingHarness] = useState(false);
@@ -138,6 +156,22 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
     descriptor
       ? void agent.setup.connect(descriptor.id, true).catch(() => undefined)
       : setup.retry();
+  const ofAgent = !!descriptor && step !== 'harness';
+  const listFailed = failed || harnesses?.length === 0;
+  const unavailable =
+    !!state?.error || status === 'unavailable' || (status === 'ready' && !harness?.models.length);
+  // Installing and signing in check the agent again when they finish: Try again is offered only
+  // for a check that failed, never beside the step still to take.
+  const canRetry = !state?.busy && (listFailed || (ofAgent && unavailable));
+  const action =
+    ofAgent && !state?.busy
+      ? status === 'not_installed'
+        ? 'install'
+        : status === 'not_logged_in'
+          ? 'login'
+          : undefined
+      : undefined;
+  const actions = (!showForm && back) || canRetry || action;
   return (
     <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup">
       <div className="flex flex-col items-start gap-3">
@@ -145,8 +179,12 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
           <Icon icon={Ai} />
         </span>
         <div className="text-sm leading-6">
-          <p className="font-semibold text-ui-fg">{t('setup.welcome')}</p>
-          <p className="mt-1 text-ui-fg-muted">{t('setup.intro')}</p>
+          <p className="font-semibold text-ui-fg">
+            {t(welcome ? 'setup.welcome' : 'setup.finish')}
+          </p>
+          <p className="mt-1 text-ui-fg-muted">
+            {t(welcome ? 'setup.intro' : 'setup.finishIntro')}
+          </p>
         </div>
       </div>
       <ol aria-label={t('setup.steps')} className="flex items-center gap-2 text-xs">
@@ -172,7 +210,7 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
         ))}
       </ol>
       {!harnesses && !failed && <Skeleton className="h-24 w-full" />}
-      {(failed || harnesses?.length === 0) && <p role="alert">{t('setup.unavailable')}</p>}
+      {listFailed && <p role="alert">{t('setup.unavailable')}</p>}
       {showForm && (
         <form
           className="flex flex-col gap-4"
@@ -180,6 +218,7 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
             event.preventDefault();
             if (!options.some((option) => option.id === choice)) return;
             if (step === 'harness') {
+              chooseHarness(choice);
               setup.confirmHarness(choice);
               setAgentSettings({ harnessId: choice, model: undefined, effort: undefined });
               setEditingHarness(false);
@@ -195,6 +234,9 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
             {/* One grouped list, not a card per option: the rows stay compact in the narrow panel. */}
             <ChoiceList
               aria-labelledby={`${formId}-legend`}
+              // The agents and their models are English names of products: their rows read left to
+              // right in every language, the agent's mark first. The efforts are words of the page.
+              dir={step === 'effort' ? undefined : 'ltr'}
               value={choice}
               onValueChange={setChoice}
               options={options.map((option) => ({
@@ -204,7 +246,6 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
                   ? {
                       start: (
                         <span
-                          dir="ltr"
                           className={cx(
                             'flex size-6 shrink-0 items-center justify-center rounded-small font-mono text-2xs font-semibold',
                             harnessLook(option.id)?.tone ??
@@ -238,52 +279,46 @@ export function ChatSetup({ setup }: { setup: ReturnType<typeof useChatSetup> })
           </div>
         </form>
       )}
-      {descriptor && step !== 'harness' && (
-        <div className="flex flex-col gap-3 text-sm" aria-live="polite">
-          {state?.busy && <p>{t(`setup.${state.busy}`)}</p>}
-          {!state?.busy && status === 'not_installed' && (
+      {(ofAgent || actions) && (
+        <div className="flex flex-col gap-4 text-sm" aria-live="polite">
+          {descriptor && ofAgent && (
             <>
-              <p>
-                {t(
-                  installsWithNpm(descriptor.id)
-                    ? 'setup.installDescriptionNpm'
-                    : 'setup.installDescription',
-                  { name: harnessName(descriptor) },
-                )}
-              </p>
-              <Button onClick={() => void agent.setup.run(descriptor.id, 'install')}>
-                {t('setup.install')}
-              </Button>
+              {state?.busy && <p>{t(`setup.${state.busy}`)}</p>}
+              {action === 'install' && (
+                <p>
+                  {t(
+                    installsWithNpm(descriptor.id)
+                      ? 'setup.installDescriptionNpm'
+                      : 'setup.installDescription',
+                    { name: harnessName(descriptor) },
+                  )}
+                </p>
+              )}
+              {action === 'login' && <p>{t('setup.signInDescription')}</p>}
+              {unavailable && <p role="alert">{t('setup.unavailable')}</p>}
             </>
           )}
-          {!state?.busy && status === 'not_logged_in' && (
-            <>
-              <p>{t('setup.signInDescription')}</p>
-              <Button onClick={() => void agent.setup.run(descriptor.id, 'login')}>
-                {t('setup.signIn')}
-              </Button>
-            </>
+          {/* One row, as under the questions: Back first, the step's own action last. */}
+          {actions && (
+            <div className="flex justify-end gap-2">
+              {!showForm && back}
+              {canRetry && (
+                <Button variant="ghost" onClick={retry}>
+                  {t('setup.retry')}
+                </Button>
+              )}
+              {descriptor && action && (
+                <Button
+                  variant="primary"
+                  onClick={() => void agent.setup.run(descriptor.id, action)}
+                >
+                  {t(action === 'install' ? 'setup.install' : 'setup.signIn')}
+                </Button>
+              )}
+            </div>
           )}
-          {(state?.error ||
-            status === 'unavailable' ||
-            (status === 'ready' && !harness?.models.length)) && (
-            <p role="alert">{t('setup.unavailable')}</p>
-          )}
-          {!showForm && back && <div className="flex justify-end">{back}</div>}
         </div>
       )}
-      {(step !== 'harness' || failed || harnesses?.length === 0) &&
-        !state?.busy &&
-        (failed ||
-          harnesses?.length === 0 ||
-          state?.error ||
-          status === 'unavailable' ||
-          status === 'not_logged_in' ||
-          (status === 'ready' && !harness?.models.length)) && (
-          <Button variant="ghost" onClick={retry}>
-            {t('setup.retry')}
-          </Button>
-        )}
     </section>
   );
 }

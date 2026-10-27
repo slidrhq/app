@@ -35,7 +35,7 @@ const TYPES: Record<string, ChartType> = {
 };
 
 /** The points of a cache (`c:strCache`, `c:numCache`, or a literal), by index. */
-function points(el: XmlElement | undefined): { count: number; values: Map<number, string> } {
+export function points(el: XmlElement | undefined): { count: number; values: Map<number, string> } {
   const ref = child(el, 'c:strRef', 'c:numRef');
   const multi = path(el, 'c:multiLvlStrRef', 'c:multiLvlStrCache');
   const cache = ref
@@ -66,7 +66,7 @@ function seriesColor(ser: XmlElement, ctx: PartContext): Color | undefined {
   return readColor(fill ?? line, ctx.colors)?.color;
 }
 
-function richText(el: XmlElement | undefined): string | undefined {
+export function richText(el: XmlElement | undefined): string | undefined {
   const rich = path(el, 'c:tx', 'c:rich');
   if (rich) {
     const text = children(rich, 'a:p')

@@ -228,6 +228,20 @@ describe('resolvePress', () => {
     group('shut', [text('kept')], { locked: true }),
     text('solo'),
     chip('label', 'Alone'),
+    // A card read from a page whose box stayed HTML, and a group with HTML that is only a part.
+    group('page', [
+      createElement.html({ id: 'paper', frame: { x: 0, y: 0, w: 400, h: 300 }, markup: '<p></p>' }),
+      text('words'),
+      createElement.svg({
+        id: 'mark',
+        frame: { x: 230, y: 60, w: 40, h: 40 },
+        markup: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
+      }),
+    ]),
+    group('loose', [
+      createElement.html({ id: 'patch', frame: { x: 0, y: 0, w: 200, h: 80 }, markup: '<p></p>' }),
+      text('note'),
+    ]),
   ]);
   const onText = () => true;
   const offText = () => false;
@@ -353,6 +367,21 @@ describe('resolvePress', () => {
       child('icon', ['card', 'row']),
     );
     expect(press(['card', 'bg']).inside).toBeUndefined();
+  });
+
+  it('picks what lies on HTML that is the whole of its group directly, as on a card', () => {
+    const child = (id: string) => ({ scope: ['page'], id, edit: false });
+    expect(press(['page', 'words'], [], [], offText)).toEqual({
+      scope: [],
+      id: 'page',
+      inside: child('words'),
+    });
+    expect(press(['page', 'mark']).inside).toEqual(child('mark'));
+    // The HTML is the card's ground, which the press takes as the card.
+    expect(press(['page', 'paper'])).toEqual({ scope: [], id: 'page' });
+    expect(press(['page', 'paper'], [], ['page']).inside).toEqual(child('paper'));
+    // HTML that is only a part of its group makes no card: off the text, the group is taken.
+    expect(press(['loose', 'note'], [], [], offText)).toEqual({ scope: [], id: 'loose' });
   });
 
   it('picks a background child only on a second click on the selected card', () => {

@@ -70,7 +70,7 @@ import { he } from './messages';
 import { ModelPicker } from './ModelPicker';
 import { ChatSetup, useChatSetup } from './ChatSetup';
 import { harnessName, installsWithNpm } from '../agent/harnessLook';
-import { OutlineCard } from './Outline';
+import { OutlineAnswer, OutlineCard } from './Outline';
 import { aiOf, navigateTo, setFollow, useAiPreferences } from './runtime';
 import { DECK } from './sessions';
 import { activityLabel, targetSlideNumber, toolIcon, toolLabel } from './toolLabels';
@@ -328,6 +328,19 @@ type Setup = ReturnType<typeof useChatSetup>;
 /** The problems that are the agent's program itself: they are put right in the conversation. */
 const SETUP_PROBLEMS = ['not_installed', 'not_logged_in', 'unavailable'];
 
+/**
+ * The problems the card explains in its own words. The rest (a failed check, an error the agent
+ * reported, the unknown) keep the program's message under the body: it is all there is to go on.
+ */
+const EXPLAINED_PROBLEMS = [
+  'not_installed',
+  'not_logged_in',
+  'quota',
+  'network',
+  'tools_unavailable',
+  'process_exited',
+];
+
 const isSetupProblem = (entry: ChatEntry | undefined) =>
   entry?.type === 'assistant' && SETUP_PROBLEMS.includes(entry.problem?.kind ?? '');
 
@@ -367,6 +380,8 @@ function ProblemCard({
   const [rechecked, setRechecked] = useState(false);
   const checked = rechecked || descriptor?.id !== origin;
   const status = state?.connection?.status;
+  // A check behind a connection that was ready is a check all the same, here.
+  const busy = state?.busy ?? (state?.checking ? 'connecting' : undefined);
   // A connection kept from before the problem may still say "ready": then the problem is right.
   const live = status && (checked || status.state !== 'ready') ? status.state : undefined;
   const fixed = settled || (live === 'ready' && !state?.error);
@@ -374,10 +389,10 @@ function ProblemCard({
   const kind = shown && isProblemKind(shown) ? shown : 'other';
   const act = (work: Promise<unknown>) =>
     void work.catch(() => undefined).finally(() => setRechecked(true));
-  // The program's own hint of a missing CLI says no more than the body, in English.
+  // Where the body says what went wrong, the program's own words say no more, in English.
   const detail =
     state?.error ??
-    (kind === 'not_installed' ? undefined : live ? status?.detail : problem.message);
+    (EXPLAINED_PROBLEMS.includes(kind) ? undefined : live ? status?.detail : problem.message);
   return (
     <div
       role="alert"
@@ -409,13 +424,13 @@ function ProblemCard({
                 )
               : t(`problem.${kind}.body`)}
         </p>
-        {descriptor && state?.busy && (
+        {descriptor && busy && (
           <p className="flex items-center gap-2 pt-1 text-sm text-ui-fg-muted">
             <Spinner />
-            {t(`setup.${state.busy}`)}
+            {t(`setup.${busy}`)}
           </p>
         )}
-        {descriptor && setup && !state?.busy && !fixed && !setup.choosingHarness && (
+        {descriptor && setup && !busy && !fixed && !setup.choosingHarness && (
           <div className="flex flex-wrap gap-1.5 pt-1.5">
             {kind === 'not_installed' && (
               <Button
@@ -578,6 +593,12 @@ function UndoTurn({ txId, disabled }: { txId: string; disabled: boolean }) {
   );
 }
 
+/** An outline the agent proposed: drawn as a card, not as a chip (AID-03). */
+const isOutline = (
+  part: AssistantEntry['parts'][number],
+): part is ToolPart & { name: 'outline_propose' } =>
+  part.type === 'tool' && part.name === 'outline_propose' && part.state !== 'failed';
+
 function AssistantTurn({
   entry,
   busy,
@@ -599,6 +620,9 @@ function AssistantTurn({
   onRetry: () => void;
 }) {
   const { t } = useTranslation('ai');
+  // The outline the turn ends on waits for an answer, which comes after all the turn says.
+  const outline = entry.parts.findLast(isOutline);
+  const waits = last && !busy && entry.outcome === 'completed';
   return (
     <article
       aria-label={t('agent')}
@@ -609,14 +633,14 @@ function AssistantTurn({
       {entry.parts.map((part, i) =>
         part.type === 'text' ? (
           <MarkdownView key={i} text={part.text} />
-        ) : part.type === 'tool' && part.name === 'outline_propose' && part.state !== 'failed' ? (
+        ) : isOutline(part) ? (
           // An outline is shown as what it is, not as a chip (AID-03).
           <OutlineCard
             key={`${part.id}-${i}`}
             part={part}
             entryId={entry.id}
             thread={thread}
-            open={last && !busy && entry.outcome === 'completed'}
+            open={waits && part === outline}
           />
         ) : part.type === 'tool' ? (
           // A harness may reuse a call id in a later round of the same run.
@@ -625,6 +649,7 @@ function AssistantTurn({
           <GateLine key={`gate-${part.round}`} part={part} />
         ),
       )}
+      {outline && <OutlineAnswer part={outline} entryId={entry.id} thread={thread} open={waits} />}
       {entry.problem && <ProblemCard problem={entry.problem} setup={setup} settled={settled} />}
       {entry.remaining && <Remaining report={entry.remaining} disabled={busy} onRetry={onRetry} />}
       {entry.outcome === 'interrupted' && (
@@ -989,7 +1014,7 @@ export function Chat({
         )}
         {state.busy && <Working activity={state.activity} stopping={state.stopping} />}
         {afterMessages}
-        {setup.needed && !inCard && <ChatSetup setup={setup} />}
+        {setup.needed && !inCard && <ChatSetup setup={setup} midway />}
       </div>
     );
   }

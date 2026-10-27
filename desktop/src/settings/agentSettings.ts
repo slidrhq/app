@@ -124,8 +124,81 @@ export function setAgentSettings(patch: Partial<StoredAgentSettings>): void {
   adopt();
   const before = stored();
   const next = parse({ ...before, ...patch });
-  if (next.harnessId !== before.harnessId) conversations.setState({}, true);
+  if (next.harnessId !== before.harnessId) {
+    conversations.setState({}, true);
+    remember(before);
+  }
+  remember(next);
   write(next);
+}
+
+/**
+ * The model and the effort last chosen on each harness, by its id, so that a harness chosen
+ * again comes back with them (`setAgentHarness`). Kept per machine, beside the connections of
+ * the harnesses (`storedConnections`).
+ */
+const CHOICES_KEY = 'slidr.agentChoices';
+
+function choices(): Record<string, ConversationSettings> {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(CHOICES_KEY) ?? 'null');
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return {};
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([id, choice]) => {
+        const { model, effort } = parse(choice);
+        return [id, { model, effort }];
+      }),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function remember({ harnessId, model, effort }: StoredAgentSettings): void {
+  if (!harnessId || !model) return;
+  try {
+    localStorage.setItem(
+      CHOICES_KEY,
+      JSON.stringify({ ...choices(), [harnessId]: { model, effort } }),
+    );
+  } catch {
+    // Not kept: the harness comes back without a model, to be chosen again.
+  }
+}
+
+/**
+ * The harness the user chose last, in Settings or in the chat's setup, by its id. Kept per
+ * machine, beside the choices. A harness id in the settings alone may be an earlier version's
+ * default: the chat's setup asks for the harness again unless it is this one, and otherwise
+ * goes on from the model (`useChatSetup`).
+ */
+const HARNESS_KEY = 'slidr.agentHarness';
+
+export function chosenHarness(): string | undefined {
+  try {
+    return localStorage.getItem(HARNESS_KEY) ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Notes that the user chose this harness; the settings are the caller's to change. */
+export function chooseHarness(harnessId: string): void {
+  try {
+    localStorage.setItem(HARNESS_KEY, harnessId);
+  } catch {
+    // Not kept: the chat's setup asks for the harness again.
+  }
+}
+
+/**
+ * Makes another harness the app's, with the model and the effort last chosen on it; without
+ * them, when it was never given any. Settings keeps them to what the harness lists now.
+ */
+export function setAgentHarness(harnessId: string): void {
+  chooseHarness(harnessId);
+  const kept = choices()[harnessId];
+  setAgentSettings({ harnessId, model: kept?.model, effort: kept?.effort });
 }
 
 /**

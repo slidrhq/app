@@ -11,7 +11,7 @@ import {
   type TextElement,
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
-import { cardBox, newCard } from './card';
+import { cardBox, cardGround, newCard } from './card';
 import { en, he } from './messages';
 
 const slide = { w: 1920, h: 1080 };
@@ -69,6 +69,32 @@ describe('cardBox', () => {
     expect(cardBox(box())).toBeUndefined();
     expect(cardBox(label())).toBeUndefined();
     expect(cardBox(group([]))).toBeUndefined();
+  });
+});
+
+describe('cardGround', () => {
+  const html = (extra: Partial<Parameters<typeof createElement.html>[0]> = {}) =>
+    createElement.html({ frame: { x: 0, y: 0, w: 400, h: 240 }, markup: '<div></div>', ...extra });
+
+  it('is the box of a card', () => {
+    const first = box();
+    expect(cardGround(group([first, label()]))).toBe(first);
+  });
+
+  it('is HTML that is the whole of its group, under the rest, where there is no box to paint', () => {
+    const ground = html();
+    const card = group([ground, label()]);
+    expect(cardGround(card)).toBe(ground);
+    expect(cardBox(card)).toBeUndefined();
+  });
+
+  it('is not HTML that is a part of the group, lies over the rest, or is turned', () => {
+    expect(cardGround(group([html({ frame: { x: 0, y: 0, w: 200, h: 240 } }), label()]))).toBe(
+      undefined,
+    );
+    expect(cardGround(group([label(), html()]))).toBeUndefined();
+    expect(cardGround(group([html({ rotation: 90 }), label()]))).toBeUndefined();
+    expect(cardGround(html())).toBeUndefined();
   });
 });
 

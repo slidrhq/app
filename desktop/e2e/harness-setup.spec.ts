@@ -215,27 +215,161 @@ test('the first-time setup, Settings and the chat picker offer only the newest o
   await expect(page.getByRole('option')).toHaveText(newest);
   await page.getByRole('option', { name: 'Sonnet 5.5', exact: true }).click();
   await expect(model).toContainText('Sonnet 5.5');
+  // The effort goes on with the next model, which has it.
+  const effort = page.getByRole('combobox', { name: 'Effort', exact: true });
+  await expect(effort).toContainText('High');
 
-  // An older model chosen before still shows what runs, but cannot be chosen again.
+  // An older model chosen before gives way to the newest of its family, and is not listed.
   await page.evaluate(async () => {
     const path = '/src/settings/index.ts';
     const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
     setAgentSettings({ model: 'opus-5', effort: 'high' });
   });
-  await expect(model).toContainText('Opus 5');
+  await expect(model).toContainText('Opus 5.5');
+  await expect(effort).toContainText('High');
   await model.click();
-  await expect(page.getByRole('option')).toHaveText([...newest, 'Opus 5']);
-  await expect(page.getByRole('option', { name: 'Opus 5', exact: true })).toHaveAttribute(
-    'aria-disabled',
-    'true',
-  );
+  await expect(page.getByRole('option')).toHaveText(newest);
   await page.screenshot({ path: 'test-results/settings-model-newest-en.png' });
   await page.keyboard.press('Escape');
   await ai.click();
-  await expect(picker).toHaveAttribute('data-model', 'opus-5');
+  await expect(picker).toHaveAttribute('data-model', 'opus-5-5');
   await picker.click();
   await expect(menu.locator('[data-model]')).toHaveText(newest);
 });
+
+for (const lang of ['he', 'en'] as const) {
+  test(`Settings shows what was chosen at once, and connects plainly only a harness never ready, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    const word = (en: string, he: string) => (lang === 'he' ? he : en);
+    await fixtures(page, [
+      { id: 'opus-5-5', label: 'Opus 5.5', effortLevels: ['low', 'high'] },
+      { id: 'sonnet-5-5', label: 'Sonnet 5.5', effortLevels: ['low', 'high'] },
+    ]);
+    const model = page.getByRole('combobox', { name: word('Model', 'מודל'), exact: true });
+    const effort = page.getByRole('combobox', { name: word('Effort', 'רמת מאמץ'), exact: true });
+    const high = word('High', 'גבוהה');
+    await model.click();
+    await page.getByRole('option', { name: 'Sonnet 5.5', exact: true }).click();
+    await effort.click();
+    await page.getByRole('option', { name: high, exact: true }).click();
+    // From here a check answers only when the page says so: what shows meanwhile can be looked at.
+    await page.evaluate(async () => {
+      const path =
+        performance
+          .getEntriesByType('resource')
+          .map((entry) => entry.name)
+          .findLast((name) => /\/src\/ai\/runtime\.ts(?:\?|$)/.test(name)) ?? '/src/ai/runtime.ts';
+      const { agentOf } = (await import(/* @vite-ignore */ path)) as typeof Runtime;
+      const setup = agentOf(window.slidr!).setup;
+      const client = (setup as unknown as { client: AgentClient }).client;
+      const connect = client.connect!.bind(client);
+      client.connect = async (id) => {
+        await new Promise((resolve) =>
+          document.addEventListener('release-check', resolve, { once: true }),
+        );
+        const connection = await connect(id);
+        // The harness has a newer Sonnet since, and no longer lists the one chosen.
+        return {
+          ...connection,
+          harness: {
+            ...connection.harness,
+            models: connection.harness.models.map((model) =>
+              model.id === 'sonnet-5-5'
+                ? { ...model, id: 'sonnet-5-6', label: 'Sonnet 5.6' }
+                : model,
+            ),
+          },
+        };
+      };
+    });
+    const release = () => page.evaluate(() => document.dispatchEvent(new Event('release-check')));
+    const connection = page.getByTestId('harness-connection');
+
+    // What the fields show in every frame drawn while the panel is on screen, one value after
+    // another, so that a blink is seen.
+    await page.evaluate(
+      (names) => {
+        const shown: string[] = [];
+        let last = '';
+        Object.assign(window, { shownFields: shown });
+        const look = () => {
+          const fields = names.map((name) => document.querySelector(`[aria-label="${name}"]`));
+          if (fields.every((field) => field && field.getBoundingClientRect().height > 0)) {
+            const value = fields
+              .map(
+                (field) =>
+                  `${field!.textContent}${field!.hasAttribute('disabled') ? ' (closed)' : ''}`,
+              )
+              .join(' | ');
+            if (value !== last) shown.push(value);
+            last = value;
+          }
+          requestAnimationFrame(look);
+        };
+        requestAnimationFrame(look);
+      },
+      [word('Model', 'מודל'), word('Effort', 'רמת מאמץ')],
+    );
+    const shown = () =>
+      page.evaluate(() => (window as unknown as { shownFields: string[] }).shownFields.splice(0));
+
+    // Opened again, the section checks the harness behind what it showed last, and says nothing
+    // of it: there is no button to refresh, and no spinner.
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
+    await expect(connection).toContainText(word('Connected', 'מחובר'));
+    await expect(connection).not.toContainText(word('Connecting', 'מתחברים'));
+    await expect(connection.getByRole('button')).toHaveCount(0);
+    await expect(model).toContainText('Sonnet 5.5');
+    await expect(effort).toContainText(high);
+    await page.screenshot({ path: `test-results/settings-agent-checking-${lang}.png` });
+    await release();
+    await expect(model).toContainText('Sonnet 5.6');
+    await expect(effort).toContainText(high);
+    expect(await shown()).toEqual([`Sonnet 5.5 | ${high}`, `Sonnet 5.6 | ${high}`]);
+
+    // Another harness, never ready before, says it is connecting; its fields wait in their place.
+    await page.getByRole('combobox', { name: 'Harness', exact: true }).click();
+    await page.getByRole('option', { name: 'Codex CLI', exact: true }).click();
+    await expect(connection).toContainText(
+      word('Connecting and loading available models', 'מתחברים וטוענים מודלים זמינים'),
+    );
+    await expect(model).toBeDisabled();
+    await expect(page.getByTestId('settings-agent').locator('.skeleton')).toHaveCount(0);
+    const defaults = page
+      .getByText(word('Defaults for chats', 'ברירת המחדל של שיחות'), { exact: true })
+      .locator('..');
+    const before = await defaults.boundingBox();
+    await page.screenshot({ path: `test-results/settings-agent-connecting-${lang}.png` });
+    await release();
+    await expect(model).toBeEnabled();
+    await expect(effort).toBeDisabled();
+    expect((await defaults.boundingBox())?.height).toBe(before?.height);
+    const chooseModel = word('Choose a model', 'בחרו מודל');
+    const chooseEffort = word('Choose an effort', 'בחרו רמת מאמץ');
+    expect(await shown()).toEqual([
+      `${chooseModel} (closed) | ${chooseEffort} (closed)`,
+      `${chooseModel} | ${chooseEffort} (closed)`,
+    ]);
+    await page.screenshot({ path: `test-results/settings-agent-connected-${lang}.png` });
+
+    // The harness of before comes back with what was chosen on it, in one frame: no placeholder,
+    // and nothing closed, on the way.
+    await page.getByRole('combobox', { name: 'Harness', exact: true }).click();
+    await page.getByRole('option', { name: 'Claude Code', exact: true }).click();
+    await expect(model).toContainText('Sonnet 5.6');
+    await expect(effort).toContainText(high);
+    await release();
+    await page.waitForTimeout(300);
+    expect(await shown()).toEqual([`Sonnet 5.6 | ${high}`]);
+    // The text of a field changes at once: its colour is not eased from the value before.
+    expect(await model.evaluate((field) => getComputedStyle(field).transitionProperty)).not.toMatch(
+      /(^|[ ,])(color|all)([ ,]|$)/,
+    );
+  });
+}
 
 test('chat handles installation, sign-in and a model without effort', async ({ page }) => {
   await openApp(page, { lang: 'en' });
@@ -257,6 +391,29 @@ test('chat handles installation, sign-in and a model without effort', async ({ p
   );
   await expect(page.getByTestId('model-picker')).toHaveAttribute('data-effort', '');
 });
+
+for (const lang of ['he', 'en'] as const) {
+  test(`the chat's install and sign-in steps end in one row, their action last, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    const setup = page.getByTestId('chat-setup');
+    const word = (en: string, he: string) => (lang === 'he' ? he : en);
+    await setup.getByRole('radio', { name: 'GitHub Copilot' }).check();
+    await setup.getByRole('button', { name: word('Continue', 'המשך'), exact: true }).click();
+    const back = word('Back', 'חזרה');
+    const install = word('Approve and install', 'אישור והתקנה');
+    await expect(setup.getByRole('button')).toHaveText([back, install]);
+    await setup.screenshot({ path: `test-results/chat-setup-install-${lang}.png` });
+    await setup.getByRole('button', { name: install, exact: true }).click();
+    // Signing in checks the agent again by itself: there is nothing to try again.
+    const signIn = word('Sign in', 'התחברות לחשבון');
+    await expect(setup.getByRole('button')).toHaveText([back, signIn]);
+    await setup.screenshot({ path: `test-results/chat-setup-sign-in-${lang}.png` });
+  });
+}
 
 test('Gemini installs with npm once approved, and Grok signs in before its models load', async ({
   page,
@@ -419,6 +576,76 @@ for (const lang of ['he', 'en'] as const) {
 }
 
 for (const lang of ['he', 'en'] as const) {
+  test(`another agent chosen in Settings mid-conversation is finished from its model, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await requestHarness(page, 'ready');
+    const ai = page.getByTestId('activity-bar').locator('[data-panel="ai"]');
+    await ai.click();
+    const input = page.getByTestId('chat-input');
+    await input.fill(lang === 'he' ? 'שקף פתיחה לרבעון' : 'An opening slide for the quarter');
+    await input.press('Enter');
+    await page.evaluate(() => document.dispatchEvent(new Event('release-harnesses')));
+    await page.evaluate(() => document.dispatchEvent(new Event('release-connection')));
+    const turn = page.getByTestId('chat-assistant');
+    await expect(turn).toHaveAttribute('data-outcome', 'completed');
+    // Another agent, never given a model, chosen in Settings.
+    await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
+    await page.locator('[data-settings-tab="agent"]').click();
+    await page.getByRole('combobox', { name: 'Harness', exact: true }).click();
+    await page.getByRole('option', { name: 'Codex CLI', exact: true }).click();
+    await ai.click();
+    const setup = page.getByTestId('chat-setup');
+    await expect(setup).toBeVisible();
+    await expect(setup).toContainText(
+      lang === 'he' ? 'בואו נשלים את ההגדרות' : 'Let’s finish setting up',
+    );
+    await expect(setup).not.toContainText(lang === 'he' ? 'ברוכים הבאים' : 'Welcome');
+    await expect(turn).toContainText('Connected on request.');
+    // The agent was chosen: the setup goes on from its model.
+    await expect(setup.locator('[aria-current="step"]')).toContainText(
+      lang === 'he' ? 'מודל' : 'Model',
+    );
+    await expect(setup.getByRole('radio', { name: 'Codex', exact: true })).toHaveCount(0);
+    await setup.getByRole('radio', { name: 'Reasoning model' }).check();
+    await setup.scrollIntoViewIfNeeded();
+    await page
+      .getByTestId('chat')
+      .screenshot({ path: `test-results/chat-setup-midway-${lang}.png` });
+    const next = () => setup.getByRole('button', { name: /^(Continue|המשך)$/ }).click();
+    await next();
+    await setup.getByRole('radio').last().check();
+    await next();
+    await expect(setup).toHaveCount(0);
+    await expect(input).toBeVisible();
+    await expect(turn).toContainText('Connected on request.');
+  });
+
+  test(`another agent chosen in Settings goes on from its model in a new chat, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await page.getByRole('combobox', { name: 'Harness', exact: true }).click();
+    await page.getByRole('option', { name: 'Codex CLI', exact: true }).click();
+    await expect(page.locator('body')).toHaveAttribute('data-connected-harness', 'codex-cli');
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    const setup = page.getByTestId('chat-setup');
+    await expect(setup.locator('[aria-current="step"]')).toContainText(
+      lang === 'he' ? 'מודל' : 'Model',
+    );
+    await expect(setup).toContainText(
+      lang === 'he' ? 'בואו נשלים את ההגדרות' : 'Let’s finish setting up',
+    );
+    await expect(setup.getByRole('radio', { name: 'Reasoning model' })).toBeVisible();
+    await page.screenshot({ path: `test-results/chat-setup-from-settings-${lang}.png` });
+    // Back still reaches the agent, with the one chosen in Settings marked.
+    await setup.getByRole('button', { name: /^(Back|חזרה)$/ }).click();
+    await expect(setup.getByRole('radio', { name: 'Codex', exact: true })).toBeChecked();
+  });
+
   test(`configured chat reopens without loading or checking harnesses in ${lang}`, async ({
     page,
   }) => {
@@ -497,9 +724,14 @@ for (const lang of ['he', 'en'] as const) {
     await expect(setup).toBeVisible();
     await expect(setup).not.toContainText('CLI');
     await expect(setup.getByRole('radio', { checked: true })).toHaveCount(0);
+    // The names of the agents and their models read left to right in Hebrew too; the efforts are
+    // words of the page.
+    const list = setup.getByRole('radiogroup');
+    await expect(list).toHaveAttribute('dir', 'ltr');
     await expect(page.locator('body')).not.toHaveAttribute('data-connected-harness');
     await expect(setup).not.toContainText('Scripted mock');
     await expect(page.getByTestId('chat-input')).toHaveCount(0);
+    await expect(setup).toContainText(lang === 'he' ? 'ברוכים הבאים' : 'Welcome');
     await page.screenshot({ path: `test-results/chat-setup-${lang}.png` });
     await setup.getByRole('radio', { name: 'Codex', exact: true }).check();
     await page.screenshot({ path: `test-results/chat-setup-selected-${lang}.png` });
@@ -510,12 +742,15 @@ for (const lang of ['he', 'en'] as const) {
     await expect(setup.getByRole('radio', { name: 'Codex', exact: true })).toBeChecked();
     await next();
     await setup.getByRole('radio', { name: 'Reasoning model' }).check();
+    await expect(list).toHaveAttribute('dir', 'ltr');
     await page.screenshot({ path: `test-results/chat-setup-model-${lang}.png` });
     await next();
     await back();
     await expect(setup.getByRole('radio', { name: 'Reasoning model' })).toBeChecked();
     await next();
     await expect(setup.getByRole('radio')).toHaveCount(2);
+    await expect(list).toHaveAttribute('dir', lang === 'he' ? 'rtl' : 'ltr');
+    await page.screenshot({ path: `test-results/chat-setup-effort-${lang}.png` });
     await setup.getByRole('radio').last().check();
     await next();
     await expect(setup).toHaveCount(0);

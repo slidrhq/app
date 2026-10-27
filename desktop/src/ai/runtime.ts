@@ -17,6 +17,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { AgentClient } from '../agent/agent';
 import { AgentService } from '../agent/agentService';
 import { captureWindowConversion, pageConversion } from '../agent/conversion';
+import { storedConnections } from '../agent/harnessSetup';
 import { pageCapture } from '../agent/pageCapture';
 import { connectToolBridge, tauriAgentFor } from '../agent/tauriAgent';
 import type { ToolBridge, ToolHandler } from '../agent/toolBridge';
@@ -192,7 +193,12 @@ function createAi(editor: Editor): AiRuntime {
     },
   };
   const harness = inApp
-    ? { client: tauriAgentFor(workspaceId), connectBridge: connectToolBridge }
+    ? {
+        client: tauriAgentFor(workspaceId),
+        connectBridge: connectToolBridge,
+        // What each CLI answered last shows at once in the next run, while it is checked again.
+        connections: storedConnections('slidr.harnesses'),
+      }
     : pageHarness();
 
   // The conversations of the chat are kept with the document (AID-01). Conversations of the

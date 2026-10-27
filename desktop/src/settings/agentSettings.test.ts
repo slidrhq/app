@@ -1,6 +1,13 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { agentSettings, setAgentSettings, setConversationSettings } from './agentSettings';
+import {
+  agentSettings,
+  chooseHarness,
+  chosenHarness,
+  setAgentHarness,
+  setAgentSettings,
+  setConversationSettings,
+} from './agentSettings';
 import { pageSettings, replaceSection, useSettings } from './store';
 
 /*
@@ -64,6 +71,38 @@ describe("the app's settings", () => {
   it('are the same object until they change, for a component that shows them', () => {
     setAgentSettings({ model: 'opus' });
     expect(agentSettings()).toBe(agentSettings());
+  });
+
+  it('bring back the model and the effort last chosen on a harness chosen again', () => {
+    setAgentSettings({ harnessId: 'claude-code', model: 'opus', effort: 'high', webAccess: false });
+    // A harness never given a model comes without one, to be chosen.
+    setAgentHarness('copilot-cli');
+    expect(agentSettings()).toEqual({ harnessId: 'copilot-cli', webAccess: false });
+    setAgentSettings({ model: 'gpt', effort: 'low' });
+    setAgentHarness('claude-code');
+    expect(agentSettings()).toEqual({
+      harnessId: 'claude-code',
+      model: 'opus',
+      effort: 'high',
+      webAccess: false,
+    });
+    // A change made on it since is what comes back.
+    setAgentSettings({ effort: 'max' });
+    setAgentHarness('copilot-cli');
+    setAgentHarness('claude-code');
+    expect(agentSettings()).toMatchObject({ model: 'opus', effort: 'max' });
+    setAgentHarness('copilot-cli');
+    expect(agentSettings()).toMatchObject({ model: 'gpt', effort: 'low' });
+  });
+
+  it('note the harness the user chose, not one an earlier version left', () => {
+    // A harness id written alone, as an earlier version's default was, is no choice.
+    setAgentSettings({ harnessId: 'claude-code' });
+    expect(chosenHarness()).toBeUndefined();
+    setAgentHarness('codex-cli');
+    expect(chosenHarness()).toBe('codex-cli');
+    chooseHarness('claude-code');
+    expect(chosenHarness()).toBe('claude-code');
   });
 });
 

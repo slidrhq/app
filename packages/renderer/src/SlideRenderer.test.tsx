@@ -580,6 +580,10 @@ describe('SlideRenderer', () => {
     expect(bordered.borderRadius).toBe('18px');
     expect(bordered.backgroundColor).not.toBe('');
     expect(layers('e_follow').some((style) => style.boxShadow.includes('inset'))).toBe(false);
+    // Its corners are the box's own: cut a second time, they are smoothed twice, and the edge
+    // of the accent is paler than the page's (a card read from HTML stayed HTML for it).
+    const following = container.querySelector<HTMLElement>('[data-element-id="e_follow"] > div')!;
+    expect(following.style.overflow).toBe('');
     // Without an accent, an outline in whole pixels is the border of the box that holds the
     // fill, and nothing around that box cuts its corners a second time.
     const plain = layers('e_plain').find((style) => style.borderTopWidth === '2px')!;

@@ -662,6 +662,8 @@ function ShapeView({ element: e }: { element: ShapeElement }) {
         ) : (
           <FillLayer fill={e.fill} ctx={ctx} style={sides} />
         );
+      // The borders have the corners of their own; an image under them is still cut to them.
+      cut = e.fill.kind === 'image';
     } else {
       layers = (
         <>

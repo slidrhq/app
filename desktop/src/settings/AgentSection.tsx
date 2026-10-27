@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, Terminal } from '@slidr/ui/icons';
 import { Button, cx, Field, Icon, Select, Skeleton, Switch } from '@slidr/ui';
 import { useStore } from 'zustand';
-import { latestModels, modelEfforts } from '../agent/harnessSetup';
+import { availableChoice, latestModels, modelEfforts } from '../agent/harnessSetup';
 import { harnessLook, installsWithNpm } from '../agent/harnessLook';
 import type { HarnessDescriptor, HarnessState } from '../agent/agent';
 import { DEFAULT_OUTLINE } from '../agent/agentService';
 import { agentOf } from '../ai/runtime';
 import { useEditor } from '../shell';
-import { setAgentSettings, useAgentSettings } from './agentSettings';
+import { setAgentHarness, setAgentSettings, useAgentSettings } from './agentSettings';
 import { InstallDialog } from './InstallDialog';
 import { SettingsGroup, SettingsItem, StatusPill, type StatusTone } from './layout';
 
@@ -20,6 +20,11 @@ import { SettingsGroup, SettingsItem, StatusPill, type StatusTone } from './layo
  * section `agent` of the settings file (`agentSettings.ts`): what every conversation runs with
  * until the picker of its chat chooses a model or an effort for that conversation alone
  * (AGT-04). A session reads them when it starts and at the start of every turn.
+ *
+ * A harness is checked again whenever the section opens, behind what it answered last (kept
+ * between runs, `HarnessSetup`): the model and the effort show at once. Only a harness never
+ * found ready says it is connecting, with its fields closed in their place until the models come
+ * in. Once the list is in, the choice is kept to it (`availableChoice`).
  */
 
 const stateTone: Record<HarnessState, StatusTone> = {
@@ -62,15 +67,17 @@ export function AgentSection() {
     if (selectedId) void agent.setup.connect(selectedId, true).catch(() => undefined);
   }, [agent, selectedId]);
 
+  // The names of the models listed so far: a model the harness no longer lists is followed by
+  // the newest of its family.
+  const named = useRef(new Map<string, string>());
   useEffect(() => {
     const connection = state?.connection;
-    if (
-      connection?.status.state === 'ready' &&
-      settings.effort &&
-      !modelEfforts(connection.harness, settings.model).includes(settings.effort)
-    ) {
-      setAgentSettings({ effort: undefined });
-    }
+    if (connection?.status.state !== 'ready') return;
+    const label = settings.model === undefined ? undefined : named.current.get(settings.model);
+    for (const model of connection.harness.models) named.current.set(model.id, model.label);
+    const choice = availableChoice(connection.harness, settings.model, settings.effort, label);
+    if (choice.model !== settings.model || choice.effort !== settings.effort)
+      setAgentSettings(choice);
   }, [state?.connection, settings.model, settings.effort]);
 
   useEffect(() => {
@@ -85,18 +92,23 @@ export function AgentSection() {
   }, [agent]);
 
   if (failed) {
-    return (
-      <p className="text-sm text-ui-fg-muted">
-        {t('agent.unavailable')}
-      </p>
-    );
+    return <p className="text-sm text-ui-fg-muted">{t('agent.unavailable')}</p>;
   }
   if (!harnesses) return <Skeleton className="h-24 w-full rounded-panel" />;
 
   const descriptor = harnesses.find((h) => h.id === selectedId);
   const harness = state?.connection?.harness;
   const status = state?.connection?.status;
-  const ready = status?.state === 'ready' && !state?.busy;
+  // Before the check of a harness has begun, it is as good as begun: the section starts it.
+  const busy = state ? state.busy : selectedId ? 'connecting' : undefined;
+  const ready = status?.state === 'ready' && !busy;
+  const action = busy
+    ? undefined
+    : status?.state === 'not_installed'
+      ? 'install'
+      : status?.state === 'not_logged_in'
+        ? 'signIn'
+        : undefined;
   // The program's own hint (a missing CLI, a sign-in) says no more than the line above it, in
   // English; only a failed install or sign-in adds a line of its own.
   const detail = state?.error;
@@ -121,10 +133,9 @@ export function AgentSection() {
                 value={descriptor.id}
                 disabled={state?.busy === 'installing' || state?.busy === 'signingIn'}
                 options={harnesses.map((h) => ({ value: h.id, label: h.name }))}
-                // Another harness has other models and other effort levels.
-                onValueChange={(harnessId) =>
-                  setAgentSettings({ harnessId, model: undefined, effort: undefined })
-                }
+                // Another harness has other models and other effort levels: it comes back with
+                // those last chosen on it, and its fields show them at once.
+                onValueChange={setAgentHarness}
               />
             </Field>
           </SettingsItem>
@@ -144,7 +155,7 @@ export function AgentSection() {
                   </span>
                 )}
               </div>
-              {state?.busy ? (
+              {busy ? (
                 <StatusPill tone="neutral">{t('agent.state.busy')}</StatusPill>
               ) : (
                 <StatusPill tone={stateTone[status?.state ?? 'unavailable']}>
@@ -153,7 +164,7 @@ export function AgentSection() {
               )}
             </div>
             <p className="text-xs text-ui-fg-muted">
-              {t(state?.busy ? `agent.${state.busy}` : `agent.${status?.state ?? 'unavailable'}`)}
+              {t(busy ? `agent.${busy}` : `agent.${status?.state ?? 'unavailable'}`)}
             </p>
             {detail && (
               <p className="break-words text-xs text-ui-fg-muted" dir="auto">
@@ -161,14 +172,15 @@ export function AgentSection() {
               </p>
             )}
           </div>
-          {!state?.busy && (
+          {/* A ready harness is checked again on its own each time the section opens. */}
+          {!busy && status?.state !== 'ready' && (
             <div className="flex flex-wrap items-center gap-2">
-              {status?.state === 'not_installed' && (
+              {action === 'install' && (
                 <Button size="sm" variant="primary" onClick={() => setConfirmInstall(selectedId)}>
                   {t('agent.install')}
                 </Button>
               )}
-              {status?.state === 'not_logged_in' && (
+              {action === 'signIn' && (
                 <Button
                   size="sm"
                   variant="primary"
@@ -182,14 +194,10 @@ export function AgentSection() {
                 variant="ghost"
                 icon={RefreshCw}
                 // Alone in its row, its icon lines up with the words above it.
-                className={
-                  status?.state === 'not_installed' || status?.state === 'not_logged_in'
-                    ? undefined
-                    : '-ms-2.5'
-                }
+                className={action ? undefined : '-ms-2.5'}
                 onClick={retry}
               >
-                {t(status?.state === 'ready' ? 'agent.refresh' : 'retry')}
+                {t('retry')}
               </Button>
             </div>
           )}
@@ -202,33 +210,33 @@ export function AgentSection() {
         onClose={() => setConfirmInstall(undefined)}
         onApprove={() => selectedId && void agent.setup.run(selectedId, 'install')}
       />
-      {ready && harness && (
+      {/* While the harness connects, the fields wait in their place, closed: nothing is swapped
+          for them, or moves, when the models come in. */}
+      {(busy === 'connecting' || (ready && harness)) && (
         <SettingsGroup title={t('agent.defaults')} note={t('agent.nextMessage')}>
           <SettingsItem>
             <Field label={t('agent.model')}>
               <Select
                 aria-label={t('agent.model')}
                 placeholder={t('agent.chooseModel')}
+                disabled={!ready}
                 value={selectedModel?.id ?? null}
-                // The newest of each family, as in the chat's setup. An older model chosen before
-                // stays listed, greyed, only so the field still shows what runs.
-                options={harness.models
-                  .filter((model) => model === selectedModel || latest.includes(model))
-                  .map((model) => ({
-                    value: model.id,
-                    label: model.label,
-                    disabled: !latest.includes(model),
-                  }))}
-                onValueChange={(model) => setAgentSettings({ model, effort: undefined })}
+                // The newest of each family, as in the chat's setup: a model of an older version
+                // is followed by its newest (`availableChoice`).
+                options={latest.map((model) => ({ value: model.id, label: model.label }))}
+                // The effort goes on with the next model where it has it.
+                onValueChange={(model) => setAgentSettings({ model })}
               />
             </Field>
           </SettingsItem>
-          {selectedModel && efforts.length > 0 && (
+          {(!selectedModel || efforts.length > 0) && (
             <SettingsItem>
               <Field label={t('agent.effort')}>
                 <Select
                   aria-label={t('agent.effort')}
                   placeholder={t('agent.chooseEffort')}
+                  // In its place before a model is chosen, so that choosing one moves nothing.
+                  disabled={!ready || !selectedModel}
                   value={
                     settings.effort && efforts.includes(settings.effort) ? settings.effort : null
                   }

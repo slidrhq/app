@@ -54,7 +54,10 @@ export function Select<T extends string>({
       <RadixSelect.Trigger
         aria-label={aria['aria-label']}
         className={cx(
-          'inline-flex cursor-default items-center justify-between gap-1.5 rounded-control text-sm text-ui-fg transition-colors select-none disabled:text-ui-fg-subtle data-placeholder:text-ui-fg-muted',
+          // Only the frame and the ground ease, on a hover: the words change at once, so a value
+          // that gives way to the placeholder, or to another value, is never drawn in the colour
+          // of the one before it.
+          'inline-flex cursor-default items-center justify-between gap-1.5 rounded-control text-sm text-ui-fg transition-[background-color,border-color] select-none disabled:text-ui-fg-subtle data-placeholder:text-ui-fg-muted',
           variant === 'field'
             ? 'border border-ui-line-strong bg-ui-field px-2.5 hover:border-ui-fg-subtle disabled:border-ui-line'
             : 'px-2 font-medium hover:bg-ui-hover active:bg-ui-pressed data-[state=open]:bg-ui-hover',

@@ -6,9 +6,12 @@
 import type { TFunction } from 'i18next';
 import type { Attachment } from '../agent/agentService';
 
-/** What the file dialog offers: the documents a deck is made from, and pictures. */
+/**
+ * What the file dialog offers: the documents a deck is made from, and pictures. Word, PowerPoint
+ * and Excel files reach the agent as Markdown the app reads them into (ADR-115).
+ */
 export const ATTACHABLE =
-  'image/*,.pdf,.md,.txt,.docx,.pptx,.html,.htm,.csv,.json,text/plain,text/markdown,text/html';
+  'image/*,.pdf,.md,.txt,.docx,.pptx,.xlsx,.html,.htm,.csv,.json,text/plain,text/markdown,text/html';
 
 /** The most files one message takes, and the largest of them: what the harness layer accepts. */
 export const MAX_FILES = 10;

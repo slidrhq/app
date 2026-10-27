@@ -52,6 +52,8 @@
     "setup": {
       "welcome": "Slidr sohbetine hoş geldiniz",
       "intro": "Başlamak için hizmetinizi seçin. Ardından bir model ve çaba düzeyi seçeceğiz.",
+      "finish": "Kurulumu tamamlayalım",
+      "finishIntro": "Aracının devam edebilmesi için birkaç seçim daha gerekiyor.",
       "steps": "Kurulum adımları",
       "steps_harness": "Hizmet",
       "steps_model": "Model",
@@ -2527,7 +2529,6 @@
       "not_logged_in": "CLI yüklü. Devam etmek için hesabınızda oturum açın.",
       "install": "Yükle…",
       "signIn": "Oturum aç",
-      "refresh": "Bağlantıyı ve modelleri yenile",
       "installTitle": "{{name}} yüklensin mi?",
       "installDescription": "Uygulama, {{name}} programını Windows App Installer ile indirip yükleyecek. Ardından bağlantıyı denetleyecek ve gerekirse oturum açmanızı isteyeceğiz.",
       "installDescriptionNpm": "Uygulama, {{name}} programını npm ile yükleyecek. Node.js yoksa önce Windows App Installer ile onu yükleyecek. Ardından bağlantıyı denetleyecek ve gerekirse oturum açmanızı isteyeceğiz.",

@@ -4,6 +4,8 @@ export const he = {
   setup: {
     welcome: 'ברוכים הבאים לצ׳אט של Slidr',
     intro: 'נתחיל בבחירת השירות שילווה אתכם. אחר כך נבחר מודל ורמת מאמץ.',
+    finish: 'בואו נשלים את ההגדרות',
+    finishIntro: 'חסרות עוד כמה בחירות כדי שהסוכן יוכל להמשיך.',
     steps: 'שלבי ההגדרה',
     steps_harness: 'שירות',
     steps_model: 'מודל',
@@ -528,6 +530,8 @@ export const en = {
   setup: {
     welcome: 'Welcome to Slidr chat',
     intro: 'Choose your service to get started. Next, we’ll pick a model and effort level.',
+    finish: 'Let’s finish setting up',
+    finishIntro: 'A few choices are still needed before the agent can carry on.',
     steps: 'Setup steps',
     steps_harness: 'Service',
     steps_model: 'Model',

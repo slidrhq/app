@@ -53,6 +53,8 @@
     "setup": {
       "welcome": "Ti diamo il benvenuto nella chat di Slidr",
       "intro": "Per iniziare, scegli il servizio. Poi sceglieremo un modello e un livello di impegno.",
+      "finish": "Completiamo la configurazione",
+      "finishIntro": "Mancano ancora alcune scelte perché l’agente possa continuare.",
       "steps": "Passaggi della configurazione",
       "steps_harness": "Servizio",
       "steps_model": "Modello",
@@ -2533,7 +2535,6 @@
       "not_logged_in": "La CLI è installata. Accedi al tuo account per continuare.",
       "install": "Installa…",
       "signIn": "Accedi",
-      "refresh": "Aggiorna connessione e modelli",
       "installTitle": "Installare {{name}}?",
       "installDescription": "L'app scaricherà e installerà {{name}} tramite Windows App Installer. Poi verificheremo la connessione e, se necessario, ti chiederemo di accedere.",
       "installDescriptionNpm": "L'app installerà {{name}} tramite npm. Se manca Node.js, lo installerà prima tramite Windows App Installer. Poi verificheremo la connessione e, se necessario, ti chiederemo di accedere.",

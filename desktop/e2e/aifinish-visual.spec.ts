@@ -7,6 +7,7 @@ import {
   LOGO,
   openApp,
   outline,
+  outlineAnswer,
   say,
   settle,
   tab,
@@ -127,7 +128,7 @@ test.describe('states', () => {
   test('an outline that was approved, and one that was turned down', async ({ page }) => {
     await openApp(page, { script: 'outline' });
     await say(page, words.he.subject);
-    await outline(page).getByTestId('outline-approve').click();
+    await outlineAnswer(page).getByTestId('outline-approve').click();
     await turnEnds(page, 2);
     await expect(outline(page)).toHaveAttribute('data-state', 'answered');
     await settle(page);
@@ -135,7 +136,7 @@ test.describe('states', () => {
 
     await page.getByTestId('conversation-new').click();
     await say(page, words.he.subject);
-    await outline(page).getByTestId('outline-reject').click();
+    await outlineAnswer(page).getByTestId('outline-reject').click();
     await expect(outline(page)).toHaveAttribute('data-state', 'rejected');
     await settle(page);
     await page.screenshot({ path: out('outline-rejected') });

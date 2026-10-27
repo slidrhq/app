@@ -45,6 +45,7 @@ import {
   type AttachedFile,
   type Exchange,
 } from '@slidr/prompts';
+import { isOfficeFile, readOfficeFile } from '@slidr/pptx/contents';
 import { createStore, type StoreApi } from 'zustand/vanilla';
 import {
   AgentError,
@@ -57,7 +58,7 @@ import {
   type TurnOutcome,
 } from './agent';
 import { GATE_ROUNDS, isClean, TurnWatch } from './qualityGate';
-import { HarnessSetup, selectionIssue } from './harnessSetup';
+import { HarnessSetup, selectionIssue, type ConnectionCache } from './harnessSetup';
 import { toReply, type BridgeTool, type ToolBridge, type ToolHandler } from './toolBridge';
 
 const ATTACHMENT_READ: BridgeTool = {
@@ -128,6 +129,8 @@ export interface AgentServiceOptions {
   /** The user's selection, for the context block. */
   selection: () => SelectionSnapshot;
   transcripts: TranscriptStore;
+  /** Where the connections of the ready harnesses are kept between runs (`HarnessSetup`). */
+  connections?: ConnectionCache;
   /**
    * Read when a session starts and when a turn ends, for the thread that asks: a conversation
    * may have a model and an effort of its own over the app's (AGT-04).
@@ -378,6 +381,11 @@ const isSessionGone = (error: unknown): boolean =>
 const SHOWN = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
 /** A picture larger than this is not shown to the model; it is still attached as a file. */
 const MAX_SHOWN_BYTES = 5 * 1024 * 1024;
+/**
+ * Of the pictures taken out of a Word, PowerPoint or Excel file, how many are shown with the
+ * message. The others are files beside it, for the agent's file tool.
+ */
+const SHOWN_PICTURES = 8;
 /** How much of a conversation's first message its title keeps. */
 const TITLE_CHARS = 80;
 
@@ -388,6 +396,16 @@ function base64(bytes: Uint8Array): string {
     binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   }
   return btoa(binary);
+}
+
+/**
+ * A picture as a harness that takes pictures is shown it; nothing for one too large, or of a
+ * type it does not take.
+ */
+function shownImage({ mime, bytes }: Attachment): ImageAttachment | undefined {
+  return SHOWN.has(mime) && bytes.length <= MAX_SHOWN_BYTES
+    ? { mediaType: mime as ImageAttachment['mediaType'], data: base64(bytes) }
+    : undefined;
 }
 
 /** An open harness session of a thread. */
@@ -652,41 +670,104 @@ export class ChatThread {
   /**
    * Puts the files of a message where the agent finds them: each in the folder of the
    * conversation, for its file tool, and a picture also with the document, so it can be placed
-   * on a slide by its asset id.
+   * on a slide by its asset id. A Word, PowerPoint or Excel file is read into Markdown beside
+   * it, with its pictures (ADR-115).
    */
   async #attach(
     files: readonly Attachment[],
   ): Promise<{ attached: Attached; shown: EntryAttachment[] }> {
-    const { client, bus, storeImage } = this.#options;
+    const thread = `${this.#options.bus.deck.id}/${this.id}`;
     const listed: AttachedFile[] = [];
     const shown: EntryAttachment[] = [];
     const images: ImageAttachment[] = [];
     const assets: AssetMeta[] = [];
     for (const file of files) {
-      const path = await client.attach(`${bus.deck.id}/${this.id}`, file);
-      const picture = file.mime.startsWith('image/');
-      const asset = picture ? await storeImage?.(file).catch(() => undefined) : undefined;
+      const { path, asset } = await this.#store(thread, file);
       if (asset) assets.push(asset);
-      listed.push({
-        name: file.name,
-        path,
-        kind: picture ? 'image' : 'file',
-        ...(asset ? { assetId: asset.id } : {}),
-        ...(file.use ? { use: file.use } : {}),
-      });
+      const image = shownImage(file);
+      if (image) images.push(image);
+      const read = isOfficeFile(file.name, file.mime)
+        ? await this.#read(thread, file, path)
+        : undefined;
+      const kind = file.mime.startsWith('image/') ? 'image' : 'file';
+      listed.push(
+        {
+          name: file.name,
+          path,
+          kind,
+          ...(asset ? { assetId: asset.id } : {}),
+          ...(file.use ? { use: file.use } : {}),
+          ...(read ? { text: read.text } : {}),
+        },
+        ...(read?.pictures ?? []),
+      );
       shown.push({
         name: file.name,
-        kind: picture ? 'image' : 'file',
+        kind,
         ...(asset ? { assetId: asset.id } : {}),
+        ...(read ? { text: read.text } : {}),
       });
-      if (SHOWN.has(file.mime) && file.bytes.length <= MAX_SHOWN_BYTES) {
-        images.push({
-          mediaType: file.mime as ImageAttachment['mediaType'],
-          data: base64(file.bytes),
-        });
+      if (read) {
+        assets.push(...read.assets);
+        images.push(...read.images);
       }
     }
     return { attached: { block: attachmentsBlock(listed), images, assets }, shown };
+  }
+
+  /** Stores a file with the conversation and, a picture, with the document. */
+  async #store(thread: string, file: Attachment): Promise<{ path: string; asset?: AssetMeta }> {
+    const { client, storeImage } = this.#options;
+    const path = await client.attach(thread, file);
+    const asset = file.mime.startsWith('image/')
+      ? await storeImage?.(file).catch(() => undefined)
+      : undefined;
+    return { path, ...(asset ? { asset } : {}) };
+  }
+
+  /**
+   * A Word, PowerPoint or Excel file as the agent reads it (ADR-115): each picture in it stored
+   * as a file of its own and with the document, then its text as Markdown, which names them.
+   * Nothing when it cannot be read, and the agent is told it has no text: a file with a
+   * password, a damaged one, one that would not fit on the disk.
+   */
+  async #read(
+    thread: string,
+    file: Attachment,
+    path: string,
+  ): Promise<
+    | { text: string; pictures: AttachedFile[]; assets: AssetMeta[]; images: ImageAttachment[] }
+    | undefined
+  > {
+    try {
+      const contents = await readOfficeFile(file.bytes);
+      const pictures: AttachedFile[] = [];
+      const assets: AssetMeta[] = [];
+      const images: ImageAttachment[] = [];
+      for (const [index, { mime, extension, bytes }] of contents.pictures.entries()) {
+        const picture = { name: `${path}.picture-${index + 1}.${extension}`, mime, bytes };
+        const stored = await this.#store(thread, picture);
+        if (stored.asset) assets.push(stored.asset);
+        const image = index < SHOWN_PICTURES ? shownImage(picture) : undefined;
+        if (image) images.push(image);
+        pictures.push({
+          name: picture.name,
+          path: stored.path,
+          kind: 'image',
+          ...(stored.asset ? { assetId: stored.asset.id } : {}),
+          from: file.name,
+        });
+      }
+      const markdown = contents.markdown(pictures.map((picture) => picture.path));
+      const { path: text } = await this.#store(thread, {
+        name: `${path}.md`,
+        mime: 'text/markdown',
+        bytes: new TextEncoder().encode(markdown),
+      });
+      return { text, pictures, assets, images };
+    } catch {
+      return undefined;
+    }
   }
 
   /**
@@ -1182,7 +1263,9 @@ export class ChatThread {
     for (const entry of before) {
       if (entry.type === 'user') {
         const said = entry.action ? `(pressed the "${entry.action.id}" action)` : entry.text;
-        const files = entry.attachments?.map((file) => file.name).join(', ');
+        const files = entry.attachments
+          ?.map((file) => (file.text ? `${file.name} (its text: ${file.text})` : file.name))
+          .join(', ');
         exchanges.push({
           user: files ? `${said} [attached: ${files}]` : said,
           reply: '',
@@ -1688,7 +1771,7 @@ export class AgentService {
 
   constructor(options: AgentServiceOptions) {
     this.#options = options;
-    this.setup = new HarnessSetup(options.client, (id) => this.harness(id));
+    this.setup = new HarnessSetup(options.client, (id) => this.harness(id), options.connections);
     this.digest = new ChangeDigest(options.bus);
     this.#unsubscribe = options.bus.subscribe((event) => {
       if (event.kind === 'reset') {

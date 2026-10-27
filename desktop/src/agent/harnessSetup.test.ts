@@ -1,6 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createScriptedAgent } from './scriptedAgent';
-import { HarnessSetup, latestModels, modelEfforts, selectionIssue } from './harnessSetup';
+import {
+  availableChoice,
+  HarnessSetup,
+  latestModels,
+  modelEfforts,
+  selectionIssue,
+  storedConnections,
+} from './harnessSetup';
 import type { HarnessConnection, HarnessDescriptor, HarnessStatus } from './agent';
 
 const harness: HarnessDescriptor = {
@@ -118,6 +125,128 @@ describe('harness setup', () => {
     finish();
     await Promise.all([installing, reconnecting]);
     expect(setup.store.getState()[harness.id]?.connection?.status.state).toBe('ready');
+  });
+
+  it('keeps a ready connection shown while it is checked again, and connects a new one plainly', async () => {
+    const { client } = createScriptedAgent({});
+    let finish!: (connection: HarnessConnection) => void;
+    client.connect = vi.fn(
+      () =>
+        new Promise<HarnessConnection>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const setup = new HarnessSetup(client, () => Promise.resolve(harness));
+    const first = setup.connect(harness.id);
+    expect(setup.store.getState()[harness.id]).toEqual({ busy: 'connecting' });
+    finish({ harness, status: ready });
+    await first;
+    const again = setup.connect(harness.id, true);
+    expect(setup.store.getState()[harness.id]).toEqual({
+      connection: { harness, status: ready },
+      checking: true,
+    });
+    const newer = { ...harness, models: [{ id: 'c', label: 'C' }] };
+    finish({ harness: newer, status: ready });
+    await again;
+    expect(setup.store.getState()[harness.id]).toEqual({
+      connection: { harness: newer, status: ready },
+    });
+  });
+
+  it('shows the ready connections of the last run at once, checks them again, and keeps them', async () => {
+    const { client } = createScriptedAgent({});
+    const signedOut = { ...ready, state: 'not_logged_in' as const };
+    const connect = (client.connect = vi.fn((id: string) =>
+      Promise.resolve({
+        harness: { ...harness, id },
+        status: id === 'grok-cli' ? signedOut : ready,
+      }),
+    ));
+    const write = vi.fn();
+    const kept = { harness, status: ready };
+    const setup = new HarnessSetup(client, () => Promise.resolve(harness), {
+      read: () => ({ [harness.id]: kept }),
+      write,
+    });
+    expect(setup.store.getState()[harness.id]).toEqual({ connection: kept });
+    // Kept from before is not checked in this run: asked for, it is checked, and shown meanwhile.
+    const checked = setup.connect(harness.id);
+    expect(setup.store.getState()[harness.id]?.checking).toBe(true);
+    await checked;
+    await setup.connect(harness.id);
+    expect(connect).toHaveBeenCalledTimes(1);
+    await setup.connect('grok-cli');
+    expect(write).toHaveBeenLastCalledWith({ [harness.id]: kept });
+  });
+
+  it('reads back only connections of the shape it keeps', () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => store.set(key, value),
+    });
+    try {
+      const cache = storedConnections('slidr.harnesses');
+      expect(cache.read()).toEqual({});
+      const kept = { harness, status: ready };
+      cache.write({ [harness.id]: kept });
+      expect(cache.read()).toEqual({ [harness.id]: kept });
+      store.set(
+        'slidr.harnesses',
+        JSON.stringify({ [harness.id]: kept, other: kept, old: { harness: { id: 'old' } } }),
+      );
+      expect(cache.read()).toEqual({ [harness.id]: kept });
+      store.set('slidr.harnesses', '{not json');
+      expect(cache.read()).toEqual({});
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps a choice to the list: the newest of its family, or else the first model and effort', () => {
+    const efforts = ['low', 'high'];
+    const listed: HarnessDescriptor = {
+      ...harness,
+      models: [
+        { id: 'opus-5-5', label: 'Opus 5.5', effortLevels: efforts },
+        { id: 'sonnet-5-5', label: 'Sonnet 5.5', effortLevels: ['medium'] },
+        { id: 'sonnet-5', label: 'Sonnet 5', effortLevels: efforts },
+        { id: 'plain', label: 'Plain model', effortLevels: [] },
+      ],
+    };
+    // Kept as it is.
+    expect(availableChoice(listed, 'opus-5-5', 'high')).toEqual({
+      model: 'opus-5-5',
+      effort: 'high',
+    });
+    // A newer version of the model takes its place; an effort it lacks gives way to its first.
+    expect(availableChoice(listed, 'sonnet-5', 'high')).toEqual({
+      model: 'sonnet-5-5',
+      effort: 'medium',
+    });
+    // Gone from the list: the newest of the family it was named in, or else the first model.
+    expect(availableChoice(listed, 'sonnet-4-8', 'low', 'Sonnet 4.8')).toEqual({
+      model: 'sonnet-5-5',
+      effort: 'medium',
+    });
+    expect(availableChoice(listed, 'haiku-4', 'high', 'Haiku 4')).toEqual({
+      model: 'opus-5-5',
+      effort: 'high',
+    });
+    expect(availableChoice(listed, 'gone', 'max')).toEqual({ model: 'opus-5-5', effort: 'low' });
+    // A model without efforts has none.
+    expect(availableChoice(listed, 'plain', 'high')).toEqual({ model: 'plain', effort: undefined });
+    // What was not chosen is still the user's to choose; a list without models changes nothing.
+    expect(availableChoice(listed)).toEqual({ model: undefined, effort: undefined });
+    expect(availableChoice(listed, 'opus-5', undefined, 'Opus 5')).toEqual({
+      model: 'opus-5-5',
+      effort: undefined,
+    });
+    expect(availableChoice({ ...harness, models: [] }, 'a', 'low')).toEqual({
+      model: 'a',
+      effort: 'low',
+    });
   });
 
   it('requires explicit available models and efforts, including models with no effort setting', () => {

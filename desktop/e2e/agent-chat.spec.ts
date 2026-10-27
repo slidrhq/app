@@ -167,7 +167,8 @@ test('a failed tool call and a failed turn each say what happened', async ({ pag
   const problem = second.getByTestId('chat-problem');
   await expect(problem).toHaveAttribute('data-kind', 'quota');
   await expect(problem).toContainText('המכסה מוצתה');
-  await expect(problem).toContainText('usage limit reached');
+  // The card says it in the user's language: the program's English adds nothing.
+  await expect(problem).not.toContainText('usage limit reached');
 
   const third = await say(page, 'And again');
   await expect(third.getByTestId('chat-problem')).toHaveAttribute('data-kind', 'tools_unavailable');

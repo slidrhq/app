@@ -74,6 +74,11 @@ export interface EntryAttachment {
   kind: 'image' | 'file';
   /** For a picture: the id it has among the deck's assets, so the chat can show it. */
   assetId?: string;
+  /**
+   * For a Word, PowerPoint or Excel file the app read (ADR-115): where its contents are, for a
+   * session that starts without the turn that listed them.
+   */
+  text?: string;
 }
 
 export interface UserEntry {

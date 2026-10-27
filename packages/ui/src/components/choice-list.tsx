@@ -19,6 +19,8 @@ export interface ChoiceListProps<T extends string> {
   /** Names the list for screen readers: this, or the id of what names it. */
   'aria-label'?: string;
   'aria-labelledby'?: string;
+  /** The way the rows read, where it is not the page's: names of products read left to right. */
+  dir?: 'ltr' | 'rtl';
   className?: string;
 }
 
@@ -31,11 +33,13 @@ export function ChoiceList<T extends string>({
   options,
   value,
   onValueChange,
+  dir,
   className,
   ...aria
 }: ChoiceListProps<T>) {
   return (
     <RadioGroup.Root
+      dir={dir}
       value={value}
       onValueChange={(next) => onValueChange(next as T)}
       className={cx(

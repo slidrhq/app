@@ -51,6 +51,8 @@
     "setup": {
       "welcome": "欢迎使用 Slidr 对话",
       "intro": "首先选择要使用的服务，然后选择模型和推理强度。",
+      "finish": "完成设置吧",
+      "finishIntro": "还需要再做几项选择，智能体才能继续工作。",
       "steps": "设置步骤",
       "steps_harness": "服务",
       "steps_model": "模型",
@@ -2521,7 +2523,6 @@
       "not_logged_in": "CLI 已安装。请登录你的帐户以继续。",
       "install": "安装…",
       "signIn": "登录",
-      "refresh": "刷新连接和模型",
       "installTitle": "要安装 {{name}} 吗？",
       "installDescription": "应用将通过 Windows App Installer 下载并安装 {{name}}。然后我们将检查连接，并在需要时请你登录。",
       "installDescriptionNpm": "应用将通过 npm 安装 {{name}}。如果缺少 Node.js，会先通过 Windows App Installer 安装。然后我们将检查连接，并在需要时请你登录。",

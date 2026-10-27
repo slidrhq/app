@@ -51,6 +51,8 @@
     "setup": {
       "welcome": "Chào mừng bạn đến với trò chuyện Slidr",
       "intro": "Chọn dịch vụ để bắt đầu. Tiếp theo, chúng ta sẽ chọn mô hình và mức nỗ lực.",
+      "finish": "Hãy hoàn tất thiết lập",
+      "finishIntro": "Cần chọn thêm một vài mục để tác nhân có thể tiếp tục.",
       "steps": "Các bước thiết lập",
       "steps_harness": "Dịch vụ",
       "steps_model": "Mô hình",
@@ -2521,7 +2523,6 @@
       "not_logged_in": "CLI đã được cài đặt. Hãy đăng nhập tài khoản để tiếp tục.",
       "install": "Cài đặt…",
       "signIn": "Đăng nhập",
-      "refresh": "Làm mới kết nối và mô hình",
       "installTitle": "Cài đặt {{name}}?",
       "installDescription": "Ứng dụng sẽ tải xuống và cài đặt {{name}} bằng Windows App Installer. Sau đó chúng tôi sẽ kiểm tra kết nối và yêu cầu bạn đăng nhập nếu cần.",
       "installDescriptionNpm": "Ứng dụng sẽ cài đặt {{name}} bằng npm. Nếu thiếu Node.js, ứng dụng sẽ cài nó trước bằng Windows App Installer. Sau đó chúng tôi sẽ kiểm tra kết nối và yêu cầu bạn đăng nhập nếu cần.",

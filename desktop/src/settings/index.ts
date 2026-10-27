@@ -3,6 +3,8 @@
 // See docs/adr/ADR-051-media-and-settings.md.
 export {
   agentSettings,
+  chooseHarness,
+  chosenHarness,
   setAgentSettings,
   setConversationSettings,
   useAgentSettings,

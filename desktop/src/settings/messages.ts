@@ -62,7 +62,6 @@ export const he = {
     not_logged_in: 'ה־CLI מותקן. נדרשת התחברות לחשבון.',
     install: 'התקנה…',
     signIn: 'התחברות לחשבון',
-    refresh: 'רענון החיבור והמודלים',
     installTitle: 'להתקין {{name}}?',
     installDescription:
       'האפליקציה תוריד ותתקין את {{name}} באמצעות Windows App Installer. לאחר ההתקנה נבדוק את החיבור ונבקש התחברות לחשבון לפי הצורך.',
@@ -160,7 +159,6 @@ export const en: Messages<typeof he> = {
     not_logged_in: 'The CLI is installed. Sign in to your account to continue.',
     install: 'Install…',
     signIn: 'Sign in',
-    refresh: 'Refresh connection and models',
     installTitle: 'Install {{name}}?',
     installDescription:
       'The app will download and install {{name}} using Windows App Installer. We will then check the connection and ask you to sign in if needed.',

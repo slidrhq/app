@@ -350,6 +350,29 @@ describe('the coloured side of a card', () => {
     expect(r.editability).toBe(1);
   });
 
+  it('is the accent of its shape when it is the only border of a rounded card', async () => {
+    // As the agent writes a step: the coloured top meets the page at the round corners, where
+    // a shape that cut its corners twice drew a paler edge and was kept HTML for it.
+    const step = (n: number, words: string) =>
+      `<div style="background:#fffdf8;border-radius:24px;box-shadow:0 16px 20px rgba(28,25,21,.12);padding:40px 28px 44px;border-top:12px solid #c2410c"><div style="font-size:120px;font-weight:700;line-height:1;color:#c2410c">${n}</div><div style="margin-top:20px;font-size:32px;line-height:1.45">${words}</div></div>`;
+    const r = await convert(`<div style="${SLIDE};background:#f5ecdf">
+      <div style="position:absolute;left:112px;top:320px;width:1696px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+        ${step(1, 'Written rules: what is allowed, and who answers for it.')}
+        ${step(2, 'Teachers try the tools before their students meet them.')}
+        ${step(3, 'One class, one goal, four weeks.')}
+      </div>
+    </div>`);
+    const cards = groups(r.slide.elements);
+    expect(cards).toHaveLength(3);
+    for (const card of cards) {
+      expect(card.children[0]).toMatchObject({
+        type: 'shape',
+        accent: { side: 'top', size: 12, corners: 'follow' },
+      });
+    }
+    expect(r.guard.fallbacks).toEqual([]);
+  });
+
   it('is the accent of its shape when it is a stripe the card draws along its top and cuts at its corners', async () => {
     const r = await convert(`<style>
         .card { position:absolute; left:200px; top:200px; width:640px; padding:40px; background:#fff; border:2px solid #e2e8f0; border-radius:24px; overflow:hidden; }
