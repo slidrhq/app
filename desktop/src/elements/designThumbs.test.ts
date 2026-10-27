@@ -148,6 +148,51 @@ describe('the pictures of the designs made ahead', () => {
     expect((await (await thumbs()).loadDesignThumbs())('cover', 'de')).toBeUndefined();
   });
 
+  it('are of the word the gallery makes of a design, the one publishing makes', async () => {
+    let written: Revs | undefined;
+    publish(
+      {},
+      {
+        more: (revs) => {
+          written = revs;
+          return pictures(revs);
+        },
+      },
+    );
+    const read = await (await designs()).loadDesigns('de');
+    const word = read.designWord('cover', 'de');
+    expect(word).toBe(written!.designs.de!.cover);
+    expect(read.designWord('cover', 'he')).toBeUndefined();
+    expect((await (await thumbs()).loadDesignThumbs())('cover', 'de', word)).toBeDefined();
+  });
+
+  it('are shown of a design as read, though the words written are of another library', async () => {
+    // A catalog published since, without the words: the design read is as it was drawn.
+    publish(
+      {},
+      {
+        more: (revs) => ({
+          ...pictures(revs),
+          'elements/designs/revs.json': JSON.stringify({
+            from: { 'elements/designs/managed.json': 'old' },
+            designs: revs.designs,
+          }),
+        }),
+      },
+    );
+    const read = await (await designs()).loadDesigns('de');
+    const thumb = await (await thumbs()).loadDesignThumbs();
+    expect(thumb('cover', 'de', read.designWord('cover', 'de'))).toBeDefined();
+    expect(thumb('cover', 'de')).toBeUndefined();
+  });
+
+  it('are not shown of a design read since it changed', async () => {
+    publish({}, { more: (revs) => pictures(revs, 'an older word') });
+    const read = await (await designs()).loadDesigns('de');
+    const thumb = await (await thumbs()).loadDesignThumbs();
+    expect(thumb('cover', 'de', read.designWord('cover', 'de'))).toBeUndefined();
+  });
+
   it('are not shown when the words are not of the library published', async () => {
     publish(
       {

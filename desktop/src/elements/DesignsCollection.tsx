@@ -95,7 +95,10 @@ function DesignTile({
   const picture = useRef<HTMLSpanElement>(null);
   const { width } = useElementSize(picture);
   const drawnIn = designs.designLanguage(id, lang);
-  const made = useMemo(() => thumb(id, drawnIn), [thumb, id, drawnIn]);
+  const made = useMemo(
+    () => thumb(id, drawnIn, designs.designWord(id, drawnIn)),
+    [thumb, designs, id, drawnIn],
+  );
   const preview = useMemo(
     () => (near && !made ? designs.designPreview(id, lang) : undefined),
     [near, made, designs, id, lang],

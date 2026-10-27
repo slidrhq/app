@@ -13,6 +13,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MEDIA_LIBRARY_URL } from '@slidr/media-library';
+import { designDrawing, designPicturePaths } from '../src/elements/designWord.ts';
 import { catalogChunks } from './mediaChunks.ts';
 import type { Plugin } from 'vite';
 
@@ -233,11 +234,7 @@ export function templateFiles(catalog: TemplateCatalog): Map<string, string> {
 /** The catalogs of the designs, in the order the app lists them: an id of both is the authored one. */
 export const DESIGN_CATALOGS = ['index.json', 'managed.json'] as const;
 
-/**
- * How the pictures of the designs made ahead are drawn: a new number puts every one of them out
- * of date, and the galleries draw the designs again until they are drawn anew.
- */
-export const DESIGN_DRAWING = 1;
+export { DESIGN_DRAWING } from '../src/elements/designWord.ts';
 
 /** The files `designFiles` writes, which a copy pulled from the site holds as they were. */
 const DESIGN_FILE = /^elements\/designs\/(?:[^/]+\/(?:index|managed)\.json|revs\.json)$/;
@@ -298,16 +295,14 @@ export function designFiles(files: ReadonlyMap<string, Buffer>): Map<string, str
     for (const [id, variants] of slides) {
       if (listed.has(id)) continue;
       listed.add(id);
-      const pictures = [`images/designs/${id}.webp`, `images/designs/${id}-bg.webp`].map(
-        (picture) => {
-          const kept = files.get(picture);
-          if (!kept) return null;
-          from[picture] = sha256(kept);
-          return from[picture];
-        },
-      );
+      const pictures = designPicturePaths(id).map((picture) => {
+        const kept = files.get(picture);
+        if (!kept) return null;
+        from[picture] = sha256(kept);
+        return from[picture];
+      });
       for (const lang of languages[id] ?? []) {
-        const drawn = JSON.stringify([DESIGN_DRAWING, variants[lang], pictures]);
+        const drawn = designDrawing(variants[lang], pictures);
         (revs[lang] ??= {})[id] = sha256(drawn).slice(0, 16);
       }
     }
