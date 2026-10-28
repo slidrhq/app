@@ -1,4 +1,4 @@
-// The ready-made slides being authored here, in the shape of `elements/designs/managed.json`:
+// The ready-made slides being authored here, in the shape of `elements/designs/index.json`:
 // every module of this folder that exports `designs`, and the sizes of their pictures.
 import type { Localized, Slide } from '@slidr/model';
 import type { DesignEntry } from './kit';

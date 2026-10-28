@@ -26,7 +26,7 @@ use async_trait::async_trait;
 
 pub use diagnostics::DiagnosticsView;
 pub use manager::{ATTACHMENTS, HarnessManager};
-pub use registry::builtin;
+pub use registry::{builtin, offered};
 #[allow(unused_imports)]
 // The whole contract is public, whether or not this crate uses each part.
 pub use types::{
@@ -47,6 +47,23 @@ pub trait AgentHarness: Send + Sync {
     /// Starts a session. Returns once the session accepts turns; its events go to `sink`, from
     /// tasks of the session's own, until `exited`.
     async fn start(&self, config: SessionConfig, sink: EventSink) -> Result<Box<dyn AgentSession>>;
+
+    /// The models of the signed-in account, from a harness that lists them itself; `None`: setup
+    /// asks the CLI by its own protocol (`setup::connect`).
+    async fn models(&self) -> Option<Result<Vec<ModelOption>>> {
+        None
+    }
+
+    /// Installs the harness's CLI, once the user approved, when the harness knows how; `None`:
+    /// setup does (`setup::install`).
+    async fn install(&self) -> Option<Result<()>> {
+        None
+    }
+
+    /// Opens the sign-in of the harness's CLI, when the harness knows how; `None`: setup does.
+    async fn login(&self) -> Option<Result<()>> {
+        None
+    }
 }
 
 /// One conversation with an agent.

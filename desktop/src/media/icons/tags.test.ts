@@ -177,7 +177,7 @@ async function keysOf(kind: TagKind): Promise<string[]> {
 describe('the library', () => {
   for (const kind of TAG_KINDS) {
     it.skipIf(!published[kind])(`tags every one of its ${kind} in Hebrew and English`, async () => {
-      // A design of the studio may carry its tags in `managed.json` instead.
+      // A design of the studio may carry its tags in `managed.json` instead, in a library of before.
       const tags = kind === 'designs' ? await loadDesignTags() : (published[kind] ?? {});
       const keys = await keysOf(kind);
       expect(keys.length).toBeGreaterThan(0);

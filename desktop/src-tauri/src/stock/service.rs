@@ -2,7 +2,7 @@
 
 use std::{
     collections::{HashMap, VecDeque},
-    sync::{Arc, Mutex, MutexGuard, PoisonError},
+    sync::{Arc, Mutex, MutexGuard, PoisonError, RwLock},
 };
 
 use serde::Deserialize;
@@ -11,7 +11,7 @@ use super::{
     Attribution, Found, ImportedPhoto, Result, SourceState, SourceStatus, StockError,
     StockErrorKind, StockProvider, StockQuery, StockResults,
 };
-use crate::{assets, settings::Settings, storage::Storage};
+use crate::{assets, settings::Settings, storage::Storage, system_settings::Offer};
 
 /// Longest query, in characters.
 const MAX_QUERY: usize = 200;
@@ -22,11 +22,15 @@ const MAX_PAGE: u32 = 1000;
 const MAX_RECENT: usize = 600;
 /// The section of the app's settings this service reads.
 const SECTION: &str = "stock";
+/// The stand-in of the tests, offered whatever the organization's settings say.
+const MOCK: &str = "mock";
 
 /// Owns the sources and what they found lately. Shared by the IPC commands; testable without
 /// Tauri.
 pub struct StockService {
     sources: Vec<Arc<dyn StockProvider>>,
+    /// Those the organization offers, and its default (ADR-117); without its settings, all.
+    offer: RwLock<Offer>,
     settings: Arc<Settings>,
     recent: Mutex<Recent>,
 }
@@ -66,20 +70,39 @@ impl StockService {
     pub fn new(settings: Arc<Settings>, sources: Vec<Arc<dyn StockProvider>>) -> Self {
         Self {
             sources,
+            offer: RwLock::new(Offer::default()),
             settings,
             recent: Mutex::new(Recent::default()),
         }
     }
 
+    /// Offers only what the organization's settings offer, its default first, from now on.
+    pub fn set_offer(&self, offer: Offer) {
+        *self.offer.write().unwrap_or_else(PoisonError::into_inner) = offer;
+    }
+
+    fn offer(&self) -> Offer {
+        self.offer
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
+    }
+
     /// The sources, in registration order, each with whether it can be searched now.
     pub fn sources(&self) -> Vec<SourceStatus> {
-        self.sources
+        let sources = self
+            .sources
             .iter()
             .map(|source| SourceStatus {
                 descriptor: source.descriptor(),
                 state: source.state(),
             })
-            .collect()
+            .collect();
+        self.offer().arrange(
+            sources,
+            |source| source.descriptor.id.clone(),
+            |source| source.descriptor.id == MOCK,
+        )
     }
 
     /// The source a search uses when it names none: the user's choice while it is registered;
@@ -170,7 +193,18 @@ impl StockService {
 
     /// The source `id` names, or the default one.
     fn source(&self, id: Option<&str>) -> Result<&Arc<dyn StockProvider>> {
-        let find = |id: &str| self.sources.iter().find(|s| s.descriptor().id == id);
+        let offer = self.offer();
+        let offered = |source: &&Arc<dyn StockProvider>| {
+            let id = source.descriptor().id;
+            id == MOCK || offer.allows(&id)
+        };
+        let find = |id: &str| {
+            self.sources
+                .iter()
+                .filter(offered)
+                .find(|s| s.descriptor().id == id)
+        };
+        // The user's choice, while it is offered; else the organization's; else the first ready.
         let found = match id {
             Some(id) => find(id),
             None => self
@@ -179,12 +213,14 @@ impl StockService {
                 .source
                 .as_deref()
                 .and_then(find)
+                .or_else(|| offer.chosen().and_then(find))
                 .or_else(|| {
                     self.sources
                         .iter()
+                        .filter(offered)
                         .find(|source| source.state() == SourceState::Ready)
                 })
-                .or_else(|| self.sources.first()),
+                .or_else(|| self.sources.iter().find(offered)),
         };
         found.ok_or_else(|| {
             StockError::new(

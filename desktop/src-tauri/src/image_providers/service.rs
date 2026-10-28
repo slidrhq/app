@@ -7,7 +7,7 @@ use std::{
     ffi::OsStr,
     fs,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex, MutexGuard, PoisonError},
+    sync::{Arc, Mutex, MutexGuard, PoisonError, RwLock},
 };
 
 use serde::Deserialize;
@@ -26,6 +26,7 @@ use crate::{
     assets::{self, ImportedAsset},
     settings::Settings,
     storage::Storage,
+    system_settings::Offer,
 };
 
 /// Most images in one job. The agent's tools ask for up to 4 (SPEC 11.4).
@@ -34,10 +35,14 @@ const MAX_COUNT: u32 = 8;
 const MAX_JOB_ID: usize = 64;
 /// The section of the app's settings this service owns.
 const SECTION: &str = "images";
+/// The stand-in of the tests, offered whatever the organization's settings say.
+const MOCK: &str = "mock";
 
 /// Owns the providers and the running jobs. Shared by the IPC commands; testable without Tauri.
 pub struct ImageService {
     providers: Vec<Slot>,
+    /// Those the organization offers, and its default (ADR-117); without its settings, all.
+    offer: RwLock<Offer>,
     /// Where the user's choice of default provider is kept, in the section `images`.
     settings: Arc<Settings>,
     /// The running jobs, each with the sender that cancels it.
@@ -85,9 +90,22 @@ impl ImageService {
             .collect();
         Self {
             providers,
+            offer: RwLock::new(Offer::default()),
             settings,
             jobs: Mutex::new(HashMap::new()),
         }
+    }
+
+    /// Offers only what the organization's settings offer, its default first, from now on.
+    pub fn set_offer(&self, offer: Offer) {
+        *self.offer.write().unwrap_or_else(PoisonError::into_inner) = offer;
+    }
+
+    fn offer(&self) -> Offer {
+        self.offer
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
     }
 
     /// Takes the choice an earlier version kept in a file of its own
@@ -107,12 +125,18 @@ impl ImageService {
         let _ = fs::remove_file(legacy_file);
     }
 
-    /// The registered providers, in registration order.
+    /// The providers offered, in registration order, the organization's default first.
     pub fn descriptors(&self) -> Vec<ProviderDescriptor> {
-        self.providers
+        let descriptors = self
+            .providers
             .iter()
             .map(|slot| slot.descriptor.clone())
-            .collect()
+            .collect();
+        self.offer().arrange(
+            descriptors,
+            |descriptor| descriptor.id.clone(),
+            |d| d.id == MOCK,
+        )
     }
 
     /// Checks one provider.
@@ -327,7 +351,16 @@ impl ImageService {
 
     /// The provider `id` names, or the default one.
     fn slot(&self, id: Option<&str>) -> Result<&Slot> {
-        let find = |id: &str| self.providers.iter().find(|slot| slot.descriptor.id == id);
+        let offer = self.offer();
+        let offered =
+            |slot: &&Slot| slot.descriptor.id == MOCK || offer.allows(&slot.descriptor.id);
+        let find = |id: &str| {
+            self.providers
+                .iter()
+                .filter(offered)
+                .find(|slot| slot.descriptor.id == id)
+        };
+        // The user's choice, while it is offered; else the organization's; else the first.
         let found = match id {
             Some(id) => find(id),
             None => self
@@ -336,7 +369,8 @@ impl ImageService {
                 .default_provider
                 .as_deref()
                 .and_then(find)
-                .or_else(|| self.providers.first()),
+                .or_else(|| offer.chosen().and_then(find))
+                .or_else(|| self.providers.iter().find(offered)),
         };
         found.ok_or_else(|| {
             ImageError::new(

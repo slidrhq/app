@@ -2562,6 +2562,8 @@
       "pickerHint": "Solo per questa chat. L'impostazione predefinita si sceglie nelle Impostazioni.",
       "web": "Ricerca e lettura sul web",
       "webHint": "L'agente può cercare sul web e leggere pagine mentre crea le diapositive.",
+      "webBlocked": "La tua organizzazione non consente all'agente di cercare sul web o leggere pagine.",
+      "askAdmin": "La tua organizzazione installa {{name}} autonomamente. Chiedi all'amministratore di installarlo su questo computer.",
       "gate": "Verifica del design alla fine di ogni turno",
       "gateHint": "Prima di terminare, l'agente corregge le segnalazioni di design nelle diapositive che ha modificato.",
       "outline": "Una scaletta prima di creare una presentazione",

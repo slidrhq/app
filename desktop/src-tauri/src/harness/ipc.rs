@@ -16,13 +16,18 @@ use super::{
     AgentError, AgentEvent, DiagnosticsView, HarnessDescriptor, HarnessManager, HarnessStatus,
     Result, SessionConfig, UserTurn, manager::AttachmentChunk, transcript,
 };
-use crate::storage::Storage;
+use crate::{storage::Storage, system_settings::SystemSettings};
 
 type Manager<'a> = State<'a, Arc<HarnessManager>>;
 
-/// `agent_harnesses()`: the registered harnesses with their capabilities (AGT-02).
+/// `agent_harnesses()`: the registered harnesses with their capabilities (AGT-02), as the
+/// organization's settings offer them once this start has read them (ADR-117).
 #[tauri::command]
-pub async fn agent_harnesses(manager: Manager<'_>) -> Result<Vec<HarnessDescriptor>> {
+pub async fn agent_harnesses(
+    manager: Manager<'_>,
+    system: State<'_, Arc<SystemSettings>>,
+) -> Result<Vec<HarnessDescriptor>> {
+    system.wait().await;
     Ok(manager.descriptors())
 }
 
@@ -41,13 +46,13 @@ pub async fn agent_connect(
 }
 
 #[tauri::command]
-pub async fn agent_install(harness_id: String) -> Result<()> {
-    super::setup::install(&harness_id).await
+pub async fn agent_install(manager: Manager<'_>, harness_id: String) -> Result<()> {
+    manager.install(&harness_id).await
 }
 
 #[tauri::command]
-pub async fn agent_login(harness_id: String) -> Result<()> {
-    super::setup::login(&harness_id).await
+pub async fn agent_login(manager: Manager<'_>, harness_id: String) -> Result<()> {
+    manager.login(&harness_id).await
 }
 
 /// `agent_start({ harnessId, thread, workspaceId?, config, onEvent })`: restores this chat's

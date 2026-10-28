@@ -17,6 +17,7 @@ mod settings;
 mod show_screen;
 mod stock;
 mod storage;
+mod system_settings;
 mod templates;
 mod updates;
 // The tool bridge. Its folder is the one place that names the protocol it speaks to agents
@@ -59,13 +60,34 @@ pub fn run() {
         )
         .setup(|app| {
             let root = app.path().app_data_dir()?;
-            manage_library(app)?;
-            app.manage(Arc::new(harness::HarnessManager::new(
+            let base = media_library::base_url();
+            let library = manage_library(app, base.clone())?;
+            let system = system_settings::SystemSettings::development().unwrap_or_else(|| {
+                system_settings::SystemSettings::new(
+                    root.join(system_settings::FILE),
+                    &app.package_info().version.to_string(),
+                    base.as_ref(),
+                )
+            });
+            let harnesses = Arc::new(harness::HarnessManager::new(
                 root.join("agent"),
                 harness::builtin(),
-            )));
+            ));
+            app.manage(Arc::clone(&harnesses));
             app.manage(tool_bridge::ToolBridge::new());
-            manage_media(app, &root);
+            let (images, stock) = manage_media(app, &root);
+            // What the organization offers, now from what was kept, and again once this start
+            // has read its library, when it reads it (ADR-117).
+            system.apply(move |policy| {
+                harnesses.offer(
+                    harness::offered(policy),
+                    policy.is_none_or(system_settings::Policy::web_allowed),
+                );
+                images.set_offer(policy.map(|p| p.images.clone()).unwrap_or_default());
+                stock.set_offer(policy.map(|p| p.stock.clone()).unwrap_or_default());
+            });
+            system.start(library);
+            app.manage(system);
             app.manage(Arc::new(templates::TemplateStore::new(&root)));
             app.manage(Arc::new(storage::Storage::new(root)));
             app.manage(Arc::new(capture::CaptureService::new()));
@@ -164,6 +186,7 @@ pub fn run() {
             image_process::ipc::image_upscale_cancel,
             image_process::ipc::image_upscale_status,
             show_screen::show_screen_set,
+            system_settings::system_settings_read,
         ]))
         .build(tauri::generate_context!())
         .expect("failed to start the Slidr application")
@@ -174,22 +197,28 @@ pub fn run() {
         });
 }
 
-/// The media library, read from the web into a cache of this machine's own: not of the roaming
-/// profile, since all of it is to be had again.
-fn manage_library(app: &tauri::App) -> tauri::Result<()> {
-    let Some(base) = media_library::base_url() else {
-        return Ok(());
+/// The media library at `base`, read from the web into a cache of this machine's own: not of the
+/// roaming profile, since all of it is to be had again. None without a library.
+fn manage_library(
+    app: &tauri::App,
+    base: Option<reqwest::Url>,
+) -> tauri::Result<Option<Arc<media_library::MediaLibrary>>> {
+    let Some(base) = base else {
+        return Ok(None);
     };
     let dir = app.path().app_local_data_dir()?.join("media");
     let library = media_library::MediaLibrary::new(base, dir);
     library.start();
-    app.manage(library);
-    Ok(())
+    app.manage(Arc::clone(&library));
+    Ok(Some(library))
 }
 
 /// The settings and the keys, and what reads them: the image providers and the photo libraries
-/// (ADR-051).
-fn manage_media(app: &tauri::App, root: &std::path::Path) {
+/// (ADR-051), which are given back for what the organization offers of them.
+fn manage_media(
+    app: &tauri::App,
+    root: &std::path::Path,
+) -> (Arc<image_providers::ImageService>, Arc<stock::StockService>) {
     let settings = Arc::new(settings::Settings::open(root.join("settings.json")));
     // Keys are kept under the app's identifier, so a development copy has keys of its own and
     // never reads or replaces the user's.
@@ -201,11 +230,14 @@ fn manage_media(app: &tauri::App, root: &std::path::Path) {
         image_providers::builtin(&secrets, &settings),
     );
     images.adopt_legacy_choice(&root.join("image-providers.json"));
-    app.manage(Arc::new(images));
-    app.manage(Arc::new(stock::StockService::new(
+    let images = Arc::new(images);
+    let stock = Arc::new(stock::StockService::new(
         Arc::clone(&settings),
         stock::builtin(&secrets),
-    )));
+    ));
+    app.manage(Arc::clone(&images));
+    app.manage(Arc::clone(&stock));
     app.manage(settings);
     app.manage(secrets);
+    (images, stock)
 }

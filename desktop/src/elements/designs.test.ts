@@ -21,7 +21,6 @@ const {
   groups: DESIGN_GROUPS,
   ids: DESIGN_IDS,
   subjects: DESIGN_SUBJECTS,
-  managed: MANAGED_DESIGN_IDS,
   designGroupName,
   designIn,
   designLanguages,
@@ -34,13 +33,15 @@ const {
   previewBackdrop,
 } = await loadAllDesigns();
 
-/** The designs of `elements/designs/index.json`, and those Slidr Studio publishes. */
-const AUTHORED = DESIGN_IDS.filter((id) => !MANAGED_DESIGN_IDS.has(id));
-const MANAGED = DESIGN_IDS.filter((id) => MANAGED_DESIGN_IDS.has(id));
-/** The groups of the authored catalog: those with an authored design. */
-const AUTHORED_GROUPS = DESIGN_GROUPS.filter((group) =>
-  designsOf(group).some((id) => !MANAGED_DESIGN_IDS.has(id)),
-);
+/**
+ * The first designs, which the app's messages name, and those made since, named `m-…`, which the
+ * catalog names (ADR-118).
+ */
+const since = (id: string) => id.startsWith('m-');
+const FIRST = DESIGN_IDS.filter((id) => !since(id));
+const SINCE = DESIGN_IDS.filter(since);
+/** The groups of the first designs. */
+const FIRST_GROUPS = DESIGN_GROUPS.filter((group) => designsOf(group).some((id) => !since(id)));
 const has = (id: string) => DESIGN_IDS.includes(id);
 /** Every design in every language it is drawn in. */
 const DRAWN = DESIGN_IDS.flatMap((id) => designLanguages(id).map((lang) => [lang, id] as const));
@@ -60,9 +61,6 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
       const own = await loadDesigns(lang);
       const drawn = DESIGN_IDS.filter((id) => designIn(id, lang));
       expect(own.ids, lang).toEqual(drawn);
-      expect([...own.managed].sort(), lang).toEqual(
-        drawn.filter((id) => MANAGED_DESIGN_IDS.has(id)).sort(),
-      );
       for (const id of drawn) {
         expect(own.designLanguages(id), `${id}/${lang}`).toEqual(designLanguages(id));
         expect(textOf(own.designSlide(id, lang, 'a')), `${id}/${lang}`).toEqual(
@@ -168,27 +166,29 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
     }
   });
 
-  it.skipIf(AUTHORED.length === 0)('ships the 296 authored designs, in 19 groups', () => {
-    expect(AUTHORED).toHaveLength(296);
-    expect(new Set(AUTHORED).size).toBe(296);
-    expect(AUTHORED_GROUPS).toHaveLength(19);
-    for (const group of AUTHORED_GROUPS) {
-      const authored = designsOf(group).filter((id) => !MANAGED_DESIGN_IDS.has(id));
-      expect(authored.length, group).toBeGreaterThanOrEqual(4);
+  it.skipIf(FIRST.length === 0)('ships the 296 first designs, in 19 groups', () => {
+    expect(FIRST).toHaveLength(296);
+    expect(new Set(FIRST).size).toBe(296);
+    expect(FIRST_GROUPS).toHaveLength(19);
+    for (const group of FIRST_GROUPS) {
+      const first = designsOf(group).filter((id) => !since(id));
+      expect(first.length, group).toBeGreaterThanOrEqual(4);
     }
   });
 
-  it.skipIf(MANAGED.length === 0)('names the managed designs apart from the authored ones', () => {
-    expect(new Set(MANAGED).size).toBe(MANAGED.length);
-    for (const id of MANAGED) expect(id, id).toMatch(/^m-/);
-    // A managed design and a group of its own are named in managed.json, in both languages.
-    for (const lang of ['he', 'en']) {
-      for (const id of MANAGED) expect(designName(id, lang), `${lang}/${id}`).toBeTruthy();
-      for (const group of DESIGN_GROUPS.filter((group) => !AUTHORED_GROUPS.includes(group))) {
-        expect(designGroupName(group, lang), `${lang}/${group}`).toBeTruthy();
+  it.skipIf(SINCE.length === 0)(
+    'names in the catalog the designs made since the first ones',
+    () => {
+      expect(new Set(SINCE).size).toBe(SINCE.length);
+      // A design made since, and a group of its own, are named in the catalog, in both languages.
+      for (const lang of ['he', 'en']) {
+        for (const id of SINCE) expect(designName(id, lang), `${lang}/${id}`).toBeTruthy();
+        for (const group of DESIGN_GROUPS.filter((group) => !FIRST_GROUPS.includes(group))) {
+          expect(designGroupName(group, lang), `${lang}/${group}`).toBeTruthy();
+        }
       }
-    }
-  });
+    },
+  );
 
   it('knows the size of every picture, so the gallery can draw a cropped one', () => {
     for (const id of DESIGN_IDS) {
@@ -325,8 +325,8 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
 
   it('leaves the subject of every picture on top, so that a click selects the picture', () => {
     // A point on the subject of each picture, in left-to-right slide pixels. The first
-    // twenty-five authored designs are listed here; a design of a pack, and a managed design,
-    // names its own point.
+    // twenty-five first designs are listed here; a design of a pack, and one made since, names its
+    // own point.
     const listed: Record<string, [x: number, y: number]> = {
       possibility: [1780, 500],
       momentum: [1650, 400],
@@ -356,7 +356,7 @@ describe.skipIf(DESIGN_IDS.length === 0)('Elements designs', () => {
       volunteer: [1410, 500],
     };
     const subjects = Object.fromEntries(
-      Object.entries(listed).filter(([id]) => AUTHORED.includes(id)),
+      Object.entries(listed).filter(([id]) => FIRST.includes(id)),
     );
     Object.assign(subjects, DESIGN_SUBJECTS);
     expect(Object.keys(subjects).sort()).toEqual([...DESIGN_IDS].sort());

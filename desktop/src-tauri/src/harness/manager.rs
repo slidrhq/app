@@ -6,7 +6,7 @@ use std::{
     io::{Read, Seek, SeekFrom},
     path::{Path, PathBuf},
     sync::{
-        Arc, Mutex, MutexGuard, PoisonError,
+        Arc, Mutex, MutexGuard, PoisonError, RwLock,
         atomic::{AtomicBool, Ordering},
     },
     time::{Duration, SystemTime},
@@ -68,7 +68,11 @@ pub struct AttachmentChunk {
 
 /// Owns the harnesses and the open sessions. Shared by the IPC commands; testable without Tauri.
 pub struct HarnessManager {
-    harnesses: Vec<Arc<dyn AgentHarness>>,
+    /// What the app offers: the built-in harnesses and the organization's own agents, as its
+    /// system settings say once they are read (ADR-117).
+    harnesses: RwLock<Vec<Arc<dyn AgentHarness>>>,
+    /// The organization's settings let the agent search and read the web.
+    web_allowed: AtomicBool,
     /// Session folders live under `<root>/<thread key>/`.
     root: PathBuf,
     sessions: Mutex<HashMap<String, Arc<Slot>>>,
@@ -99,7 +103,8 @@ impl HarnessManager {
             .map_or(IDLE_LIMIT, Duration::from_secs);
         Self {
             diagnostics: Arc::new(Diagnostics::new(root.clone())),
-            harnesses,
+            harnesses: RwLock::new(harnesses),
+            web_allowed: AtomicBool::new(true),
             root,
             sessions: Mutex::new(HashMap::new()),
             idle_limit,
@@ -117,7 +122,24 @@ impl HarnessManager {
 
     /// The registered harnesses, in registration order.
     pub fn descriptors(&self) -> Vec<HarnessDescriptor> {
-        self.harnesses.iter().map(|h| h.descriptor()).collect()
+        self.offered().iter().map(|h| h.descriptor()).collect()
+    }
+
+    fn offered(&self) -> Vec<Arc<dyn AgentHarness>> {
+        self.harnesses
+            .read()
+            .unwrap_or_else(PoisonError::into_inner)
+            .clone()
+    }
+
+    /// Offers `harnesses` from now on, as the organization's settings say, and lets the agent
+    /// search and read the web only when `web_allowed`. Sessions open go on as they are.
+    pub fn offer(&self, harnesses: Vec<Arc<dyn AgentHarness>>, web_allowed: bool) {
+        *self
+            .harnesses
+            .write()
+            .unwrap_or_else(PoisonError::into_inner) = harnesses;
+        self.web_allowed.store(web_allowed, Ordering::SeqCst);
     }
 
     /// Where the agent of `thread` reads files from. An HTML import puts the file being
@@ -210,7 +232,24 @@ impl HarnessManager {
 
     pub async fn connect(&self, harness_id: &str) -> Result<super::HarnessConnection> {
         let harness = self.harness(harness_id)?;
-        Ok(super::setup::connect(harness.descriptor(), harness.probe().await).await)
+        Ok(super::setup::connect(harness.as_ref()).await)
+    }
+
+    /// Installs the CLI of `harness_id`, once the user approved: as the harness knows how, or as
+    /// setup does for the built-in ones.
+    pub async fn install(&self, harness_id: &str) -> Result<()> {
+        match self.harness(harness_id)?.install().await {
+            Some(result) => result,
+            None => super::setup::install(harness_id).await,
+        }
+    }
+
+    /// Opens the sign-in of the CLI of `harness_id`.
+    pub async fn login(&self, harness_id: &str) -> Result<()> {
+        match self.harness(harness_id)?.login().await {
+            Some(result) => result,
+            None => super::setup::login(harness_id).await,
+        }
     }
 
     /// Starts a session on `harness_id` and returns its id. `thread` names the conversation
@@ -225,6 +264,8 @@ impl HarnessManager {
     ) -> Result<String> {
         let harness = self.harness(harness_id)?;
         config.workdir = thread_dir(&self.root, thread)?;
+        // Whatever the webview asks, when the organization's settings never let the agent out.
+        config.web_access &= self.web_allowed.load(Ordering::SeqCst);
         // Once in a run of the app, before its first session writes anything: no session is open
         // yet, so no folder is in use. The one this session is about to use stays whatever its age.
         if !self.swept.swap(true, Ordering::SeqCst) {
@@ -448,7 +489,7 @@ impl HarnessManager {
     }
 
     fn harness(&self, id: &str) -> Result<Arc<dyn AgentHarness>> {
-        self.harnesses
+        self.offered()
             .iter()
             .find(|h| h.descriptor().id == id)
             .cloned()

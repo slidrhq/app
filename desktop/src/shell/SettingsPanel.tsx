@@ -11,7 +11,7 @@ import {
   TabsTile,
   TabsTileList,
 } from '@slidr/ui';
-import { currentLanguage, languages, nativeName, setLanguage, type Language } from '../i18n';
+import { currentLanguage, nativeName, offeredLanguages, setLanguage, type Language } from '../i18n';
 import {
   loadSettings,
   SETTINGS_PAGES,
@@ -170,8 +170,9 @@ function General() {
           className="w-full"
           value={language}
           onValueChange={(next) => void setLanguage(next)}
-          // Each language is named in itself, so it can be found from any UI.
-          options={languages.map((value) => ({ value, label: nativeName(value) }))}
+          // Each language is named in itself, so it can be found from any UI. Those the
+          // organization offers (ADR-117).
+          options={offeredLanguages().map((value) => ({ value, label: nativeName(value) }))}
         />
         <p className="px-1 text-xs text-ui-fg-muted">{t('settings.languageHint')}</p>
       </section>

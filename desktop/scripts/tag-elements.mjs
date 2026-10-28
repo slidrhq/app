@@ -38,7 +38,8 @@
 // CLI's (opus, low), --jobs the batches that run at once (4). CLAUDE_PATH names the CLI when it is
 // not on the PATH. A key is what the kind's catalogue calls the item: `lucide:cake`,
 // `fluent-emoji:balloon`, `birthday-cake`, `magnet-birthday`, `shape:rightArrow`, `steps`,
-// `birthday`. The designs Slidr Studio publishes come with their tags (`managed.json`); one
+// `birthday`. The designs Slidr Studio publishes come with their tags, which the library writes
+// into `tags/designs.json` (a library of before kept them in `managed.json`, ADR-118); one
 // published before the studio wrote them is tagged here.
 //
 // Run it after a generator's catalogue is published, with `--upload`.
@@ -99,6 +100,7 @@ const NEEDS = {
   frames: ['elements/catalogs/frames-catalog.json'],
   shapes: ['elements/catalogs/shapes.json'],
   cards: ['elements/cards/catalog.json'],
+  // The catalog, and the catalog of before of a library that still has one (ADR-118).
   designs: ['elements/designs/index.json', 'elements/designs/managed.json'],
 };
 if (media) {
@@ -138,6 +140,12 @@ const read = (path) => {
   if (!published.has(path)) throw new Error(`The published library has no ${path}.`);
   return published.get(path);
 };
+
+/** A file of the library, or nothing where it has none. */
+const readIf = (path) =>
+  (media ? existsSync(join(media, ...path.split('/'))) : published.has(path))
+    ? read(path)
+    : undefined;
 
 /* ---------------------------------------------------------------- what each kind holds */
 
@@ -259,8 +267,9 @@ const items = {
     }));
   },
   designs() {
-    const authored = read('elements/designs/index.json');
-    const managed = read('elements/designs/managed.json');
+    // The app's messages name the first designs; the catalog, those made since (ADR-118).
+    const catalog = read('elements/designs/index.json');
+    const managed = readIf('elements/designs/managed.json') ?? {};
     const one = (id, group, names, groupNames, slides) => {
       const text = (lang) => clipped(textOf(slides[lang]?.elements ?? []));
       return {
@@ -273,26 +282,28 @@ const items = {
         ].join('\n   '),
       };
     };
-    const all = authored.groups.flatMap((group) =>
-      (authored.groupIds[group] ?? [])
-        .filter((id) => authored.slides[id])
+    const named = (lang, id) =>
+      (lang === 'en' ? elementsEn : elementsHe).designs.name[id] ?? catalog.names?.[id]?.[lang];
+    const grouped = (lang, group) =>
+      (lang === 'en' ? elementsEn : elementsHe).designs.group[group] ??
+      catalog.groupNames?.[group]?.[lang];
+    const all = catalog.groups.flatMap((group) =>
+      (catalog.groupIds[group] ?? [])
+        .filter((id) => catalog.slides[id])
         .map((id) =>
           one(
             id,
             group,
-            { en: elementsEn.designs.name[id] ?? id, he: elementsHe.designs.name[id] ?? id },
-            {
-              en: elementsEn.designs.group[group] ?? group,
-              he: elementsHe.designs.group[group] ?? group,
-            },
-            authored.slides[id],
+            { en: named('en', id) ?? id, he: named('he', id) ?? id },
+            { en: grouped('en', group) ?? group, he: grouped('he', group) ?? group },
+            catalog.slides[id],
           ),
         ),
     );
     const taken = new Set(all.map(({ key }) => key));
     for (const group of managed.groups ?? []) {
       for (const id of managed.groupIds?.[group] ?? []) {
-        // Tags already supplied by the studio are read by readTags; an authored id wins.
+        // Tags already supplied by the studio are read by readTags; the catalog's id wins.
         if (taken.has(id) || !managed.slides?.[id]) continue;
         taken.add(id);
         all.push(
@@ -584,7 +595,7 @@ function readTags(kind) {
       ? {}
       : { ...(published.get(`tags/${kind}.json`)?.tags ?? {}) };
   if (kind !== 'designs') return tags;
-  const managed = read('elements/designs/managed.json').tags ?? {};
+  const managed = readIf('elements/designs/managed.json')?.tags ?? {};
   for (const [key, own] of Object.entries(managed)) {
     tags[key] = { ...own, ...tags[key] };
   }

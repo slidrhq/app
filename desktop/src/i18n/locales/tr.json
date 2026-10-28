@@ -2556,6 +2556,8 @@
       "pickerHint": "Yalnızca bu sohbet için. Varsayılan, Ayarlar'da belirlenir.",
       "web": "Web'de arama ve okuma",
       "webHint": "Aracı, slayt oluştururken web'de arama yapabilir ve sayfaları okuyabilir.",
+      "webBlocked": "Kuruluşunuz aracının web'de arama yapmasına veya sayfa okumasına izin vermiyor.",
+      "askAdmin": "{{name}} kuruluşunuz tarafından yüklenir. Bu bilgisayara yüklemesi için yöneticinizden yardım isteyin.",
       "gate": "Her turun sonunda tasarım denetimi",
       "gateHint": "Aracı, bitirmeden önce dokunduğu slaytlardaki tasarım bulgularını düzeltir.",
       "outline": "Sunu oluşturmadan önce ana hat",

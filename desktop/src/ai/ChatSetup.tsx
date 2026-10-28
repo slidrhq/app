@@ -6,8 +6,14 @@ import { Ai, Terminal } from '@slidr/ui/icons';
 import type { HarnessDescriptor } from '../agent/agent';
 import type { ChatProblem } from '../agent/transcript';
 import { latestModels, modelEfforts, selectionIssue } from '../agent/harnessSetup';
-import { harnessLook, harnessName, installsWithNpm } from '../agent/harnessLook';
+import {
+  harnessLook,
+  harnessName,
+  installedByOrganization,
+  installsWithNpm,
+} from '../agent/harnessLook';
 import { chooseHarness, chosenHarness, setAgentSettings, useAgentSettings } from '../settings';
+import { defaultAgent } from '../settings/systemSettings';
 import { useEditor } from '../shell';
 import { agentOf } from './runtime';
 
@@ -115,7 +121,8 @@ export function ChatSetup({
   const [finishing, setFinishing] = useState(midway);
   if (!finishing && (midway || setup.chosenBefore)) setFinishing(true);
   const welcome = !finishing;
-  const [choice, setChoice] = useState('');
+  // The agent the organization starts its people on is chosen to begin with (ADR-117).
+  const [choice, setChoice] = useState(() => defaultAgent() ?? '');
   const formId = useId();
   const [editingHarness, setEditingHarness] = useState(false);
   const connection = state?.connection;
@@ -162,11 +169,17 @@ export function ChatSetup({
     !!state?.error || status === 'unavailable' || (status === 'ready' && !harness?.models.length);
   // Installing and signing in check the agent again when they finish: Try again is offered only
   // for a check that failed, never beside the step still to take.
-  const canRetry = !state?.busy && (listFailed || (ofAgent && unavailable));
+  // An agent the organization installs itself is not installed from here: it is checked again
+  // once the organization has.
+  const byOrganization = !!descriptor && installedByOrganization(descriptor.id);
+  const awaitingInstall = byOrganization && status === 'not_installed';
+  const canRetry = !state?.busy && (listFailed || (ofAgent && (unavailable || awaitingInstall)));
   const action =
     ofAgent && !state?.busy
       ? status === 'not_installed'
-        ? 'install'
+        ? byOrganization
+          ? undefined
+          : 'install'
         : status === 'not_logged_in'
           ? 'login'
           : undefined
@@ -295,6 +308,9 @@ export function ChatSetup({
                 </p>
               )}
               {action === 'login' && <p>{t('setup.signInDescription')}</p>}
+              {awaitingInstall && !state?.busy && (
+                <p>{t('settings:agent.askAdmin', { name: harnessName(descriptor) })}</p>
+              )}
               {unavailable && <p role="alert">{t('setup.unavailable')}</p>}
             </>
           )}

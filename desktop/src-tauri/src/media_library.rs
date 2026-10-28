@@ -129,6 +129,18 @@ pub enum Refresh {
     Offline,
 }
 
+/// What reading one file with the manifest of this start came to ([`MediaLibrary::read_fresh`]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Fresh {
+    /// The file, the very bytes the manifest of this start names.
+    Found(Vec<u8>),
+    /// The library, as it was published when the app started, does not have it.
+    Missing,
+    /// It cannot be said now: no network, no manifest of this start, or a site whose file is not
+    /// the one its manifest names.
+    Unavailable,
+}
+
 /// Why a file is not answered.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Miss {
@@ -147,6 +159,8 @@ pub struct MediaLibrary {
     current: RwLock<Option<Arc<Current>>>,
     /// Whether the manifest was read from the web in this run, or failed to be.
     refreshed: watch::Sender<bool>,
+    /// What the read of this run came to, once it is over.
+    outcome: RwLock<Option<Refresh>>,
 }
 
 /// Where the library is read from: in a development build the copy [`VARIABLE`] names, else as
@@ -268,6 +282,7 @@ impl MediaLibrary {
             client: net::client(),
             current: RwLock::new(current),
             refreshed: watch::Sender::new(false),
+            outcome: RwLock::new(None),
         })
     }
 
@@ -300,6 +315,7 @@ impl MediaLibrary {
     /// longer names.
     pub async fn refresh(&self) -> Refresh {
         let outcome = self.read_manifest().await;
+        *self.outcome.write().unwrap_or_else(PoisonError::into_inner) = Some(outcome);
         self.refreshed.send_replace(true);
         if outcome == Refresh::Changed
             && let Some(current) = self.current()
@@ -338,6 +354,30 @@ impl MediaLibrary {
         };
         let mut refreshed = self.refreshed.subscribe();
         let _ = tokio::time::timeout(wait, refreshed.wait_for(|done| *done)).await;
+    }
+
+    /// A file of the library as it is published now: read with the manifest of this start, never
+    /// with one kept from before, which may not have it yet. What a missing file means is then
+    /// what the library says, and a library that could not be read says nothing.
+    pub async fn read_fresh(&self, path: &str) -> Fresh {
+        let mut refreshed = self.refreshed.subscribe();
+        // The manifest's own timeout bounds it; a little more for the answer to arrive.
+        let wait = MANIFEST_TIMEOUT + Duration::from_secs(1);
+        let _ = tokio::time::timeout(wait, refreshed.wait_for(|done| *done)).await;
+        let outcome = *self.outcome.read().unwrap_or_else(PoisonError::into_inner);
+        if !matches!(outcome, Some(Refresh::Changed | Refresh::Same)) {
+            return Fresh::Unavailable;
+        }
+        let Some(current) = self.current() else {
+            return Fresh::Unavailable;
+        };
+        let Some(entry) = current.manifest.files.get(path) else {
+            return Fresh::Missing;
+        };
+        match self.file(path, entry).await {
+            Ok(bytes) if matches(entry, &bytes) => Fresh::Found(bytes),
+            Ok(_) | Err(_) => Fresh::Unavailable,
+        }
     }
 
     /// The answer of the protocol to a request.
@@ -663,6 +703,41 @@ mod tests {
         }
         assert_eq!(site.requests_for("fonts/heebo/heebo%20latin.woff2"), 1);
         assert!(kept(dir.path(), b"font"));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn a_fresh_read_goes_by_the_manifest_of_this_start() -> std::io::Result<()> {
+        let site = Site::new(&[("fonts/catalog.json", b"{}")]).await?;
+        let dir = tempfile::tempdir()?;
+        // Before this start's manifest is read, nothing is said of a file.
+        let library = MediaLibrary::new(url(UNREACHABLE), dir.path().to_path_buf());
+        library.refresh().await;
+        assert_eq!(
+            library.read_fresh("system/settings.json").await,
+            Fresh::Unavailable
+        );
+
+        // A manifest kept from a run before does not name a file published since.
+        let first = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        first.refresh().await;
+        assert_eq!(
+            first.read_fresh("system/settings.json").await,
+            Fresh::Missing
+        );
+        site.set("system/settings.json", Some(b"{\"version\":1}"));
+        let second = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        // Asked before this start's manifest has come, the read waits for it.
+        let (_, read) = tokio::join!(second.refresh(), second.read_fresh("system/settings.json"));
+        assert_eq!(read, Fresh::Found(b"{\"version\":1}".to_vec()));
+
+        // Offline, a kept manifest that names it says nothing either: it may be gone.
+        let offline = MediaLibrary::new(url(UNREACHABLE), dir.path().to_path_buf());
+        offline.refresh().await;
+        assert_eq!(
+            offline.read_fresh("system/settings.json").await,
+            Fresh::Unavailable
+        );
         Ok(())
     }
 

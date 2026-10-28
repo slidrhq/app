@@ -2562,6 +2562,8 @@
       "pickerHint": "Pour cette conversation uniquement. La valeur par défaut se règle dans les Paramètres.",
       "web": "Recherche et lecture sur le Web",
       "webHint": "L’agent peut effectuer des recherches sur le Web et lire des pages pendant qu’il crée les diapositives.",
+      "webBlocked": "Votre organisation ne permet pas à l’agent d’effectuer des recherches sur le Web ni de lire des pages.",
+      "askAdmin": "Votre organisation installe {{name}} elle-même. Demandez à votre administrateur de l’installer sur cet ordinateur.",
       "gate": "Contrôle du design à la fin de chaque tour",
       "gateHint": "Avant de terminer, l’agent corrige les problèmes de design sur les diapositives qu’il a modifiées.",
       "outline": "Un plan avant de créer une présentation",

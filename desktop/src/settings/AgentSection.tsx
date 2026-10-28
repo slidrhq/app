@@ -4,7 +4,7 @@ import { RefreshCw, Terminal } from '@slidr/ui/icons';
 import { Button, cx, Field, Icon, Select, Skeleton, Switch } from '@slidr/ui';
 import { useStore } from 'zustand';
 import { availableChoice, latestModels, modelEfforts } from '../agent/harnessSetup';
-import { harnessLook, installsWithNpm } from '../agent/harnessLook';
+import { harnessLook, installedByOrganization, installsWithNpm } from '../agent/harnessLook';
 import type { HarnessDescriptor, HarnessState } from '../agent/agent';
 import { DEFAULT_OUTLINE } from '../agent/agentService';
 import { agentOf } from '../ai/runtime';
@@ -12,6 +12,7 @@ import { useEditor } from '../shell';
 import { setAgentHarness, setAgentSettings, useAgentSettings } from './agentSettings';
 import { InstallDialog } from './InstallDialog';
 import { SettingsGroup, SettingsItem, StatusPill, type StatusTone } from './layout';
+import { useSystemPolicy, webAccessOf, webBlocked, webDefault } from './systemSettings';
 
 /*
  * The agent's part of the settings screen (WG3-T08, WG11-T11): the harness that runs the
@@ -46,7 +47,7 @@ function HarnessMark({ id }: { id: string }) {
         mark?.tone ?? 'bg-ui-tool-violet text-ui-tool-violet-fg',
       )}
     >
-      {mark ? mark.glyph : <Icon icon={Terminal} />}
+      {mark?.glyph ?? <Icon icon={Terminal} />}
     </span>
   );
 }
@@ -58,7 +59,12 @@ export function AgentSection() {
   const [harnesses, setHarnesses] = useState<HarnessDescriptor[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [confirmInstall, setConfirmInstall] = useState<string>();
-  const selectedId = settings.harnessId ?? harnesses?.[0]?.id;
+  // The organization's settings name what web access may be, and which agent comes first.
+  const policy = useSystemPolicy();
+  // The harness chosen, while the app offers it; else the first it offers, the organization's
+  // default when it names one.
+  const offered = !harnesses || harnesses.some((harness) => harness.id === settings.harnessId);
+  const selectedId = (offered ? settings.harnessId : undefined) ?? harnesses?.[0]?.id;
   const state = useStore(agent.setup.store, (states) =>
     selectedId ? states[selectedId] : undefined,
   );
@@ -102,10 +108,14 @@ export function AgentSection() {
   // Before the check of a harness has begun, it is as good as begun: the section starts it.
   const busy = state ? state.busy : selectedId ? 'connecting' : undefined;
   const ready = status?.state === 'ready' && !busy;
+  // An agent the organization installs itself is not installed by the app.
+  const byOrganization = installedByOrganization(selectedId);
   const action = busy
     ? undefined
     : status?.state === 'not_installed'
-      ? 'install'
+      ? byOrganization
+        ? undefined
+        : 'install'
       : status?.state === 'not_logged_in'
         ? 'signIn'
         : undefined;
@@ -166,6 +176,11 @@ export function AgentSection() {
             <p className="text-xs text-ui-fg-muted">
               {t(busy ? `agent.${busy}` : `agent.${status?.state ?? 'unavailable'}`)}
             </p>
+            {byOrganization && status?.state === 'not_installed' && !busy && (
+              <p className="text-xs text-ui-fg-muted">
+                {t('agent.askAdmin', { name: descriptor?.name })}
+              </p>
+            )}
             {detail && (
               <p className="break-words text-xs text-ui-fg-muted" dir="auto">
                 {detail}
@@ -258,10 +273,14 @@ export function AgentSection() {
           <Switch
             side="end"
             label={t('agent.web')}
-            hint={t('agent.webHint')}
-            checked={settings.webAccess !== false}
-            // On is the default: it is not written, so the default can change under it.
-            onCheckedChange={(on) => setAgentSettings({ webAccess: on ? undefined : false })}
+            hint={t(webBlocked(policy) ? 'agent.webBlocked' : 'agent.webHint')}
+            checked={webAccessOf(settings.webAccess, policy)}
+            disabled={webBlocked(policy)}
+            // The default, on unless the organization says off, is not written, so the default
+            // can change under it.
+            onCheckedChange={(on) =>
+              setAgentSettings({ webAccess: on === webDefault(policy) ? undefined : on })
+            }
           />
         </SettingsItem>
         <SettingsItem>

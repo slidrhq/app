@@ -1,6 +1,6 @@
 # Custom agent CLI — the integration contract
 
-Status: Proposal, 2026-10-26. Not implemented. Builds on the harness contract ([ADR-010](adr/ADR-010-agent-harness.md), [ADR-096](adr/ADR-096-gemini-and-grok-harnesses.md)), the tool bridge ([ADR-022](adr/ADR-022-mcp-bridge.md)) and the image providers ([ADR-004](adr/ADR-004-image-provider.md), [ADR-025](adr/ADR-025-image-providers.md), [ADR-051](adr/ADR-051-media-and-settings.md), [ADR-097](adr/ADR-097-images-made-while-the-agent-goes-on.md)).
+Status: Proposal, 2026-10-26. The agent half is implemented on 2026-10-27 for the agents an organization's system settings name ([ADR-117](adr/ADR-117-system-settings-from-the-library.md); `harness/custom_cli.rs`); "Add a CLI…" in Settings and the image half (§7) are not. Builds on the harness contract ([ADR-010](adr/ADR-010-agent-harness.md), [ADR-096](adr/ADR-096-gemini-and-grok-harnesses.md)), the tool bridge ([ADR-022](adr/ADR-022-mcp-bridge.md)) and the image providers ([ADR-004](adr/ADR-004-image-provider.md), [ADR-025](adr/ADR-025-image-providers.md), [ADR-051](adr/ADR-051-media-and-settings.md), [ADR-097](adr/ADR-097-images-made-while-the-agent-goes-on.md)).
 
 ## 1. Purpose
 
@@ -55,6 +55,16 @@ The user adds the CLI in Settings → Agent ("Add a CLI…"). The app stores it 
 | `env` | object of strings | no | Added to the environment of every start. Not for secrets: Settings shows it, and `settings.json` is plain text. |
 
 Everything else — the name, the version, what the CLI can do — the CLI says itself (`slidr describe`), so the registration stays this small and the CLI is the one source of truth.
+
+**As implemented (ADR-117)**, an agent is registered by the organization's system settings, `agents.custom[]` of `system/settings.json` in its library, not in `settings.json`. The registration also names how the agent is shown and installed, so the organization chooses its name:
+
+| Field | Rule |
+|---|---|
+| `name` | Required, 1–40 characters: the name the app shows, in place of `describe`'s. |
+| `glyph` | Optional, 1–2 characters on its mark. |
+| `tone` | Optional: `orange`, `green`, `blue`, `violet`, `teal`, `pink` or `rose`. Violet by default. |
+| `command` | An absolute path, which `%NAME%` of the environment may begin, or a program's name, looked for where the app finds the CLIs it installs (npm's package is started as Node.js on its `bin` script). |
+| `install` | Optional: `{ "winget": "<id>", "source"?: "<source>" }` or `{ "npm": "<package>" }`, run once the user approves, as for the built-in CLIs. Without it the organization installs the CLI, and the app says to ask the administrator. |
 
 ## 4. Rules for every start
 

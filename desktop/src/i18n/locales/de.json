@@ -2556,6 +2556,8 @@
       "pickerHint": "Nur für diesen Chat. Der Standard wird in den Einstellungen festgelegt.",
       "web": "Websuche und Lesen von Webseiten",
       "webHint": "Der Agent darf im Web suchen und Seiten lesen, während er Folien erstellt.",
+      "webBlocked": "Ihre Organisation erlaubt dem Agenten nicht, im Web zu suchen oder Seiten zu lesen.",
+      "askAdmin": "Ihre Organisation installiert {{name}} selbst. Bitten Sie Ihren Administrator, es auf diesem Computer zu installieren.",
       "gate": "Designprüfung am Ende jedes Durchlaufs",
       "gateHint": "Bevor der Agent fertig ist, behebt er Designbefunde auf den Folien, die er bearbeitet hat.",
       "outline": "Gliederung vor dem Erstellen einer Präsentation",

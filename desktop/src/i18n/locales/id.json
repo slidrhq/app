@@ -2550,6 +2550,8 @@
       "pickerHint": "Hanya untuk obrolan ini. Default diatur di Pengaturan.",
       "web": "Pencarian dan pembacaan web",
       "webHint": "Agen boleh mencari di web dan membaca halaman saat membuat slide.",
+      "webBlocked": "Organisasi Anda tidak mengizinkan agen mencari di web atau membaca halaman.",
+      "askAdmin": "Organisasi Anda menginstal {{name}} sendiri. Minta administrator Anda untuk menginstalnya di komputer ini.",
       "gate": "Pemeriksaan desain di akhir setiap giliran",
       "gateHint": "Sebelum selesai, Agen memperbaiki temuan desain pada slide yang diubahnya.",
       "outline": "Kerangka sebelum membuat presentasi",

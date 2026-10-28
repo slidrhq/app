@@ -2,7 +2,7 @@
  * Scratch review page (not part of the app):
  *   ?t=<template>&lang=<code>[&slide=<n>][&w=1920]     a template's sample deck, or one slide of it
  *   &src=library                                      the library's template, not one authored here
- *   ?d=<id,id,...>|all&src=managed|new&lang=<code>[&w=] ready-made slides
+ *   ?d=<id,id,...>|all&src=library|new&lang=<code>[&w=] ready-made slides
  *   ?covers&lang=<code>[&only=<id,id,...>][&w=]       the covers of the built-in templates, as the
  *                                                     galleries draw them (`templateCover`)
  * Only what is written in the language: a design not written in it is left out, and a template
@@ -62,7 +62,7 @@ interface Drawn {
 
 let resolve: (asset: AssetMeta) => string | undefined = () => undefined;
 
-type ManagedCatalog = {
+type DesignCatalog = {
   slides: Record<string, Localized<Slide>>;
   sizes: Record<string, number[]>;
   groupIds: Record<string, string[]>;
@@ -127,13 +127,12 @@ async function load(): Promise<Drawn[]> {
     return slides.map((slide, i) => ({ key: `${i + 1}. ${slide.name ?? ''}`, deck, slide }));
   }
   const src = query.get('src') ?? 'new';
-  const catalog: ManagedCatalog =
-    src === 'managed' || src === 'library'
-      ? ((await readMediaJson<ManagedCatalog>(
-          src === 'library' ? 'elements/designs/index.json' : 'elements/designs/managed.json',
-        )) as ManagedCatalog)
+  // The library's catalog (ADR-118), or the designs being authored here.
+  const catalog: DesignCatalog =
+    src === 'library'
+      ? ((await readMediaJson<DesignCatalog>('elements/designs/index.json')) as DesignCatalog)
       : newDesigns();
-  // The authored catalog keeps no sizes of its pictures: they are in `images/designs/sizes.json`,
+  // The library's catalog keeps no sizes of its pictures: they are in `images/designs/sizes.json`,
   // which the app reads too (`designAssets.ts`). Without them a cropped picture is drawn wrong.
   if (src === 'library') {
     catalog.sizes =

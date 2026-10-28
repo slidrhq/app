@@ -57,6 +57,7 @@ import {
   type ToolSource,
   type TurnOutcome,
 } from './agent';
+import { customAgent, loadSystemSettings, webAccessOf } from '../settings/systemSettings';
 import { GATE_ROUNDS, isClean, TurnWatch } from './qualityGate';
 import { HarnessSetup, selectionIssue, type ConnectionCache } from './harnessSetup';
 import { toReply, type BridgeTool, type ToolBridge, type ToolHandler } from './toolBridge';
@@ -81,6 +82,12 @@ const ATTACHMENT_READ: BridgeTool = {
 };
 
 const ATTACHMENT_HARNESSES = new Set(['codex-cli', 'copilot-cli', 'gemini-cli', 'grok-cli']);
+
+/**
+ * The harnesses without file tools of their own, given the app's `attachment_read`: the one-shot
+ * CLIs, and the organization's own agents (ADR-117), whose protocol lets a CLI go without them.
+ */
+const readsAttachments = (id: string): boolean => ATTACHMENT_HARNESSES.has(id) || !!customAgent(id);
 import type {
   AssistantEntry,
   AssistantPart,
@@ -435,7 +442,7 @@ interface Session {
 
 /** What of the settings a session is started with, as one string to compare. */
 function sessionSettings({ harnessId, model, effort, webAccess }: AgentSettings): string {
-  return JSON.stringify([harnessId ?? null, model ?? null, effort ?? null, webAccess ?? true]);
+  return JSON.stringify([harnessId ?? null, model ?? null, effort ?? null, webAccessOf(webAccess)]);
 }
 
 /** The files of a message as the turn carries them. */
@@ -887,7 +894,7 @@ export class ChatThread {
     await api.ready(run.turn, name, input);
     const before = run.watch.mark();
     let result: ToolResult;
-    if (name === ATTACHMENT_READ.name && ATTACHMENT_HARNESSES.has(this.#session?.harnessId ?? '')) {
+    if (name === ATTACHMENT_READ.name && readsAttachments(this.#session?.harnessId ?? '')) {
       const args = input as { name?: unknown; offset?: unknown } | null;
       const file = args?.name;
       const offset = args?.offset ?? 0;
@@ -1311,7 +1318,7 @@ export class ChatThread {
     if (issue) throw new ProblemError({ kind: 'invalid_input', message: issue });
     const bridge = await this.#service.bridge();
     const tools: BridgeTool[] = [...api.list(this.scope.kind)];
-    if (ATTACHMENT_HARNESSES.has(harness.id) && client.readAttachment) tools.push(ATTACHMENT_READ);
+    if (readsAttachments(harness.id) && client.readAttachment) tools.push(ATTACHMENT_READ);
     const { sessionKey, endpoint } = await bridge.open(tools);
     const names = tools.map((tool) => tool.name);
     // A conversation continues only on the harness it was held on.
@@ -1329,7 +1336,8 @@ export class ChatThread {
           scope: harnessScope(this.scope),
           systemPrompt: systemPrompt({ scope: this.scope.kind, tools: names }),
           toolEndpoint: endpoint,
-          webAccess: settings.webAccess ?? true,
+          // The user's choice, within what the organization allows (ADR-117).
+          webAccess: webAccessOf(settings.webAccess),
           ...(settings.model ? { model: settings.model } : {}),
           ...(settings.effort ? { effort: settings.effort } : {}),
           ...(resume ? { resume } : {}),
@@ -1857,10 +1865,13 @@ export class AgentService {
 
   /** The harnesses the app offers, for a picker of harness, model and effort (CHT-U06). */
   harnesses(): Promise<HarnessDescriptor[]> {
-    this.#harnesses ??= this.#options.client.harnesses().catch((error: unknown) => {
-      this.#harnesses = null;
-      throw error;
-    });
+    // After the organization's settings, which name the marks of its own agents.
+    this.#harnesses ??= loadSystemSettings()
+      .then(() => this.#options.client.harnesses())
+      .catch((error: unknown) => {
+        this.#harnesses = null;
+        throw error;
+      });
     return this.#harnesses;
   }
 

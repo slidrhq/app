@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   designTagsOf,
   localName,
-  managedSize,
   mergeCatalogs,
   type DesignCatalog,
   type ManagedDesignCatalog,
@@ -16,17 +15,24 @@ const slide = (name: string) => ({
 });
 const slides = (...ids: string[]) => Object.fromEntries(ids.map((id) => [id, slide(id)]));
 
-const authored: Partial<DesignCatalog> = {
+/** The catalog: the first designs, and one made since, which it names. */
+const catalog: Partial<DesignCatalog> = {
   groups: ['events', 'business'],
-  groupIds: { events: ['wedding', 'concert', 'gone'], business: ['webinar'] },
-  slides: slides('wedding', 'concert', 'webinar'),
-  subjects: { wedding: [1500, 600] },
+  groupIds: { events: ['wedding', 'concert', 'gone', 'm-picnic'], business: ['webinar'] },
+  slides: slides('wedding', 'concert', 'webinar', 'm-picnic'),
+  subjects: { wedding: [1500, 600], 'm-picnic': [10, 20] },
+  names: { 'm-picnic': { he: 'פיקניק', en: 'Picnic' } },
+  groupNames: { events: { he: 'אירועים', en: 'Events' } },
 };
 
+/** The catalog of the designs Slidr Studio made, of a library of before (ADR-118). */
 const managed: Partial<ManagedDesignCatalog> = {
   version: 1,
   groups: ['invitations', 'events', 'empty'],
-  groupNames: { invitations: { he: 'הזמנות', en: 'Invitations' } },
+  groupNames: {
+    invitations: { he: 'הזמנות', en: 'Invitations' },
+    events: { he: 'אחר', en: 'Other' },
+  },
   groupIds: {
     invitations: ['m-garden-wedding', 'm-garden-wedding', 'm-no-slide'],
     events: ['m-street-party', 'wedding'],
@@ -46,82 +52,90 @@ const managed: Partial<ManagedDesignCatalog> = {
   sizes: { 'm-garden-wedding': [1536, 1024], 'm-garden-wedding-bg': [1920, 1080] },
 };
 
-const order = (catalog: DesignCatalog) =>
-  catalog.groups.flatMap((group) => catalog.groupIds[group]);
+const order = (merged: Pick<DesignCatalog, 'groups' | 'groupIds'>) =>
+  merged.groups.flatMap((group) => merged.groupIds[group]);
 
 describe('the catalog of designs', () => {
-  it('is empty without either file', () => {
+  it('is empty without a file', () => {
     const merged = mergeCatalogs(undefined, undefined);
     expect(merged.groups).toEqual([]);
     expect(merged.groupIds).toEqual({});
-    expect(merged.managed.size).toBe(0);
   });
 
-  it('is the authored catalog as it was, without a managed one', () => {
-    const merged = mergeCatalogs(authored, undefined);
+  it('is the catalog as it is, with its names, where there is no catalog of before', () => {
+    const merged = mergeCatalogs(catalog, undefined);
     expect(merged.groups).toEqual(['events', 'business']);
     // A design without a slide is not listed.
-    expect(order(merged)).toEqual(['wedding', 'concert', 'webinar']);
-    expect(merged.subjects).toEqual({ wedding: [1500, 600] });
-    expect(merged.managed.size).toBe(0);
+    expect(order(merged)).toEqual(['wedding', 'concert', 'm-picnic', 'webinar']);
+    expect(merged.subjects).toEqual({ wedding: [1500, 600], 'm-picnic': [10, 20] });
+    expect(localName(merged.names.get('m-picnic'), 'he')).toBe('פיקניק');
+    expect(merged.names.has('wedding')).toBe(false);
+    expect(localName(merged.groupNames.get('events'), 'en')).toBe('Events');
+    expect(merged.sizes.size).toBe(0);
   });
 
-  it('puts the managed designs after the authored ones', () => {
-    const merged = mergeCatalogs(authored, managed);
-    // A group the authored catalog has takes them after its own; a new one comes last.
+  it('puts the designs of a catalog of before after its own, as the library folds them', () => {
+    const merged = mergeCatalogs(catalog, managed);
+    // A group the catalog has takes them after its own; a new one comes last.
     expect(merged.groups).toEqual(['events', 'business', 'invitations']);
-    expect(merged.groupIds.events).toEqual(['wedding', 'concert', 'm-street-party']);
+    expect(merged.groupIds.events).toEqual(['wedding', 'concert', 'm-picnic', 'm-street-party']);
     expect(merged.groupIds.invitations).toEqual(['m-garden-wedding']);
     expect(order(merged)).toEqual([
       'wedding',
       'concert',
+      'm-picnic',
       'm-street-party',
       'webinar',
       'm-garden-wedding',
     ]);
-    expect([...merged.managed].sort()).toEqual(['m-garden-wedding', 'm-street-party']);
     expect(merged.slides['m-garden-wedding']?.en?.name).toBe('m-garden-wedding-en');
+    // The catalog's own name of a group is kept.
+    expect(localName(merged.groupNames.get('events'), 'en')).toBe('Events');
+    expect(localName(merged.groupNames.get('invitations'), 'he-IL')).toBe('הזמנות');
   });
 
-  it('keeps the authored design where both catalogs have an id', () => {
-    const merged = mergeCatalogs(authored, managed);
+  it('keeps the catalog’s design where both have an id', () => {
+    const merged = mergeCatalogs(catalog, managed);
     expect(merged.slides.wedding?.he?.name).toBe('wedding-he');
     expect(merged.groupIds.events!.filter((id) => id === 'wedding')).toHaveLength(1);
-    expect(merged.managed.has('wedding')).toBe(false);
     expect(merged.subjects.wedding).toEqual([1500, 600]);
     expect(merged.names.has('wedding')).toBe(false);
   });
 
-  it('lists a managed design once, only with a slide, and a new group only with a design', () => {
-    const merged = mergeCatalogs(authored, managed);
+  it('lists a design of before once, only with a slide, and a new group only with a design', () => {
+    const merged = mergeCatalogs(catalog, managed);
     expect(order(merged).filter((id) => id === 'm-garden-wedding')).toHaveLength(1);
     expect(merged.slides['m-no-slide']).toBeUndefined();
     expect(merged.groups).not.toContain('empty');
   });
 
-  it('takes the subjects and the names of the managed designs it keeps', () => {
-    const merged = mergeCatalogs(authored, managed);
+  it('takes the subjects, the names and the sizes of the designs of before it keeps', () => {
+    const merged = mergeCatalogs(catalog, managed);
     expect(merged.subjects['m-garden-wedding']).toEqual([1480, 520]);
     // A point that is not two numbers is left out.
     expect(merged.subjects['m-street-party']).toBeUndefined();
     expect(localName(merged.names.get('m-garden-wedding'), 'he')).toBe('חתונה בגן');
     expect(localName(merged.names.get('m-garden-wedding'), 'en-US')).toBe('Garden wedding');
     expect(localName(merged.names.get('m-street-party'), 'en')).toBeUndefined();
-    expect(localName(merged.groupNames.get('invitations'), 'he-IL')).toBe('הזמנות');
+    expect(merged.sizes.get('m-garden-wedding')).toEqual([1536, 1024]);
+    expect(merged.sizes.get('m-garden-wedding-bg')).toEqual([1920, 1080]);
+    expect(merged.sizes.get('m-street-party')).toBeUndefined();
+    expect(merged.sizes.get('constructor')).toBeUndefined();
   });
 
-  it('survives a managed file that is not what it should be', () => {
+  it('survives a file that is not what it should be', () => {
     const broken = {
       groups: 'invitations',
       groupIds: { invitations: 'm-a' },
       slides: null,
       names: [],
       groupNames: 7,
+      sizes: [],
     } as unknown as Partial<ManagedDesignCatalog>;
-    const merged = mergeCatalogs(authored, broken);
+    const merged = mergeCatalogs(catalog, broken);
     expect(merged.groups).toEqual(['events', 'business']);
-    expect(merged.managed.size).toBe(0);
-    expect(merged.groupNames.size).toBe(0);
+    expect(merged.groupNames.size).toBe(1);
+    expect(mergeCatalogs(broken).groups).toEqual([]);
     // An id that is a name of Object's own is not taken for a design.
     const sneaky = mergeCatalogs(undefined, {
       groups: ['x'],
@@ -131,18 +145,18 @@ describe('the catalog of designs', () => {
     expect(sneaky.groups).toEqual([]);
   });
 
-  it('takes the tags of the managed designs it keeps, with the library’s', () => {
-    const tagged = mergeCatalogs(authored, {
+  it('takes the tags of the designs of before it keeps, with the library’s', () => {
+    const tagged = mergeCatalogs(catalog, {
       ...managed,
       tags: {
         'm-garden-wedding': { he: ['חתונה', 7], en: ['wedding'] },
-        // The authored design of this id is kept, without the managed one's tags.
+        // The catalog's design of this id is kept, without the other's tags.
         wedding: { he: ['אחר'], en: ['other'] },
       } as unknown as ManagedDesignCatalog['tags'],
     });
     expect(tagged.tags.get('m-garden-wedding')).toEqual({ he: ['חתונה'], en: ['wedding'] });
     expect(tagged.tags.has('wedding')).toBe(false);
-    expect(mergeCatalogs(authored, managed).tags.size).toBe(0);
+    expect(mergeCatalogs(catalog, managed).tags.size).toBe(0);
     const all = designTagsOf(
       {
         'm-garden-wedding': { he: ['גן'], en: ['garden', 'wedding'], fr: ['mariage'] },
@@ -156,13 +170,5 @@ describe('the catalog of designs', () => {
       fr: ['mariage'],
     });
     expect(all.concert).toEqual({ en: ['music'] });
-  });
-
-  it('knows the sizes of the managed pictures', () => {
-    expect(managedSize(managed, 'm-garden-wedding')).toEqual([1536, 1024]);
-    expect(managedSize(managed, 'm-garden-wedding-bg')).toEqual([1920, 1080]);
-    expect(managedSize(managed, 'm-street-party')).toBeUndefined();
-    expect(managedSize(managed, 'constructor')).toBeUndefined();
-    expect(managedSize(undefined, 'm-garden-wedding')).toBeUndefined();
   });
 });

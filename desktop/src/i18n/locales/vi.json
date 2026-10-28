@@ -2550,6 +2550,8 @@
       "pickerHint": "Chỉ cho cuộc trò chuyện này. Mặc định được đặt trong Cài đặt.",
       "web": "Tìm kiếm và đọc nội dung web",
       "webHint": "Tác nhân có thể tìm kiếm trên web và đọc các trang trong khi tạo trang chiếu.",
+      "webBlocked": "Tổ chức của bạn không cho phép tác nhân tìm kiếm trên web hoặc đọc các trang.",
+      "askAdmin": "Tổ chức của bạn tự cài đặt {{name}}. Hãy nhờ quản trị viên cài đặt trên máy tính này.",
       "gate": "Kiểm tra thiết kế sau mỗi lượt",
       "gateHint": "Trước khi hoàn tất, tác nhân sẽ sửa các vấn đề thiết kế trên những trang chiếu mà nó đã chỉnh sửa.",
       "outline": "Dàn ý trước khi tạo bản trình bày",

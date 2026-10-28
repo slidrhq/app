@@ -2562,6 +2562,8 @@
       "pickerHint": "Somente para este chat. O padrão é definido nas Configurações.",
       "web": "Pesquisa e leitura na web",
       "webHint": "O agente pode pesquisar na web e ler páginas enquanto cria os slides.",
+      "webBlocked": "Sua organização não permite que o agente pesquise na web nem leia páginas.",
+      "askAdmin": "Sua organização instala o {{name}} por conta própria. Peça ao administrador para instalá-lo neste computador.",
       "gate": "Verificação de design ao fim de cada turno",
       "gateHint": "Antes de terminar, o agente corrige os apontamentos de design nos slides em que mexeu.",
       "outline": "Roteiro antes de criar uma apresentação",

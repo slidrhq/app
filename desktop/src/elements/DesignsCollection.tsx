@@ -50,17 +50,17 @@ function galleryIn(lang: string): Promise<Gallery> {
 
 /**
  * The names of designs and of their groups, in the language of the interface or in `lng`: the
- * app's own, else the one `managed.json` gives a design of Slidr Studio, else the id. A name
- * that neither has is reported as a missing string.
+ * app's own, else the one the catalog gives a design made since the first ones, else the id. A
+ * name that neither has is reported as a missing string.
  */
 function useDesignNames(designs: Designs) {
   const { t, i18n } = useTranslation('elements');
   const lang = i18n.language;
   return useMemo(() => {
-    const named = (key: string, managed: string | undefined, id: string, lng: string) =>
+    const named = (key: string, given: string | undefined, id: string, lng: string) =>
       i18n.exists(key, { ns: 'elements', lng })
         ? t(key, { lng })
-        : (managed ?? t(key, { lng, defaultValue: id }));
+        : (given ?? t(key, { lng, defaultValue: id }));
     return {
       design: (id: DesignId, lng = lang) =>
         named(`designs.name.${id}`, designs.designName(id, lng), id, lng),

@@ -165,6 +165,32 @@ export function useLanguage(): Language {
   return isLanguage(current.language) ? current.language : 'en';
 }
 
+/** The UI languages the organization offers (ADR-117): every one, until its settings say. */
+let offered: readonly Language[] = languages;
+
+/** The languages the picker offers, in its order. */
+export const offeredLanguages = (): readonly Language[] => offered;
+
+/**
+ * Offers only `allowed` of the UI languages, as the organization's settings say (ADR-117), and
+ * shows the UI in one of them: the user's own choice while it is offered; else the organization's
+ * `preferred`; else the system's, when it is offered; else the first offered. A choice that is not
+ * offered is kept, and comes back if the organization offers it again.
+ */
+export async function offerLanguages(
+  allowed?: readonly string[],
+  preferred?: string,
+): Promise<void> {
+  const named = allowed?.filter(isLanguage) ?? [];
+  offered = named.length > 0 ? languages.filter((language) => named.includes(language)) : languages;
+  const has = (language: string | undefined): language is Language =>
+    isLanguage(language) && offered.includes(language);
+  const own = storedLanguage();
+  const system = systemLanguage();
+  const shown = has(own) ? own : has(preferred) ? preferred : has(system) ? system : offered[0];
+  if (shown && i18n.language !== shown) await i18n.changeLanguage(shown);
+}
+
 /** Switches the UI language live and remembers it. */
 export async function setLanguage(language: Language): Promise<void> {
   try {

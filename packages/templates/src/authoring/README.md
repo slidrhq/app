@@ -14,7 +14,7 @@ when merged.
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `<id>.ts`                              | A template: theme, layouts for both directions, the sample in Hebrew and English. It exports `entry`.                                    |
 | `atlas/<lang>.ts`                      | The words of Atlas's sample, a module a language (`atlas/copy.ts` lists them).                                                           |
-| `designs/kit.ts`, `designs/<topic>.ts` | Ready-made slides in the shape of `elements/designs/managed.json`. Each topic module exports `designs`.                                  |
+| `designs/kit.ts`, `designs/<topic>.ts` | Ready-made slides in the shape of `elements/designs/index.json`. Each topic module exports `designs`.                                    |
 | `pictures/`                            | The pictures of the samples (`<id>-<name>.webp`, recorded in `<id>.json`) and of the designs (`designs/<id>.webp`, size in `<id>.json`). |
 | `artwork/`                             | The HTML and three.js pages the pictures were rendered from.                                                                             |
 | `registry.ts`, `designs/registry.ts`   | Everything in this folder, for the review page and the catalog.                                                                          |

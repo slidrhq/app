@@ -92,6 +92,8 @@ export const he = {
     pickerHint: 'לשיחה הזאת בלבד. ברירת המחדל נקבעת בהגדרות.',
     web: 'חיפוש וקריאה ברשת',
     webHint: 'הסוכן רשאי לחפש ברשת ולקרוא דפים כשהוא בונה שקפים.',
+    webBlocked: 'הארגון לא מאפשר לסוכן לחפש ברשת או לקרוא דפים.',
+    askAdmin: 'הארגון מתקין את {{name}} בעצמו. בקשו ממנהל המערכת להתקין אותו במחשב הזה.',
     gate: 'בדיקת עיצוב בסוף כל תור',
     gateHint: 'הסוכן מתקן ממצאי עיצוב בשקפים שנגע בהם לפני שהוא מסיים.',
     outline: 'מתווה לפני בניית מצגת',
@@ -190,6 +192,9 @@ export const en: Messages<typeof he> = {
     pickerHint: 'For this chat only. The default is set in Settings.',
     web: 'Web search and reading',
     webHint: 'The agent may search the web and read pages while it builds slides.',
+    webBlocked: 'Your organization does not let the agent search the web or read pages.',
+    askAdmin:
+      'Your organization installs {{name}} itself. Ask your administrator to install it on this computer.',
     gate: 'Design check at the end of every turn',
     gateHint: 'The agent fixes design findings on the slides it touched before it finishes.',
     outline: 'An outline before building a deck',

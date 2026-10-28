@@ -1,5 +1,5 @@
 //! Connection and setup use the CLIs' own metadata protocols, without submitting a prompt.
-use std::{path::PathBuf, process::Stdio, time::Duration};
+use std::{collections::BTreeMap, path::PathBuf, process::Stdio, time::Duration};
 
 use serde_json::{Value, json};
 use tokio::{
@@ -9,10 +9,10 @@ use tokio::{
 };
 
 use super::{
-    AgentError, AgentErrorKind, HarnessConnection, HarnessDescriptor, HarnessState, HarnessStatus,
-    ModelOption, Result,
+    AgentError, AgentErrorKind, AgentHarness, HarnessConnection, HarnessState, ModelOption, Result,
     registry::one_shot::{self, Launch},
 };
+use crate::system_settings::Install;
 
 /// The winget packages of the CLIs the app installs, by harness.
 const PACKAGES: [(&str, &str); 5] = [
@@ -128,12 +128,20 @@ fn command(program: impl AsRef<std::ffi::OsStr>) -> Command {
     command
 }
 
-pub async fn connect(
-    mut harness: HarnessDescriptor,
-    mut status: HarnessStatus,
-) -> HarnessConnection {
+/// Checks a harness and, when it is ready, lists the models of its account: from the harness
+/// itself when it lists them (an agent of the organization's own), or by its CLI's own protocol.
+pub async fn connect(source: &dyn AgentHarness) -> HarnessConnection {
+    let mut status = source.probe().await;
+    // After the probe, which tells a CLI of the organization's what it can do.
+    let mut harness = source.descriptor();
     if status.state == HarnessState::Ready && harness.id != "mock" {
-        match timeout(Duration::from_secs(60), discover(&harness.id)).await {
+        let listed = async {
+            match source.models().await {
+                Some(models) => models,
+                None => discover(&harness.id).await,
+            }
+        };
+        match timeout(Duration::from_secs(60), listed).await {
             Ok(Ok(models)) if !models.is_empty() => {
                 harness.models = models;
                 harness.effort_levels.clear();
@@ -583,6 +591,43 @@ pub async fn install(id: &str) -> Result<()> {
     run_installer(command(npm).args(["install", "--global", "@google/gemini-cli"])).await
 }
 
+/// Installs a CLI of the organization's own (ADR-117), once the user approved: its WinGet package,
+/// from the source the settings name or the community's, or its npm package, after Node.js when
+/// npm is missing.
+pub(crate) async fn install_package(install: &Install) -> Result<()> {
+    if !cfg!(windows) {
+        return Err(AgentError::new(
+            AgentErrorKind::ProcessExited,
+            "Automatic installation currently requires Windows. Install the CLI with its official installer, then retry.",
+        ));
+    }
+    match install {
+        Install::Winget { winget, source } => {
+            let mut args = winget_args(winget).map(str::to_owned);
+            if let Some(source) = source {
+                args[5].clone_from(source);
+            }
+            run_installer(command("winget.exe").args(args)).await
+        }
+        Install::Npm { npm } => {
+            let program = match npm_program() {
+                Some(program) => program,
+                None => {
+                    run_installer(command("winget.exe").args(winget_args("OpenJS.NodeJS.LTS")))
+                        .await?;
+                    npm_program().ok_or_else(|| {
+                        AgentError::new(
+                            AgentErrorKind::ProcessExited,
+                            "Node.js was installed, but npm was not found. Restart the app and retry.",
+                        )
+                    })?
+                }
+            };
+            run_installer(command(program).args(["install", "--global", npm.as_str()])).await
+        }
+    }
+}
+
 fn winget_args(package: &str) -> [&str; 10] {
     [
         "install",
@@ -654,23 +699,53 @@ pub async fn login(id: &str) -> Result<()> {
         "gemini-cli" => "",
         _ => return Err(AgentError::invalid_input("unknown login command")),
     };
+    let mut start = vec![launch.program.to_string_lossy().into_owned()];
+    start.extend(
+        launch
+            .script
+            .iter()
+            .map(|script| script.to_string_lossy().into_owned()),
+    );
+    let hint = if id == "gemini-cli" {
+        "Choose Sign in with Google. When you are signed in, type /quit to return to Slidr."
+    } else {
+        ""
+    };
+    terminal(id, &start, args, hint, &BTreeMap::new()).await
+}
+
+/// Opens a terminal on the sign-in of a CLI of the organization's own (ADR-117): `start`, the
+/// program and every argument, `slidr login` last, with `env` added to its environment.
+pub(crate) async fn sign_in_terminal(
+    start: &[String],
+    env: &BTreeMap<String, String>,
+) -> Result<()> {
+    terminal("", start, "", "", env).await
+}
+
+/// A visible terminal that runs `start`, each part quoted, then `args` as they are, and waits for
+/// it to end: the CLI's own sign-in, interactive, in a browser or on the device code it shows.
+async fn terminal(
+    id: &str,
+    start: &[String],
+    args: &str,
+    hint: &str,
+    env: &BTreeMap<String, String>,
+) -> Result<()> {
     #[cfg(windows)]
     {
-        let quote =
-            |path: &std::path::Path| format!("'{}'", path.to_string_lossy().replace('\'', "''"));
-        let mut start = vec![quote(launch.program.as_path())];
-        if let Some(script) = &launch.script {
-            start.push(quote(script.as_path()));
-        }
-        let hint = if id == "gemini-cli" {
-            "Write-Host 'Choose Sign in with Google. When you are signed in, type /quit to return to Slidr.'; "
+        let quote = |part: &str| format!("'{}'", part.replace('\'', "''"));
+        let start: Vec<String> = start.iter().map(|part| quote(part)).collect();
+        let hint = if hint.is_empty() {
+            String::new()
         } else {
-            ""
+            format!("Write-Host {}; ", quote(hint))
         };
         let script = format!("{hint}& {} {}; exit $LASTEXITCODE", start.join(" "), args);
         let mut cmd = command("powershell.exe");
         one_shot::quiet(id, &mut cmd);
-        cmd.creation_flags(0x0000_0010)
+        cmd.envs(env)
+            .creation_flags(0x0000_0010)
             .args(["-NoProfile", "-Command", &script]);
         let status = timeout(Duration::from_secs(600), cmd.status())
             .await
@@ -691,7 +766,8 @@ pub async fn login(id: &str) -> Result<()> {
     }
     #[cfg(not(windows))]
     {
-        let program = launch.script.as_ref().unwrap_or(&launch.program).display();
+        let _ = (id, hint, env);
+        let program = start.join(" ");
         let message = if args.is_empty() {
             format!("Run {program} in a terminal and sign in, then retry.")
         } else {

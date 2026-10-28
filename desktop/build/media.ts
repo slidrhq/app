@@ -231,7 +231,10 @@ export function templateFiles(catalog: TemplateCatalog): Map<string, string> {
   return files;
 }
 
-/** The catalogs of the designs, in the order the app lists them: an id of both is the authored one. */
+/**
+ * The catalog of the designs, and the catalog of before of a library that still has one (ADR-118),
+ * in the order the app lists them: an id of both is the first's.
+ */
 export const DESIGN_CATALOGS = ['index.json', 'managed.json'] as const;
 
 export { DESIGN_DRAWING } from '../src/elements/designWord.ts';
@@ -248,9 +251,9 @@ const sha256 = (bytes: Buffer | string) => createHash('sha256').update(bytes).di
  * The files the library's publisher writes into `elements/designs/` from the catalogs of the
  * designs (ADR-109), by their place in that folder. A gallery shows the designs of one language,
  * and a catalog holds every language: so each is written again for each language,
- * `<language>/index.json` and `<language>/managed.json`, the catalog with the slides of that
- * language alone, the languages every design is drawn in (`languages`) and the hash of the file
- * it was made from (`from`).
+ * `<language>/index.json` (and `<language>/managed.json` of a catalog of before), the catalog
+ * with the slides of that language alone, the languages every design is drawn in (`languages`)
+ * and the hash of the file it was made from (`from`).
  *
  * `revs.json` gives each design in each language a word, of its slide and its pictures: a picture
  * of a design made ahead is of a word (`images/designs/thumbs/index.json`), and is shown only

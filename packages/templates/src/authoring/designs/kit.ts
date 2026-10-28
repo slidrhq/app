@@ -1,6 +1,6 @@
 /**
  * What the ready-made slides of Elements → Designs are written with, in the shape of the media
- * library's `elements/designs/managed.json`: a slide in Hebrew and one in English, and one in each
+ * library's catalog of them, `elements/designs/index.json`: a slide in Hebrew and one in English, and one in each
  * other language the design is written in (`@slidr/model` languages), each drawn by hand for its
  * direction, with every run of text naming its font, size, weight and colour, and one picture,
  * `__subject__`, that the app swaps for the design's file when it is inserted.

@@ -7,8 +7,9 @@ import { isTauri } from '@tauri-apps/api/core';
 import { App } from './App';
 import { tauriStorage } from './document/tauriStorage';
 import { registerBuiltinFonts } from './fonts';
-import { currentLanguage } from './i18n';
+import { currentLanguage, offerLanguages } from './i18n';
 import { shareScriptNonce } from './scriptNonce';
+import { loadSystemSettings } from './settings/systemSettings';
 import { createEditor, type Editor } from './shell/editor';
 import { startDocument } from './shell/fileActions';
 import './shell/plugins';
@@ -28,6 +29,10 @@ const editor = createEditor({
   storage: isTauri() ? tauriStorage : null,
 });
 void startDocument(editor);
+// The organization's settings (ADR-117): the languages it offers, and the one it starts in.
+void loadSystemSettings().then(
+  (policy) => policy && offerLanguages(policy.languages.offered, policy.languages.default),
+);
 
 declare global {
   interface Window {

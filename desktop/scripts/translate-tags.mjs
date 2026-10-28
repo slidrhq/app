@@ -3,8 +3,9 @@
 // Uses the signed-in Claude CLI as tag-elements.mjs does. Source tags remain intact. Each
 // distinct English phrase is translated once per language, with Hebrew and item context.
 // The tags are those tag-elements.mjs keeps (desktop/.tags/<kind>.json, --work), or else the
-// published library's (tags/<kind>.json, and the designs' own in managed.json): no copy of the
-// library is needed. The translations are written into that folder, with progress saved after
+// published library's (tags/<kind>.json, and the designs' own in managed.json, of a library not
+// published since its catalogs of the designs were made one, ADR-118): no copy of the library is
+// needed. The translations are written into that folder, with progress saved after
 // every batch in translations.json for resumable runs; tag-elements.mjs --upload then sends them.
 // --from <author-copy> reads and writes an author's copy instead, as before (its tags/,
 // managed.json, and archive/tag-translations.json).
