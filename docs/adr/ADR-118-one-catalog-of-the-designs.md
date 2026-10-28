@@ -1,6 +1,6 @@
 # ADR-118 — One catalog of the designs, and an import that merges catalogs
 
-Status: Implemented in the 2026-10-28 working trees of the app, Slidr Library and Slidr Studio; **not committed** at the time of this record, the library **not deployed**, and the published library **not folded** yet.
+Status: Implemented on 2026-10-28 in the app, Slidr Library and Slidr Studio. The library with the fold and **Bring the designs up to date** was deployed that day (its commit `3370971`); the published library is **not folded** yet: it is when that button is pressed, or by the next upload published.
 
 ## Request
 
