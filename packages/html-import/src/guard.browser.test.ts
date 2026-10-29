@@ -258,3 +258,99 @@ describe('the guard against injected errors', () => {
     }
   });
 });
+
+/** Glints of many colours, softened as a lens does, on a dark ground: the fine detail of a photo. */
+function glinting(width: number, height: number): OffscreenCanvas {
+  let seed = 7;
+  const random = () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const canvas = new OffscreenCanvas(width, height);
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#3a0d2a';
+  ctx.fillRect(0, 0, width, height);
+  ctx.filter = 'blur(1px)';
+  for (let i = 0; i < 60_000; i++) {
+    ctx.fillStyle = `hsl(${Math.floor(random() * 360)} 90% ${45 + Math.floor(random() * 50)}%)`;
+    ctx.fillRect(random() * width, random() * height, 1 + random() * 3, 1 + random() * 3);
+  }
+  return canvas;
+}
+
+/**
+ * The picture at half its size, by the canvas's best filter, and mirrored on request. `dx` moves
+ * it that much to the left, and it is drawn as much wider, so that it still fills its box.
+ */
+async function halved(picture: OffscreenCanvas, dx: number, mirrored = false): Promise<string> {
+  const canvas = new OffscreenCanvas(picture.width / 2, picture.height / 2);
+  const ctx = canvas.getContext('2d')!;
+  ctx.imageSmoothingQuality = 'high';
+  if (mirrored) ctx.setTransform(-1, 0, 0, 1, canvas.width, 0);
+  ctx.drawImage(picture, -dx, 0, canvas.width + 2 * dx, canvas.height);
+  return URL.createObjectURL(await canvas.convertToBlob({ type: 'image/png' }));
+}
+
+describe('the guard on a photo the browser resamples', () => {
+  it('takes the photo however it was resampled, and still not another photo', async () => {
+    const deck = createDeck({ lang: 'en' });
+    deck.assets.photo = {
+      id: 'photo',
+      file: 'photo.png',
+      mime: 'image/png',
+      kind: 'image',
+      origin: 'ai',
+      bytes: 0,
+      width: 940,
+      height: 1672,
+    };
+    const photo = glinting(940, 1672);
+    const full = URL.createObjectURL(await photo.convertToBlob({ type: 'image/png' }));
+    // The source draws the photo at half its size, which this browser does as the mean of every
+    // four pixels. The slide is handed it already halved another way and a quarter pixel over:
+    // what another of the browser's ways of drawing it comes to.
+    const other = await halved(photo, 0.25);
+    const mirrored = await halved(photo, 0, true);
+    let url = full;
+    const base = testHost();
+    const host = { ...base, resolveAsset: () => url };
+    const html = `<div style="position:relative;width:1920px;height:1080px;background:#ffffff">
+      <img data-asset="photo" style="position:absolute;left:144px;top:72px;width:470px;height:836px;object-fit:cover;border-radius:24px">
+    </div>`;
+    const loaded = await loadHtml(html, deck, host, deck.size);
+    url = other;
+    const conversion = await startConversion(loaded.root, {
+      deck,
+      host,
+      foreign: false,
+      behind: 'slide',
+    });
+    try {
+      const item = conversion.proposal.items.find((i) => i.element.type === 'image')!;
+      expect(item.resampled).toBe(true);
+      expect((await conversion.judge({ fit: false })).faithful).toBe(true);
+      // Held to the strict threshold, the same photo would be another one.
+      item.resampled = false;
+      expect((await conversion.judge({ fit: false })).faithful).toBe(false);
+      item.resampled = true;
+
+      const frame = item.element.frame;
+      item.element.frame = { ...frame, x: frame.x + 4 };
+      expect((await conversion.judge({ fit: false })).faithful).toBe(false);
+      item.element.frame = frame;
+      const effects = item.element.effects;
+      expect(effects?.radius).toBe(24);
+      delete item.element.effects;
+      expect((await conversion.judge({ fit: false })).faithful).toBe(false);
+      item.element.effects = effects;
+      url = mirrored;
+      expect((await conversion.judge({ fit: false })).faithful).toBe(false);
+    } finally {
+      conversion.dispose();
+      loaded.dispose();
+      for (const made of [full, other, mirrored]) URL.revokeObjectURL(made);
+    }
+  });
+});
