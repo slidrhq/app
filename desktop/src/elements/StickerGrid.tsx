@@ -4,7 +4,7 @@ import { cx, Skeleton, Tooltip } from '@slidr/ui';
 import { tell, useEditor } from '../shell';
 import { insertSticker } from './insert';
 import type { RecentSticker } from './recent';
-import { stickerMarkup, type Sticker } from './stickers';
+import { stickerMarkup, stickerName, type Sticker } from './stickers';
 
 /* The grids of graphics and emoji: a drawing is a button that puts it on the slide. */
 
@@ -149,7 +149,7 @@ export function StickerGrid({
 export function StickerButton({ sticker, size }: { sticker: RecentSticker; size: StickerSize }) {
   const { t, i18n } = useTranslation('elements');
   const editor = useEditor();
-  const name = i18n.language.startsWith('he') ? sticker.label.he : sticker.label.en;
+  const name = stickerName(sticker, i18n.language);
   return (
     <Tooltip content={name}>
       <button

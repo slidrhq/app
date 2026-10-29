@@ -33,13 +33,14 @@ import {
 import type { RecentFile } from '../document/storage';
 import { useDeck, useEditor, useFile } from './editor';
 import {
+  importFile,
   newDocument,
   openDocument,
   recentFiles,
   saveDocument,
   saveDocumentAs,
 } from './fileActions';
-import { useAction, useShortcut } from './registry';
+import { useAction, useImporters, useShortcut } from './registry';
 import { setWelcome, showShortcuts } from './store';
 
 /** Global document actions belong to the title bar, independently of the slide tools. */
@@ -168,12 +169,11 @@ function FileMenu() {
   // Find and replace is another area's: the menu offers what its shortcut does, when it is there.
   const find = useShortcut('find.replace');
   const focusTaken = useRef(false);
-  // So is HTML import: it asks for the file, and about the open document if it has work.
-  const runImport = useAction('import');
+  // So are the imports, of HTML and of PowerPoint (ADR-108): one dialog offers the files of all
+  // of them, and the area of the one chosen asks about the open document if it has work.
+  const importers = useImporters();
+  // And the export, whose dialog asks for the format first.
   const runExport = useAction('export');
-  // And PowerPoint files, in both directions (ADR-108).
-  const runImportPptx = useAction('importPptx');
-  const runExportPptx = useAction('exportPptx');
   // And the deck's properties are the templates area's: the direction turns the layouts too.
   const runProperties = useAction('deckProperties');
 
@@ -254,22 +254,18 @@ function FileMenu() {
           {t('file.saveAs')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {runImport && (
-          <DropdownMenuItem icon={FileInput} data-testid="file-import" onSelect={runImport}>
-            {t('file.importHtml')}
-          </DropdownMenuItem>
-        )}
-        {runImportPptx && (
+        {importers.length > 0 && (
           <DropdownMenuItem
-            data-testid="file-import-pptx"
-            className="ps-8"
-            onSelect={runImportPptx}
+            icon={FileInput}
+            data-testid="file-import"
+            onSelect={() => void importFile(editor, importers)}
           >
-            {t('file.importPptx')}
+            {t('file.import')}
           </DropdownMenuItem>
         )}
         <DropdownMenuItem
           icon={Share}
+          data-testid="file-export"
           disabled={!runExport}
           onSelect={() => {
             // The dialog takes the keyboard; closing the menu must leave it there.
@@ -277,18 +273,7 @@ function FileMenu() {
             runExport?.();
           }}
         >
-          {t('file.exportHtml')}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          data-testid="file-export-pptx"
-          className="ps-8"
-          disabled={!runExportPptx}
-          onSelect={() => {
-            focusTaken.current = true;
-            runExportPptx?.();
-          }}
-        >
-          {t('file.exportPptx')}
+          {t('file.export')}
         </DropdownMenuItem>
         {find && (
           <>

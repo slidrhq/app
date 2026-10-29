@@ -1469,7 +1469,7 @@
     }
   },
   "export": {
-    "title": "Exportar para HTML",
+    "title": "Exportar apresentação",
     "description": "Um único arquivo que é reproduzido em qualquer navegador, com ou sem internet.",
     "descriptionBeside": "Um arquivo que é reproduzido em qualquer navegador, com ou sem internet, e uma pasta ao lado dele com os vídeos e áudios.",
     "close": "Fechar",
@@ -1477,6 +1477,7 @@
     "export": "Exportar",
     "again": "Exportar novamente",
     "filter": "Página HTML",
+    "format": "Formato",
     "slides": {
       "label": "Slides",
       "all": "A apresentação inteira",
@@ -2414,7 +2415,6 @@
   "pptx": {
     "filter": "Apresentação do PowerPoint",
     "export": {
-      "title": "Exportar para o PowerPoint",
       "description": "Um arquivo .pptx que abre no PowerPoint, no Keynote e no Apresentações Google, com cada texto, forma, tabela e gráfico editável.",
       "working": "Exportando a apresentação…",
       "mediaOne": "Um arquivo de mídia dentro do arquivo, {{size}}",
@@ -2590,10 +2590,8 @@
       "open": "Abrir…",
       "recent": "Abrir recente",
       "noRecent": "Nenhum arquivo recente",
-      "importHtml": "Importar HTML…",
-      "importPptx": "Importar PowerPoint…",
-      "exportHtml": "Exportar HTML…",
-      "exportPptx": "Exportar para o PowerPoint…",
+      "import": "Importar…",
+      "export": "Exportar…",
       "missing": "Arquivo não encontrado",
       "save": "Salvar",
       "saveAs": "Salvar como…",
@@ -2601,6 +2599,9 @@
       "properties": "Propriedades da apresentação…",
       "filter": "Apresentação do Slidr",
       "filterAll": "Todos os arquivos que o Slidr pode abrir",
+      "filterImport": "Todos os arquivos que o Slidr pode importar",
+      "importUnknown": "Este tipo de arquivo não pode ser importado",
+      "importKinds": "O Slidr importa: {{kinds}}.",
       "unsavedTitle": "Salvar as alterações em “{{name}}”?",
       "unsavedBody": "Suas alterações serão perdidas se você não as salvar.",
       "dontSave": "Não salvar",
@@ -3075,7 +3076,17 @@
       "magen": "Sentinela",
       "shvav": "Circuito",
       "mutzar": "Lançamento",
-      "atlas": "Atlas"
+      "atlas": "Atlas",
+      "dofek": "Pulso",
+      "gir": "Giz",
+      "hon": "Capital",
+      "tavlin": "Especiaria",
+      "rakia": "Cosmos",
+      "maslul": "Pista",
+      "taarucha": "Exposição",
+      "hadran": "Bis",
+      "tefer": "Ateliê",
+      "sade": "Colheita"
     },
     "tagline": {
       "zerem": "Tecnologia em movimento, turquesa brilhando em uma noite azul-profunda",
@@ -3102,7 +3113,17 @@
       "magen": "Verde-oliva escuro e laranja de alerta, com a precisão de uma tela de controle",
       "shvav": "Verde de placa de circuito e cobre, para um hardware a caminho da produção",
       "mutzar": "Janelas de produto, cursores e notificações, para o lançamento de uma nova versão",
-      "atlas": "Um globo, rotas e selos postais sobre papel de mapa, em todos os idiomas, para o que atravessa fronteiras"
+      "atlas": "Um globo, rotas e selos postais sobre papel de mapa, em todos os idiomas, para o que atravessa fronteiras",
+      "dofek": "Turquesa de centro cirúrgico, vermelho de pulso e o traçado de um monitor, para hospitais, clínicas e saúde pública",
+      "gir": "Um quadro verde com moldura de carvalho, giz na mão e o compasso do professor, para aulas, cursos e reuniões de pais",
+      "hon": "Tinta bordô, guilhochês e um fio de cobre sobre papel-moeda, para números que guardam seu valor",
+      "tavlin": "Sacas de especiarias, etiquetas de papel kraft e a serifa de um livro de receitas sobre papel açafrão, para cozinhas, chefs e festivais gastronômicos",
+      "rakia": "Rastros de estrelas, uma lua crescente e o espectro sobre um céu noturno profundo, para a ciência que olha para cima",
+      "maslul": "Raias vermelhas, linhas brancas e um cronômetro, para atletas e clubes na linha de largada",
+      "taarucha": "Paredes de galeria pintadas, obras emolduradas e etiquetas de museu, para uma exposição prestes a abrir",
+      "hadran": "Discos, ingressos e luz de palco sobre papel rosado, para a música que pede bis",
+      "tefer": "Papel de molde, fita métrica e linha grená, para marcas de moda, ateliês e artesãos",
+      "sade": "Trigo maduro sobre uma faixa de terra, um campo desenhado em corte, para quem cultiva nosso alimento"
     },
     "properties": {
       "title": "Propriedades da apresentação",

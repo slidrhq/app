@@ -23,7 +23,7 @@ The order mirrors with the UI language. Text direction inside a deck follows the
 ### Title and document actions
 
 - The 56px title bar provides the File menu, Undo/Redo, deck name, Export, Present, and window controls. Its gradient must keep light text readable.
-- The File menu offers New, Open, Recent, Import HTML, Save, Save As, Search, keyboard shortcuts, and the way back to the welcome screen. Export is also accessible there; its implementation stays in the export domain.
+- The File menu offers New, Open, Recent, Save, Save As, Import, Export, Search, keyboard shortcuts, and the way back to the welcome screen. Import is one item for every kind of file the app imports, and Export one dialog that asks for the format first ([ADR-119](../adr/ADR-119-one-import-one-export.md)); their implementations stay in the import and export domains.
 - In the current working tree, the product logo/name and open document name are centered together. The document name truncates within the available width, uses automatic text direction, and still shows unsaved state. Empty title-bar regions drag the window; controls remain clickable. Document editing actions are unavailable during startup and on the welcome screen. See [ADR-081](../adr/ADR-081-shell-navigation-polish.md).
 
 ### Creation and navigation

@@ -6,6 +6,7 @@ import { currentLanguage, i18n } from '../i18n';
 import { ask, tell } from './dialogs';
 import type { AssetMeta, Deck } from '@slidr/model';
 import { newDeck, syncFileState, type Editor } from './editor';
+import { pickFiles } from './pickFiles';
 import type { FileImporter } from './registry';
 import { WORKSPACE_KEY } from './startup';
 import { setWelcome } from './store';
@@ -313,13 +314,61 @@ export async function loadFile(
     ],
   });
   if (!chosen) return false;
-  const extension = chosen.split('.').at(-1)?.toLowerCase() ?? '';
-  const importer = importers.find((candidate) => candidate.extensions.includes(extension));
+  const importer = importerOf(importers, chosen);
   if (importer) {
     importer.open(chosen);
     return true;
   }
   return openDocument(editor, chosen);
+}
+
+/** The importer of a file, by the extension of its path or name. */
+function importerOf(importers: readonly FileImporter[], name: string): FileImporter | undefined {
+  const extension = name.split('.').at(-1)?.toLowerCase() ?? '';
+  return importers.find((candidate) => candidate.extensions.includes(extension));
+}
+
+/**
+ * "Import…" of the File menu: one dialog for every kind of file the app imports (an HTML page, a
+ * PowerPoint presentation), and the import of the kind the chosen file is of, which makes a
+ * document of its own. In a plain browser, which has no files of the app's own, the page's own
+ * picker stands in for the system's dialog. True when a file was chosen and handed on.
+ */
+export async function importFile(
+  editor: Editor,
+  importers: readonly FileImporter[],
+): Promise<boolean> {
+  const extensions = importers.flatMap((importer) => importer.extensions);
+  if (!editor.document) {
+    const [file] = await pickFiles(extensions.map((extension) => `.${extension}`).join(','));
+    if (!file) return false;
+    const importer = importerOf(importers, file.name);
+    if (importer) importer.openFile(file);
+    else await refuseImport(importers);
+    return importer !== undefined;
+  }
+  const chosen = await openDialog({
+    multiple: false,
+    directory: false,
+    filters: [
+      { name: t('file.filterImport'), extensions },
+      ...importers.map((importer) => ({
+        name: importer.filterName(),
+        extensions: [...importer.extensions],
+      })),
+    ],
+  });
+  if (!chosen) return false;
+  const importer = importerOf(importers, chosen);
+  if (importer) importer.open(chosen);
+  else await refuseImport(importers);
+  return importer !== undefined;
+}
+
+/** A file of no importer's kind, chosen with "All files" of the dialog: says what is taken. */
+async function refuseImport(importers: readonly FileImporter[]): Promise<void> {
+  const kinds = importers.map((importer) => importer.filterName()).join(', ');
+  await tell(t('file.importUnknown'), t('file.importKinds', { kinds }));
 }
 
 /** Saves to the document's file, or asks for one. True when the deck was saved. */

@@ -1,0 +1,79 @@
+{
+  "taaruchaPainting": {
+    "id": "29c407b32dd082ebe33b421a6c249e230057c11c0f462db61bcd554ad738d079",
+    "file": "29c407b32dd082ebe33b421a6c249e230057c11c0f462db61bcd554ad738d079.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 364880,
+    "width": 1086,
+    "height": 1448,
+    "origin": "import",
+    "name": "taarucha-painting.webp"
+  },
+  "taaruchaStudio": {
+    "id": "029b850d08dda5ad9707a9c62d1329f3504a4598fe0fa916418d882d3abf04df",
+    "file": "029b850d08dda5ad9707a9c62d1329f3504a4598fe0fa916418d882d3abf04df.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 139770,
+    "width": 1086,
+    "height": 1448,
+    "origin": "import",
+    "name": "taarucha-studio.webp"
+  },
+  "taaruchaGallery": {
+    "id": "69d6950f91596f24a169e8a556d7dcc86e3de8297e5f5c30fadc6342a7f7c8c7",
+    "file": "69d6950f91596f24a169e8a556d7dcc86e3de8297e5f5c30fadc6342a7f7c8c7.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 129422,
+    "width": 1672,
+    "height": 941,
+    "origin": "import",
+    "name": "taarucha-gallery.webp"
+  },
+  "taaruchaTeam1": {
+    "id": "6ddd2faa74029ace6c18fc8cc73c2e915b27263865473c08c5d1ff8a19719c46",
+    "file": "6ddd2faa74029ace6c18fc8cc73c2e915b27263865473c08c5d1ff8a19719c46.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 46464,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "taarucha-team-1.webp"
+  },
+  "taaruchaTeam2": {
+    "id": "310312ec6a43233b259d02412afd4a3d3ce337a8873040a64bfcfaf5e6904545",
+    "file": "310312ec6a43233b259d02412afd4a3d3ce337a8873040a64bfcfaf5e6904545.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 42938,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "taarucha-team-2.webp"
+  },
+  "taaruchaTeam3": {
+    "id": "54655d787e7f30852f84f91095398a92417c2e78028973859f2cec6080de13fd",
+    "file": "54655d787e7f30852f84f91095398a92417c2e78028973859f2cec6080de13fd.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 42672,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "taarucha-team-3.webp"
+  },
+  "taaruchaTeam4": {
+    "id": "382d44b3f459201df4a46b58698a6dc99cb73312ffae4db4155c3ef1b4b1abc7",
+    "file": "382d44b3f459201df4a46b58698a6dc99cb73312ffae4db4155c3ef1b4b1abc7.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 54558,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "taarucha-team-4.webp"
+  }
+}

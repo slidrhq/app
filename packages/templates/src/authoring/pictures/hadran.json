@@ -1,0 +1,68 @@
+{
+  "hadranStudio": {
+    "id": "2a80bf9908ba5fd2e4947707835f59d78374fcc7c72a8cd597fab6527659630d",
+    "file": "2a80bf9908ba5fd2e4947707835f59d78374fcc7c72a8cd597fab6527659630d.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 185746,
+    "width": 1200,
+    "height": 1200,
+    "origin": "import",
+    "name": "hadran-studio.webp"
+  },
+  "hadranConcert": {
+    "id": "c4f66d9189d4987b2db12c48294f13fc8e8b775acb12e5691818f56b3be31d4f",
+    "file": "c4f66d9189d4987b2db12c48294f13fc8e8b775acb12e5691818f56b3be31d4f.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 112018,
+    "width": 1600,
+    "height": 542,
+    "origin": "import",
+    "name": "hadran-concert.webp"
+  },
+  "hadranTeam1": {
+    "id": "a1b669679f1c6f8dfcabb1bf6108a6cee118646986b016ba1e8ac2656498bd08",
+    "file": "a1b669679f1c6f8dfcabb1bf6108a6cee118646986b016ba1e8ac2656498bd08.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 53528,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hadran-team-1.webp"
+  },
+  "hadranTeam2": {
+    "id": "4a177b01b68ea523b65d8aa14c660a37170ea45f47e20028ddf8fd9ee9b1d8f9",
+    "file": "4a177b01b68ea523b65d8aa14c660a37170ea45f47e20028ddf8fd9ee9b1d8f9.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 32368,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hadran-team-2.webp"
+  },
+  "hadranTeam3": {
+    "id": "1da9bdd2c54ac7e25c1a829d94e8acffb3e7ba8cb2777345be505bf6596ebc12",
+    "file": "1da9bdd2c54ac7e25c1a829d94e8acffb3e7ba8cb2777345be505bf6596ebc12.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 30858,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hadran-team-3.webp"
+  },
+  "hadranTeam4": {
+    "id": "148fda09a60eec69a7f3089bfa6122d7159ec79ff6ab75a5803eae847e6b8bf7",
+    "file": "148fda09a60eec69a7f3089bfa6122d7159ec79ff6ab75a5803eae847e6b8bf7.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 47832,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hadran-team-4.webp"
+  }
+}

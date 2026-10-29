@@ -1,4 +1,4 @@
-import { elementSchemas } from '@slidr/model';
+import { CONTENT_LANGUAGES, elementSchemas } from '@slidr/model';
 import { extraShapes, presetPath, shapePresets } from '@slidr/renderer';
 import { describe, expect, it } from 'vitest';
 import { en, he } from './messages';
@@ -42,6 +42,14 @@ describe('the shape library', () => {
       if (extraShapes[preset]) {
         expect(extraShapes[preset].he, preset).not.toBe('');
         expect(extraShapes[preset].en, preset).not.toBe('');
+        // And in every other language of the app, with the number of a shape made with one.
+        const names = extraShapes[preset].names ?? {};
+        const number = /\d+$/.exec(preset)?.[0];
+        for (const lang of CONTENT_LANGUAGES.filter((one) => one !== 'he' && one !== 'en')) {
+          expect(names[lang]?.trim(), `${preset} ${lang}`).toBeTruthy();
+          if (number) expect(names[lang], `${preset} ${lang}`).toContain(number);
+          expect(names[lang], `${preset} ${lang}`).not.toMatch(/\p{Script=Hebrew}|\{n\}/u);
+        }
       } else {
         expect(he.shape, preset).toHaveProperty(preset);
         expect(en.shape, preset).toHaveProperty(preset);

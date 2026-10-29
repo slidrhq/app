@@ -1,0 +1,68 @@
+{
+  "sadeFields": {
+    "id": "9a6441ca14460e3d10086436673da2059ff34e90c8b911dee77aff0dad6eb80f",
+    "file": "9a6441ca14460e3d10086436673da2059ff34e90c8b911dee77aff0dad6eb80f.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 250004,
+    "width": 1600,
+    "height": 583,
+    "origin": "import",
+    "name": "sade-fields.webp"
+  },
+  "sadeDrip": {
+    "id": "782ec9b6dc0e0fa782349b92bcb062ab1d972a08d47a792d1c5338d4b2b8338f",
+    "file": "782ec9b6dc0e0fa782349b92bcb062ab1d972a08d47a792d1c5338d4b2b8338f.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 135388,
+    "width": 800,
+    "height": 890,
+    "origin": "import",
+    "name": "sade-drip.webp"
+  },
+  "sadeTeam1": {
+    "id": "e63141dc7b9695485dbd258f61e746805d2fd8e558057a956975df3c45300c1f",
+    "file": "e63141dc7b9695485dbd258f61e746805d2fd8e558057a956975df3c45300c1f.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 60118,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "sade-team-1.webp"
+  },
+  "sadeTeam2": {
+    "id": "7ba38981d252e69bc4574b22a5b9505786dc58a30c00c15a0b3f8eeb363f2814",
+    "file": "7ba38981d252e69bc4574b22a5b9505786dc58a30c00c15a0b3f8eeb363f2814.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 68632,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "sade-team-2.webp"
+  },
+  "sadeTeam3": {
+    "id": "943c191bdb068e611066d9c324dfed64ca42292cad980893a332328521d3f816",
+    "file": "943c191bdb068e611066d9c324dfed64ca42292cad980893a332328521d3f816.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 54114,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "sade-team-3.webp"
+  },
+  "sadeTeam4": {
+    "id": "ab433cf5af256fe4f9bf13784c993157ace261671c1fc569e03dbff8fca35e5b",
+    "file": "ab433cf5af256fe4f9bf13784c993157ace261671c1fc569e03dbff8fca35e5b.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 49630,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "sade-team-4.webp"
+  }
+}

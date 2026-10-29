@@ -1,4 +1,5 @@
 import type { ExportResult } from '@slidr/html-export';
+import type { PptxExportResult } from '@slidr/pptx';
 import {
   Button,
   Dialog,
@@ -8,12 +9,15 @@ import {
   NumberField,
   ScrollArea,
   SegmentedControl,
+  Select,
   Spinner,
 } from '@slidr/ui';
 import { CircleAlert, CircleCheck, TriangleAlert } from '@slidr/ui/icons';
 import type { TFunction } from 'i18next';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { exportPptxTo } from '../pptx/exportPptx';
+import { PptxExportReport } from '../pptx/PptxExportReport';
 import type { Editor } from '../shell';
 import {
   chooseDestination,
@@ -31,15 +35,38 @@ import {
 import { warningText } from './warnings';
 
 /*
- * The export dialog (WG9-T12, SPEC 12): which slides, with or without animations; then where to
- * save; then what went into the file: its size, its assets and fonts, and what could not be
- * exported as it is in the deck.
+ * The export dialog (WG9-T12, SPEC 12): the format first, an HTML page or a PowerPoint
+ * presentation (ADR-108); then which slides, with or without animations, and for HTML where its
+ * video and audio go; then where to save; then what went into the file: its size, its assets and
+ * fonts, and what could not be exported as it is in the deck.
  */
+
+export type ExportFormat = 'html' | 'pptx';
+
+/** The format of the last export: the next one is offered in it. */
+let lastFormat: ExportFormat = 'html';
+
+const rememberFormat = (format: ExportFormat) => {
+  lastFormat = format;
+};
 
 type Phase =
   | { at: 'choose' }
   | { at: 'working' }
-  | { at: 'done'; result: ExportResult; destination: Destination; seconds: number }
+  | {
+      at: 'done';
+      format: 'html';
+      result: ExportResult;
+      destination: Destination;
+      seconds: number;
+    }
+  | {
+      at: 'done';
+      format: 'pptx';
+      result: PptxExportResult;
+      destination: Destination;
+      seconds: number;
+    }
   | { at: 'failed'; title: string; message: string };
 
 /** A count in words: one string for one, another for more (see `messages.ts`). */
@@ -48,9 +75,11 @@ const counted = (t: TFunction<'export'>, key: string, n: number): string =>
 
 export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () => void }) {
   const { t } = useTranslation('export');
+  const { t: tp } = useTranslation('pptx');
   // The deck as it is when the dialog opens: the dialog is modal, and the file is of that deck.
   const [deck] = useState(() => editor.bus.deck);
   const total = deck.slides.length;
+  const [format, setFormat] = useState(lastFormat);
   const [ranged, setRanged] = useState(false);
   const [from, setFrom] = useState(1);
   const [to, setTo] = useState(total);
@@ -60,23 +89,44 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
 
   const range = ranged ? { from, to } : null;
   const plan = planExport(deck, range);
-  // The video and audio of the slides that will be exported, and what they weigh (MED-05).
+  // The video and audio of the slides that will be exported, and what they weigh (MED-05). Where
+  // they go is HTML's choice: a PowerPoint file has them inside.
   const media = planMedia(deck, plan.slideIds);
-  const beside = media.assets.length > 0 && (mediaBeside || media.tooLarge);
+  const beside = format === 'html' && media.assets.length > 0 && (mediaBeside || media.tooLarge);
   const choices: ExportChoices = { range, animations, media: beside ? 'beside' : 'inside' };
+  // Each format is named as the save dialog names its files.
+  const formats = [
+    { value: 'html', label: t('filter') },
+    { value: 'pptx', label: tp('filter') },
+  ] as const;
 
   const run = async () => {
+    rememberFormat(format);
     const name = exportFileName(
       editor.file.getState().path,
       deck.meta.title,
       t('app.untitled', { ns: 'shell' }),
+      format,
     );
-    const destination = await chooseDestination(name, t('filter'));
+    const destination = await chooseDestination(
+      name,
+      format === 'pptx' ? tp('filter') : t('filter'),
+      format,
+    );
     // The save dialog was cancelled: the choices are still there.
     if (!destination) return;
     setPhase({ at: 'working' });
+    if (format === 'pptx') {
+      const outcome = await exportPptxTo(editor, deck, choices, destination);
+      if (outcome.ok) setPhase({ at: 'done', format, ...outcome });
+      else {
+        const title = outcome.step === 'save' ? t('failed.save') : t('failed.title');
+        setPhase({ at: 'failed', title, message: outcome.message });
+      }
+      return;
+    }
     const outcome = await exportTo(editor, deck, choices, destination);
-    if (outcome.ok) setPhase({ at: 'done', ...outcome });
+    if (outcome.ok) setPhase({ at: 'done', format, ...outcome });
     else {
       const title =
         outcome.step === 'save'
@@ -90,7 +140,15 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
 
   // One file, unless its video and audio go into a folder beside it (ADR-057).
   const withFolder =
-    phase.at === 'done' ? phase.result.mediaFolder !== undefined : phase.at !== 'failed' && beside;
+    phase.at === 'done'
+      ? phase.format === 'html' && phase.result.mediaFolder !== undefined
+      : phase.at !== 'failed' && beside;
+  const description =
+    format === 'pptx'
+      ? tp('export.description')
+      : withFolder
+        ? t('descriptionBeside')
+        : t('description');
 
   const close = (
     <Button variant={phase.at === 'done' ? 'primary' : 'ghost'} onClick={onClose}>
@@ -123,14 +181,24 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
     <Dialog open onOpenChange={(open) => !open && phase.at !== 'working' && onClose()}>
       <DialogContent
         title={t('title')}
-        description={withFolder ? t('descriptionBeside') : t('description')}
+        description={description}
         closeLabel={phase.at === 'working' ? undefined : t('close')}
         footer={footer}
         data-testid="export-dialog"
+        data-format={format}
         data-phase={phase.at}
       >
         {phase.at === 'choose' && (
           <div className="flex flex-col gap-4">
+            <Field label={t('format')}>
+              <Select
+                aria-label={t('format')}
+                className="w-56 self-start"
+                value={format}
+                onValueChange={setFormat}
+                options={formats}
+              />
+            </Field>
             <Field label={t('slides.label')}>
               <SegmentedControl
                 aria-label={t('slides.label')}
@@ -188,7 +256,7 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
                 <p className="text-xs text-ui-fg-muted">{t('animations.withoutHint')}</p>
               )}
             </Field>
-            {media.assets.length > 0 && (
+            {format === 'html' && media.assets.length > 0 && (
               <MediaChoice media={media} beside={beside} onChange={setMediaBeside} />
             )}
           </div>
@@ -196,7 +264,7 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
         {phase.at === 'working' && (
           <div role="status" className="flex items-center gap-2 py-4 text-ui-fg-muted">
             <Spinner />
-            {t('working')}
+            {format === 'pptx' ? tp('export.working') : t('working')}
           </div>
         )}
         {phase.at === 'failed' && (
@@ -208,7 +276,12 @@ export function ExportDialog({ editor, onClose }: { editor: Editor; onClose: () 
             </div>
           </div>
         )}
-        {phase.at === 'done' && <Report editor={editor} {...phase} />}
+        {phase.at === 'done' &&
+          (phase.format === 'pptx' ? (
+            <PptxExportReport {...phase} />
+          ) : (
+            <Report editor={editor} {...phase} />
+          ))}
       </DialogContent>
     </Dialog>
   );

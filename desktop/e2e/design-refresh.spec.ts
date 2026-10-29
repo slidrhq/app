@@ -113,7 +113,7 @@ for (const lang of ['he', 'en'] as const) {
             zoom: 'זום',
             from: 'מאיפה להתחיל',
             current: 'הצגה מהשקף הנוכחי',
-            export: 'ייצוא HTML…',
+            export: 'ייצוא…',
           }
         : {
             text: 'Text box',
@@ -122,7 +122,7 @@ for (const lang of ['he', 'en'] as const) {
             zoom: 'Zoom',
             from: 'Start from',
             current: 'Present from the current slide',
-            export: 'Export HTML…',
+            export: 'Export…',
           };
     const before = (await elements(page)).length;
     await creation(page).getByRole('button', { name: names.text, exact: true }).click();

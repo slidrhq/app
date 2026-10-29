@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { contentLanguageOf } from '@slidr/model';
 import { extraShapes } from '@slidr/renderer';
 import {
   Flag,
@@ -505,7 +506,10 @@ function useShapeNames() {
   return useCallback(
     (preset: string, lng: string = i18n.language) => {
       const extra = extraShapes[preset];
-      if (extra) return lng.startsWith('he') ? extra.he : extra.en;
+      if (extra) {
+        const own = contentLanguageOf(lng);
+        return (own && extra.names?.[own]) || (own === 'he' ? extra.he : extra.en);
+      }
       return i18n.exists(`objects:shape.${preset}`, { lng })
         ? t(`shape.${preset}`, { lng })
         : preset;

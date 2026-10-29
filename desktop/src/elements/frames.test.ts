@@ -1,6 +1,7 @@
 import { mediaFiles, readMediaJson } from '@slidr/media-library';
 import {
   CommandBus,
+  CONTENT_LANGUAGES,
   createDeck,
   createElement,
   createSlide,
@@ -16,6 +17,8 @@ import {
 } from '@slidr/model';
 import { presetPath } from '@slidr/renderer';
 import { describe, expect, it } from 'vitest';
+import { builtinFaces, builtinFamilies } from '../fonts/builtinFonts.generated';
+import { familyIn, fontShelf } from './designFonts';
 import {
   featuredFrames,
   followsTheme,
@@ -23,7 +26,10 @@ import {
   framedElement,
   framedPicture,
   frameElement,
+  frameIn,
+  frameLanguage,
   frameLook,
+  frameName,
   frameOutline,
   framePatch,
   frameRev,
@@ -48,6 +54,10 @@ import {
 
 const catalog = await readMediaJson<FramesCatalog>('elements/catalogs/frames-catalog.json');
 const frames = catalog ? framesOf(catalog) : [];
+/** The languages every magnet says its words in: Hebrew, English, and those it was written in since. */
+const magnetLanguages = CONTENT_LANGUAGES.filter((lang) =>
+  frames.filter((one) => one.group === 'magnets').every((one) => frameLanguage(one, lang) === lang),
+);
 
 const ids = (found: readonly { id: string }[]) => found.map(({ id }) => id);
 const frame = (id: string): PhotoFrame => {
@@ -67,6 +77,11 @@ describe.skipIf(!catalog)('the catalogue of frames', () => {
   it('names every frame in English and in Hebrew', () => {
     expect(ids(frames.filter((one) => !/[a-z]/i.test(one.label.en)))).toEqual([]);
     expect(ids(frames.filter((one) => !/\p{Script=Hebrew}/u.test(one.label.he)))).toEqual([]);
+    // A magnet is named in every language its words are written in.
+    for (const lang of magnetLanguages) {
+      const unnamed = frames.filter((one) => one.group === 'magnets' && !one.label[lang]?.trim());
+      expect(ids(unnamed), lang).toEqual([]);
+    }
   });
 
   it('shows twenty frames first, plain ones and decorated ones, in the order it names them', () => {
@@ -82,11 +97,14 @@ describe.skipIf(!catalog)('the catalogue of frames', () => {
     const without = (...gone: string[]) => FRAME_GROUPS.filter((group) => !gone.includes(group));
     expect(groupsIn('he')).toEqual(without('latin'));
     expect(groupsIn('en')).toEqual(without('hebrew'));
-    // The words beside a magnet are Hebrew and English; the Latin letters are German letters too.
-    expect(groupsIn('de')).toEqual(without('hebrew', 'magnets'));
-    expect(groupsIn('vi')).toEqual(without('hebrew', 'magnets'));
-    expect(groupsIn('ar')).toEqual(without('hebrew', 'latin', 'magnets'));
-    expect(groupsIn('zh-CN')).toEqual(without('hebrew', 'latin', 'magnets'));
+    // The magnets are offered in the languages their words are written in; the Latin letters are
+    // German letters too.
+    const magnets = (lang: string) =>
+      (magnetLanguages as readonly string[]).includes(lang) ? [] : ['magnets'];
+    expect(groupsIn('de')).toEqual(without('hebrew', ...magnets('de')));
+    expect(groupsIn('vi')).toEqual(without('hebrew', ...magnets('vi')));
+    expect(groupsIn('ar')).toEqual(without('hebrew', 'latin', ...magnets('ar')));
+    expect(groupsIn('zh-CN')).toEqual(without('hebrew', 'latin', ...magnets('zh-CN')));
     // The frames shown first have no language.
     for (const lang of ['he', 'en', 'ru', 'ja']) {
       expect(featuredFrames(framesIn(frames, lang)), lang).toEqual(featuredFrames(frames));
@@ -504,12 +522,12 @@ describe.skipIf(!catalog)('the magnets of events', () => {
           expect(words, one.id).toMatch(/\p{Script=Hebrew}/u);
         }
       }
-      for (const lang of ['he', 'en']) {
+      for (const lang of magnetLanguages) {
         // On a slide a magnet is as large as the safe margins allow: no type there is too small.
         const landed = frameSizeOn(one, { w: 1920, h: 1080 });
         for (const caption of captions(group(one, lang, { x: 0, y: 0, ...landed }))) {
           const words = plainText(caption.content);
-          if (lang === 'en') expect(words, one.id).not.toMatch(/\p{Script=Hebrew}/u);
+          if (lang !== 'he') expect(words, `${one.id} ${lang}`).not.toMatch(/\p{Script=Hebrew}/u);
           expect(caption).toMatchObject({ wrap: false, autoFit: 'shrink', vAlign: 'middle' });
           const [paragraph] = caption.content.paragraphs;
           const size = paragraph?.runs[0]?.marks?.size ?? 0;
@@ -526,6 +544,92 @@ describe.skipIf(!catalog)('the magnets of events', () => {
     expect(runs.map((run) => run.text).join('')).toBe('Kindergarten Party');
     expect(new Set(runs.map((run) => JSON.stringify(run.marks?.color))).size).toBeGreaterThan(3);
   });
+
+  it('say their words in a language all of them are written in, else in English', () => {
+    const summer = frame('magnet-summer');
+    const languages = new Set<string>(CONTENT_LANGUAGES);
+    type Line = Record<string, unknown> & { he: { text: string }; en: { text: string } };
+    // Its lines in Hebrew, English, German and Arabic, and in no other language.
+    const written = (line: Line) => ({
+      ...Object.fromEntries(Object.entries(line).filter(([key]) => !languages.has(key))),
+      he: line.he,
+      en: line.en,
+      de: { ...line.en, text: `DE ${line.en.text}` },
+      ar: { ...line.he, text: 'كلمات' },
+    });
+    const translated = {
+      ...summer,
+      label: { en: summer.label.en, he: summer.label.he, de: 'Sommermagnet' },
+      extras: summer.extras!.map((extra) =>
+        extra.kind === 'caption'
+          ? written(extra as unknown as Line)
+          : extra.kind === 'label'
+            ? { ...extra, lines: extra.lines.map((line) => written(line as unknown as Line)) }
+            : extra,
+      ),
+    } as PhotoFrame;
+    expect(['de', 'de-AT', 'ar', 'fr'].map((lang) => frameIn(translated, lang))).toEqual([
+      true,
+      true,
+      true,
+      false,
+    ]);
+    expect(frameLanguage(translated, 'de-AT')).toBe('de');
+    expect(frameLanguage(translated, 'fr')).toBe('en');
+    expect(frameName(translated, 'de')).toBe('Sommermagnet');
+    expect(frameName(translated, 'fr')).toBe(summer.label.en);
+    const english = said(group(summer, 'en'));
+    expect(said(group(translated, 'de'))).toEqual(english.map((text) => `DE ${text}`));
+    expect(said(group(translated, 'fr'))).toEqual(english);
+    // Arabic reads from the right, as Hebrew does.
+    for (const caption of captions(group(translated, 'ar'))) {
+      expect(plainText(caption.content)).toBe('كلمات');
+      expect(caption.content.paragraphs[0]?.dir).toBe('rtl');
+    }
+    // Named in German in the catalogue, it is found by that name too.
+    const named = framesOf({
+      featured: [],
+      groups: [
+        {
+          id: 'magnets',
+          frames: [
+            {
+              id: 'one',
+              en: 'Summer magnet',
+              he: 'מגנט',
+              names: { de: 'Sommermagnet' },
+              w: 10,
+              h: 10,
+            },
+          ],
+        },
+      ],
+    });
+    expect(named[0]?.label).toEqual({ de: 'Sommermagnet', en: 'Summer magnet', he: 'מגנט' });
+    expect(ids(searchFrames(named, 'sommermagnet', 5))).toEqual(['frame:one']);
+  });
+
+  it.skipIf(builtinFamilies.length === 0)(
+    'set each language but Hebrew and English in families of its own letters',
+    () => {
+      const shelf = fontShelf({ families: builtinFamilies, faces: builtinFaces });
+      for (const lang of magnetLanguages) {
+        if (lang === 'he' || lang === 'en') continue;
+        for (const one of magnets) {
+          for (const caption of captions(group(one, lang))) {
+            for (const run of caption.content.paragraphs.flatMap((paragraph) => paragraph.runs)) {
+              // A line without a family of its own is in the deck's, which the theme sets.
+              const font = run.marks?.font;
+              if (!font) continue;
+              expect(familyIn(shelf, font, lang, run.text), `${lang} ${one.id} "${run.text}"`).toBe(
+                font,
+              );
+            }
+          }
+        }
+      }
+    },
+  );
 
   it('set a line to one side of its box, the same side in both languages', () => {
     const sided = extras.find(
@@ -779,7 +883,7 @@ describe.skipIf(!catalog)('the small pictures of the magnets', () => {
     const name = (one: PhotoFrame) => one.id.replace(/^frame:/, '');
     expect(ids(pictured.filter((one) => index.frames[name(one)] !== frameRev(one)))).toEqual([]);
     expect(Object.keys(index.frames).sort()).toEqual(pictured.map(name).sort());
-    for (const lang of ['he', 'en']) {
+    for (const lang of magnetLanguages) {
       expect(
         ids(pictured.filter((one) => !files.has(`images/frames/${lang}/${name(one)}.webp`))),
         lang,

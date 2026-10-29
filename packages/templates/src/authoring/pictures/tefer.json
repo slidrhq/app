@@ -1,0 +1,68 @@
+{
+  "teferWorkroom": {
+    "id": "7a316d42cae5b7066bbffea6b7cdb94a05afad2031d3371cd208c8d28c31ad9e",
+    "file": "7a316d42cae5b7066bbffea6b7cdb94a05afad2031d3371cd208c8d28c31ad9e.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 125058,
+    "width": 1600,
+    "height": 616,
+    "origin": "import",
+    "name": "tefer-workroom.webp"
+  },
+  "teferCutting": {
+    "id": "44a679c154b4098773828af1793a7435100ac5dcf4f9707a6f16d0bb90be49f5",
+    "file": "44a679c154b4098773828af1793a7435100ac5dcf4f9707a6f16d0bb90be49f5.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 134964,
+    "width": 1086,
+    "height": 1202,
+    "origin": "import",
+    "name": "tefer-cutting.webp"
+  },
+  "teferTeam1": {
+    "id": "cf86dc14d476bd3d81bb90df6451eb684475ad921f05f5480a03b8eaf2cbfbaa",
+    "file": "cf86dc14d476bd3d81bb90df6451eb684475ad921f05f5480a03b8eaf2cbfbaa.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 38488,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tefer-team-1.webp"
+  },
+  "teferTeam2": {
+    "id": "a0a2fd85c2efddd3d0d98e19348d8b534b98a720e023fd7e3f3658c06b294e6a",
+    "file": "a0a2fd85c2efddd3d0d98e19348d8b534b98a720e023fd7e3f3658c06b294e6a.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 33276,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tefer-team-2.webp"
+  },
+  "teferTeam3": {
+    "id": "1d7e1d9c6c16db1aff048bc3d96e6a64382ec5bc1f4c2fc9d586a8be0361f0f9",
+    "file": "1d7e1d9c6c16db1aff048bc3d96e6a64382ec5bc1f4c2fc9d586a8be0361f0f9.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 55524,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tefer-team-3.webp"
+  },
+  "teferTeam4": {
+    "id": "415d80c465de9cd2951952a771cc06826a35ddc2846bb3f744a30d8864ce0c5b",
+    "file": "415d80c465de9cd2951952a771cc06826a35ddc2846bb3f744a30d8864ce0c5b.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 47714,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tefer-team-4.webp"
+  }
+}

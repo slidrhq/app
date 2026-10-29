@@ -1,0 +1,68 @@
+{
+  "maslulTeam1": {
+    "id": "be4bfee777a4a5b73423416505d66eb85bfd09fe182ea9a1040f6ec58eb76602",
+    "file": "be4bfee777a4a5b73423416505d66eb85bfd09fe182ea9a1040f6ec58eb76602.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 29724,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "maslul-team-1.webp"
+  },
+  "maslulTeam2": {
+    "id": "738109943496ae5ae712b463d571b92e42ae4c46c6d8276d8ba7b29aafb66cbe",
+    "file": "738109943496ae5ae712b463d571b92e42ae4c46c6d8276d8ba7b29aafb66cbe.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 33206,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "maslul-team-2.webp"
+  },
+  "maslulTeam3": {
+    "id": "0d3b2d44c78b0eb00e2bd91af57dd208fb10ddc0a0304c6d1ba882332218baab",
+    "file": "0d3b2d44c78b0eb00e2bd91af57dd208fb10ddc0a0304c6d1ba882332218baab.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 33202,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "maslul-team-3.webp"
+  },
+  "maslulTeam4": {
+    "id": "94ba778dcdd452e21cd4455fdc1b140268ebc83b700846ce5403fcc34775cf1c",
+    "file": "94ba778dcdd452e21cd4455fdc1b140268ebc83b700846ce5403fcc34775cf1c.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 25050,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "maslul-team-4.webp"
+  },
+  "maslulDawn": {
+    "id": "b377f9a3f51a2417e5123a7b0e923f21bda0e73e772d85f751a2175884cbf934",
+    "file": "b377f9a3f51a2417e5123a7b0e923f21bda0e73e772d85f751a2175884cbf934.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 104914,
+    "width": 1600,
+    "height": 900,
+    "origin": "import",
+    "name": "maslul-dawn.webp"
+  },
+  "maslulBlocks": {
+    "id": "ce849758f56e43851db980e0418d4ce4b525ab152da9085f9c39284563ae4a80",
+    "file": "ce849758f56e43851db980e0418d4ce4b525ab152da9085f9c39284563ae4a80.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 95958,
+    "width": 1086,
+    "height": 1448,
+    "origin": "import",
+    "name": "maslul-blocks.webp"
+  }
+}

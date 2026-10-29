@@ -1,0 +1,68 @@
+{
+  "girLabs": {
+    "id": "e8ae1b0ca3271663cb5cb3252c038daedd4b81ac2aaf45dada12e3b17279b614",
+    "file": "e8ae1b0ca3271663cb5cb3252c038daedd4b81ac2aaf45dada12e3b17279b614.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 120460,
+    "width": 1086,
+    "height": 1448,
+    "origin": "import",
+    "name": "gir-labs.webp"
+  },
+  "girGarden": {
+    "id": "3776de2082c96dad36eeb9bf9ad7e647b6d6083badde5d16a5fdbf6f10a729d5",
+    "file": "3776de2082c96dad36eeb9bf9ad7e647b6d6083badde5d16a5fdbf6f10a729d5.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 290338,
+    "width": 1600,
+    "height": 900,
+    "origin": "import",
+    "name": "gir-garden.webp"
+  },
+  "girTeam1": {
+    "id": "46f7c65c7a9d32b0be325499bacd3afce1ec9056070b79a55b7416a8505612f3",
+    "file": "46f7c65c7a9d32b0be325499bacd3afce1ec9056070b79a55b7416a8505612f3.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 48612,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "gir-team-1.webp"
+  },
+  "girTeam2": {
+    "id": "16cb7f0c6a3c37478acccd71970d71c463d8d3ea489cd78741ec5ef97691d26a",
+    "file": "16cb7f0c6a3c37478acccd71970d71c463d8d3ea489cd78741ec5ef97691d26a.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 44264,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "gir-team-2.webp"
+  },
+  "girTeam3": {
+    "id": "a8976af50ab6da6d77850d1ac7d619df967eef03d1a341988fad0503b8644210",
+    "file": "a8976af50ab6da6d77850d1ac7d619df967eef03d1a341988fad0503b8644210.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 48794,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "gir-team-3.webp"
+  },
+  "girTeam4": {
+    "id": "5fdec14bdb57160995910ad44cd7f98a80a1481650cc5614cf7eea2314a13ff5",
+    "file": "5fdec14bdb57160995910ad44cd7f98a80a1481650cc5614cf7eea2314a13ff5.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 34354,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "gir-team-4.webp"
+  }
+}

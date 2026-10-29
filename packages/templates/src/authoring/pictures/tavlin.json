@@ -1,0 +1,68 @@
+{
+  "tavlinMarket": {
+    "id": "c718857fd7d0fa605f5b8446026765ac1fee2fe4381726ef1544f8e7837b1312",
+    "file": "c718857fd7d0fa605f5b8446026765ac1fee2fe4381726ef1544f8e7837b1312.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 204832,
+    "width": 1600,
+    "height": 584,
+    "origin": "import",
+    "name": "tavlin-market.webp"
+  },
+  "tavlinClass": {
+    "id": "f90d5166cefbd1307b9a9fee28792c4f1d178872821ebc0b0c0bee115264e1c3",
+    "file": "f90d5166cefbd1307b9a9fee28792c4f1d178872821ebc0b0c0bee115264e1c3.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 282744,
+    "width": 1086,
+    "height": 1276,
+    "origin": "import",
+    "name": "tavlin-class.webp"
+  },
+  "tavlinTeam1": {
+    "id": "790cfed396516720c16f908d0593428dc79b71af7606dfb36524f2f4840d9b32",
+    "file": "790cfed396516720c16f908d0593428dc79b71af7606dfb36524f2f4840d9b32.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 24974,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tavlin-team-1.webp"
+  },
+  "tavlinTeam2": {
+    "id": "5e1c46d1f93f641c7d3cf408756ab6caefe2432e91e38886a7699210df129481",
+    "file": "5e1c46d1f93f641c7d3cf408756ab6caefe2432e91e38886a7699210df129481.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 47428,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tavlin-team-2.webp"
+  },
+  "tavlinTeam3": {
+    "id": "562f41525cb458549840e4aeaaae92ad0d5686db38fcff610caa549b88ee3f02",
+    "file": "562f41525cb458549840e4aeaaae92ad0d5686db38fcff610caa549b88ee3f02.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 39068,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tavlin-team-3.webp"
+  },
+  "tavlinTeam4": {
+    "id": "29b052fbdc1600ad57baa54c26410363361bdf49475d7b79a327a55241a9d939",
+    "file": "29b052fbdc1600ad57baa54c26410363361bdf49475d7b79a327a55241a9d939.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 35484,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "tavlin-team-4.webp"
+  }
+}

@@ -404,7 +404,7 @@ test('the templates fill the screen once the page scrolled to them, and only Bac
   await expect(way).toBeFocused();
 });
 
-test('"Load from file" and "Import HTML" ask for the file at once', async ({ page }) => {
+test('"Load from file" and "Import" ask for the file at once', async ({ page }) => {
   await openWelcome(page);
   // The dialog for the file, and nothing else: the screen stays while no file is chosen. What
   // a chosen file starts is the import's own suite (`import-panel.spec.ts`).
@@ -416,7 +416,7 @@ test('"Load from file" and "Import HTML" ask for the file at once', async ({ pag
   await page.getByTestId('welcome-blank').click();
   await expect(page.getByTestId('stage-frame')).toBeVisible();
   const fromMenu = page.waitForEvent('filechooser');
-  await (await fileItem(page, 'ייבוא HTML…')).click();
+  await (await fileItem(page, 'ייבוא…')).click();
   await fromMenu;
   // No panel of the import, and no view of it in the AI chat: the chat is as it was.
   await expect(page.locator('[data-testid="activity-bar"] [data-panel="import"]')).toHaveCount(0);

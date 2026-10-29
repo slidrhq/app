@@ -1,6 +1,6 @@
 # ADR-108 — PowerPoint files in and out
 
-Status: Implemented on 2026-10-20. It takes back one line of the README, "Out of scope: PowerPoint (`.pptx`) compatibility".
+Status: Implemented on 2026-10-20. It takes back one line of the README, "Out of scope: PowerPoint (`.pptx`) compatibility". Its File menu items were merged with HTML's by [ADR-119](ADR-119-one-import-one-export.md) on 2026-10-28: one "Import…" for both kinds of file, and one "Export…" whose dialog chooses the format first.
 
 ## Request
 

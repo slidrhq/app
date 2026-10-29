@@ -123,6 +123,15 @@ describe('the catalog of designs', () => {
     expect(merged.sizes.get('constructor')).toBeUndefined();
   });
 
+  it('names a design in the language of the interface, else in English, but Hebrew in Hebrew', () => {
+    const names = { he: 'מפגש מפתחים', en: 'Developer meetup', de: 'Entwicklertreffen' };
+    expect(localName(names, 'de-AT')).toBe('Entwicklertreffen');
+    expect(localName(names, 'fr')).toBe('Developer meetup');
+    expect(localName(names, 'he')).toBe('מפגש מפתחים');
+    expect(localName({ en: 'Developer meetup' }, 'he')).toBeUndefined();
+    expect(localName({ de: '  ', en: 'Developer meetup' }, 'de')).toBe('Developer meetup');
+  });
+
   it('survives a file that is not what it should be', () => {
     const broken = {
       groups: 'invitations',

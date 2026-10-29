@@ -75,7 +75,7 @@ test('a dialog keeps the keyboard, closes with Esc, and gives it back to the Fil
   const trigger = page.getByTestId('file-menu-trigger');
   await trigger.focus();
   await page.keyboard.press('Enter');
-  await page.getByRole('menuitem', { name: 'Export HTML…' }).focus();
+  await page.getByRole('menuitem', { name: 'Export…' }).focus();
   await page.keyboard.press('Enter');
   const dialog = page.getByTestId('export-dialog');
   await expect(dialog).toBeVisible();

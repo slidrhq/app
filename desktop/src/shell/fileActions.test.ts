@@ -7,6 +7,7 @@ import { answer, pendingDialog } from './dialogs';
 import { createEditor, type Editor } from './editor';
 import {
   confirmDiscard,
+  importFile,
   loadFile,
   newDocument,
   openDocument,
@@ -581,6 +582,7 @@ describe('with storage', () => {
       extensions: ['html', 'htm'],
       filterName: () => 'HTML',
       open: (path) => imported.push(path),
+      openFile: (file) => imported.push(file.name),
     };
 
     dialog.open.mockResolvedValueOnce('C:\\pages\\Deck.HTM');
@@ -608,6 +610,51 @@ describe('with storage', () => {
     dialog.open.mockResolvedValueOnce(null);
     expect(await loadFile(editor, [html])).toBe(false);
     expect(imported).toHaveLength(1);
+  });
+
+  it('imports from one dialog: each file goes to the importer of its kind', async () => {
+    const { storage, log } = fakeStorage();
+    const editor = createEditor({ lang: 'he', storage });
+    await startDocument(editor);
+    const imported: string[] = [];
+    const importer = (id: string, extensions: string[]): FileImporter => ({
+      id,
+      extensions,
+      filterName: () => id.toUpperCase(),
+      open: (path) => imported.push(`${id} ${path}`),
+      openFile: (file) => imported.push(`${id} ${file.name}`),
+    });
+    const importers = [importer('html', ['html', 'htm']), importer('pptx', ['pptx'])];
+
+    dialog.open.mockResolvedValueOnce('C:\\decks\\Review.PPTX');
+    expect(await importFile(editor, importers)).toBe(true);
+    dialog.open.mockResolvedValueOnce('C:\\pages\\deck.htm');
+    expect(await importFile(editor, importers)).toBe(true);
+    expect(imported).toEqual(['pptx C:\\decks\\Review.PPTX', 'html C:\\pages\\deck.htm']);
+    // Every file that is imported, then each kind of them on its own: never the app's own files.
+    expect(dialog.open).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        multiple: false,
+        filters: [
+          { name: expect.any(String) as string, extensions: ['html', 'htm', 'pptx'] },
+          { name: 'HTML', extensions: ['html', 'htm'] },
+          { name: 'PPTX', extensions: ['pptx'] },
+        ],
+      }),
+    );
+
+    // A file of no importer's kind is refused and said, and nothing is opened.
+    dialog.open.mockResolvedValueOnce('C:\\decks\\talk.slidr');
+    const refusing = importFile(editor, importers);
+    await vi.waitFor(() => expect(pendingDialog()?.body).toContain('HTML, PPTX'));
+    answer('ok');
+    expect(await refusing).toBe(false);
+    expect(log).not.toContain('open C:\\decks\\talk.slidr');
+
+    // A dialog that was cancelled changes nothing.
+    dialog.open.mockResolvedValueOnce(null);
+    expect(await importFile(editor, importers)).toBe(false);
+    expect(imported).toHaveLength(2);
   });
 
   it('lets go of the workspace when the window closes', async () => {

@@ -2,14 +2,14 @@ import type { Messages } from '../i18n/he';
 
 /**
  * The strings of PowerPoint export and import (ADR-108). English has the same keys
- * (`registerMessages` checks). What the HTML export dialog says too (the slides, the animations,
- * the buttons) is read from its namespace, `export`. A warning names the slides it is on with
- * `slides`; `{{detail}}` is the font, the file or the kind of object it is about.
+ * (`registerMessages` checks). What the export dialog says of every format (its title, the
+ * slides, the animations, the buttons) is read from its namespace, `export`. A warning names the
+ * slides it is on with `slides`; `{{detail}}` is the font, the file or the kind of object it is
+ * about.
  */
 export const he = {
   filter: 'מצגת PowerPoint',
   export: {
-    title: 'ייצוא ל-PowerPoint',
     description:
       'קובץ ‎.pptx שנפתח ב-PowerPoint, ב-Keynote וב-Google Slides, וכל טקסט, צורה, טבלה ותרשים בו ניתנים לעריכה.',
     working: 'מייצא את המצגת…',
@@ -71,7 +71,6 @@ export const he = {
 export const en: Messages<typeof he> = {
   filter: 'PowerPoint presentation',
   export: {
-    title: 'Export to PowerPoint',
     description:
       'A .pptx file that opens in PowerPoint, Keynote and Google Slides, with every text, shape, table and chart in it editable.',
     working: 'Exporting the deck…',

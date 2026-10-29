@@ -1,11 +1,9 @@
 import type { AssetMeta } from '@slidr/model';
 import { importPptx, PptxReadError, type ImportWarning } from '@slidr/pptx';
 import { invoke, isTauri } from '@tauri-apps/api/core';
-import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { builtinFamilies, loadSystemFonts } from '../fonts';
 import { userFonts } from '../fonts/userFonts';
 import { currentLanguage, i18n } from '../i18n';
-import { pickFiles } from '../objects/insert';
 import type { Editor } from '../shell';
 import { tell } from '../shell/dialogs';
 import { newDocumentFrom } from '../shell/fileActions';
@@ -22,26 +20,12 @@ import { openImportReport } from './open';
 const t = (key: string, options?: Record<string, unknown>) =>
   i18n.t(key, { ns: 'pptx', ...options });
 
-const ACCEPT = '.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation';
-
 /** What a file is called on the disk, whichever slash its path has. */
 const baseName = (path: string) => path.split(/[\\/]/).at(-1) ?? path;
 
-/** "Import PowerPoint…": asks for the file, and imports it. */
-export async function importPptxFile(editor: Editor): Promise<void> {
-  if (!isTauri()) {
-    const [file] = await pickFiles(ACCEPT);
-    if (!file) return;
-    await importPptxBytes(editor, file.name, new Uint8Array(await file.arrayBuffer()));
-    return;
-  }
-  const chosen = await openDialog({
-    multiple: false,
-    directory: false,
-    filters: [{ name: t('filter'), extensions: ['pptx'] }],
-  });
-  if (!chosen) return;
-  await importPptxPath(editor, chosen);
+/** Imports a PowerPoint file the page's own picker gave, in a plain browser. */
+export async function importPptxFile(editor: Editor, file: File): Promise<void> {
+  await importPptxBytes(editor, file.name, new Uint8Array(await file.arrayBuffer()));
 }
 
 /** Imports the PowerPoint file at a path: one chosen in the system's dialog. */

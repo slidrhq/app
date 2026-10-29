@@ -1465,7 +1465,7 @@
     }
   },
   "export": {
-    "title": "Als HTML exportieren",
+    "title": "Präsentation exportieren",
     "description": "Eine Datei, die in jedem Browser abgespielt wird – mit oder ohne Internet.",
     "descriptionBeside": "Eine Datei, die in jedem Browser abgespielt wird – mit oder ohne Internet –, und daneben ein Ordner mit Video und Audio.",
     "close": "Schließen",
@@ -1473,6 +1473,7 @@
     "export": "Exportieren",
     "again": "Erneut exportieren",
     "filter": "HTML-Seite",
+    "format": "Format",
     "slides": {
       "label": "Folien",
       "all": "Die ganze Präsentation",
@@ -2408,7 +2409,6 @@
   "pptx": {
     "filter": "PowerPoint-Präsentation",
     "export": {
-      "title": "Nach PowerPoint exportieren",
       "description": "Eine .pptx-Datei, die sich in PowerPoint, Keynote und Google Präsentationen öffnen lässt und in der jeder Text, jede Form, Tabelle und jedes Diagramm bearbeitbar ist.",
       "working": "Präsentation wird exportiert…",
       "mediaOne": "Eine Mediendatei in der Datei, {{size}}",
@@ -2584,10 +2584,8 @@
       "open": "Öffnen…",
       "recent": "Zuletzt verwendet",
       "noRecent": "Keine zuletzt verwendeten Dateien",
-      "importHtml": "HTML importieren…",
-      "importPptx": "PowerPoint importieren…",
-      "exportHtml": "HTML exportieren…",
-      "exportPptx": "Nach PowerPoint exportieren…",
+      "import": "Importieren…",
+      "export": "Exportieren…",
       "missing": "Datei nicht gefunden",
       "save": "Speichern",
       "saveAs": "Speichern unter…",
@@ -2595,6 +2593,9 @@
       "properties": "Präsentationseigenschaften…",
       "filter": "Slidr-Präsentation",
       "filterAll": "Alle Dateien, die Slidr laden kann",
+      "filterImport": "Alle Dateien, die Slidr importieren kann",
+      "importUnknown": "Dateien dieser Art können nicht importiert werden",
+      "importKinds": "Slidr importiert: {{kinds}}.",
       "unsavedTitle": "Änderungen an „{{name}}“ speichern?",
       "unsavedBody": "Ihre Änderungen gehen verloren, wenn Sie sie nicht speichern.",
       "dontSave": "Nicht speichern",
@@ -3069,7 +3070,17 @@
       "magen": "Wächter",
       "shvav": "Platine",
       "mutzar": "Startschuss",
-      "atlas": "Atlas"
+      "atlas": "Atlas",
+      "dofek": "Puls",
+      "gir": "Kreide",
+      "hon": "Kapital",
+      "tavlin": "Gewürz",
+      "rakia": "Kosmos",
+      "maslul": "Laufbahn",
+      "taarucha": "Ausstellung",
+      "hadran": "Zugabe",
+      "tefer": "Atelier",
+      "sade": "Ernte"
     },
     "tagline": {
       "zerem": "Technik in Bewegung: Türkis, das in tiefblauer Nacht leuchtet",
@@ -3096,7 +3107,17 @@
       "magen": "Dunkles Oliv und alarmierendes Orange, mit der Präzision eines Kontrolldisplays",
       "shvav": "Platinengrün und Kupfer – für Hardware auf dem Weg in die Serienfertigung",
       "mutzar": "Produktfenster, Mauszeiger und Benachrichtigungen – für den Launch einer neuen Version",
-      "atlas": "Ein Globus, Routen und Briefmarken auf Landkartenpapier, in jeder Sprache – für alles, was Grenzen überschreitet"
+      "atlas": "Ein Globus, Routen und Briefmarken auf Landkartenpapier, in jeder Sprache – für alles, was Grenzen überschreitet",
+      "dofek": "OP-Türkis, Pulsrot und die Kurve eines Monitors – für Kliniken, Praxen und öffentliche Gesundheit",
+      "gir": "Eine grüne Tafel im Eichenrahmen, Kreide in der Hand und der Zirkel der Lehrkraft – für Unterricht, Kurse und Elternabende",
+      "hon": "Bordeauxrote Tinte, Guillochen und ein Kupferfaden auf Banknotenpapier – für Zahlen, die ihren Wert behalten",
+      "tavlin": "Gewürzsäcke, Preisschilder aus Packpapier und die Serifenschrift eines Kochbuchs auf Safranpapier – für Küchen, Köche und Food-Festivals",
+      "rakia": "Sternspuren, eine Mondsichel und das Spektrum auf tiefem Nachthimmel – für Wissenschaft, die nach oben blickt",
+      "maslul": "Rote Bahnen, weiße Linien und eine Stoppuhr – für Athleten und Vereine in den Startblöcken",
+      "taarucha": "Farbige Galeriewände, gerahmte Werke und Museumsschilder – für eine Ausstellung kurz vor der Eröffnung",
+      "hadran": "Platten, Tickets und Bühnenlicht auf rosa Papier – für Musik, nach der der Saal eine Zugabe verlangt",
+      "tefer": "Schnittmusterpapier, Maßband und granatroter Faden – für Modelabels, Ateliers und Handwerk",
+      "sade": "Reifer Weizen über einem Streifen Ackerboden, ein Feld im Schnitt – für alle, die unser Essen anbauen"
     },
     "properties": {
       "title": "Präsentationseigenschaften",

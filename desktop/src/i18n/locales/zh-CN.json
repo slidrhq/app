@@ -1461,7 +1461,7 @@
     }
   },
   "export": {
-    "title": "导出为 HTML",
+    "title": "导出演示文稿",
     "description": "一个可在任何浏览器中播放的文件，联网或离线均可。",
     "descriptionBeside": "一个可在任何浏览器中播放的文件（联网或离线均可），旁边另有一个存放视频和音频的文件夹。",
     "close": "关闭",
@@ -1469,6 +1469,7 @@
     "export": "导出",
     "again": "再次导出",
     "filter": "HTML 网页",
+    "format": "格式",
     "slides": {
       "label": "幻灯片",
       "all": "整个演示文稿",
@@ -2402,7 +2403,6 @@
   "pptx": {
     "filter": "PowerPoint 演示文稿",
     "export": {
-      "title": "导出为 PowerPoint",
       "description": "可在 PowerPoint、Keynote 和 Google 幻灯片中打开的 .pptx 文件，其中的每段文字、每个形状、表格和图表都可以编辑。",
       "working": "正在导出演示文稿…",
       "mediaOne": "文件中有 1 个媒体文件，{{size}}",
@@ -2578,10 +2578,8 @@
       "open": "打开…",
       "recent": "打开最近使用的文件",
       "noRecent": "没有最近使用的文件",
-      "importHtml": "导入 HTML…",
-      "importPptx": "导入 PowerPoint…",
-      "exportHtml": "导出 HTML…",
-      "exportPptx": "导出为 PowerPoint…",
+      "import": "导入…",
+      "export": "导出…",
       "missing": "找不到文件",
       "save": "保存",
       "saveAs": "另存为…",
@@ -2589,6 +2587,9 @@
       "properties": "演示文稿属性…",
       "filter": "Slidr 演示文稿",
       "filterAll": "Slidr 可加载的所有文件",
+      "filterImport": "Slidr 可导入的所有文件",
+      "importUnknown": "无法导入此类文件",
+      "importKinds": "Slidr 可导入：{{kinds}}。",
       "unsavedTitle": "是否保存对“{{name}}”的更改？",
       "unsavedBody": "如果不保存，你所做的更改将会丢失。",
       "dontSave": "不保存",
@@ -3063,7 +3064,17 @@
       "magen": "哨兵",
       "shvav": "电路",
       "mutzar": "首发",
-      "atlas": "地图集"
+      "atlas": "地图集",
+      "dofek": "脉搏",
+      "gir": "粉笔",
+      "hon": "资本",
+      "tavlin": "香料",
+      "rakia": "苍穹",
+      "maslul": "跑道",
+      "taarucha": "展览",
+      "hadran": "返场",
+      "tefer": "裁缝",
+      "sade": "丰收"
     },
     "tagline": {
       "zerem": "动感科技：深蓝夜色中闪耀的青绿光芒",
@@ -3090,7 +3101,17 @@
       "magen": "深橄榄色与警示橙，兼具控制显示屏般的精准",
       "shvav": "电路板绿与铜色，献给即将投产的硬件",
       "mutzar": "产品窗口、光标与通知，献给新版本的发布",
-      "atlas": "地图纸上的地球仪、航线与邮票，以每一种语言，献给跨越国界的事物"
+      "atlas": "地图纸上的地球仪、航线与邮票，以每一种语言，献给跨越国界的事物",
+      "dofek": "手术室青绿、脉搏红与监护仪波形，献给医院、诊所与公共卫生",
+      "gir": "橡木框里的绿色黑板，手中的粉笔与老师的圆规，献给课堂、课程与家长会",
+      "hon": "钞票纸上的酒红油墨、扭索纹与一道铜线，献给守住价值的数字",
+      "tavlin": "香料麻袋、牛皮纸价签与藏红花色纸上的食谱衬线字，献给厨房、主厨与美食节",
+      "rakia": "星轨、新月与光谱，铺展在深邃的夜空，献给仰望星空的科学",
+      "maslul": "红色跑道、白色线条与秒表，献给站上起跑线的运动员和俱乐部",
+      "taarucha": "上色的展厅墙面、装框的作品与博物馆展签，献给即将开幕的展览",
+      "hadran": "粉色纸面上的唱片、门票与舞台灯光，献给让人高喊“再来一首”的音乐",
+      "tefer": "纸样纸、软尺与石榴红丝线，献给时装品牌、工坊与手作人",
+      "sade": "一条沃土之上的成熟麦穗，以剖面描绘的田野，献给种出我们粮食的人"
     },
     "properties": {
       "title": "演示文稿属性",

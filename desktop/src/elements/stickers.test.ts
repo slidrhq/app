@@ -8,6 +8,7 @@ import {
   graphicsOf,
   searchStickers,
   stickerMarkup,
+  stickerName,
   type EmojiCatalog,
   type GraphicsCatalog,
 } from './stickers';
@@ -181,9 +182,33 @@ describe.skipIf(!available)('the emoji', () => {
     expect(ids(searchStickers(emoji, 'לב אדום', 3))[0]).toBe('emoji:red-heart');
   });
 
+  it('are named in the other languages the catalogue gives, else in English', () => {
+    const [cake] = emojiOf([
+      {
+        id: 'food',
+        emoji: [
+          'birthday-cake|🎂|birthday cake|cake|עוגת יום הולדת|עוגה|de=Geburtstagskuchen|ja=バースデーケーキ|xx=nothing|fr=',
+        ],
+      },
+    ] as EmojiCatalog);
+    expect(cake?.label).toEqual({
+      en: 'birthday cake',
+      he: 'עוגת יום הולדת',
+      de: 'Geburtstagskuchen',
+      ja: 'バースデーケーキ',
+    });
+    expect(['de-AT', 'ja', 'fr', 'he'].map((lang) => stickerName(cake!, lang))).toEqual([
+      'Geburtstagskuchen',
+      'バースデーケーキ',
+      'birthday cake',
+      'עוגת יום הולדת',
+    ]);
+    expect(ids(searchStickers([cake!], 'geburtstagskuchen', 3))).toEqual(['emoji:birthday-cake']);
+  });
+
   it('are whole SVG documents', async () => {
     const rocket = emoji.find(({ id }) => id === 'emoji:rocket')!;
-    expect(rocket.label).toEqual({ en: 'rocket', he: 'טיל' });
+    expect(rocket.label).toMatchObject({ en: 'rocket', he: 'טיל' });
     expect(await stickerMarkup(rocket)).toMatch(
       /^<svg xmlns="http:\/\/www.w3.org\/2000\/svg" viewBox="0 0 36 36"><path/,
     );

@@ -21,6 +21,7 @@ import {
   drawnWhole,
   featuredFrames,
   FRAME_GROUPS,
+  frameName,
   frameOutline,
   framePreview,
   framesIn,
@@ -179,10 +180,10 @@ function FrameButton({
   frame: PhotoFrame;
   picture: Target<ImageElement> | undefined;
 }) {
-  const { t, i18n } = useTranslation('elements');
+  const { t } = useTranslation('elements');
   const editor = useEditor();
   const lang = useLanguage();
-  const name = i18n.language.startsWith('he') ? frame.label.he : frame.label.en;
+  const name = frameName(frame, lang);
   return (
     <Tooltip content={name}>
       <button

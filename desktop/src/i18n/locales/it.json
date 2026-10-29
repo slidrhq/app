@@ -1469,7 +1469,7 @@
     }
   },
   "export": {
-    "title": "Esporta in HTML",
+    "title": "Esporta presentazione",
     "description": "Un unico file che si riproduce in qualsiasi browser, con o senza connessione Internet.",
     "descriptionBeside": "Un file che si riproduce in qualsiasi browser, con o senza connessione Internet, e accanto una cartella con video e audio.",
     "close": "Chiudi",
@@ -1477,6 +1477,7 @@
     "export": "Esporta",
     "again": "Esporta di nuovo",
     "filter": "Pagina HTML",
+    "format": "Formato",
     "slides": {
       "label": "Diapositive",
       "all": "Tutta la presentazione",
@@ -2414,7 +2415,6 @@
   "pptx": {
     "filter": "Presentazione PowerPoint",
     "export": {
-      "title": "Esporta in PowerPoint",
       "description": "Un file .pptx che si apre in PowerPoint, Keynote e Presentazioni Google, con ogni testo, forma, tabella e grafico modificabile.",
       "working": "Esportazione della presentazione…",
       "mediaOne": "Un file multimediale nel file, {{size}}",
@@ -2590,10 +2590,8 @@
       "open": "Apri…",
       "recent": "Apri recenti",
       "noRecent": "Nessun file recente",
-      "importHtml": "Importa HTML…",
-      "importPptx": "Importa PowerPoint…",
-      "exportHtml": "Esporta HTML…",
-      "exportPptx": "Esporta in PowerPoint…",
+      "import": "Importa…",
+      "export": "Esporta…",
       "missing": "File non trovato",
       "save": "Salva",
       "saveAs": "Salva con nome…",
@@ -2601,6 +2599,9 @@
       "properties": "Proprietà della presentazione…",
       "filter": "Presentazione Slidr",
       "filterAll": "Tutti i file supportati da Slidr",
+      "filterImport": "Tutti i file che Slidr può importare",
+      "importUnknown": "Questo tipo di file non può essere importato",
+      "importKinds": "Slidr importa: {{kinds}}.",
       "unsavedTitle": "Salvare le modifiche a “{{name}}”?",
       "unsavedBody": "Se non le salvi, le modifiche andranno perse.",
       "dontSave": "Non salvare",
@@ -3075,7 +3076,17 @@
       "magen": "Sentinella",
       "shvav": "Circuito",
       "mutzar": "Lancio",
-      "atlas": "Atlante"
+      "atlas": "Atlante",
+      "dofek": "Battito",
+      "gir": "Gesso",
+      "hon": "Capitale",
+      "tavlin": "Spezia",
+      "rakia": "Cosmo",
+      "maslul": "Pista",
+      "taarucha": "Mostra",
+      "hadran": "Bis",
+      "tefer": "Sartoria",
+      "sade": "Raccolto"
     },
     "tagline": {
       "zerem": "Tecnologia in movimento, turchese luminoso su una notte blu profondo",
@@ -3102,7 +3113,17 @@
       "magen": "Verde oliva scuro e arancione d'allerta, con la precisione di un pannello di controllo",
       "shvav": "Il verde dei circuiti stampati e il rame, per un hardware pronto ad andare in produzione",
       "mutzar": "Finestre di prodotto, cursori e notifiche, per il lancio di una nuova versione",
-      "atlas": "Un mappamondo, rotte e francobolli su carta geografica, in ogni lingua, per ciò che attraversa i confini"
+      "atlas": "Un mappamondo, rotte e francobolli su carta geografica, in ogni lingua, per ciò che attraversa i confini",
+      "dofek": "Il verde acqua della sala operatoria, il rosso del battito e la traccia di un monitor, per ospedali, ambulatori e sanità pubblica",
+      "gir": "Una lavagna verde in una cornice di rovere, il gesso in mano e il compasso dell'insegnante, per lezioni, corsi e incontri con i genitori",
+      "hon": "Inchiostro bordeaux, guilloche e un filo di rame su carta da banconota, per cifre che mantengono il loro valore",
+      "tavlin": "Sacchi di spezie, cartellini in carta kraft e il serif di un ricettario su carta zafferano, per cucine, chef e festival gastronomici",
+      "rakia": "Scie di stelle, una falce di Luna e lo spettro su un cielo notturno profondo, per una scienza che guarda in alto",
+      "maslul": "Corsie rosse, linee bianche e un cronometro, per atleti e club ai blocchi di partenza",
+      "taarucha": "Pareti di galleria dipinte, opere incorniciate e didascalie da museo, per una mostra che sta per aprire",
+      "hadran": "Dischi, biglietti e una luce di scena su carta rosa, per la musica che chiede un bis",
+      "tefer": "Carta per cartamodelli, metro da sarta e filo granata, per marchi di moda, sartorie e artigiani",
+      "sade": "Grano maturo su una striscia di terra, un campo disegnato in sezione, per chi coltiva il nostro cibo"
     },
     "properties": {
       "title": "Proprietà della presentazione",

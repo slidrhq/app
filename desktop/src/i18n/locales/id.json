@@ -1461,7 +1461,7 @@
     }
   },
   "export": {
-    "title": "Ekspor ke HTML",
+    "title": "Ekspor presentasi",
     "description": "Satu file yang dapat diputar di browser apa pun, dengan atau tanpa internet.",
     "descriptionBeside": "File yang dapat diputar di browser apa pun, dengan atau tanpa internet, beserta folder di sebelahnya yang berisi video dan audio.",
     "close": "Tutup",
@@ -1469,6 +1469,7 @@
     "export": "Ekspor",
     "again": "Ekspor lagi",
     "filter": "Halaman HTML",
+    "format": "Format",
     "slides": {
       "label": "Slide",
       "all": "Seluruh presentasi",
@@ -2402,7 +2403,6 @@
   "pptx": {
     "filter": "Presentasi PowerPoint",
     "export": {
-      "title": "Ekspor ke PowerPoint",
       "description": "File .pptx yang dapat dibuka di PowerPoint, Keynote, dan Google Slide, dengan setiap teks, bentuk, tabel, dan diagram di dalamnya dapat diedit.",
       "working": "Mengekspor presentasi…",
       "mediaOne": "Satu file media di dalam file, {{size}}",
@@ -2578,10 +2578,8 @@
       "open": "Buka…",
       "recent": "Buka terbaru",
       "noRecent": "Tidak ada file terbaru",
-      "importHtml": "Impor HTML…",
-      "importPptx": "Impor PowerPoint…",
-      "exportHtml": "Ekspor HTML…",
-      "exportPptx": "Ekspor ke PowerPoint…",
+      "import": "Impor…",
+      "export": "Ekspor…",
       "missing": "File tidak ditemukan",
       "save": "Simpan",
       "saveAs": "Simpan sebagai…",
@@ -2589,6 +2587,9 @@
       "properties": "Properti presentasi…",
       "filter": "Presentasi Slidr",
       "filterAll": "Semua file yang dapat dimuat Slidr",
+      "filterImport": "Semua file yang dapat diimpor Slidr",
+      "importUnknown": "Jenis file ini tidak dapat diimpor",
+      "importKinds": "Slidr mengimpor: {{kinds}}.",
       "unsavedTitle": "Simpan perubahan pada “{{name}}”?",
       "unsavedBody": "Perubahan Anda akan hilang jika tidak disimpan.",
       "dontSave": "Jangan simpan",
@@ -3063,7 +3064,17 @@
       "magen": "Penjaga",
       "shvav": "Sirkuit",
       "mutzar": "Peluncuran",
-      "atlas": "Atlas"
+      "atlas": "Atlas",
+      "dofek": "Denyut",
+      "gir": "Kapur",
+      "hon": "Modal",
+      "tavlin": "Rempah",
+      "rakia": "Cakrawala",
+      "maslul": "Lintasan",
+      "taarucha": "Pameran",
+      "hadran": "Sekali Lagi",
+      "tefer": "Jahitan",
+      "sade": "Panen"
     },
     "tagline": {
       "zerem": "Teknologi yang bergerak, toska menyala di malam biru pekat",
@@ -3090,7 +3101,17 @@
       "magen": "Zaitun gelap dan jingga siaga, dengan presisi layar kendali",
       "shvav": "Hijau papan sirkuit dan tembaga, untuk perangkat keras yang menuju produksi",
       "mutzar": "Jendela produk, kursor, dan notifikasi, untuk peluncuran versi baru",
-      "atlas": "Bola dunia, rute, dan perangko di atas kertas peta, dalam setiap bahasa, untuk apa pun yang melintasi batas negara"
+      "atlas": "Bola dunia, rute, dan perangko di atas kertas peta, dalam setiap bahasa, untuk apa pun yang melintasi batas negara",
+      "dofek": "Toska ruang operasi, merah denyut, dan garis monitor, untuk rumah sakit, klinik, dan kesehatan masyarakat",
+      "gir": "Papan hijau berbingkai kayu ek, kapur di tangan dan jangka milik guru, untuk pelajaran, kursus, dan pertemuan orang tua murid",
+      "hon": "Tinta merah marun, ukiran guilloche, dan benang tembaga di atas kertas uang, untuk angka yang tetap bernilai",
+      "tavlin": "Karung rempah, label harga kertas kraft, dan huruf serif buku resep di atas kertas kunyit, untuk dapur, koki, dan festival kuliner",
+      "rakia": "Jejak bintang, bulan sabit, dan spektrum di langit malam yang pekat, untuk ilmu yang menatap ke atas",
+      "maslul": "Lintasan merah, garis putih, dan stopwatch, untuk atlet dan klub yang siap di garis start",
+      "taarucha": "Dinding galeri berwarna, karya berbingkai, dan label museum, untuk pameran yang segera dibuka",
+      "hadran": "Piringan hitam, tiket, dan cahaya panggung di atas kertas merah muda, untuk musik yang membuat penonton meminta satu lagu lagi",
+      "tefer": "Kertas pola, meteran jahit, dan benang merah delima, untuk label mode, bengkel jahit, dan perajin",
+      "sade": "Gandum matang di atas sejalur tanah, ladang yang digambar dalam irisan, untuk mereka yang menanam pangan kita"
     },
     "properties": {
       "title": "Properti presentasi",

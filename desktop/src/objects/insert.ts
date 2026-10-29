@@ -1,6 +1,7 @@
 import { findSlide, type AssetMeta, type Element, type Frame } from '@slidr/model';
 import { deckLanguage, i18n } from '../i18n';
 import { focusStage, type Editor } from '../shell';
+import { pickFiles } from '../shell/pickFiles';
 import { newCard } from './card';
 import { newLine, newShape, type LineKind } from './shapes';
 import { insertFiles } from './takeIn';
@@ -11,28 +12,9 @@ import { insertFiles } from './takeIn';
  * ends selected.
  */
 
-/**
- * Asks for files with the system's file dialog. The input is made in code, not in JSX: it works
- * in the Tauri webview and in a browser alike. Resolves with nothing when the dialog is cancelled.
- */
-export function pickFiles(accept: string, multiple = false): Promise<File[]> {
-  return new Promise((resolve) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = accept;
-    input.multiple = multiple;
-    input.hidden = true;
-    const done = (files: File[]) => {
-      input.remove();
-      resolve(files);
-    };
-    input.addEventListener('change', () => done(Array.from(input.files ?? [])), { once: true });
-    input.addEventListener('cancel', () => done([]), { once: true });
-    // Attached while the dialog is open, so the input cannot be collected before it answers.
-    document.body.append(input);
-    input.click();
-  });
-}
+// The file picker is the shell's, which asks with it for a file to import in a plain browser; the
+// areas take it from here, beside what they insert.
+export { pickFiles };
 
 export const IMAGE_FILES = 'image/*';
 

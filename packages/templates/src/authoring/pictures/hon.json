@@ -1,0 +1,68 @@
+{
+  "honHomes": {
+    "id": "eca9c7e877af3f0de6dfcc63aaa08db549b9c24725766f5fea7939404cbd89f3",
+    "file": "eca9c7e877af3f0de6dfcc63aaa08db549b9c24725766f5fea7939404cbd89f3.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 343600,
+    "width": 960,
+    "height": 1280,
+    "origin": "import",
+    "name": "hon-homes.webp"
+  },
+  "honStreet": {
+    "id": "5621f2c1b474bafa43be96f33e339f0bf5f0471ad95ecb71a3e6e681100b30ff",
+    "file": "5621f2c1b474bafa43be96f33e339f0bf5f0471ad95ecb71a3e6e681100b30ff.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 285736,
+    "width": 1227,
+    "height": 1086,
+    "origin": "import",
+    "name": "hon-street.webp"
+  },
+  "honTeam1": {
+    "id": "b9acd46f5999de98e70f57e641324c3b148878dff65c451321c1e4e721349ea3",
+    "file": "b9acd46f5999de98e70f57e641324c3b148878dff65c451321c1e4e721349ea3.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 26348,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hon-team-1.webp"
+  },
+  "honTeam2": {
+    "id": "9cfb482bb411d91dfbd7ed785312b513bffb019d784adde937cc26f0235e11cc",
+    "file": "9cfb482bb411d91dfbd7ed785312b513bffb019d784adde937cc26f0235e11cc.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 31160,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hon-team-2.webp"
+  },
+  "honTeam3": {
+    "id": "f3ca439f053b03d081ee5fc210e4a8578096d2bdaead31927d6ad91a24f72f3c",
+    "file": "f3ca439f053b03d081ee5fc210e4a8578096d2bdaead31927d6ad91a24f72f3c.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 27582,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hon-team-3.webp"
+  },
+  "honTeam4": {
+    "id": "bdc1a01f46b7f200b9fa2570d988e1e7c23276562f92b8ae00da596bb32562d2",
+    "file": "bdc1a01f46b7f200b9fa2570d988e1e7c23276562f92b8ae00da596bb32562d2.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 65732,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "hon-team-4.webp"
+  }
+}

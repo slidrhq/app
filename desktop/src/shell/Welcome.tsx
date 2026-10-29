@@ -32,9 +32,9 @@ import { useLaidOutSize } from '../templates/PreviewGrid';
 import { TemplateShowroom } from '../templates/TemplateShowroom';
 import { useTemplatesIn } from '../templates/written';
 import { useEditor, useFile, type Editor } from './editor';
-import { loadFile, newDocument, openDocument, recentFiles } from './fileActions';
+import { importFile, loadFile, newDocument, openDocument, recentFiles } from './fileActions';
 import { modalOpen, overlayOf } from './overlay';
-import { PanelId, useAction, useImporters } from './registry';
+import { PanelId, useImporters } from './registry';
 import { openPanel, setWelcome, useShell } from './store';
 
 /*
@@ -229,7 +229,6 @@ export function Welcome() {
   const editor = useEditor();
   const busy = useFile((s) => s.busy);
   const hasStorage = editor.document !== null;
-  const runImport = useAction('import');
   const importers = useImporters();
   // Built-in templates first, then the user's own; drawn again when the personal ones are read.
   const personal = useStore(library.state, (s) => s.personal);
@@ -343,10 +342,10 @@ export function Welcome() {
     setWelcome(false);
     focusChat();
   };
-  // In a plain browser there are no files of the app's own: the HTML import alone, by its dialog.
+  // In a plain browser there are no files of the app's own: the imports alone, by their picker.
   const load = () => {
     if (hasStorage) void loadFile(editor, importers);
-    else runImport?.();
+    else void importFile(editor, importers);
   };
   const open = async (path: string) => {
     if (await openDocument(editor, path)) setWelcome(false);
@@ -493,7 +492,7 @@ export function Welcome() {
                     size="sm"
                     icon={FolderOpen}
                     data-testid="welcome-load"
-                    disabled={!hasStorage && !runImport}
+                    disabled={!hasStorage && importers.length === 0}
                     onClick={load}
                   >
                     {t('welcome.load')}

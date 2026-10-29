@@ -607,12 +607,27 @@ test('a switch of the language leaves only what is in the new one, and what has 
   ]);
   await page.screenshot({ path: 'test-results/elements/language-frames-en.png' });
 
-  // German: the magnets and the card sets have Hebrew and English words only. Shapes, graphics,
-  // emoji, icons and tables have no language.
+  // German: the card sets have Hebrew and English words only, and the magnets are offered once
+  // the library has their words in German too. Shapes, graphics, emoji, icons and tables have no
+  // language.
+  const germanMagnets = await page.evaluate(async () => {
+    const answer = await fetch('/media-library/elements/catalogs/frames-catalog.json');
+    const catalog = (await answer.json()) as {
+      groups: { id: string; frames: { extras?: { kind: string; lines?: object[] }[] }[] }[];
+    };
+    const magnets = catalog.groups.find((group) => group.id === 'magnets')?.frames ?? [];
+    return magnets.every((magnet) =>
+      (magnet.extras ?? [])
+        .flatMap((extra) =>
+          extra.kind === 'caption' ? [extra] : extra.kind === 'label' ? (extra.lines ?? []) : [],
+        )
+        .every((line) => 'de' in line),
+    );
+  });
   await switchLanguage(page, 'de');
   expect(await shownGroups(groups)).toEqual([
     'featured',
-    ...FRAME_GROUPS.filter((group) => group !== 'hebrew' && group !== 'magnets'),
+    ...FRAME_GROUPS.filter((group) => group !== 'hebrew' && (germanMagnets || group !== 'magnets')),
   ]);
   await panel.getByRole('button', { name: 'Zurück zu den Sammlungen' }).click();
   const tiles = panel.locator('[data-collection]');
@@ -1158,7 +1173,7 @@ test('frames are in the exported file as they are on the slide', async ({ page }
   expect(phone.id).not.toBe(heart.id);
 
   await page.getByTestId('file-menu-trigger').click();
-  await page.getByRole('menuitem', { name: 'Export HTML…', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Export…', exact: true }).click();
   await expect(page.getByTestId('export-dialog')).toBeVisible();
   const download = page.waitForEvent('download');
   await page.getByTestId('export-run').click();

@@ -1,14 +1,7 @@
 import { createDeckApi, startTurn, type ToolResult } from '@slidr/agent-tools';
 import { i18n, registerMessages } from '../i18n';
-import { getEditor, registerAction, registerImporter, whenEditor } from '../shell';
-import {
-  continueImport,
-  importFile,
-  importRestored,
-  importSource,
-  importThread,
-  startImport,
-} from './flow';
+import { getEditor, registerImporter, whenEditor } from '../shell';
+import { continueImport, importRestored, importSource, importThread, startImport } from './flow';
 import { en, he } from './messages';
 import { importBrief } from './progress';
 import { buildReport } from './report';
@@ -25,21 +18,19 @@ import {
 } from './session';
 
 /*
- * HTML import (SPEC ch. 13, WG9-T18): "Import HTML" of the File menu and of the welcome screen
- * asks for the file, and the import is a conversation of the AI chat from its first message on.
- * See docs/adr/ADR-036-html-import.md.
+ * HTML import (SPEC ch. 13, WG9-T18): "Import…" of the File menu and "Load from file" of the
+ * welcome screen ask for the file, and the import is a conversation of the AI chat from its first
+ * message on. See docs/adr/ADR-036-html-import.md.
  */
 
 registerMessages('import', { he, en });
 
-registerAction('import', () => void importFile(getEditor()));
-
-// "Load from file" of the welcome screen takes an HTML file as this import does.
 registerImporter({
   id: 'html',
   extensions: ['html', 'htm'],
   filterName: () => i18n.t('filter', { ns: 'import' }),
   open: (path) => void importSource(getEditor(), { path }),
+  openFile: (file) => void importSource(getEditor(), { file }),
 });
 
 // A deck that was imported has its import again when it is opened (IMP-07), and the AI chat

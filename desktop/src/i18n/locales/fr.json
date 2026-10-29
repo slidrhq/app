@@ -1469,7 +1469,7 @@
     }
   },
   "export": {
-    "title": "Exporter en HTML",
+    "title": "Exporter la présentation",
     "description": "Un seul fichier lisible dans n’importe quel navigateur, avec ou sans Internet.",
     "descriptionBeside": "Un fichier lisible dans n’importe quel navigateur, avec ou sans Internet, accompagné d’un dossier contenant la vidéo et l’audio.",
     "close": "Fermer",
@@ -1477,6 +1477,7 @@
     "export": "Exporter",
     "again": "Exporter à nouveau",
     "filter": "Page HTML",
+    "format": "Format",
     "slides": {
       "label": "Diapositives",
       "all": "Toute la présentation",
@@ -2414,7 +2415,6 @@
   "pptx": {
     "filter": "Présentation PowerPoint",
     "export": {
-      "title": "Exporter vers PowerPoint",
       "description": "Un fichier .pptx qui s’ouvre dans PowerPoint, Keynote et Google Slides, où chaque texte, forme, tableau et graphique reste modifiable.",
       "working": "Exportation de la présentation…",
       "mediaOne": "Un fichier multimédia dans le fichier, {{size}}",
@@ -2590,10 +2590,8 @@
       "open": "Ouvrir…",
       "recent": "Ouvrir un fichier récent",
       "noRecent": "Aucun fichier récent",
-      "importHtml": "Importer du HTML…",
-      "importPptx": "Importer du PowerPoint…",
-      "exportHtml": "Exporter en HTML…",
-      "exportPptx": "Exporter vers PowerPoint…",
+      "import": "Importer…",
+      "export": "Exporter…",
       "missing": "Fichier introuvable",
       "save": "Enregistrer",
       "saveAs": "Enregistrer sous…",
@@ -2601,6 +2599,9 @@
       "properties": "Propriétés de la présentation…",
       "filter": "Présentation Slidr",
       "filterAll": "Tous les fichiers pris en charge par Slidr",
+      "filterImport": "Tous les fichiers que Slidr peut importer",
+      "importUnknown": "Ce type de fichier ne peut pas être importé",
+      "importKinds": "Slidr importe : {{kinds}}.",
       "unsavedTitle": "Enregistrer les modifications apportées à « {{name}} » ?",
       "unsavedBody": "Vos modifications seront perdues si vous ne les enregistrez pas.",
       "dontSave": "Ne pas enregistrer",
@@ -3075,7 +3076,17 @@
       "magen": "Sentinelle",
       "shvav": "Circuit",
       "mutzar": "Lancement",
-      "atlas": "Atlas"
+      "atlas": "Atlas",
+      "dofek": "Pouls",
+      "gir": "Craie",
+      "hon": "Capital",
+      "tavlin": "Épice",
+      "rakia": "Cosmos",
+      "maslul": "Piste",
+      "taarucha": "Exposition",
+      "hadran": "Rappel",
+      "tefer": "Atelier",
+      "sade": "Moisson"
     },
     "tagline": {
       "zerem": "La technologie en mouvement, un turquoise lumineux sur une nuit bleu profond",
@@ -3102,7 +3113,17 @@
       "magen": "Un vert olive sombre et un orange d’alerte, avec la précision d’un écran de contrôle",
       "shvav": "Le vert d’un circuit imprimé et le cuivre, pour du matériel en route vers la production",
       "mutzar": "Fenêtres de produit, curseurs et notifications, pour le lancement d’une nouvelle version",
-      "atlas": "Un globe, des itinéraires et des timbres-poste sur papier de carte, dans toutes les langues, pour ce qui traverse les frontières"
+      "atlas": "Un globe, des itinéraires et des timbres-poste sur papier de carte, dans toutes les langues, pour ce qui traverse les frontières",
+      "dofek": "Le turquoise du bloc opératoire, le rouge du pouls et le tracé d’un moniteur, pour les hôpitaux, les cliniques et la santé publique",
+      "gir": "Un tableau vert dans un cadre en chêne, la craie à la main et le compas du professeur, pour les cours, les ateliers et les réunions de parents",
+      "hon": "Une encre bordeaux, des guillochis et un fil de cuivre sur papier fiduciaire, pour des chiffres qui gardent leur valeur",
+      "tavlin": "Des sacs d’épices, des étiquettes en papier kraft et le serif d’un livre de cuisine sur papier safran, pour les cuisines, les chefs et les festivals gourmands",
+      "rakia": "Des filés d’étoiles, un croissant de Lune et le spectre sur un ciel nocturne profond, pour une science qui lève les yeux",
+      "maslul": "Des couloirs rouges, des lignes blanches et un chronomètre, pour les athlètes et les clubs sur la ligne de départ",
+      "taarucha": "Des cimaises colorées, des œuvres encadrées et des cartels de musée, pour une exposition sur le point d’ouvrir",
+      "hadran": "Des disques, des billets et une lumière de scène sur papier rose, pour une musique qui appelle un rappel",
+      "tefer": "Papier à patron, mètre ruban et fil grenat, pour les marques de mode, les ateliers et les artisans",
+      "sade": "Du blé mûr sur une bande de terre, un champ dessiné en coupe, pour celles et ceux qui cultivent notre nourriture"
     },
     "properties": {
       "title": "Propriétés de la présentation",

@@ -1,0 +1,68 @@
+{
+  "dofekTeam1": {
+    "id": "617c38289f71869378cfe750535aad331ab99e1dd24de3f5aa3303bf6929492b",
+    "file": "617c38289f71869378cfe750535aad331ab99e1dd24de3f5aa3303bf6929492b.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 33454,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "dofek-team-1.webp"
+  },
+  "dofekTeam2": {
+    "id": "62425db82845462d337b915ca36d30304a30a172aa41c18e06c78a9d0976c4bc",
+    "file": "62425db82845462d337b915ca36d30304a30a172aa41c18e06c78a9d0976c4bc.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 40268,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "dofek-team-2.webp"
+  },
+  "dofekTeam3": {
+    "id": "824e66d8a7c58d87b38a2ae6eb25ddf0545d8215ebde62cb30eaca247ed06733",
+    "file": "824e66d8a7c58d87b38a2ae6eb25ddf0545d8215ebde62cb30eaca247ed06733.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 26838,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "dofek-team-3.webp"
+  },
+  "dofekTeam4": {
+    "id": "8344762b84a08ce558f39333ebb77aea7a7a019a64db53718d8b9919b2fa4529",
+    "file": "8344762b84a08ce558f39333ebb77aea7a7a019a64db53718d8b9919b2fa4529.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 38712,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "dofek-team-4.webp"
+  },
+  "dofekResponder": {
+    "id": "15196d255e7a96429cd676dd3901a8123e3afc7a63b0c79bae3ad30bcf03446b",
+    "file": "15196d255e7a96429cd676dd3901a8123e3afc7a63b0c79bae3ad30bcf03446b.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 87370,
+    "width": 1000,
+    "height": 1094,
+    "origin": "import",
+    "name": "dofek-responder.webp"
+  },
+  "dofekPark": {
+    "id": "cc4d132b234858f29c1b7ed87662b4fb832690422fce96f2335436b3a1e26a4c",
+    "file": "cc4d132b234858f29c1b7ed87662b4fb832690422fce96f2335436b3a1e26a4c.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 200902,
+    "width": 1600,
+    "height": 593,
+    "origin": "import",
+    "name": "dofek-park.webp"
+  }
+}

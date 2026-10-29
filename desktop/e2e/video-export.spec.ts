@@ -27,7 +27,7 @@ const shot = (name: string) =>
 
 async function openDialog(page: Page, label = 'ייצוא') {
   await page.getByTestId('file-menu-trigger').click();
-  await page.getByRole('menuitem', { name: `${label} HTML…`, exact: true }).click();
+  await page.getByRole('menuitem', { name: `${label}…`, exact: true }).click();
   const dialog = page.getByTestId('export-dialog');
   await expect(dialog).toBeVisible();
   return dialog;

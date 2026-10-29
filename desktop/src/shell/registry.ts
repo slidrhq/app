@@ -201,9 +201,6 @@ export type ToolAction =
   | 'insert.icon'
   | 'present'
   | 'export'
-  | 'import'
-  | 'exportPptx'
-  | 'importPptx'
   | 'deckProperties'
   | 'transition';
 
@@ -251,8 +248,9 @@ export function useActionPopover(id: ToolAction): ComponentType<ActionPopoverPro
 
 /**
  * A kind of file the app takes in by importing it rather than opening it, such as a page of HTML
- * (ADR-036). "Load from file" of the welcome screen offers its files in the same dialog as the
- * app's own, and hands it the one chosen.
+ * (ADR-036) or a PowerPoint presentation (ADR-108). "Import…" of the File menu offers the files of
+ * every importer in one dialog, "Load from file" of the welcome screen offers them in the same
+ * dialog as the app's own, and each hands the one chosen to the importer of its extension.
  */
 export interface FileImporter extends Registered {
   /** The extensions of its files, without the dot: `['html', 'htm']`. */
@@ -261,11 +259,13 @@ export interface FileImporter extends Registered {
   filterName: () => string;
   /** Imports the file the user chose. */
   open: (path: string) => void;
+  /** Imports a file the page's own picker gave: in a plain browser, which has no paths. */
+  openFile: (file: File) => void;
 }
 
 const importers = createRegistry<FileImporter>();
 
-/** Lets "Load from file" take a kind of file in. Returns a function that removes it. */
+/** Lets "Import…" and "Load from file" take a kind of file in. Returns its remover. */
 export function registerImporter(importer: FileImporter): () => void {
   return importers.register(importer);
 }

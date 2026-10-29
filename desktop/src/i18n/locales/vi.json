@@ -1461,7 +1461,7 @@
     }
   },
   "export": {
-    "title": "Xuất sang HTML",
+    "title": "Xuất bản trình bày",
     "description": "Một tệp duy nhất phát được trên mọi trình duyệt, dù có hay không có internet.",
     "descriptionBeside": "Một tệp phát được trên mọi trình duyệt, dù có hay không có internet, kèm một thư mục bên cạnh chứa video và âm thanh.",
     "close": "Đóng",
@@ -1469,6 +1469,7 @@
     "export": "Xuất",
     "again": "Xuất lại",
     "filter": "Trang HTML",
+    "format": "Định dạng",
     "slides": {
       "label": "Trang chiếu",
       "all": "Toàn bộ bản trình bày",
@@ -2402,7 +2403,6 @@
   "pptx": {
     "filter": "Bản trình bày PowerPoint",
     "export": {
-      "title": "Xuất sang PowerPoint",
       "description": "Một tệp .pptx mở được trong PowerPoint, Keynote và Google Trang trình bày, trong đó mọi văn bản, hình, bảng và biểu đồ đều chỉnh sửa được.",
       "working": "Đang xuất bản trình bày…",
       "mediaOne": "Một tệp đa phương tiện trong tệp, {{size}}",
@@ -2578,10 +2578,8 @@
       "open": "Mở…",
       "recent": "Mở gần đây",
       "noRecent": "Không có tệp gần đây",
-      "importHtml": "Nhập HTML…",
-      "importPptx": "Nhập PowerPoint…",
-      "exportHtml": "Xuất HTML…",
-      "exportPptx": "Xuất sang PowerPoint…",
+      "import": "Nhập…",
+      "export": "Xuất…",
       "missing": "Không tìm thấy tệp",
       "save": "Lưu",
       "saveAs": "Lưu thành…",
@@ -2589,6 +2587,9 @@
       "properties": "Thuộc tính bản trình bày…",
       "filter": "Bản trình bày Slidr",
       "filterAll": "Tất cả tệp Slidr có thể mở",
+      "filterImport": "Tất cả tệp Slidr có thể nhập",
+      "importUnknown": "Không thể nhập loại tệp này",
+      "importKinds": "Slidr nhập được: {{kinds}}.",
       "unsavedTitle": "Lưu thay đổi cho “{{name}}”?",
       "unsavedBody": "Thay đổi của bạn sẽ bị mất nếu bạn không lưu.",
       "dontSave": "Không lưu",
@@ -3063,7 +3064,17 @@
       "magen": "Lính gác",
       "shvav": "Bo mạch",
       "mutzar": "Ra mắt",
-      "atlas": "Tập bản đồ"
+      "atlas": "Tập bản đồ",
+      "dofek": "Nhịp tim",
+      "gir": "Phấn",
+      "hon": "Nguồn vốn",
+      "tavlin": "Gia vị",
+      "rakia": "Vũ trụ",
+      "maslul": "Đường chạy",
+      "taarucha": "Triển lãm",
+      "hadran": "Thêm một bài",
+      "tefer": "Xưởng may",
+      "sade": "Mùa gặt"
     },
     "tagline": {
       "zerem": "Công nghệ chuyển động, sắc ngọc lam rực sáng giữa đêm xanh thẳm",
@@ -3090,7 +3101,17 @@
       "magen": "Xanh ô liu sẫm và cam cảnh báo, chính xác như một màn hình điều khiển",
       "shvav": "Xanh bảng mạch và ánh đồng, cho phần cứng đang trên đường vào sản xuất",
       "mutzar": "Cửa sổ sản phẩm, con trỏ và thông báo, cho buổi ra mắt phiên bản mới",
-      "atlas": "Quả địa cầu, tuyến đường và tem thư trên giấy bản đồ, bằng mọi ngôn ngữ, cho những gì vượt qua biên giới"
+      "atlas": "Quả địa cầu, tuyến đường và tem thư trên giấy bản đồ, bằng mọi ngôn ngữ, cho những gì vượt qua biên giới",
+      "dofek": "Xanh ngọc phòng mổ, đỏ nhịp tim và đường sóng monitor, cho bệnh viện, phòng khám và y tế cộng đồng",
+      "gir": "Bảng xanh trong khung gỗ sồi, viên phấn trên tay và chiếc com-pa của thầy cô, cho những giờ học, khóa học và buổi họp phụ huynh",
+      "hon": "Mực đỏ rượu vang, hoa văn guilloche và sợi chỉ đồng trên giấy in tiền, cho những con số giữ trọn giá trị",
+      "tavlin": "Bao gia vị, nhãn giá giấy kraft và kiểu chữ có chân của sách dạy nấu ăn trên nền giấy màu nghệ tây, cho những gian bếp, đầu bếp và lễ hội ẩm thực",
+      "rakia": "Vệt sao, trăng lưỡi liềm và quang phổ trên bầu trời đêm sâu thẳm, cho khoa học hướng lên cao",
+      "maslul": "Làn chạy đỏ, vạch trắng và đồng hồ bấm giờ, cho vận động viên và câu lạc bộ trên vạch xuất phát",
+      "taarucha": "Tường phòng trưng bày sơn màu, tác phẩm đóng khung và nhãn bảo tàng, cho một triển lãm sắp khai mạc",
+      "hadran": "Đĩa than, vé và ánh đèn sân khấu trên giấy hồng, cho âm nhạc khiến khán giả đòi thêm một bài",
+      "tefer": "Giấy rập, thước dây và chỉ đỏ lựu, cho nhãn hàng thời trang, xưởng may và người làm nghề",
+      "sade": "Lúa mì chín trên dải đất nâu, cánh đồng vẽ theo mặt cắt, cho những người trồng nên lương thực của chúng ta"
     },
     "properties": {
       "title": "Thuộc tính bản trình bày",

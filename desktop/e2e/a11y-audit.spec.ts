@@ -395,7 +395,7 @@ test('the dialogs: the shortcut map and its editor, export, a question', async (
   await expect(map).toBeHidden();
 
   await page.getByTestId('file-menu-trigger').click();
-  await page.getByRole('menuitem', { name: 'Export HTML…' }).click();
+  await page.getByRole('menuitem', { name: 'Export…' }).click();
   await expect(page.getByTestId('export-dialog')).toBeVisible();
   await survey.audit('the export dialog');
   await survey.popups('[data-testid="export-dialog"]', 'the export dialog');
@@ -404,12 +404,15 @@ test('the dialogs: the shortcut map and its editor, export, a question', async (
 
   // PowerPoint (ADR-108): the export's choices and its report, and the report of an import.
   await page.getByTestId('file-menu-trigger').click();
-  await page.getByTestId('file-export-pptx').click();
-  const pptx = page.getByTestId('pptx-export-dialog');
+  await page.getByTestId('file-export').click();
+  const pptx = page.getByTestId('export-dialog');
   await expect(pptx).toBeVisible();
+  await pptx.getByRole('combobox', { name: 'Format' }).click();
+  await page.getByRole('option', { name: 'PowerPoint presentation' }).click();
+  await expect(pptx).toHaveAttribute('data-format', 'pptx');
   await survey.audit('the PowerPoint export dialog');
-  await survey.popups('[data-testid="pptx-export-dialog"]', 'the PowerPoint export dialog');
-  await page.getByTestId('pptx-export-run').click();
+  await survey.popups('[data-testid="export-dialog"]', 'the PowerPoint export dialog');
+  await page.getByTestId('export-run').click();
   await expect(pptx).toHaveAttribute('data-phase', 'done');
   await survey.audit('the PowerPoint export report');
   await page.keyboard.press('Escape');

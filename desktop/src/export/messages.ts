@@ -4,7 +4,7 @@
  * form for two as well, and the Hebrew for "2 slides" reads right without one.
  */
 export const he = {
-  title: 'ייצוא ל-HTML',
+  title: 'ייצוא המצגת',
   description: 'קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.',
   descriptionBeside: 'קובץ שמתנגן בכל דפדפן, גם בלי אינטרנט, ולידו תיקייה עם הווידאו והאודיו.',
   close: 'סגירה',
@@ -12,6 +12,7 @@ export const he = {
   export: 'ייצוא',
   again: 'ייצוא נוסף',
   filter: 'דף HTML',
+  format: 'פורמט',
   slides: {
     label: 'שקפים',
     all: 'כל המצגת',
@@ -86,7 +87,7 @@ export const he = {
 };
 
 export const en: typeof he = {
-  title: 'Export to HTML',
+  title: 'Export presentation',
   description: 'One file that plays in any browser, with or without the internet.',
   descriptionBeside:
     'A file that plays in any browser, with or without the internet, and a folder beside it with the video and audio.',
@@ -95,6 +96,7 @@ export const en: typeof he = {
   export: 'Export',
   again: 'Export again',
   filter: 'HTML page',
+  format: 'Format',
   slides: {
     label: 'Slides',
     all: 'The whole deck',

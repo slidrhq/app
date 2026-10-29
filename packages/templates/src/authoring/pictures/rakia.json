@@ -1,0 +1,68 @@
+{
+  "rakiaSite": {
+    "id": "3adad5f007f8a09974b16d7089c6807b551a924f05a83ca1a71de158e7e84de9",
+    "file": "3adad5f007f8a09974b16d7089c6807b551a924f05a83ca1a71de158e7e84de9.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 183578,
+    "width": 1600,
+    "height": 584,
+    "origin": "import",
+    "name": "rakia-site.webp"
+  },
+  "rakiaMirror": {
+    "id": "5a8508b7c1b60a92bf084b1e657d3c965b03eb167e86a5fa47817e272e67ab96",
+    "file": "5a8508b7c1b60a92bf084b1e657d3c965b03eb167e86a5fa47817e272e67ab96.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 129768,
+    "width": 1000,
+    "height": 1000,
+    "origin": "import",
+    "name": "rakia-mirror.webp"
+  },
+  "rakiaTeam1": {
+    "id": "ed8d076de624ff15110b1964311404a19cf8b10dad23330017a6be329c10195a",
+    "file": "ed8d076de624ff15110b1964311404a19cf8b10dad23330017a6be329c10195a.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 58142,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "rakia-team-1.webp"
+  },
+  "rakiaTeam2": {
+    "id": "9c0b6296ee07ad9ff4365625e2499a22327071072d85c420fd91908eb1d52c95",
+    "file": "9c0b6296ee07ad9ff4365625e2499a22327071072d85c420fd91908eb1d52c95.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 49134,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "rakia-team-2.webp"
+  },
+  "rakiaTeam3": {
+    "id": "9fa94fedf63861cd72202e323a1d2bd12907a741131f6280cddd885388f6e44a",
+    "file": "9fa94fedf63861cd72202e323a1d2bd12907a741131f6280cddd885388f6e44a.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 47994,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "rakia-team-3.webp"
+  },
+  "rakiaTeam4": {
+    "id": "34d1266890887e78ef94c8a3bfada5c949eababcf18dc3110a8008639af4e1b7",
+    "file": "34d1266890887e78ef94c8a3bfada5c949eababcf18dc3110a8008639af4e1b7.webp",
+    "mime": "image/webp",
+    "kind": "image",
+    "bytes": 63554,
+    "width": 720,
+    "height": 720,
+    "origin": "ai",
+    "name": "rakia-team-4.webp"
+  }
+}

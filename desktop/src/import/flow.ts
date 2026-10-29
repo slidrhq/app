@@ -1,19 +1,16 @@
 /**
- * Starting an import (SPEC 13.3 steps 1 to 3, WG9-T18): the system's dialog asks for the file,
- * then a new deck unless the open one is still blank, the file in the isolated page, and the
+ * Starting an import (SPEC 13.3 steps 1 to 3, WG9-T18): the file the shell's dialog gave, then
+ * a new deck unless the open one is still blank, the file in the isolated page, and the
  * first message to the agent, which is a request in the AI chat like one the user typed. And
  * going on with one that was cut (IMP-09): the page again, from the source the deck keeps, and
  * a message that asks the agent to continue.
  */
 import type { SessionScope } from '@slidr/agent-tools';
 import { createDeck, createSlide, type Deck } from '@slidr/model';
-import { isTauri } from '@tauri-apps/api/core';
-import { open as openDialog } from '@tauri-apps/plugin-dialog';
 import { createStore } from 'zustand/vanilla';
 import type { ChatThread } from '../agent/agentService';
 import { aiOf } from '../ai/runtime';
 import { currentLanguage, i18n } from '../i18n';
-import { pickFiles } from '../objects/insert';
 import type { Editor } from '../shell';
 import { tell } from '../shell/dialogs';
 import { newDocument } from '../shell/fileActions';
@@ -141,39 +138,15 @@ export async function startImport(
   return true;
 }
 
-/** Asks for the file with the system's dialog. Null when the dialog was cancelled. */
-async function chooseSource(): Promise<ImportSource | null> {
-  if (!isTauri()) {
-    // A plain browser has no file dialog of the app's; the page's own picker stands in.
-    const [file] = await pickFiles('.html,.htm,text/html');
-    return file ? { file } : null;
-  }
-  const path = await openDialog({
-    multiple: false,
-    directory: false,
-    filters: [{ name: i18n.t('filter', { ns: 'import' }), extensions: ['html', 'htm'] }],
-  });
-  return path ? { path } : null;
-}
-
 /**
- * "Import HTML" of the File menu and of the welcome screen: the dialog for the file, and the
- * import of the one that was chosen, with the agent's plan shown for approval first (SPEC 13.3
- * step 3). A file that could not be opened or loaded is said in a dialog, like a document that
- * could not be opened.
- */
-export async function importFile(editor: Editor): Promise<void> {
-  // One at a time: a file that is still loading is the import that was asked for.
-  if (importOpening.getState()) return;
-  const source = await chooseSource();
-  if (source) await importSource(editor, source);
-}
-
-/**
- * The import of a file that was already chosen: by "Import HTML", or by "Load from file" of the
- * welcome screen, whose dialog offers HTML beside the app's own files.
+ * The import of an HTML file that was chosen in "Import…" of the File menu, whose dialog offers
+ * every kind of file the app imports, or in "Load from file" of the welcome screen, which offers
+ * them beside the app's own files. The agent's plan is shown for approval first (SPEC 13.3 step
+ * 3). A file that could not be opened or loaded is said in a dialog, like a document that could
+ * not be opened.
  */
 export async function importSource(editor: Editor, source: ImportSource): Promise<void> {
+  // One at a time: a file that is still loading is the import that was asked for.
   if (importOpening.getState()) return;
   try {
     await startImport(editor, source, { confirm: true });
