@@ -1470,8 +1470,15 @@
   },
   "export": {
     "title": "Exportar presentación",
+    "intro": "Un archivo que se abre sin Slidr: elige el formato y lo que incluye, y guárdalo.",
     "description": "Un solo archivo que se reproduce en cualquier navegador, con o sin internet.",
     "descriptionBeside": "Un archivo que se reproduce en cualquier navegador, con o sin internet, y una carpeta junto a él con el video y el audio.",
+    "steps": "Pasos de la exportación",
+    "stepContent": "Contenido",
+    "stepSave": "Guardar",
+    "formatQuestion": "¿En qué formato quieres exportar?",
+    "continue": "Continuar",
+    "back": "Atrás",
     "close": "Cerrar",
     "cancel": "Cancelar",
     "export": "Exportar",
@@ -1493,6 +1500,7 @@
     "animations": {
       "label": "Animaciones y transiciones",
       "with": "Incluidas",
+      "withHint": "Las diapositivas se construyen y cambian como en la presentación.",
       "without": "Sin ellas",
       "withoutHint": "Cada diapositiva se muestra completa y la siguiente aparece de inmediato."
     },
@@ -2415,7 +2423,7 @@
   "pptx": {
     "filter": "Presentación de PowerPoint",
     "export": {
-      "description": "Un archivo .pptx que se abre en PowerPoint, Keynote y Presentaciones de Google, con cada texto, forma, tabla y gráfico editable.",
+      "description": "Se abre en PowerPoint, Keynote y Presentaciones de Google, y todo en él se puede editar.",
       "working": "Exportando la presentación…",
       "mediaOne": "Un archivo multimedia dentro del archivo, {{size}}",
       "mediaMany": "{{n}} archivos multimedia dentro del archivo, {{size}}",
@@ -2590,7 +2598,6 @@
       "open": "Abrir…",
       "recent": "Abrir reciente",
       "noRecent": "No hay archivos recientes",
-      "import": "Importar…",
       "export": "Exportar…",
       "missing": "No se encontró el archivo",
       "save": "Guardar",
@@ -2599,7 +2606,6 @@
       "properties": "Propiedades de la presentación…",
       "filter": "Presentación de Slidr",
       "filterAll": "Todos los archivos que Slidr puede cargar",
-      "filterImport": "Todos los archivos que Slidr puede importar",
       "importUnknown": "Este tipo de archivo no se puede importar",
       "importKinds": "Slidr importa: {{kinds}}.",
       "unsavedTitle": "¿Quieres guardar los cambios en “{{name}}”?",

@@ -1462,8 +1462,15 @@
   },
   "export": {
     "title": "Ekspor presentasi",
+    "intro": "File yang terbuka tanpa Slidr: pilih format dan isinya, lalu simpan.",
     "description": "Satu file yang dapat diputar di browser apa pun, dengan atau tanpa internet.",
     "descriptionBeside": "File yang dapat diputar di browser apa pun, dengan atau tanpa internet, beserta folder di sebelahnya yang berisi video dan audio.",
+    "steps": "Langkah ekspor",
+    "stepContent": "Isi",
+    "stepSave": "Simpan",
+    "formatQuestion": "Ekspor dalam format apa?",
+    "continue": "Lanjutkan",
+    "back": "Kembali",
     "close": "Tutup",
     "cancel": "Batal",
     "export": "Ekspor",
@@ -1485,6 +1492,7 @@
     "animations": {
       "label": "Animasi dan transisi",
       "with": "Disertakan",
+      "withHint": "Slide tersusun dan berganti seperti saat presentasi.",
       "without": "Tanpa",
       "withoutHint": "Setiap slide ditampilkan utuh, dan slide berikutnya langsung muncul."
     },
@@ -2403,7 +2411,7 @@
   "pptx": {
     "filter": "Presentasi PowerPoint",
     "export": {
-      "description": "File .pptx yang dapat dibuka di PowerPoint, Keynote, dan Google Slide, dengan setiap teks, bentuk, tabel, dan diagram di dalamnya dapat diedit.",
+      "description": "Terbuka di PowerPoint, Keynote, dan Google Slide, dan semua isinya dapat diedit.",
       "working": "Mengekspor presentasi…",
       "mediaOne": "Satu file media di dalam file, {{size}}",
       "mediaMany": "{{n}} file media di dalam file, {{size}}",
@@ -2578,7 +2586,6 @@
       "open": "Buka…",
       "recent": "Buka terbaru",
       "noRecent": "Tidak ada file terbaru",
-      "import": "Impor…",
       "export": "Ekspor…",
       "missing": "File tidak ditemukan",
       "save": "Simpan",
@@ -2587,7 +2594,6 @@
       "properties": "Properti presentasi…",
       "filter": "Presentasi Slidr",
       "filterAll": "Semua file yang dapat dimuat Slidr",
-      "filterImport": "Semua file yang dapat diimpor Slidr",
       "importUnknown": "Jenis file ini tidak dapat diimpor",
       "importKinds": "Slidr mengimpor: {{kinds}}.",
       "unsavedTitle": "Simpan perubahan pada “{{name}}”?",

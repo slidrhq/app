@@ -25,12 +25,15 @@ import {
 const shot = (name: string) =>
   fileURLToPath(new URL(`../test-results/objects/${name}.png`, import.meta.url));
 
-async function openDialog(page: Page, label = 'ייצוא') {
+/** Opens the export card from the File menu and goes on from the format, HTML, to its choices. */
+async function openExport(page: Page, label = 'ייצוא') {
   await page.getByTestId('file-menu-trigger').click();
   await page.getByRole('menuitem', { name: `${label}…`, exact: true }).click();
-  const dialog = page.getByTestId('export-dialog');
-  await expect(dialog).toBeVisible();
-  return dialog;
+  const card = page.getByTestId('export-card');
+  await expect(card).toBeVisible();
+  await card.getByTestId('export-continue').click();
+  await expect(card).toHaveAttribute('data-step', 'content');
+  return card;
 }
 
 /** A video and a sound on the first slide. */
@@ -45,14 +48,14 @@ async function withClips(page: Page, media: TestMedia) {
   return { video, sound };
 }
 
-/** Runs the export of the open dialog and collects what the browser downloaded, by file name. */
+/** Runs the export of the open card and collects what the browser downloaded, by file name. */
 async function exported(page: Page, count: number): Promise<Map<string, string>> {
   const downloads: Download[] = [];
   const collect = (download: Download) => downloads.push(download);
   page.on('download', collect);
   await page.getByTestId('export-run').click();
   await expect.poll(() => downloads.length, { timeout: 20_000 }).toBe(count);
-  await expect(page.getByTestId('export-dialog')).toHaveAttribute('data-phase', 'done');
+  await expect(page.getByTestId('export-card')).toHaveAttribute('data-phase', 'done');
   page.off('download', collect);
   const files = new Map<string, string>();
   for (const download of downloads) {
@@ -64,14 +67,14 @@ async function exported(page: Page, count: number): Promise<Map<string, string>>
   return files;
 }
 
-/** A size as the dialog writes it, read back as a number of bytes, roughly. */
+/** A size as the card writes it, read back as a number of bytes, roughly. */
 const kB = (bytes: number) => `${Math.round(bytes / 1000)} kB`;
 
 test('a deck without video or audio is not asked where its media goes', async ({ page }) => {
   await openApp(page);
-  const dialog = await openDialog(page);
-  await expect(dialog.getByRole('radiogroup', { name: 'אנימציות ומעברים' })).toBeVisible();
-  await expect(dialog.getByRole('radiogroup', { name: 'וידאו ואודיו' })).toHaveCount(0);
+  const card = await openExport(page);
+  await expect(card.getByRole('radiogroup', { name: 'אנימציות ומעברים' })).toBeVisible();
+  await expect(card.getByRole('radiogroup', { name: 'וידאו ואודיו' })).toHaveCount(0);
   await expect(page.getByTestId('export-media')).toHaveCount(0);
 });
 
@@ -81,9 +84,9 @@ test('media goes into the file by default: the size is said first, and the repor
 }) => {
   const media = await openWithMedia(page);
   const { video, sound } = await withClips(page, media);
-  const dialog = await openDialog(page);
+  const card = await openExport(page);
 
-  const where = dialog.getByRole('radiogroup', { name: 'וידאו ואודיו' });
+  const where = card.getByRole('radiogroup', { name: 'וידאו ואודיו' });
   await expect(where.getByRole('radio', { name: 'בתוך הקובץ' })).toBeChecked();
   // What the two files add to the file, said before the export: four characters for three bytes.
   const inFile = Math.ceil((media.video.length + media.sound.length) / 3) * 4;
@@ -132,8 +135,8 @@ test('media goes into a folder beside the file: the file refers to it, and plays
 }) => {
   const media = await openWithMedia(page);
   const { video, sound } = await withClips(page, media);
-  const dialog = await openDialog(page);
-  await dialog.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
+  const card = await openExport(page);
+  await card.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
   const hint = page.getByTestId('export-media');
   await expect(hint).toContainText('2 קובצי מדיה');
   // Beside the file the media weighs what its files weigh.
@@ -205,21 +208,30 @@ test('media goes into a folder beside the file: the file refers to it, and plays
   expect(pageProblems(page)).toEqual([]);
 });
 
-test('the dialog says one file only while the media goes inside it (ADR-057)', async ({ page }) => {
+test('the card says one file only while the media goes inside it (ADR-057)', async ({ page }) => {
   const media = await openWithMedia(page);
   await withClips(page, media);
-  const dialog = await openDialog(page);
-  await expect(dialog).toHaveAccessibleDescription('קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.');
-  await dialog.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
-  await expect(dialog).toHaveAccessibleDescription(
+  const card = await openExport(page);
+  await card.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
+  await expect(page.getByTestId('export-media')).toContainText('התיקייה צריכה לעבור יחד עם הקובץ');
+  // The format says it as well: an HTML page with a folder beside it.
+  await card.getByTestId('export-back').click();
+  const html = card.getByRole('radio', { name: 'דף HTML' });
+  await expect(html).toHaveAccessibleDescription(
     'קובץ שמתנגן בכל דפדפן, גם בלי אינטרנט, ולידו תיקייה עם הווידאו והאודיו.',
   );
-  // The report of a file exported that way says the same.
+  await card.getByTestId('export-continue').click();
+  // The report of a file exported that way says where the media went.
   await exported(page, 3);
-  await expect(dialog).toHaveAccessibleDescription(/ולידו תיקייה עם הווידאו והאודיו/);
-  await dialog.getByRole('button', { name: 'ייצוא נוסף' }).click();
-  await dialog.getByRole('radio', { name: 'בתוך הקובץ' }).click();
-  await expect(dialog).toHaveAccessibleDescription('קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.');
+  await expect(page.getByTestId('export-media-folder')).toBeVisible();
+  await expect(card).not.toContainText('קובץ אחד');
+  // Another export, with the media inside: one file again.
+  await card.getByRole('button', { name: 'ייצוא נוסף' }).click();
+  await expect(html).toHaveAccessibleDescription(/ולידו תיקייה/);
+  await card.getByTestId('export-continue').click();
+  await card.getByRole('radio', { name: 'בתוך הקובץ' }).click();
+  await card.getByTestId('export-back').click();
+  await expect(html).toHaveAccessibleDescription('קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.');
   expect(pageProblems(page)).toEqual([]);
 });
 
@@ -237,11 +249,11 @@ test('only the media of the slides that are exported counts', async ({ page }) =
     editor.selection.getState().setCurrentSlide('s_second');
   });
   await addClip(page, 'video', media.video);
-  const dialog = await openDialog(page);
+  const card = await openExport(page);
   await expect(page.getByTestId('export-media')).toContainText('2 קובצי מדיה');
-  await dialog.getByRole('radio', { name: 'טווח' }).click();
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).fill('1');
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
+  await card.getByRole('radio', { name: 'טווח' }).click();
+  await card.getByRole('textbox', { name: 'עד שקף' }).fill('1');
+  await card.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
   await expect(page.getByTestId('export-count')).toHaveText('ייוצא שקף אחד.');
   await expect(page.getByTestId('export-media')).toContainText('קובץ מדיה אחד');
 });
@@ -265,25 +277,25 @@ test('large media is warned about, and media too large for one file can only go 
 
   // 60 MB of video is 80 MB in the file: more than is easy to send.
   await claim(page, 60_000_000);
-  let dialog = await openDialog(page);
+  let card = await openExport(page);
   const hint = page.getByTestId('export-media');
   await expect(hint).toHaveAttribute('data-warning', 'true');
   await expect(hint).toHaveAttribute('role', 'status');
   await expect(hint).toContainText('80 MB');
   await expect(hint).toContainText('אפשר לשמור את המדיה בתיקייה ליד הקובץ');
-  await expect(dialog.getByRole('radio', { name: 'בתוך הקובץ' })).toBeChecked();
+  await expect(card.getByRole('radio', { name: 'בתוך הקובץ' })).toBeChecked();
   await page.screenshot({ path: shot('media-export-warning-light-he') });
   // Beside the file there is nothing to warn about.
-  await dialog.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
+  await card.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
   await expect(hint).toHaveAttribute('data-warning', 'false');
   await expect(hint).toContainText('60 MB');
-  await dialog.getByRole('button', { name: 'ביטול' }).click();
+  await card.getByTestId('export-close').click();
 
   // 400 MB cannot go into one file at all.
   await claim(page, 400_000_000);
-  dialog = await openDialog(page);
-  await expect(dialog.getByRole('radio', { name: 'בתוך הקובץ' })).toBeDisabled();
-  await expect(dialog.getByRole('radio', { name: 'בתיקייה ליד הקובץ' })).toBeChecked();
+  card = await openExport(page);
+  await expect(card.getByRole('radio', { name: 'בתוך הקובץ' })).toBeDisabled();
+  await expect(card.getByRole('radio', { name: 'בתיקייה ליד הקובץ' })).toBeChecked();
   await expect(hint).toHaveAttribute('data-warning', 'true');
   await expect(hint).toContainText('יותר ממה שקובץ אחד יכול להכיל');
   await expect(hint).toContainText('400 MB');
@@ -331,8 +343,8 @@ test('media whose file is not at hand is said to be missing, beside the file too
       },
     ]);
   });
-  const dialog = await openDialog(page);
-  await dialog.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
+  const card = await openExport(page);
+  await card.getByRole('radio', { name: 'בתיקייה ליד הקובץ' }).click();
   await exported(page, 1);
   await expect(page.getByTestId('export-warnings')).toHaveText(
     /^הנכס .lost\.mp3. לא נקרא, והוא חסר בקובץ\.$/,
@@ -342,12 +354,12 @@ test('media whose file is not at hand is said to be missing, beside the file too
 
 for (const theme of ['light', 'dark'] as const) {
   for (const lang of ['he', 'en'] as const) {
-    test(`the media choice of the export dialog, ${theme} ${lang}`, async ({ page }) => {
+    test(`the media choice of the export card, ${theme} ${lang}`, async ({ page }) => {
       await openApp(page, { lang, theme });
       const media = await testMedia(page);
       await withClips(page, media);
       const label = lang === 'he' ? 'ייצוא' : 'Export';
-      await openDialog(page, label);
+      await openExport(page, label);
       await page.screenshot({ path: shot(`media-export-choice-${theme}-${lang}`) });
       await page.setViewportSize({ width: 1366, height: 768 });
       await page.screenshot({ path: shot(`media-export-choice-${theme}-${lang}-1366`) });

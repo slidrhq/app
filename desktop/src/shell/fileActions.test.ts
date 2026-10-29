@@ -7,7 +7,6 @@ import { answer, pendingDialog } from './dialogs';
 import { createEditor, type Editor } from './editor';
 import {
   confirmDiscard,
-  importFile,
   loadFile,
   newDocument,
   openDocument,
@@ -22,6 +21,10 @@ const dialog = vi.hoisted(() => ({
   save: vi.fn<() => Promise<string | null>>(),
 }));
 vi.mock('@tauri-apps/plugin-dialog', () => dialog);
+
+/** The page's own file picker, which a plain browser has instead of the system's dialog. */
+const picker = vi.hoisted(() => ({ pickFiles: vi.fn<(accept: string) => Promise<File[]>>() }));
+vi.mock('./pickFiles', () => picker);
 
 /** Just enough storage: workspaces and files in memory, and a log of what was asked. */
 function fakeStorage() {
@@ -114,6 +117,7 @@ beforeEach(() => {
   sessionStorage.clear();
   dialog.open.mockReset();
   dialog.save.mockReset();
+  picker.pickFiles.mockReset();
 });
 
 describe('without storage (a plain browser)', () => {
@@ -139,6 +143,43 @@ describe('without storage (a plain browser)', () => {
     const editor = createEditor({ lang: 'he', storage: null });
     expect(await confirmDiscard(editor)).toBe(true);
     expect(pendingDialog()).toBeNull();
+  });
+
+  it('opens through the page’s picker: the files of the importers', async () => {
+    // There are no files of the app's own, and the imports are what opens.
+    const editor = createEditor({ lang: 'he', storage: null });
+    const imported: string[] = [];
+    const importer = (id: string, extensions: string[]): FileImporter => ({
+      id,
+      extensions,
+      filterName: () => id.toUpperCase(),
+      open: (path) => imported.push(`${id} path ${path}`),
+      openFile: (file) => imported.push(`${id} ${file.name}`),
+    });
+    const importers = [importer('html', ['html', 'htm']), importer('pptx', ['pptx'])];
+    const file = (name: string) => new File(['x'], name);
+
+    picker.pickFiles.mockResolvedValueOnce([file('Review.PPTX')]);
+    expect(await loadFile(editor, importers)).toBe(true);
+    picker.pickFiles.mockResolvedValueOnce([file('deck.htm')]);
+    expect(await loadFile(editor, importers)).toBe(true);
+    expect(imported).toEqual(['pptx Review.PPTX', 'html deck.htm']);
+    // Every file that is imported, never the app's own; no system dialog.
+    expect(picker.pickFiles).toHaveBeenLastCalledWith('.html,.htm,.pptx');
+    expect(dialog.open).not.toHaveBeenCalled();
+
+    // A file of no importer's kind, chosen with "All files", is refused and said.
+    picker.pickFiles.mockResolvedValueOnce([file('talk.slidr')]);
+    const refusing = loadFile(editor, importers);
+    await vi.waitFor(() => expect(pendingDialog()?.body).toContain('HTML, PPTX'));
+    answer('ok');
+    expect(await refusing).toBe(false);
+
+    // A picker that was cancelled changes nothing, and with no importer there is nothing to open.
+    picker.pickFiles.mockResolvedValueOnce([]);
+    expect(await loadFile(editor, importers)).toBe(false);
+    expect(await loadFile(editor, [])).toBe(false);
+    expect(imported).toHaveLength(2);
   });
 });
 
@@ -610,51 +651,6 @@ describe('with storage', () => {
     dialog.open.mockResolvedValueOnce(null);
     expect(await loadFile(editor, [html])).toBe(false);
     expect(imported).toHaveLength(1);
-  });
-
-  it('imports from one dialog: each file goes to the importer of its kind', async () => {
-    const { storage, log } = fakeStorage();
-    const editor = createEditor({ lang: 'he', storage });
-    await startDocument(editor);
-    const imported: string[] = [];
-    const importer = (id: string, extensions: string[]): FileImporter => ({
-      id,
-      extensions,
-      filterName: () => id.toUpperCase(),
-      open: (path) => imported.push(`${id} ${path}`),
-      openFile: (file) => imported.push(`${id} ${file.name}`),
-    });
-    const importers = [importer('html', ['html', 'htm']), importer('pptx', ['pptx'])];
-
-    dialog.open.mockResolvedValueOnce('C:\\decks\\Review.PPTX');
-    expect(await importFile(editor, importers)).toBe(true);
-    dialog.open.mockResolvedValueOnce('C:\\pages\\deck.htm');
-    expect(await importFile(editor, importers)).toBe(true);
-    expect(imported).toEqual(['pptx C:\\decks\\Review.PPTX', 'html C:\\pages\\deck.htm']);
-    // Every file that is imported, then each kind of them on its own: never the app's own files.
-    expect(dialog.open).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        multiple: false,
-        filters: [
-          { name: expect.any(String) as string, extensions: ['html', 'htm', 'pptx'] },
-          { name: 'HTML', extensions: ['html', 'htm'] },
-          { name: 'PPTX', extensions: ['pptx'] },
-        ],
-      }),
-    );
-
-    // A file of no importer's kind is refused and said, and nothing is opened.
-    dialog.open.mockResolvedValueOnce('C:\\decks\\talk.slidr');
-    const refusing = importFile(editor, importers);
-    await vi.waitFor(() => expect(pendingDialog()?.body).toContain('HTML, PPTX'));
-    answer('ok');
-    expect(await refusing).toBe(false);
-    expect(log).not.toContain('open C:\\decks\\talk.slidr');
-
-    // A dialog that was cancelled changes nothing.
-    dialog.open.mockResolvedValueOnce(null);
-    expect(await importFile(editor, importers)).toBe(false);
-    expect(imported).toHaveLength(2);
   });
 
   it('lets go of the workspace when the window closes', async () => {

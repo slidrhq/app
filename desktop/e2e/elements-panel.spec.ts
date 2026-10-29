@@ -1174,7 +1174,7 @@ test('frames are in the exported file as they are on the slide', async ({ page }
 
   await page.getByTestId('file-menu-trigger').click();
   await page.getByRole('menuitem', { name: 'Export…', exact: true }).click();
-  await expect(page.getByTestId('export-dialog')).toBeVisible();
+  await page.getByTestId('export-continue').click();
   const download = page.waitForEvent('download');
   await page.getByTestId('export-run').click();
   const html = readFileSync(await (await download).path(), 'utf8');

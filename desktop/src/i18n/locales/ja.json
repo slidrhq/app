@@ -1462,8 +1462,15 @@
   },
   "export": {
     "title": "プレゼンテーションのエクスポート",
+    "intro": "Slidr がなくても開けるファイルです。形式と含める内容を選んで保存します。",
     "description": "どのブラウザーでも再生できる 1 つのファイルです。インターネットに接続していなくても再生できます。",
     "descriptionBeside": "どのブラウザーでも再生できるファイルと、ビデオとオーディオを入れたフォルダーをファイルの隣に作成します。インターネットに接続していなくても再生できます。",
+    "steps": "エクスポートの手順",
+    "stepContent": "内容",
+    "stepSave": "保存",
+    "formatQuestion": "どの形式でエクスポートしますか？",
+    "continue": "続行",
+    "back": "戻る",
     "close": "閉じる",
     "cancel": "キャンセル",
     "export": "エクスポート",
@@ -1485,6 +1492,7 @@
     "animations": {
       "label": "アニメーションと画面切り替え",
       "with": "含める",
+      "withHint": "スライドショーと同じように、スライドが組み立てられて切り替わります。",
       "without": "含めない",
       "withoutHint": "各スライドは最初からすべて表示され、次のスライドへはすぐに切り替わります。"
     },
@@ -2403,7 +2411,7 @@
   "pptx": {
     "filter": "PowerPoint プレゼンテーション",
     "export": {
-      "description": "PowerPoint、Keynote、Google スライドで開ける .pptx ファイルです。テキスト、図形、表、グラフはすべて編集できます。",
+      "description": "PowerPoint、Keynote、Google スライドで開け、中身はすべて編集できます。",
       "working": "プレゼンテーションをエクスポートしています…",
       "mediaOne": "ファイル内のメディア ファイル 1 個、{{size}}",
       "mediaMany": "ファイル内のメディア ファイル {{n}} 個、{{size}}",
@@ -2578,7 +2586,6 @@
       "open": "開く…",
       "recent": "最近使ったファイルを開く",
       "noRecent": "最近使ったファイルはありません",
-      "import": "インポート…",
       "export": "エクスポート…",
       "missing": "ファイルが見つかりません",
       "save": "保存",
@@ -2587,7 +2594,6 @@
       "properties": "プレゼンテーションのプロパティ…",
       "filter": "Slidr プレゼンテーション",
       "filterAll": "Slidr で読み込めるすべてのファイル",
-      "filterImport": "Slidr でインポートできるすべてのファイル",
       "importUnknown": "この種類のファイルはインポートできません",
       "importKinds": "Slidr でインポートできるファイル: {{kinds}}。",
       "unsavedTitle": "「{{name}}」への変更を保存しますか？",

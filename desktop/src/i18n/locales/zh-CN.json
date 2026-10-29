@@ -1462,8 +1462,15 @@
   },
   "export": {
     "title": "导出演示文稿",
+    "intro": "无需 Slidr 也能打开的文件：选择格式和要包含的内容，然后保存。",
     "description": "一个可在任何浏览器中播放的文件，联网或离线均可。",
     "descriptionBeside": "一个可在任何浏览器中播放的文件（联网或离线均可），旁边另有一个存放视频和音频的文件夹。",
+    "steps": "导出步骤",
+    "stepContent": "内容",
+    "stepSave": "保存",
+    "formatQuestion": "要导出为哪种格式？",
+    "continue": "继续",
+    "back": "返回",
     "close": "关闭",
     "cancel": "取消",
     "export": "导出",
@@ -1485,6 +1492,7 @@
     "animations": {
       "label": "动画和切换效果",
       "with": "包含",
+      "withHint": "幻灯片会像放映时一样逐步出现并切换。",
       "without": "不包含",
       "withoutHint": "每张幻灯片都会完整显示，并立即切换到下一张。"
     },
@@ -2403,7 +2411,7 @@
   "pptx": {
     "filter": "PowerPoint 演示文稿",
     "export": {
-      "description": "可在 PowerPoint、Keynote 和 Google 幻灯片中打开的 .pptx 文件，其中的每段文字、每个形状、表格和图表都可以编辑。",
+      "description": "可在 PowerPoint、Keynote 和 Google 幻灯片中打开，其中的所有内容都可编辑。",
       "working": "正在导出演示文稿…",
       "mediaOne": "文件中有 1 个媒体文件，{{size}}",
       "mediaMany": "文件中有 {{n}} 个媒体文件，{{size}}",
@@ -2578,7 +2586,6 @@
       "open": "打开…",
       "recent": "打开最近使用的文件",
       "noRecent": "没有最近使用的文件",
-      "import": "导入…",
       "export": "导出…",
       "missing": "找不到文件",
       "save": "保存",
@@ -2587,7 +2594,6 @@
       "properties": "演示文稿属性…",
       "filter": "Slidr 演示文稿",
       "filterAll": "Slidr 可加载的所有文件",
-      "filterImport": "Slidr 可导入的所有文件",
       "importUnknown": "无法导入此类文件",
       "importKinds": "Slidr 可导入：{{kinds}}。",
       "unsavedTitle": "是否保存对“{{name}}”的更改？",

@@ -348,8 +348,8 @@ export function DecomposeDialog({
 let closing: (() => void) | undefined;
 
 /**
- * Opens the dialog for one `html` element. A React root of its own, like the export dialog: it
- * has a preview and a report, which the shell's question dialog does not. Does nothing while it
+ * Opens the dialog for one `html` element. A React root of its own, like the import report of
+ * PowerPoint (`pptx/open.tsx`): it has a preview and a report, which the shell's question dialog does not. Does nothing while it
  * is open already.
  */
 export function openDecomposeDialog(editor: Editor, slideId: string, elementId: string): void {

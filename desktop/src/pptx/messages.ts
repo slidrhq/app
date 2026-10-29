@@ -2,7 +2,7 @@ import type { Messages } from '../i18n/he';
 
 /**
  * The strings of PowerPoint export and import (ADR-108). English has the same keys
- * (`registerMessages` checks). What the export dialog says of every format (its title, the
+ * (`registerMessages` checks). What the export card says of every format (its title, the
  * slides, the animations, the buttons) is read from its namespace, `export`. A warning names the
  * slides it is on with `slides`; `{{detail}}` is the font, the file or the kind of object it is
  * about.
@@ -10,8 +10,7 @@ import type { Messages } from '../i18n/he';
 export const he = {
   filter: 'מצגת PowerPoint',
   export: {
-    description:
-      'קובץ ‎.pptx שנפתח ב-PowerPoint, ב-Keynote וב-Google Slides, וכל טקסט, צורה, טבלה ותרשים בו ניתנים לעריכה.',
+    description: 'נפתח ב-PowerPoint, ב-Keynote וב-Google Slides, וכל מה שבו ניתן לעריכה.',
     working: 'מייצא את המצגת…',
     mediaOne: 'קובץ מדיה אחד בתוך הקובץ, {{size}}',
     mediaMany: '{{n}} קובצי מדיה בתוך הקובץ, {{size}}',
@@ -71,8 +70,7 @@ export const he = {
 export const en: Messages<typeof he> = {
   filter: 'PowerPoint presentation',
   export: {
-    description:
-      'A .pptx file that opens in PowerPoint, Keynote and Google Slides, with every text, shape, table and chart in it editable.',
+    description: 'Opens in PowerPoint, Keynote and Google Slides, with everything in it editable.',
     working: 'Exporting the deck…',
     mediaOne: 'One media file inside the file, {{size}}',
     mediaMany: '{{n}} media files inside the file, {{size}}',

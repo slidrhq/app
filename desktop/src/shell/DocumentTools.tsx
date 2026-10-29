@@ -4,7 +4,6 @@ import {
   ChevronDown,
   FileCog,
   FilePlus,
-  FileInput,
   FolderOpen,
   History,
   House,
@@ -33,7 +32,7 @@ import {
 import type { RecentFile } from '../document/storage';
 import { useDeck, useEditor, useFile } from './editor';
 import {
-  importFile,
+  loadFile,
   newDocument,
   openDocument,
   recentFiles,
@@ -169,8 +168,9 @@ function FileMenu() {
   // Find and replace is another area's: the menu offers what its shortcut does, when it is there.
   const find = useShortcut('find.replace');
   const focusTaken = useRef(false);
-  // So are the imports, of HTML and of PowerPoint (ADR-108): one dialog offers the files of all
-  // of them, and the area of the one chosen asks about the open document if it has work.
+  // So are the imports, of HTML and of PowerPoint (ADR-108): "Open…" offers their files with the
+  // app's own (ADR-123), and the area of the one chosen asks about the open document if it has
+  // work. In a plain browser they are all that opens.
   const importers = useImporters();
   // And the export, whose dialog asks for the format first.
   const runExport = useAction('export');
@@ -210,8 +210,9 @@ function FileMenu() {
         <DropdownMenuItem
           icon={FolderOpen}
           shortcut="Ctrl+O"
-          disabled={!hasStorage}
-          onSelect={() => void openDocument(editor)}
+          data-testid="file-open"
+          disabled={!hasStorage && importers.length === 0}
+          onSelect={() => void loadFile(editor, importers)}
         >
           {t('file.open')}
         </DropdownMenuItem>
@@ -254,15 +255,6 @@ function FileMenu() {
           {t('file.saveAs')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {importers.length > 0 && (
-          <DropdownMenuItem
-            icon={FileInput}
-            data-testid="file-import"
-            onSelect={() => void importFile(editor, importers)}
-          >
-            {t('file.import')}
-          </DropdownMenuItem>
-        )}
         <DropdownMenuItem
           icon={Share}
           data-testid="file-export"

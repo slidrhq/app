@@ -5,8 +5,8 @@ import { EditorProvider, focusStage, type Editor } from '../shell';
 import { DeckProperties } from './DeckProperties';
 
 /*
- * The deck's properties are a React root of their own, like the export dialog, with the editor
- * given to it so its fields follow the deck as it changes.
+ * The deck's properties are a React root of their own, modal like the shell's dialogs, with the
+ * editor given to it so its fields follow the deck as it changes.
  */
 
 let closing: (() => void) | undefined;

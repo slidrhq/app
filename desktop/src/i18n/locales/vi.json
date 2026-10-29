@@ -1462,8 +1462,15 @@
   },
   "export": {
     "title": "Xuất bản trình bày",
+    "intro": "Một tệp mở được cả khi không có Slidr: chọn định dạng và nội dung, rồi lưu lại.",
     "description": "Một tệp duy nhất phát được trên mọi trình duyệt, dù có hay không có internet.",
     "descriptionBeside": "Một tệp phát được trên mọi trình duyệt, dù có hay không có internet, kèm một thư mục bên cạnh chứa video và âm thanh.",
+    "steps": "Các bước xuất",
+    "stepContent": "Nội dung",
+    "stepSave": "Lưu",
+    "formatQuestion": "Bạn muốn xuất ở định dạng nào?",
+    "continue": "Tiếp tục",
+    "back": "Quay lại",
     "close": "Đóng",
     "cancel": "Hủy",
     "export": "Xuất",
@@ -1485,6 +1492,7 @@
     "animations": {
       "label": "Hiệu ứng động và chuyển tiếp",
       "with": "Bao gồm",
+      "withHint": "Các trang chiếu được dựng và chuyển như khi trình chiếu.",
       "without": "Không bao gồm",
       "withoutHint": "Mỗi trang chiếu hiển thị trọn vẹn ngay và trang tiếp theo xuất hiện tức thì."
     },
@@ -2403,7 +2411,7 @@
   "pptx": {
     "filter": "Bản trình bày PowerPoint",
     "export": {
-      "description": "Một tệp .pptx mở được trong PowerPoint, Keynote và Google Trang trình bày, trong đó mọi văn bản, hình, bảng và biểu đồ đều chỉnh sửa được.",
+      "description": "Mở được trong PowerPoint, Keynote và Google Trang trình bày, mọi nội dung đều chỉnh sửa được.",
       "working": "Đang xuất bản trình bày…",
       "mediaOne": "Một tệp đa phương tiện trong tệp, {{size}}",
       "mediaMany": "{{n}} tệp đa phương tiện trong tệp, {{size}}",
@@ -2578,7 +2586,6 @@
       "open": "Mở…",
       "recent": "Mở gần đây",
       "noRecent": "Không có tệp gần đây",
-      "import": "Nhập…",
       "export": "Xuất…",
       "missing": "Không tìm thấy tệp",
       "save": "Lưu",
@@ -2587,7 +2594,6 @@
       "properties": "Thuộc tính bản trình bày…",
       "filter": "Bản trình bày Slidr",
       "filterAll": "Tất cả tệp Slidr có thể mở",
-      "filterImport": "Tất cả tệp Slidr có thể nhập",
       "importUnknown": "Không thể nhập loại tệp này",
       "importKinds": "Slidr nhập được: {{kinds}}.",
       "unsavedTitle": "Lưu thay đổi cho “{{name}}”?",

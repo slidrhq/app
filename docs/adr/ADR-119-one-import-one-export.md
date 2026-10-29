@@ -1,6 +1,6 @@
 # ADR-119 — One Import and one Export in the File menu
 
-Status: Implemented on 2026-10-28 in the app. It changes how the File menu reaches the imports of [ADR-036](ADR-036-html-import.md) and [ADR-108](ADR-108-powerpoint-files.md) and the exports of [ADR-032](ADR-032-export-dialog-and-fonts.md) and ADR-108; what each import and export does is unchanged.
+Status: Implemented on 2026-10-28 in the app. Superseded in part by [ADR-123](ADR-123-open-every-file-and-export-in-the-chat.md) on 2026-10-29: "Import…" is gone ("Open…" takes every file), and the export dialog is a card of the AI chat. It changes how the File menu reaches the imports of [ADR-036](ADR-036-html-import.md) and [ADR-108](ADR-108-powerpoint-files.md) and the exports of [ADR-032](ADR-032-export-dialog-and-fonts.md) and ADR-108; what each import and export does is unchanged.
 
 ## Request
 

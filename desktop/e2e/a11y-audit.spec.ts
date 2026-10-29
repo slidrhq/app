@@ -394,24 +394,27 @@ test('the dialogs: the shortcut map and its editor, export, a question', async (
   await page.keyboard.press('Escape');
   await expect(map).toBeHidden();
 
+  // The export card of the AI chat (ADR-123): its format, and its choices.
   await page.getByTestId('file-menu-trigger').click();
   await page.getByRole('menuitem', { name: 'Export…' }).click();
-  await expect(page.getByTestId('export-dialog')).toBeVisible();
-  await survey.audit('the export dialog');
-  await survey.popups('[data-testid="export-dialog"]', 'the export dialog');
+  const card = page.getByTestId('export-card');
+  await expect(card).toBeVisible();
+  await survey.audit('the export card');
+  await card.getByTestId('export-continue').click();
+  await expect(card).toHaveAttribute('data-step', 'content');
+  await survey.audit('the export card, its choices');
   await page.keyboard.press('Escape');
-  await expect(page.getByTestId('export-dialog')).toBeHidden();
+  await expect(card).toBeHidden();
 
   // PowerPoint (ADR-108): the export's choices and its report, and the report of an import.
   await page.getByTestId('file-menu-trigger').click();
   await page.getByTestId('file-export').click();
-  const pptx = page.getByTestId('export-dialog');
+  const pptx = page.getByTestId('export-card');
   await expect(pptx).toBeVisible();
-  await pptx.getByRole('combobox', { name: 'Format' }).click();
-  await page.getByRole('option', { name: 'PowerPoint presentation' }).click();
+  await pptx.getByRole('radio', { name: 'PowerPoint presentation' }).click();
   await expect(pptx).toHaveAttribute('data-format', 'pptx');
-  await survey.audit('the PowerPoint export dialog');
-  await survey.popups('[data-testid="export-dialog"]', 'the PowerPoint export dialog');
+  await pptx.getByTestId('export-continue').click();
+  await survey.audit('the PowerPoint export card');
   await page.getByTestId('export-run').click();
   await expect(pptx).toHaveAttribute('data-phase', 'done');
   await survey.audit('the PowerPoint export report');

@@ -7,8 +7,8 @@ import { focusStage } from '../shell';
 import { ImportReport } from './ImportReport';
 
 /*
- * The report of a PowerPoint import is a React root of its own, as the export dialog is
- * (`export/open.tsx`): modal, one at a time.
+ * The report of a PowerPoint import is a React root of its own, modal, one at a time: the
+ * shell's `ask()` asks a question with buttons, and the report is a list.
  */
 
 let closing: (() => void) | undefined;

@@ -42,7 +42,7 @@ Design Check measures rendered ink and reports deterministic findings for layout
 
 **Working tree:** transition controls open immediately below the row containing the chosen effect and scroll that control group into view. The underlying transition schema and playback remain the same. See [ADR-080](adr/ADR-080-transition-settings.md).
 
-HTML export renders the deck into the shared slide DOM, waits for fonts and settled content, serializes shadow roots, embeds assets, and includes the shared runtime. The deck model is not embedded in the export. Users choose slide range and animation inclusion through the export dialog, accessible from the File menu. The output must open offline and preserve slide appearance and navigation. See [ADR-021](adr/ADR-021-html-export.md) and [ADR-032](adr/ADR-032-export-dialog-and-fonts.md).
+HTML export renders the deck into the shared slide DOM, waits for fonts and settled content, serializes shadow roots, embeds assets, and includes the shared runtime. The deck model is not embedded in the export. Users choose the format, the slide range and animation inclusion on the export card, which "Export…" of the File menu opens in the AI chat ([ADR-123](adr/ADR-123-open-every-file-and-export-in-the-chat.md)). The output must open offline and preserve slide appearance and navigation. See [ADR-021](adr/ADR-021-html-export.md) and [ADR-032](adr/ADR-032-export-dialog-and-fonts.md).
 
 ## 6. AI chat and Deck API
 

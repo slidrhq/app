@@ -1466,8 +1466,15 @@
   },
   "export": {
     "title": "Sunuyu dışarı aktar",
+    "intro": "Slidr olmadan da açılan bir dosya: biçimi ve içeriğini seçin, sonra kaydedin.",
     "description": "İnternet bağlantısı olsun ya da olmasın, her tarayıcıda oynatılan tek bir dosya.",
     "descriptionBeside": "İnternet bağlantısı olsun ya da olmasın, her tarayıcıda oynatılan bir dosya ve yanında video ile seslerin bulunduğu bir klasör.",
+    "steps": "Dışa aktarma adımları",
+    "stepContent": "İçerik",
+    "stepSave": "Kaydet",
+    "formatQuestion": "Hangi biçimde dışa aktarılsın?",
+    "continue": "Devam",
+    "back": "Geri",
     "close": "Kapat",
     "cancel": "İptal",
     "export": "Dışarı aktar",
@@ -1489,6 +1496,7 @@
     "animations": {
       "label": "Animasyonlar ve geçişler",
       "with": "Dahil",
+      "withHint": "Slaytlar, gösterideki gibi oluşur ve değişir.",
       "without": "Hariç",
       "withoutHint": "Her slayt bütün olarak gösterilir ve sonraki slayt hemen gelir."
     },
@@ -2409,7 +2417,7 @@
   "pptx": {
     "filter": "PowerPoint sunusu",
     "export": {
-      "description": "PowerPoint, Keynote ve Google Slaytlar’da açılan, içindeki her metnin, şeklin, tablonun ve grafiğin düzenlenebildiği bir .pptx dosyası.",
+      "description": "PowerPoint, Keynote ve Google Slaytlar’da açılır ve içindeki her şey düzenlenebilir.",
       "working": "Sunu dışarı aktarılıyor…",
       "mediaOne": "Dosyanın içinde bir medya dosyası, {{size}}",
       "mediaMany": "Dosyanın içinde {{n}} medya dosyası, {{size}}",
@@ -2584,7 +2592,6 @@
       "open": "Aç…",
       "recent": "Son kullanılanlar",
       "noRecent": "Son kullanılan dosya yok",
-      "import": "İçeri aktar…",
       "export": "Dışarı aktar…",
       "missing": "Dosya bulunamadı",
       "save": "Kaydet",
@@ -2593,7 +2600,6 @@
       "properties": "Sunu özellikleri…",
       "filter": "Slidr sunusu",
       "filterAll": "Slidr ile açılabilen tüm dosyalar",
-      "filterImport": "Slidr ile içeri aktarılabilen tüm dosyalar",
       "importUnknown": "Bu türde bir dosya içeri aktarılamaz",
       "importKinds": "Slidr şunları içeri aktarır: {{kinds}}.",
       "unsavedTitle": "“{{name}}” dosyasındaki değişiklikler kaydedilsin mi?",

@@ -150,6 +150,7 @@ for (const [deck, sign] of [
     // ---- The exported file ----
     await page.getByTestId('file-menu-trigger').click();
     await page.getByRole('menuitem', { name: 'ייצוא…', exact: true }).click();
+    await page.getByTestId('export-continue').click();
     const [download] = await Promise.all([
       page.waitForEvent('download'),
       page.getByTestId('export-run').click(),

@@ -55,6 +55,8 @@ import type {
   ToolTarget,
   UserEntry,
 } from '../agent/transcript';
+import { exportCard } from '../export/card';
+import { ExportCard } from '../export/ExportCard';
 import { pickFiles } from '../objects/insert';
 import { ask, openSettings, useDeck, useEditor } from '../shell';
 import { TemplateDraftCard } from '../templates/DraftCard';
@@ -81,7 +83,8 @@ import { activityLabel, targetSlideNumber, toolIcon, toolLabel } from './toolLab
  * that changed the deck, and a card that says what to do when the agent cannot run. There is one
  * chat, a deck session: what the user has selected goes to the agent with each message, and the
  * chip beside the composer says what that is. The conversation of an HTML import is one of its
- * conversations, on a session of its own (SPEC 13.3).
+ * conversations, on a session of its own (SPEC 13.3). The export of the File menu asks its
+ * questions here too, on a card that never reaches the agent (ADR-123).
  */
 
 /**
@@ -948,6 +951,8 @@ export function Chat({
   const state = useStore(thread.store);
   const last = state.entries.at(-1);
   const setup = useChatSetup(last?.type === 'assistant' ? last.problem : undefined);
+  // "Export…" of the File menu asks its questions here, after the conversation (ADR-123).
+  const exporting = useStore(exportCard, (s) => s.open);
   const focus = useFocus();
   const deck = scope.kind === 'deck';
   const said = closingWords(state.entries, state.busy, t('turn.interrupted'));
@@ -976,7 +981,15 @@ export function Chat({
     setup.state?.connection?.status.state !== 'ready';
 
   let content: ReactNode;
-  if (!state.ready || (state.entries.length === 0 && setup.checking)) {
+  if (exporting && state.entries.length === 0) {
+    // The export asks nothing of the agent: it is shown before the setup, or in place of the
+    // openings of an empty chat.
+    content = (
+      <div className="flex flex-col gap-4 p-4">
+        <ExportCard />
+      </div>
+    );
+  } else if (!state.ready || (state.entries.length === 0 && setup.checking)) {
     content = <Loading />;
   } else if (state.entries.length === 0 && setup.needed) {
     content = <ChatSetup setup={setup} />;
@@ -1015,6 +1028,7 @@ export function Chat({
         {state.busy && <Working activity={state.activity} stopping={state.stopping} />}
         {afterMessages}
         {setup.needed && !inCard && <ChatSetup setup={setup} midway />}
+        {exporting && <ExportCard />}
       </div>
     );
   }

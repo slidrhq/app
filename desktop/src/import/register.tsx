@@ -18,7 +18,7 @@ import {
 } from './session';
 
 /*
- * HTML import (SPEC ch. 13, WG9-T18): "Import…" of the File menu and "Load from file" of the
+ * HTML import (SPEC ch. 13, WG9-T18): "Open…" of the File menu and "Load from file" of the
  * welcome screen ask for the file, and the import is a conversation of the AI chat from its first
  * message on. See docs/adr/ADR-036-html-import.md.
  */

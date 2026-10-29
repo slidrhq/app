@@ -1470,8 +1470,15 @@
   },
   "export": {
     "title": "Exporter la présentation",
+    "intro": "Un fichier qui s’ouvre sans Slidr : choisissez le format et le contenu, puis enregistrez-le.",
     "description": "Un seul fichier lisible dans n’importe quel navigateur, avec ou sans Internet.",
     "descriptionBeside": "Un fichier lisible dans n’importe quel navigateur, avec ou sans Internet, accompagné d’un dossier contenant la vidéo et l’audio.",
+    "steps": "Étapes de l’exportation",
+    "stepContent": "Contenu",
+    "stepSave": "Enregistrement",
+    "formatQuestion": "Dans quel format exporter ?",
+    "continue": "Continuer",
+    "back": "Retour",
     "close": "Fermer",
     "cancel": "Annuler",
     "export": "Exporter",
@@ -1493,6 +1500,7 @@
     "animations": {
       "label": "Animations et transitions",
       "with": "Incluses",
+      "withHint": "Les diapositives se construisent et s’enchaînent comme pendant le diaporama.",
       "without": "Sans",
       "withoutHint": "Chaque diapositive s’affiche en entier, et la suivante apparaît immédiatement."
     },
@@ -2415,7 +2423,7 @@
   "pptx": {
     "filter": "Présentation PowerPoint",
     "export": {
-      "description": "Un fichier .pptx qui s’ouvre dans PowerPoint, Keynote et Google Slides, où chaque texte, forme, tableau et graphique reste modifiable.",
+      "description": "S’ouvre dans PowerPoint, Keynote et Google Slides, et tout y reste modifiable.",
       "working": "Exportation de la présentation…",
       "mediaOne": "Un fichier multimédia dans le fichier, {{size}}",
       "mediaMany": "{{n}} fichiers multimédias dans le fichier, {{size}}",
@@ -2590,7 +2598,6 @@
       "open": "Ouvrir…",
       "recent": "Ouvrir un fichier récent",
       "noRecent": "Aucun fichier récent",
-      "import": "Importer…",
       "export": "Exporter…",
       "missing": "Fichier introuvable",
       "save": "Enregistrer",
@@ -2599,7 +2606,6 @@
       "properties": "Propriétés de la présentation…",
       "filter": "Présentation Slidr",
       "filterAll": "Tous les fichiers pris en charge par Slidr",
-      "filterImport": "Tous les fichiers que Slidr peut importer",
       "importUnknown": "Ce type de fichier ne peut pas être importé",
       "importKinds": "Slidr importe : {{kinds}}.",
       "unsavedTitle": "Enregistrer les modifications apportées à « {{name}} » ?",

@@ -291,16 +291,27 @@ export async function openDocument(editor: Editor, path?: string): Promise<boole
 }
 
 /**
- * "Load from file" of the welcome screen: one dialog for every file the app takes in, and what
- * suits the file that was chosen. A `.slidr` file is opened; a file of an importer (an HTML
- * page) is imported, which makes a document of its own. True when a file was chosen.
+ * "Open…" of the File menu (Ctrl+O) and "Load from file" of the welcome screen (ADR-123): one
+ * dialog for every file the app takes in, and what suits the file that was chosen. A `.slidr`
+ * file is opened; a file of an importer (an HTML page, a PowerPoint presentation) is imported,
+ * which makes a document of its own. In a plain browser, which has no files of the app's own,
+ * the page's own picker offers the importers' files, and the importer gets the `File`. True
+ * when a file was chosen and handed on.
  */
 export async function loadFile(
   editor: Editor,
   importers: readonly FileImporter[],
 ): Promise<boolean> {
-  if (!editor.document) return false;
   const imported = importers.flatMap((importer) => importer.extensions);
+  if (!editor.document) {
+    if (imported.length === 0) return false;
+    const [file] = await pickFiles(imported.map((extension) => `.${extension}`).join(','));
+    if (!file) return false;
+    const importer = importerOf(importers, file.name);
+    if (importer) importer.openFile(file);
+    else await refuseImport(importers);
+    return importer !== undefined;
+  }
   const chosen = await openDialog({
     multiple: false,
     directory: false,
@@ -328,44 +339,7 @@ function importerOf(importers: readonly FileImporter[], name: string): FileImpor
   return importers.find((candidate) => candidate.extensions.includes(extension));
 }
 
-/**
- * "Import…" of the File menu: one dialog for every kind of file the app imports (an HTML page, a
- * PowerPoint presentation), and the import of the kind the chosen file is of, which makes a
- * document of its own. In a plain browser, which has no files of the app's own, the page's own
- * picker stands in for the system's dialog. True when a file was chosen and handed on.
- */
-export async function importFile(
-  editor: Editor,
-  importers: readonly FileImporter[],
-): Promise<boolean> {
-  const extensions = importers.flatMap((importer) => importer.extensions);
-  if (!editor.document) {
-    const [file] = await pickFiles(extensions.map((extension) => `.${extension}`).join(','));
-    if (!file) return false;
-    const importer = importerOf(importers, file.name);
-    if (importer) importer.openFile(file);
-    else await refuseImport(importers);
-    return importer !== undefined;
-  }
-  const chosen = await openDialog({
-    multiple: false,
-    directory: false,
-    filters: [
-      { name: t('file.filterImport'), extensions },
-      ...importers.map((importer) => ({
-        name: importer.filterName(),
-        extensions: [...importer.extensions],
-      })),
-    ],
-  });
-  if (!chosen) return false;
-  const importer = importerOf(importers, chosen);
-  if (importer) importer.open(chosen);
-  else await refuseImport(importers);
-  return importer !== undefined;
-}
-
-/** A file of no importer's kind, chosen with "All files" of the dialog: says what is taken. */
+/** A file of no importer's kind, chosen with "All files" of the picker: says what is taken. */
 async function refuseImport(importers: readonly FileImporter[]): Promise<void> {
   const kinds = importers.map((importer) => importer.filterName()).join(', ');
   await tell(t('file.importUnknown'), t('file.importKinds', { kinds }));

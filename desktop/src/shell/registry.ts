@@ -248,9 +248,9 @@ export function useActionPopover(id: ToolAction): ComponentType<ActionPopoverPro
 
 /**
  * A kind of file the app takes in by importing it rather than opening it, such as a page of HTML
- * (ADR-036) or a PowerPoint presentation (ADR-108). "Import…" of the File menu offers the files of
- * every importer in one dialog, "Load from file" of the welcome screen offers them in the same
- * dialog as the app's own, and each hands the one chosen to the importer of its extension.
+ * (ADR-036) or a PowerPoint presentation (ADR-108). "Open…" of the File menu and "Load from file"
+ * of the welcome screen offer the files of every importer in the same dialog as the app's own,
+ * and hand the one chosen to the importer of its extension (ADR-123).
  */
 export interface FileImporter extends Registered {
   /** The extensions of its files, without the dot: `['html', 'htm']`. */
@@ -265,7 +265,7 @@ export interface FileImporter extends Registered {
 
 const importers = createRegistry<FileImporter>();
 
-/** Lets "Import…" and "Load from file" take a kind of file in. Returns its remover. */
+/** Lets "Open…" and "Load from file" take a kind of file in. Returns its remover. */
 export function registerImporter(importer: FileImporter): () => void {
   return importers.register(importer);
 }
@@ -273,6 +273,11 @@ export function registerImporter(importer: FileImporter): () => void {
 /** The kinds of file that are imported, in the order they registered. */
 export function useImporters(): readonly FileImporter[] {
   return useStore(importers.store, (s) => s.items);
+}
+
+/** The same, outside React: for a keyboard shortcut. */
+export function fileImporters(): readonly FileImporter[] {
+  return importers.store.getState().items;
 }
 
 /* ---------------------------------------------------------------- keyboard shortcuts */

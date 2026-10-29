@@ -12,9 +12,15 @@ import {
   type LucideIcon,
 } from '@slidr/ui/icons';
 import { Button, Tooltip } from '@slidr/ui';
-import { newDocument, openDocument, saveDocument, saveDocumentAs } from './fileActions';
+import { loadFile, newDocument, saveDocument, saveDocumentAs } from './fileActions';
 import { NotesPanel } from './NotesPanel';
-import { PanelId, registerContextTool, registerPanel, registerShortcut } from './registry';
+import {
+  fileImporters,
+  PanelId,
+  registerContextTool,
+  registerPanel,
+  registerShortcut,
+} from './registry';
 import { SettingsPanel } from './SettingsPanel';
 import { openPanel, setZoom, showShortcuts, zoomBy } from './store';
 import { PanelEmpty } from './ToolPanel';
@@ -174,7 +180,7 @@ registerShortcut({
   keys: 'Ctrl+O',
   label: 'keys.open',
   ...file,
-  run: (editor) => void openDocument(editor),
+  run: (editor) => void loadFile(editor, fileImporters()),
 });
 registerShortcut({
   id: 'shell.save',

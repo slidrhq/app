@@ -158,7 +158,7 @@ for (const lang of ['he', 'en'] as const) {
     await expect(page.getByTestId('present')).toHaveCount(0);
     await page.getByTestId('file-menu-trigger').click();
     await page.getByRole('menuitem', { name: names.export, exact: true }).click();
-    await expect(page.getByTestId('export-dialog')).toBeVisible();
+    await expect(page.getByTestId('export-card')).toBeVisible();
   });
 }
 

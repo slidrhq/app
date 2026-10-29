@@ -139,9 +139,9 @@ export async function startImport(
 }
 
 /**
- * The import of an HTML file that was chosen in "Import…" of the File menu, whose dialog offers
- * every kind of file the app imports, or in "Load from file" of the welcome screen, which offers
- * them beside the app's own files. The agent's plan is shown for approval first (SPEC 13.3 step
+ * The import of an HTML file that was chosen in "Open…" of the File menu or in "Load from file"
+ * of the welcome screen, whose dialog offers every kind of file the app imports beside the app's
+ * own files (ADR-123). The agent's plan is shown for approval first (SPEC 13.3 step
  * 3). A file that could not be opened or loaded is said in a dialog, like a document that could
  * not be opened.
  */

@@ -1,12 +1,20 @@
 /**
- * The strings of the export dialog. English has the same keys (`registerMessages` checks). A
- * count has a string for one and a string for more, chosen by the code (`counted`): Hebrew has a
- * form for two as well, and the Hebrew for "2 slides" reads right without one.
+ * The strings of the export card of the AI chat (ADR-123). English has the same keys
+ * (`registerMessages` checks). A count has a string for one and a string for more, chosen by the
+ * code (`counted`): Hebrew has a form for two as well, and the Hebrew for "2 slides" reads right
+ * without one.
  */
 export const he = {
   title: 'ייצוא המצגת',
+  intro: 'קובץ שנפתח גם בלי Slidr: בוחרים פורמט ומה ייכלל בו, ושומרים.',
   description: 'קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.',
   descriptionBeside: 'קובץ שמתנגן בכל דפדפן, גם בלי אינטרנט, ולידו תיקייה עם הווידאו והאודיו.',
+  steps: 'שלבי הייצוא',
+  stepContent: 'תוכן',
+  stepSave: 'שמירה',
+  formatQuestion: 'באיזה פורמט לייצא?',
+  continue: 'המשך',
+  back: 'חזרה',
   close: 'סגירה',
   cancel: 'ביטול',
   export: 'ייצוא',
@@ -28,6 +36,7 @@ export const he = {
   animations: {
     label: 'אנימציות ומעברים',
     with: 'כלולים',
+    withHint: 'השקפים ייבנו ויתחלפו כמו בהצגה.',
     without: 'בלי',
     withoutHint: 'כל שקף יוצג שלם, והמעבר לשקף הבא יהיה מיידי.',
   },
@@ -88,9 +97,16 @@ export const he = {
 
 export const en: typeof he = {
   title: 'Export presentation',
+  intro: 'A file that opens without Slidr: choose the format and what goes in, then save it.',
   description: 'One file that plays in any browser, with or without the internet.',
   descriptionBeside:
     'A file that plays in any browser, with or without the internet, and a folder beside it with the video and audio.',
+  steps: 'Export steps',
+  stepContent: 'Content',
+  stepSave: 'Save',
+  formatQuestion: 'Which format would you like?',
+  continue: 'Continue',
+  back: 'Back',
   close: 'Close',
   cancel: 'Cancel',
   export: 'Export',
@@ -112,6 +128,7 @@ export const en: typeof he = {
   animations: {
     label: 'Animations and transitions',
     with: 'Included',
+    withHint: 'The slides build and change as in the slide show.',
     without: 'Without',
     withoutHint: 'Every slide is shown whole, and the next one comes at once.',
   },

@@ -58,8 +58,8 @@ export const deckChat = (page: Page): Locator =>
   aiPanel(page).locator('[data-testid="chat"][data-scope="deck"]');
 
 /**
- * "Import HTML" and the file given to the dialog it opens, as the user does: from the File menu,
- * or from the button given (the card of the welcome screen).
+ * An HTML file given to the dialog "Open…" opens, as the user does: from the File menu, or from
+ * the button given (the card of the welcome screen).
  */
 export async function pickFile(page: Page, path = HANDWRITTEN, from?: Locator): Promise<void> {
   const dialog = page.waitForEvent('filechooser');
@@ -67,7 +67,7 @@ export async function pickFile(page: Page, path = HANDWRITTEN, from?: Locator): 
     await from.click();
   } else {
     await page.getByTestId('file-menu-trigger').click();
-    await page.getByTestId('file-import').click();
+    await page.getByTestId('file-open').click();
   }
   await (await dialog).setFiles(path);
 }

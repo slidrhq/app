@@ -7,7 +7,7 @@ import { formatBytes, ltr, type Destination } from '../export/exportDeck';
 import { WarningList } from './WarningList';
 
 /*
- * What the export dialog shows after a PowerPoint export (ADR-108): what went into the file and
+ * What the export card shows after a PowerPoint export (ADR-108): what went into the file and
  * what PowerPoint shows otherwise than Slidr. Its words are the HTML report's where they say the
  * same (`export`).
  */

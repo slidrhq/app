@@ -50,16 +50,16 @@ async function readBack(bytes: Uint8Array) {
 async function exportFromMenu(page: Page) {
   await page.getByTestId('file-menu-trigger').click();
   await page.getByTestId('file-export').click();
-  const dialog = page.getByTestId('export-dialog');
-  await expect(dialog).toBeVisible();
-  // The format is the dialog's first choice; HTML is offered until another was exported.
-  await dialog.getByRole('combobox', { name: 'פורמט' }).click();
-  await page.getByRole('option', { name: 'מצגת PowerPoint' }).click();
-  await expect(dialog).toHaveAttribute('data-format', 'pptx');
-  return dialog;
+  const card = page.getByTestId('export-card');
+  await expect(card).toBeVisible();
+  // The format is the card's first question; HTML is offered until another was exported.
+  await card.getByRole('radio', { name: 'מצגת PowerPoint' }).click();
+  await expect(card).toHaveAttribute('data-format', 'pptx');
+  await card.getByTestId('export-continue').click();
+  return card;
 }
 
-/** Runs the export of the open dialog and returns the file the browser downloaded. */
+/** Runs the export of the open card and returns the file the browser downloaded. */
 async function exported(page: Page) {
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -70,12 +70,12 @@ async function exported(page: Page) {
   return { name: download.suggestedFilename(), path, bytes: new Uint8Array(readFileSync(path)) };
 }
 
-/** Imports a file through "Import…". */
+/** Imports a file through "Open…", which takes every file the app reads (ADR-123). */
 async function importFromMenu(page: Page, file: string | { name: string; buffer: Buffer }) {
   await page.getByTestId('file-menu-trigger').click();
   const [chooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByTestId('file-import').click(),
+    page.getByTestId('file-open').click(),
   ]);
   await chooser.setFiles(
     typeof file === 'string'
@@ -90,14 +90,14 @@ test('exports the deck to a PowerPoint file that reads back as the deck', async 
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await openApp(page, { deck: 'probe' });
-  const dialog = await exportFromMenu(page);
+  const card = await exportFromMenu(page);
   // The choices are the HTML export's: four slides, one of them hidden.
-  await expect(dialog.getByRole('group', { name: 'שקפים' })).toBeVisible();
+  await expect(card.getByRole('group', { name: 'שקפים' })).toBeVisible();
   await expect(page.getByTestId('export-count')).toHaveText(
     'ייוצאו 3 שקפים. שקף מוסתר אחד לא ייכלל.',
   );
   const file = await exported(page);
-  await expect(dialog).toHaveAttribute('data-phase', 'done');
+  await expect(card).toHaveAttribute('data-phase', 'done');
   expect(file.name).toBe('Runtime probe.pptx');
   await expect(page.getByTestId('pptx-export-report')).toContainText('הקובץ ירד למחשב');
   await expect(page.getByTestId('pptx-export-summary')).toContainText('3 שקפים');
@@ -122,11 +122,11 @@ test('exports the deck to a PowerPoint file that reads back as the deck', async 
 
 test('exports a range of slides without their animations', async ({ page }) => {
   await openApp(page, { deck: 'probe' });
-  const dialog = await exportFromMenu(page);
-  await dialog.getByRole('radio', { name: 'טווח' }).click();
-  await dialog.getByRole('textbox', { name: 'משקף' }).fill('2');
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).fill('2');
-  await dialog.getByRole('radio', { name: 'בלי' }).click();
+  const card = await exportFromMenu(page);
+  await card.getByRole('radio', { name: 'טווח' }).click();
+  await card.getByRole('textbox', { name: 'משקף' }).fill('2');
+  await card.getByRole('textbox', { name: 'עד שקף' }).fill('2');
+  await card.getByRole('radio', { name: 'בלי' }).click();
   await expect(page.getByTestId('export-count')).toHaveText('ייוצא שקף אחד.');
   const back = await readBack((await exported(page)).bytes);
   expect(texts(back.deck)).toEqual([
@@ -174,7 +174,7 @@ test('a deck goes to PowerPoint and comes back with its slides', async ({ page }
   await exportFromMenu(page);
   const file = await exported(page);
   await page.keyboard.press('Escape');
-  await expect(page.getByTestId('export-dialog')).toBeHidden();
+  await expect(page.getByTestId('export-card')).toBeHidden();
 
   await importFromMenu(page, file.path);
   // Where the open deck has changes nobody saved, the app asks before it puts another in its place.

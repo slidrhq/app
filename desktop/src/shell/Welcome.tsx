@@ -32,7 +32,7 @@ import { useLaidOutSize } from '../templates/PreviewGrid';
 import { TemplateShowroom } from '../templates/TemplateShowroom';
 import { useTemplatesIn } from '../templates/written';
 import { useEditor, useFile, type Editor } from './editor';
-import { importFile, loadFile, newDocument, openDocument, recentFiles } from './fileActions';
+import { loadFile, newDocument, openDocument, recentFiles } from './fileActions';
 import { modalOpen, overlayOf } from './overlay';
 import { PanelId, useImporters } from './registry';
 import { openPanel, setWelcome, useShell } from './store';
@@ -343,10 +343,7 @@ export function Welcome() {
     focusChat();
   };
   // In a plain browser there are no files of the app's own: the imports alone, by their picker.
-  const load = () => {
-    if (hasStorage) void loadFile(editor, importers);
-    else void importFile(editor, importers);
-  };
+  const load = () => void loadFile(editor, importers);
   const open = async (path: string) => {
     if (await openDocument(editor, path)) setWelcome(false);
   };

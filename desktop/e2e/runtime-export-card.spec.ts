@@ -3,9 +3,9 @@ import { pathToFileURL } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { FHD, LAPTOP, loadDeck, openApp, shot } from './runtime-app-helpers';
 
-// The export dialog in the app (WG9-T12): the File menu, the choices of EXP-08 that mean
-// something today, and the report. In a plain browser the file is a download; in the app it goes
-// through the save dialog and the Rust command, which the Tauri run checks.
+// The export card in the AI chat (WG9-T12, ADR-123): the File menu, the format, the choices of
+// EXP-08 that mean something today, and the report. In a plain browser the file is a download; in
+// the app it goes through the save dialog and the Rust command, which the Tauri run checks.
 
 test.use({ viewport: FHD });
 
@@ -53,15 +53,19 @@ async function addPictures(page: Page) {
   });
 }
 
-async function openDialog(page: Page, label = 'ייצוא') {
+/** Opens the export card from the File menu and goes on from the format, HTML, to its choices. */
+async function openExport(page: Page, label = 'ייצוא') {
   await page.getByTestId('file-menu-trigger').click();
   await page.getByRole('menuitem', { name: `${label}…`, exact: true }).click();
-  const dialog = page.getByTestId('export-dialog');
-  await expect(dialog).toBeVisible();
-  return dialog;
+  const card = page.getByTestId('export-card');
+  await expect(card).toBeVisible();
+  await expect(card).toHaveAttribute('data-step', 'format');
+  await card.getByTestId('export-continue').click();
+  await expect(card).toHaveAttribute('data-step', 'content');
+  return card;
 }
 
-/** Runs the export of the open dialog and returns the file the browser downloaded. */
+/** Runs the export of the open card and returns the file the browser downloaded. */
 async function exported(page: Page) {
   const [download] = await Promise.all([
     page.waitForEvent('download'),
@@ -78,16 +82,16 @@ test('exports the deck to one file, and reports what went into it', async ({ pag
   page.on('pageerror', (error) => errors.push(error.message));
   await openApp(page, { deck: 'probe' });
   await addPictures(page);
-  const dialog = await openDialog(page);
+  const card = await openExport(page);
   // Each choice is a field of the design system, named by its label (ADR-060).
-  await expect(dialog.getByRole('group', { name: 'שקפים' })).toBeVisible();
-  await expect(dialog.getByRole('group', { name: 'אנימציות ומעברים' })).toBeVisible();
+  await expect(card.getByRole('group', { name: 'שקפים' })).toBeVisible();
+  await expect(card.getByRole('group', { name: 'אנימציות ומעברים' })).toBeVisible();
   // Four slides, one of them hidden.
   await expect(page.getByTestId('export-count')).toHaveText(
     'ייוצאו 3 שקפים. שקף מוסתר אחד לא ייכלל.',
   );
   const file = await exported(page);
-  await expect(dialog).toHaveAttribute('data-phase', 'done');
+  await expect(card).toHaveAttribute('data-phase', 'done');
   expect(file.name).toBe('Runtime probe.html');
 
   const report = page.getByTestId('export-report');
@@ -136,8 +140,8 @@ test('exports the deck to one file, and reports what went into it', async ({ pag
   ).toEqual({ slide: 0, step: 1 });
   await context.close();
 
-  await dialog.getByRole('button', { name: 'סגירה' }).last().click();
-  await expect(dialog).toHaveCount(0);
+  await card.getByRole('button', { name: 'סגירה' }).last().click();
+  await expect(card).toHaveCount(0);
   await expect(page.getByTestId('stage-surface')).toBeFocused();
   expect(errors).toEqual([]);
 });
@@ -146,9 +150,9 @@ test('the report says how many live charts went in, and what their library adds 
   page,
 }) => {
   await openApp(page, { deck: 'charts-rtl' });
-  const dialog = await openDialog(page);
+  const card = await openExport(page);
   const file = await exported(page);
-  await expect(dialog).toHaveAttribute('data-phase', 'done');
+  await expect(card).toHaveAttribute('data-phase', 'done');
   const charts = await page.evaluate(
     () =>
       window
@@ -163,11 +167,11 @@ test('the report says how many live charts went in, and what their library adds 
   // The library is the one script a file has only with a chart in it: hundreds of kilobytes.
   await expect(line).toContainText(/\d+ kB|\d+(\.\d)? MB/);
   await page.screenshot({ path: shot('export-report-charts-light-he') });
-  await dialog.getByRole('button', { name: 'סגירה' }).last().click();
+  await card.getByRole('button', { name: 'סגירה' }).last().click();
 
   // A deck without a chart has no such line.
   await loadDeck(page, 'probe');
-  await openDialog(page);
+  await openExport(page);
   await exported(page);
   await expect(page.getByTestId('export-report')).toBeVisible();
   await expect(page.getByTestId('export-charts')).toHaveCount(0);
@@ -175,32 +179,32 @@ test('the report says how many live charts went in, and what their library adds 
 
 test('a range of slides, without animations', async ({ page }) => {
   await openApp(page, { deck: 'probe' });
-  const dialog = await openDialog(page);
-  await dialog.getByRole('radio', { name: 'טווח' }).click();
-  await dialog.getByRole('textbox', { name: 'משקף' }).fill('2');
-  await dialog.getByRole('textbox', { name: 'משקף' }).press('Enter');
+  const card = await openExport(page);
+  await card.getByRole('radio', { name: 'טווח' }).click();
+  await card.getByRole('textbox', { name: 'משקף' }).fill('2');
+  await card.getByRole('textbox', { name: 'משקף' }).press('Enter');
   await expect(page.getByTestId('export-count')).toHaveText(
     'ייוצאו 2 שקפים. שקף מוסתר אחד לא ייכלל.',
   );
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).fill('3');
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
+  await card.getByRole('textbox', { name: 'עד שקף' }).fill('3');
+  await card.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
   await expect(page.getByTestId('export-count')).toHaveText(
     'ייוצא שקף אחד. שקף מוסתר אחד לא ייכלל.',
   );
   // Only the hidden slide: nothing to export.
-  await dialog.getByRole('textbox', { name: 'משקף' }).fill('3');
-  await dialog.getByRole('textbox', { name: 'משקף' }).press('Enter');
+  await card.getByRole('textbox', { name: 'משקף' }).fill('3');
+  await card.getByRole('textbox', { name: 'משקף' }).press('Enter');
   await expect(page.getByTestId('export-count')).toHaveText('אין שקפים לייצא בטווח הזה.');
   await expect(page.getByTestId('export-run')).toBeDisabled();
 
-  await dialog.getByRole('textbox', { name: 'משקף' }).fill('2');
-  await dialog.getByRole('textbox', { name: 'משקף' }).press('Enter');
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).fill('4');
-  await dialog.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
-  await dialog.getByRole('radio', { name: 'בלי' }).click();
-  await expect(dialog).toContainText('כל שקף יוצג שלם');
+  await card.getByRole('textbox', { name: 'משקף' }).fill('2');
+  await card.getByRole('textbox', { name: 'משקף' }).press('Enter');
+  await card.getByRole('textbox', { name: 'עד שקף' }).fill('4');
+  await card.getByRole('textbox', { name: 'עד שקף' }).press('Enter');
+  await card.getByRole('radio', { name: 'בלי' }).click();
+  await expect(card).toContainText('כל שקף יוצג שלם');
   const file = await exported(page);
-  await expect(dialog).toHaveAttribute('data-phase', 'done');
+  await expect(card).toHaveAttribute('data-phase', 'done');
   const slides = Array.from(
     file.html.matchAll(/<section class="slide" data-slide="([^"]+)"/g),
     (m) => m[1],
@@ -210,39 +214,89 @@ test('a range of slides, without animations', async ({ page }) => {
   // Without pictures the report says so.
   await expect(page.getByTestId('export-report')).toContainText('אין בקובץ תמונות או מדיה.');
 
-  // "Export again" goes back to the choices as they were.
-  await dialog.getByRole('button', { name: 'ייצוא נוסף' }).click();
-  await expect(dialog.getByRole('radio', { name: 'בלי' })).toHaveAttribute('aria-checked', 'true');
+  // "Export again" starts at the format, with the choices as they were.
+  await card.getByRole('button', { name: 'ייצוא נוסף' }).click();
+  await expect(card).toHaveAttribute('data-step', 'format');
+  await card.getByTestId('export-continue').click();
+  await expect(card.getByRole('radio', { name: 'בלי' })).toHaveAttribute('aria-checked', 'true');
   await page.keyboard.press('Escape');
-  await expect(dialog).toHaveCount(0);
+  await expect(card).toHaveCount(0);
+});
+
+test('the card is the keyboard’s, and waits in the chat while another panel is shown', async ({
+  page,
+}) => {
+  await openApp(page, { deck: 'probe' });
+  await page.getByTestId('file-menu-trigger').click();
+  await page.getByTestId('file-export').click();
+  const card = page.getByTestId('export-card');
+  // In the AI chat, with the keyboard on the format that is chosen: the arrows choose, Enter
+  // goes on.
+  await expect(page.locator('[data-testid="chat"] [data-testid="export-card"]')).toBeVisible();
+  await expect(card.getByRole('radio', { name: 'דף HTML' })).toBeFocused();
+  await expect(card.getByRole('radio', { name: 'דף HTML' })).toHaveAccessibleDescription(
+    'קובץ אחד שמתנגן בכל דפדפן, גם בלי אינטרנט.',
+  );
+  // Held as a finger holds it: the list chooses the row the arrow moved to while it is down.
+  await page.keyboard.press('ArrowDown', { delay: 50 });
+  await expect(card).toHaveAttribute('data-format', 'pptx');
+  await page.keyboard.press('Enter');
+  await expect(card).toHaveAttribute('data-step', 'content');
+  await expect(card.getByTestId('export-chosen')).toHaveText('מצגת PowerPoint');
+  await expect(card.getByRole('radio', { name: 'כל המצגת' })).toBeFocused();
+
+  // Another panel and back: the card is where it was, and nothing was sent to the agent.
+  await page.locator('[data-testid="activity-bar"] button[data-panel="animations"]').click();
+  await expect(card).toBeHidden();
+  await page.locator('[data-testid="activity-bar"] button[data-panel="ai"]').click();
+  await expect(card).toHaveAttribute('data-step', 'content');
+  await expect(card).toHaveAttribute('data-format', 'pptx');
+  await expect(page.getByTestId('chat-user')).toHaveCount(0);
+
+  // Back goes to the format; Escape puts the card away and gives the keyboard to the slide.
+  await card.getByTestId('export-back').click();
+  await expect(card.getByRole('radio', { name: 'מצגת PowerPoint' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(card).toHaveCount(0);
+  await expect(page.getByTestId('stage-surface')).toBeFocused();
+  // Asked for again, it starts at the format, which is the one chosen last.
+  await page.getByTestId('file-menu-trigger').click();
+  await page.getByTestId('file-export').click();
+  await expect(card).toHaveAttribute('data-step', 'format');
+  await expect(card.getByRole('radio', { name: 'מצגת PowerPoint' })).toBeFocused();
 });
 
 for (const theme of ['light', 'dark'] as const) {
   for (const lang of ['he', 'en'] as const) {
-    test(`the dialog: ${theme}, ${lang}`, async ({ page }) => {
+    test(`the card: ${theme}, ${lang}`, async ({ page }) => {
       const errors: string[] = [];
       page.on('console', (message) => {
         if (message.type() === 'error') errors.push(message.text());
       });
       await openApp(page, { deck: 'probe', lang, theme });
       await addPictures(page);
-      const dialog = await openDialog(page, lang === 'he' ? 'ייצוא' : 'Export');
-      await dialog.getByRole('radio').nth(1).click();
+      await page.getByTestId('file-menu-trigger').click();
+      await page.getByTestId('file-export').click();
+      await expect(page.getByTestId('export-card')).toBeVisible();
+      await page.screenshot({ path: shot(`export-format-${theme}-${lang}`) });
+      await page.keyboard.press('Escape');
+      const card = await openExport(page, lang === 'he' ? 'ייצוא' : 'Export');
+      await card.getByRole('radio').nth(1).click();
       await page.screenshot({ path: shot(`export-${theme}-${lang}`) });
       await exported(page);
-      await expect(dialog).toHaveAttribute('data-phase', 'done');
+      await expect(card).toHaveAttribute('data-phase', 'done');
       await page.screenshot({ path: shot(`export-report-${theme}-${lang}`) });
       expect(errors).toEqual([]);
     });
   }
 }
 
-test('the dialog at 1366x768', async ({ page }) => {
+test('the card at 1366x768', async ({ page }) => {
   await page.setViewportSize(LAPTOP);
   await openApp(page, { deck: 'probe' });
   await addPictures(page);
-  const dialog = await openDialog(page);
+  const card = await openExport(page);
   await exported(page);
-  await expect(dialog).toHaveAttribute('data-phase', 'done');
+  await expect(card).toHaveAttribute('data-phase', 'done');
   await page.screenshot({ path: shot('export-report-light-he-1366') });
 });
