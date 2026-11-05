@@ -77,14 +77,34 @@ function pickedFrom(hex: string | null, hue = 0): Picked {
   return { ...rgbToHsv(rgb, hue), a: rgb.a };
 }
 
+/** Takes a colour from anywhere on the screen: `#rrggbb`, or null when the user cancelled. */
+export type ScreenSampler = () => Promise<string | null>;
+
 interface EyeDropperLike {
   open: () => Promise<{ sRGBHex: string }>;
 }
 
-/** The browser's screen colour sampler; Chromium and WebView2 have it. */
-function eyeDropper(): EyeDropperLike | undefined {
+/** The browser's screen colour sampler, where there is one (Chromium). Esc rejects: nothing. */
+function browserSampler(): ScreenSampler | null {
   const Ctor = (globalThis as { EyeDropper?: new () => EyeDropperLike }).EyeDropper;
-  return Ctor ? new Ctor() : undefined;
+  return Ctor
+    ? () =>
+        new Ctor().open().then(
+          ({ sRGBHex }) => sRGBHex,
+          () => null,
+        )
+    : null;
+}
+
+let screenSampler = browserSampler();
+
+/**
+ * Where the eyedropper takes its colour from: the browser's `EyeDropper` unless the app says
+ * otherwise. WebView2 has the API without the part of the browser that shows it (`open()`
+ * rejects at once, as if cancelled), so the desktop app gives its own. Null hides the eyedropper.
+ */
+export function setScreenSampler(sampler: ScreenSampler | null): void {
+  screenSampler = sampler;
 }
 
 /** A swatch of a colour, or of "no colour". For triggers; it is not a control itself. */
@@ -187,19 +207,21 @@ export function ColorPicker({
     update({ ...picked, ...move });
   };
 
-  const sample = () => {
-    void eyeDropper()
-      ?.open()
-      .then(({ sRGBHex }) => {
-        update({ ...pickedFrom(sRGBHex, picked.h), a: picked.a });
+  const sample = (sampler: ScreenSampler) => {
+    sampler().then(
+      (sampled) => {
+        // Null: the user cancelled, and nothing was picked.
+        if (!sampled) return;
+        update({ ...pickedFrom(sampled, picked.h), a: picked.a });
         onGestureEnd?.();
-      })
-      // Esc while sampling rejects; nothing was picked.
-      .catch(() => undefined);
+      },
+      (error: unknown) => console.error('Could not take a colour from the screen', error),
+    );
   };
 
   const hex = toHex(rgb, false).slice(1).toUpperCase();
   const selectedChoice = value === null ? null : choiceId;
+  const sampler = screenSampler;
 
   return (
     <div className={cx('flex flex-col gap-3', className)}>
@@ -301,12 +323,12 @@ export function ColorPicker({
         />
       )}
       <div className="flex items-center gap-2">
-        {eyeDropper() && (
+        {sampler && (
           <IconButton
             icon={Pipette}
             label={labels.eyedropper}
             variant="secondary"
-            onClick={sample}
+            onClick={() => sample(sampler)}
           />
         )}
         <Input

@@ -4,7 +4,8 @@
 //! `about:` are not requests and are not seen.
 //!
 //! COM calls in windows-rs are `unsafe`; this file, `capture/webview2.rs`,
-//! `fonts/directwrite.rs` and `show_screen/win32.rs` are the four places the app allows it.
+//! `fonts/directwrite.rs`, `show_screen/win32.rs` and `screen_color/win32.rs` are the five places
+//! the app allows it.
 
 use std::time::Duration;
 

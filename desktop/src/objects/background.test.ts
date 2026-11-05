@@ -2,18 +2,31 @@ import {
   CommandBus,
   createBaseTheme,
   createDeck,
+  createElement,
   createSlide,
   type Background,
   type Layout,
+  type SvgElement,
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
+import { backgroundDrawing, markupAtSpeed, pieceSpeed } from '../elements/motion';
+import { motionBackgrounds } from '../elements/motionBackgrounds';
+import { INK } from '../elements/motionKit';
 import {
   applyToAllCommands,
+  drawingColour,
+  drawingColours,
+  drawingOpacity,
+  drawingSpeed,
   inheritedBackground,
   shownBackground,
   variantIndex,
   withAdjust,
+  withDrawingColour,
+  withDrawingOpacity,
+  withDrawingSpeed,
   withFill,
+  withoutDrawing,
 } from './background';
 
 const photo: Background = {
@@ -83,6 +96,14 @@ describe('editing a background', () => {
     expect(withAdjust(photo, { dim: 0 })).not.toHaveProperty('dim');
     expect(withAdjust(accent, { blur: 20, dim: 0.5 })).toEqual({ ...accent, blur: 20, dim: 0.5 });
   });
+
+  it('keeps the drawing of a background under a new fill, and takes it away alone (ADR-125)', () => {
+    const bar = createElement.shape({ id: 'e_bar', frame: { x: 40, y: 100, w: 300, h: 12 } });
+    const drawn: Background = { ...photo, elements: [bar] };
+    expect(withFill(drawn, accent.fill).elements).toEqual([bar]);
+    expect(withoutDrawing(drawn)).toEqual(photo);
+    expect(withoutDrawing(accent)).toBe(accent);
+  });
 });
 
 describe('apply to all slides', () => {
@@ -131,5 +152,75 @@ describe('apply to all slides', () => {
     const bus = new CommandBus(deck);
     bus.batch(applyToAllCommands(bus.deck, 's1'));
     expect(applyToAllCommands(bus.deck, 's1')).toEqual([]);
+  });
+});
+
+describe('the drawing of a background (ADR-129)', () => {
+  const deck = createDeck({ lang: 'he' });
+  const of = (id: string): Background => {
+    const source = motionBackgrounds().find((one) => one.id === id)!;
+    return { ...accent, elements: [backgroundDrawing(source, deck)] };
+  };
+  const picture = (background: Background) => background.elements![0] as SvgElement;
+  const waves = of('waves');
+
+  it('lists the colours that stand for the theme, and what they are drawn in', () => {
+    expect(drawingColours(waves)).toEqual([INK.primary, INK.accent]);
+    expect(drawingColour(waves, INK.accent)).toEqual({ token: 'accent' });
+    expect(drawingColours(accent)).toEqual([]);
+  });
+
+  it('draws a colour in another, and keeps the rest of the background', () => {
+    const red = { value: '#e11d48' };
+    const next = withDrawingColour(waves, INK.accent.toUpperCase(), red);
+    expect(drawingColour(next, INK.accent)).toEqual(red);
+    expect(drawingColour(next, INK.primary)).toEqual({ token: 'primary' });
+    expect(picture(next).colorOverrides).toEqual({
+      [INK.primary]: { token: 'primary' },
+      [INK.accent]: red,
+    });
+    expect(next.fill).toBe(waves.fill);
+    expect(picture(next).markup).toBe(picture(waves).markup);
+    // The background it was made from is as it was: one undo step gives it back.
+    expect(drawingColour(waves, INK.accent)).toEqual({ token: 'accent' });
+  });
+
+  it('moves at a speed, drawn again from the collection each time', () => {
+    expect(drawingSpeed(waves)).toBe(1);
+    const fast = withDrawingSpeed(waves, 2);
+    expect(drawingSpeed(fast)).toBe(2);
+    const source = motionBackgrounds().find((one) => one.id === 'waves')!.markup;
+    expect(picture(fast).markup).toBe(markupAtSpeed(source, 2));
+    // From 2 to 0.5 is from the collection's pace, not from the picture already sped up.
+    const slow = withDrawingSpeed(fast, 0.5);
+    expect(picture(slow).markup).toBe(markupAtSpeed(source, 0.5));
+    expect(pieceSpeed(picture(slow).markup!)).toBe(0.5);
+    expect(picture(withDrawingSpeed(slow, 1)).markup).toBe(source);
+    // Its colours and its mirror are the element's, and stay.
+    expect(picture(fast).colorOverrides).toEqual(picture(waves).colorOverrides);
+    expect(picture(fast).flipH).toBe(picture(waves).flipH);
+  });
+
+  it('has no speed when nothing in it moves', () => {
+    expect(drawingSpeed(of('dots'))).toBeUndefined();
+    const dots = of('dots');
+    expect(withDrawingSpeed(dots, 2)).toEqual(dots);
+    expect(drawingSpeed(accent)).toBeUndefined();
+  });
+
+  it('is drawn at an opacity', () => {
+    expect(drawingOpacity(waves)).toBe(1);
+    expect(drawingOpacity(withDrawingOpacity(waves, 0.4))).toBe(0.4);
+    expect(drawingOpacity(accent)).toBeUndefined();
+    expect(withDrawingOpacity(accent, 0.4)).toBe(accent);
+  });
+
+  it('goes on a slide in one step, which undo takes back', () => {
+    const bus = new CommandBus(deckOf({ background: waves }));
+    const next = withDrawingSpeed(withDrawingOpacity(waves, 0.5), 3);
+    bus.dispatch({ type: 'slide.update', slideId: 's1', patch: { background: next } });
+    expect(drawingSpeed(bus.deck.slides[0]!.background!)).toBe(3);
+    bus.undo();
+    expect(bus.deck.slides[0]!.background).toEqual(waves);
   });
 });

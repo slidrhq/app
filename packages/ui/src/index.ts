@@ -66,10 +66,12 @@ export { Slider, type SliderProps } from './components/slider';
 export {
   ColorPicker,
   ColorSwatch,
+  setScreenSampler,
   type ColorChoice,
   type ColorChoiceGroup,
   type ColorPickerLabels,
   type ColorPickerProps,
+  type ScreenSampler,
 } from './components/color-picker';
 export {
   FontPicker,

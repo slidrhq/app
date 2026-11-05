@@ -68,6 +68,7 @@
       "signingIn": "Schließen Sie die Anmeldung im geöffneten Fenster ab. Danach geht es hier weiter.",
       "installDescription": "{{name}} ist auf diesem Computer nicht installiert. Mit Ihrer Zustimmung laden wir es herunter, installieren es mit dem Windows App Installer und machen dann hier weiter.",
       "installDescriptionNpm": "{{name}} ist auf diesem Computer nicht installiert. Mit Ihrer Zustimmung installieren wir es mit npm – fehlt Node.js, installieren wir es zuerst mit dem Windows App Installer – und machen dann hier weiter.",
+      "installDescriptionLibrary": "{{name}} ist auf diesem Computer nicht installiert. Mit Ihrer Zustimmung laden wir es aus der Bibliothek Ihrer Organisation herunter, installieren es und machen dann hier weiter.",
       "install": "Zustimmen und installieren",
       "signInDescription": "Melden Sie sich bei Ihrem Konto an, um die verfügbaren Modelle zu laden.",
       "signIn": "Anmelden",
@@ -612,7 +613,9 @@
       "paragraph": "Absatz {{n}} von {{total}}",
       "row": "{{effect}}: {{name}}",
       "original": "Ursprüngliche Bewegung",
-      "originalHint": "Die Bewegung aus der importierten Datei, so wie sie dort festgelegt war. Wenn Sie einen anderen Effekt wählen, wird sie ersetzt."
+      "originalHint": "Die Bewegung aus der importierten Datei, so wie sie dort festgelegt war. Wenn Sie einen anderen Effekt wählen, wird sie ersetzt.",
+      "disableHint": "Das Objekt bleibt grau und blass, bis eine Animation „Aktivieren“ folgt. Damit es schon beim Öffnen der Folie deaktiviert erscheint, wählen Sie dafür „Als deaktiviert anzeigen“.",
+      "enableHint": "Das Objekt erhält sein gewohntes Aussehen zurück und behält es. Damit es bis zu dieser Animation deaktiviert erscheint, wählen Sie dafür „Als deaktiviert anzeigen“."
     },
     "group": {
       "leadIn": "Beim Öffnen der Folie",
@@ -659,7 +662,9 @@
         "heartbeat": "Herzschlag",
         "flicker": "Flackern",
         "float": "Schweben",
-        "tilt": "Neigen"
+        "tilt": "Neigen",
+        "disable": "Deaktivieren",
+        "enable": "Aktivieren"
       },
       "exit": {
         "disappear": "Verschwinden",
@@ -803,6 +808,8 @@
       "lock": "Sperren",
       "unlock": "Entsperren",
       "hide": "Ausblenden",
+      "disable": "Als deaktiviert anzeigen",
+      "enable": "Als aktiv anzeigen",
       "duplicate": "Duplizieren",
       "pasteStyle": "Formatierung einfügen",
       "delete": "Löschen",
@@ -861,6 +868,7 @@
       "order": "Ebenenreihenfolge",
       "lock": "Sperren",
       "visibility": "Aus- und einblenden",
+      "disabled": "Als deaktiviert oder aktiv anzeigen",
       "rename": "Umbenennen",
       "paste": "Einfügen",
       "cut": "Ausschneiden",
@@ -1046,7 +1054,10 @@
       "insert": "Grafik einfügen",
       "frame": "Rahmen einfügen",
       "reframe": "Bild in Rahmen setzen",
-      "cards": "Kartenset einfügen"
+      "cards": "Kartenset einfügen",
+      "animation": "Animation einfügen",
+      "background": "Hintergrund anwenden",
+      "motion": "Bewegung ändern"
     },
     "collection": {
       "cards": "Kartensets",
@@ -1055,7 +1066,9 @@
       "emoji": "Emojis",
       "icons": "Symbole",
       "frames": "Rahmen",
-      "tables": "Tabellen"
+      "tables": "Tabellen",
+      "animations": "Animationen",
+      "backgrounds": "Hintergründe"
     },
     "designs": {
       "title": "Fertige Folien",
@@ -1462,6 +1475,110 @@
       "ready": "Vorgegebene Größen",
       "custom": "Andere Größe",
       "size": "{{rows}} Zeilen × {{cols}} Spalten"
+    },
+    "animations": {
+      "search": "Animationen durchsuchen",
+      "searchPlaceholder": "Animationen suchen…",
+      "hint": "Klicken Sie auf eine Animation, um sie zur Folie hinzuzufügen. Sie bewegt sich von selbst, und Sie können sie wie jedes Objekt verschieben, skalieren und drehen.",
+      "group": {
+        "basic": "Animierte Formen",
+        "path": "Auf einer Bahn",
+        "spin": "Drehen",
+        "scale": "Wachsen und Pulsieren",
+        "lines": "Linien und Wellen",
+        "particles": "Partikel und Netze"
+      },
+      "name": {
+        "orbit": "Umlaufbahn",
+        "conveyor": "Boxen auf einer Bahn",
+        "trace": "Leiterbahn",
+        "atom": "Atom",
+        "shuttle": "Punkt auf einer Linie",
+        "hexagon": "Drehende Sechsecke",
+        "rings": "Drehende Ringe",
+        "radar": "Radar",
+        "ripple": "Wellenringe",
+        "breathe": "Atmende Form",
+        "bars": "Wachsende Balken",
+        "waves": "Wellen",
+        "draw": "Gezeichneter Pfeil",
+        "flowArrow": "Fließender Verbinder",
+        "heartbeat": "Herzschlag",
+        "network": "Netzwerk",
+        "converge": "Sich sammelnde Partikel",
+        "float": "Aufsteigende Blasen"
+      }
+    },
+    "backgrounds": {
+      "hint": "Klicken Sie auf einen Hintergrund, um ihn auf die Folie oder auf alle ausgewählten Folien anzuwenden. Die Farben stammen aus der Vorlage; das Werkzeug „Hintergrund“ führt zum Hintergrund der Vorlage zurück.",
+      "animated": "Bewegte Hintergründe",
+      "still": "Ruhige Hintergründe",
+      "name": {
+        "flow": "Schaltkreisfluss",
+        "waves": "Wellen",
+        "converge": "Sammeln",
+        "orbit": "Umlaufbahnen",
+        "radar": "Radar",
+        "network": "Netzwerk",
+        "drift": "Wanderndes Licht",
+        "particles": "Aufsteigende Partikel",
+        "dots": "Punktraster",
+        "contours": "Höhenlinien",
+        "arcs": "Bögen in der Ecke"
+      }
+    },
+    "animatedShapes": {
+      "title": "Animierte Formen",
+      "hint": "Gewöhnliche Formen, die eine Bewegung wiederholen. Farbe, Kontur und Größe bearbeiten Sie wie bei jeder Form, die Bewegung mit dem Werkzeug „Bewegung“.",
+      "more": "Alle Animationen",
+      "name": {
+        "ring": "Drehender Ring",
+        "hexagon": "Drehendes Sechseck",
+        "star": "Drehender Stern",
+        "octagon": "Drehendes Achteck",
+        "square": "Quadrat, das sich dreht und ruht",
+        "pulse": "Pulsierender Kreis",
+        "heart": "Schlagendes Herz",
+        "float": "Schwebender Kreis",
+        "arrow": "Wackelnder Pfeil",
+        "blink": "Blinkender Punkt"
+      }
+    },
+    "motion": {
+      "title": "Bewegung",
+      "piece": "Tempo der Animation",
+      "loop": "Wiederholte Bewegung",
+      "kind": {
+        "none": "Keine",
+        "spin": "Drehen",
+        "pulse": "Pulsieren",
+        "float": "Schweben",
+        "swing": "Schwingen",
+        "blink": "Blinken"
+      },
+      "speed": "Tempo",
+      "pace": {
+        "slow": "Langsam",
+        "medium": "Mittel",
+        "fast": "Schnell"
+      },
+      "round": "Sekunden pro Runde",
+      "rhythm": "Rhythmus",
+      "rhythmKind": {
+        "steady": "Gleichmäßig",
+        "smooth": "Weich",
+        "pause": "Mit Pausen"
+      },
+      "direction": "Richtung",
+      "clockwise": "Im Uhrzeigersinn",
+      "counterclockwise": "Gegen den Uhrzeigersinn",
+      "amount": {
+        "pulse": "Pulsgröße",
+        "float": "Schwebehöhe",
+        "swing": "Schwingwinkel",
+        "blink": "Blinkstärke"
+      },
+      "hint": "Die Bewegung wiederholt sich, solange die Folie gezeigt wird: im Editor, in der Präsentation und in einer exportierten Datei."
     }
   },
   "export": {
@@ -2322,6 +2439,11 @@
       "blur": "Weichzeichnen",
       "dim": "Abdunkeln",
       "applyAll": "Auf alle Folien anwenden",
+      "noDrawing": "Hintergrundzeichnung entfernen",
+      "drawingColours": "Farben der Zeichnung",
+      "drawingColour": "Farbe {{n}} der Zeichnung",
+      "speed": "Bewegungsgeschwindigkeit",
+      "drawingOpacity": "Deckkraft der Zeichnung",
       "reset": "Zurück zum Designhintergrund"
     },
     "groups": {
@@ -2540,6 +2662,7 @@
       "installTitle": "{{name}} installieren?",
       "installDescription": "Die App lädt {{name}} herunter und installiert es mit dem Windows App Installer. Danach prüfen wir die Verbindung und bitten Sie bei Bedarf, sich anzumelden.",
       "installDescriptionNpm": "Die App installiert {{name}} mit npm. Fehlt Node.js, wird es zuerst mit dem Windows App Installer installiert. Danach prüfen wir die Verbindung und bitten Sie bei Bedarf, sich anzumelden.",
+      "installDescriptionLibrary": "Die App lädt {{name}} aus der Bibliothek Ihrer Organisation herunter und installiert es auf diesem Computer. Danach prüfen wir die Verbindung und bitten Sie bei Bedarf, sich anzumelden.",
       "approveInstall": "Zustimmen und installieren",
       "chooseModel": "Modell auswählen",
       "chooseEffort": "Aufwand auswählen",

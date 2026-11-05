@@ -131,8 +131,10 @@ describe('tool definitions for a transport adapter', () => {
 
   it('do not copy the element schema twice', () => {
     const add = listing.find((t) => t.name === 'element_add')!;
-    // Raised from 30 KB for the card of a magnet and the window of its photograph (ADR-095).
-    expect(JSON.stringify(add.inputSchema).length).toBeLessThan(31_000);
+    // Raised from 30 KB for the card of a magnet and the window of its photograph (ADR-095), and
+    // from 31 KB for the look of an element out of use (`disabled`), which every element type has,
+    // and from 31.5 KB for the motion an element repeats (`ambient`, ADR-128), written once.
+    expect(JSON.stringify(add.inputSchema).length).toBeLessThan(32_000);
   });
 
   it('stay within a size the agent can afford', () => {
@@ -141,8 +143,10 @@ describe('tool definitions for a transport adapter', () => {
     // from 93 KB for a picture's outline mask and the artwork of its frame, from 95 KB for the
     // card of a magnet and the window of its photograph (ADR-095), from 97 KB for the motion an
     // import carries over and a new slide gets by default (ADR-092), and from 98 KB for the
-    // numbering style of a list, the number it starts at and the size of its marker.
-    expect(total).toBeLessThan(99_000);
+    // numbering style of a list, the number it starts at and the size of its marker, and from 99 KB
+    // for the look of an element out of use and the animations that take it there and back, and
+    // from 99.5 KB for the motion an element repeats (ADR-128).
+    expect(total).toBeLessThan(100_500);
   });
 
   it('give the image tools, and the drafting of a template, more time than a call gets by default', () => {

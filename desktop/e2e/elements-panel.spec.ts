@@ -32,7 +32,17 @@ import { shapePresets } from '@slidr/renderer';
  * selected, as one undo step.
  */
 
-const COLLECTIONS = ['cards', 'shapes', 'graphics', 'emoji', 'icons', 'frames', 'tables'];
+const COLLECTIONS = [
+  'cards',
+  'shapes',
+  'graphics',
+  'emoji',
+  'icons',
+  'frames',
+  'tables',
+  'animations',
+  'backgrounds',
+];
 
 /** The groups of photo frames, in the order the collection shows them. */
 const FRAME_GROUPS = [
@@ -81,7 +91,17 @@ test('the first screen offers the collections by kind, each with a name', async 
   expect(
     await tiles.evaluateAll((all) => all.map((tile) => tile.getAttribute('data-collection'))),
   ).toEqual(COLLECTIONS);
-  for (const name of ['Card sets', 'Shapes', 'Graphics', 'Emoji', 'Icons', 'Frames', 'Tables']) {
+  for (const name of [
+    'Card sets',
+    'Shapes',
+    'Graphics',
+    'Emoji',
+    'Icons',
+    'Frames',
+    'Tables',
+    'Animations',
+    'Backgrounds',
+  ]) {
     await expect(panel.getByRole('button', { name, exact: true })).toBeVisible();
   }
   // Nothing was used yet, so nothing is offered again.

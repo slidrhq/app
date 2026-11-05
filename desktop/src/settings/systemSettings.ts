@@ -4,8 +4,9 @@ import { create } from 'zustand';
 /*
  * The organization's settings of the app (ADR-117): what it offers, and what it starts with.
  * Slidr Library publishes them into the media library (its README, "System settings"), and the
- * Rust core reads them when the app first starts, keeps them, and reads them again only when the
- * app starts as another version (`src-tauri/src/system_settings.rs`).
+ * Rust core reads them when the app first starts and keeps them. Every later start goes by what it
+ * kept, at once, and reads the library again in the background for the next start (ADR-124,
+ * `src-tauri/src/system_settings.rs`).
  *
  * The core holds to them what it runs: the agents it offers, the organization's own among them,
  * and web access; the image providers and the photo libraries. This page holds the interface to
@@ -29,8 +30,14 @@ export interface CustomAgent {
   glyph?: string;
   /** A tint of the design system's tools: `orange`, `green`, `blue`, `violet`, `teal`, `pink`, `rose`. */
   tone?: string;
-  /** How the app installs its CLI; without it, the organization does. */
-  install?: { winget: string; source?: string } | { npm: string };
+  /**
+   * How the app installs its CLI; without it, the organization does. `package`: from the
+   * organization's library, a .zip unpacked into a folder of the agent's own (ADR-125).
+   */
+  install?:
+    | { winget: string; source?: string }
+    | { npm: string }
+    | { package: string; sha256: string; size: number };
 }
 
 export interface SystemPolicy {
@@ -45,8 +52,9 @@ const store = create<{ policy: SystemPolicy | null }>(() => ({ policy: null }));
 let loading: Promise<SystemPolicy | null> | null = null;
 
 /**
- * Reads the settings from the core, once. The core answers once its read of this start is over:
- * at once from what it kept, or when it has read the library. A plain browser page has none.
+ * Reads the settings from the core, once. The core answers with the settings this start goes by:
+ * at once from what it kept, or, on a first start or with another library, when it has read the
+ * library. A plain browser page has none.
  */
 export function loadSystemSettings(): Promise<SystemPolicy | null> {
   loading ??= (

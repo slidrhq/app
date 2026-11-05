@@ -13,6 +13,7 @@ import {
   GraphicsCollection,
   Drill,
   NothingFound,
+  OpenCollectionContext,
   OpenGroupContext,
   Section,
   ShapesCollection,
@@ -25,6 +26,16 @@ import {
 import { CARD_SETS, cardSetsIn } from './cardSets';
 import { framesIn, loadFrames, searchFrames } from './frames';
 import { FrameGrid, FramesCollection } from './FramesCollection';
+import {
+  AnimationsCollection,
+  BackgroundGrid,
+  BackgroundsCollection,
+  foundMotions,
+  MotionGrid,
+  MotionShapeGrid,
+  searchMotion,
+  useMotionIndex,
+} from './MotionCollection';
 import { useRecentStickers, type RecentSticker } from './recent';
 import {
   CardSetList,
@@ -38,9 +49,9 @@ import { COLLECTIONS, CollectionTile, FrameThumbDefs, type CollectionId } from '
 
 /**
  * Elements: everything that can be put on a slide, by kind. The first screen offers the
- * collections (card sets, shapes, graphics, emoji, icons, frames, tables), what was
- * used lately, and one search over the drawings of all of them; a collection opens in
- * its place.
+ * collections (card sets, shapes, graphics, emoji, icons, frames, tables, animations and
+ * backgrounds), what was used lately, and one search over the drawings of all of them; a
+ * collection opens in its place.
  */
 export function ElementsPanel() {
   const [chosen, setCollection] = useState<CollectionId | 'recent' | null>(null);
@@ -51,7 +62,9 @@ export function ElementsPanel() {
     <div className="@container flex flex-col" data-testid="elements-panel">
       <Drill screen={collection ?? 'home'} depth={collection ? 1 : 0} className="flex flex-col">
         {collection ? (
-          <Collection id={collection} onBack={() => setCollection(null)} />
+          <OpenCollectionContext value={setCollection}>
+            <Collection id={collection} onBack={() => setCollection(null)} />
+          </OpenCollectionContext>
         ) : (
           <Home onOpen={setCollection} />
         )}
@@ -177,7 +190,7 @@ function AllRecent() {
 }
 
 /** How many of each kind the search of the first screen shows. */
-const FOUND = { shapes: 12, graphics: 18, frames: 12, emoji: 24, icons: 24, cards: 3 };
+const FOUND = { shapes: 12, graphics: 18, frames: 12, emoji: 24, icons: 24, cards: 3, motion: 8 };
 
 /**
  * What a query finds across the collections, in the UI language: by the names of what they hold
@@ -192,6 +205,7 @@ function Found({ query }: { query: string }) {
   const allGraphics = useLoaded(loadGraphics);
   const allFrames = useLoaded(loadFrames);
   const allEmoji = useLoaded(loadEmoji);
+  const allMotion = useMotionIndex();
   const [icons, setIcons] = useState<{ query: string; icons: FoundIcon[] }>();
 
   useEffect(() => {
@@ -225,6 +239,10 @@ function Found({ query }: { query: string }) {
     () => (allCardSets ? searchCardSets(allCardSets, query).slice(0, FOUND.cards) : []),
     [allCardSets, query],
   );
+  const motion = useMemo(
+    () => foundMotions(searchMotion(allMotion, query, FOUND.motion)),
+    [allMotion, query],
+  );
 
   // The icons found for an earlier query are not this query's.
   const foundIcons = icons?.query === query ? icons.icons : undefined;
@@ -243,7 +261,10 @@ function Found({ query }: { query: string }) {
     frames.length +
     emoji.length +
     foundIcons.length +
-    cardSets.length;
+    cardSets.length +
+    motion.shapes.length +
+    motion.pieces.length +
+    motion.backgrounds.length;
   if (count === 0) return <NothingFound />;
   return (
     <div className="flex flex-col gap-5" data-testid="elements-found">
@@ -271,6 +292,17 @@ function Found({ query }: { query: string }) {
       {foundIcons.length > 0 && (
         <Section title={t('collection.icons')} data-group="icons">
           <FoundIcons icons={foundIcons} />
+        </Section>
+      )}
+      {motion.shapes.length + motion.pieces.length > 0 && (
+        <Section title={t('collection.animations')} data-group="animations">
+          {motion.shapes.length > 0 && <MotionShapeGrid shapes={motion.shapes} />}
+          {motion.pieces.length > 0 && <MotionGrid pieces={motion.pieces} />}
+        </Section>
+      )}
+      {motion.backgrounds.length > 0 && (
+        <Section title={t('collection.backgrounds')} data-group="backgrounds">
+          <BackgroundGrid backgrounds={motion.backgrounds} />
         </Section>
       )}
       {cardSets.length > 0 && (
@@ -318,6 +350,8 @@ const views: Record<CollectionId | 'recent', () => ReactNode> = {
   icons: () => <IconsTab />,
   frames: () => <FramesCollection />,
   tables: () => <TablesCollection />,
+  animations: () => <AnimationsCollection />,
+  backgrounds: () => <BackgroundsCollection />,
 };
 
 /**

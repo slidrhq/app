@@ -10,12 +10,13 @@ import { z } from 'zod';
 import { formatZodError } from '../errors';
 import { getSlide } from '../lookup';
 import { DeckApiError, defineTool } from '../tool';
+import { ThemeTokens } from './shared';
 
 export const themeUpdate = defineTool({
   name: 'theme_update',
   description:
     'Changes theme tokens for the whole deck: everything that uses a token follows. colors, fonts and textStyles are merged key by key; the other fields are replaced whole. Returns `deck: ["theme"]` and lint findings.',
-  input: commandDefs['theme.update'].schema.shape.patch,
+  input: ThemeTokens,
   scopes: ['deck'],
   writes: true,
   run(patch, ctx) {

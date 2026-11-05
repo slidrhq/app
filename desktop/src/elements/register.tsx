@@ -5,6 +5,7 @@ import { CardSetTools } from './cardSetTools';
 import { DesignsPanel } from './DesignsCollection';
 import { ElementsPanel } from './ElementsPanel';
 import { en, he } from './messages';
+import { MotionTool } from './MotionTool';
 
 registerMessages('elements', { he, en });
 
@@ -42,4 +43,14 @@ registerContextTool({
   group: 'elements.cards',
   order: 45,
   render: CardSetTools,
+});
+
+// Row B of any one element (ADR-128): the motion it repeats, and the speed of an animation of
+// Elements. After the look of the element (effects at 800) and before the arrange menu (900).
+registerContextTool({
+  id: 'elements.motion',
+  kinds: ['text', 'image', 'shape', 'table', 'chart', 'media', 'html', 'group'],
+  group: 'elements.motion',
+  order: 860,
+  render: MotionTool,
 });

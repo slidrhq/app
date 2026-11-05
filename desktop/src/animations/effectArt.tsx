@@ -376,7 +376,9 @@ function transitionArt(type: string, d: Draw): ReactNode {
 
 /** The pictures of the animation presets, each on a canvas of 88 by 62. */
 function objectArt(effect: string, d: Draw): ReactNode {
-  const motif = /^(cover|reveal|swap|crossfade|dissolve|appear|disappear)$/.test(effect)
+  const motif = /^(cover|reveal|swap|crossfade|dissolve|appear|disappear|disable|enable)$/.test(
+    effect,
+  )
     ? effect
     : /blur/.test(effect)
       ? 'blur'
@@ -411,10 +413,43 @@ function objectArt(effect: string, d: Draw): ReactNode {
     <rect x={x} y={y} width={size} height={size} rx="6" fill={WHITE} opacity={opacity} />
   );
 
+  /** The object out of use: faint, with the sign of a thing that cannot be used on it. */
+  const disabled = (x: number, y = 17, size = 28): ReactNode => {
+    const cx = x + size / 2;
+    const cy = y + size / 2;
+    const r = size * 0.24;
+    const d = r * Math.SQRT1_2;
+    return (
+      <>
+        {trace(x, y, size)}
+        <g fill="none" stroke={WHITE} strokeWidth="2.2" strokeLinecap="round">
+          <circle cx={cx} cy={cy} r={r} />
+          <path d={`M${cx - d} ${cy + d}L${cx + d} ${cy - d}`} />
+        </g>
+      </>
+    );
+  };
+
   switch (motif) {
     case 'appear':
     case 'disappear':
       return block();
+    case 'disable':
+      return (
+        <>
+          {block(8, 17, 28)}
+          {line('M40 31h8m-3.5-3.5 3.5 3.5-3.5 3.5')}
+          {disabled(52)}
+        </>
+      );
+    case 'enable':
+      return (
+        <>
+          {disabled(8)}
+          {line('M40 31h8m-3.5-3.5 3.5 3.5-3.5 3.5')}
+          {block(52, 17, 28)}
+        </>
+      );
     case 'cover':
       return (
         <>

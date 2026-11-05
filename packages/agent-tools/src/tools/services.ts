@@ -5,7 +5,6 @@
  */
 import {
   Archetype,
-  commandDefs,
   createElement,
   findElementInDeck,
   PlaceholderRole,
@@ -22,7 +21,7 @@ import { getElement, getSlide, slideNumber } from '../lookup';
 import type { HtmlSlideConversion, PngImage, StoredImage } from '../services';
 import { DeckApiError, defineTool, type ToolContext, type ToolOutput } from '../tool';
 import { animatesItself, withDefaultMotion } from '../motion';
-import { afterSlide, indexAfter } from './shared';
+import { afterSlide, indexAfter, ThemeTokens } from './shared';
 
 const Id = z.string().min(1);
 const ALL = ['deck', 'slide', 'object'] as const;
@@ -357,8 +356,6 @@ export const templateApply = defineTool({
     return {};
   },
 });
-
-const ThemeTokens = commandDefs['theme.update'].schema.shape.patch;
 
 /** A full draft of sixteen layouts is sixteen conversions and two lint passes. */
 const TEMPLATE_TIMEOUT_MS = 210_000;

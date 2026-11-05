@@ -483,7 +483,7 @@ export const animationSet = defineTool({
       .array(StepInput)
       .optional()
       .describe(
-        `Each step animates one element of the slide; an empty list removes all animations. preset, by category: entrance ${oneOf(animationPresets.entrance)}; emphasis ${oneOf(animationPresets.emphasis)}; exit ${oneOf(animationPresets.exit)}. trigger: onClick, withPrevious or afterPrevious. direction is the way the element, or the edge of a wipe, travels: flyIn with up comes from below; start and end follow the reading direction of the slide. textBy paragraph brings a text in one paragraph per trigger; word and char stagger within one step.`,
+        `Each step animates one element of the slide; an empty list removes all animations. preset, by category: entrance ${oneOf(animationPresets.entrance)}; emphasis ${oneOf(animationPresets.emphasis)}; exit ${oneOf(animationPresets.exit)}. trigger: onClick, withPrevious or afterPrevious. direction is the way the element, or the edge of a wipe, travels: flyIn with up comes from below; start and end follow the reading direction of the slide. textBy paragraph brings a text in one paragraph per trigger; word and char stagger within one step. The emphasis disable greys an element out (as its field disabled shows it from the start) and it stays so until an enable step; by paragraph it greys one paragraph per trigger, the points already covered of a list.`,
       ),
     elementIds: z
       .array(Id)

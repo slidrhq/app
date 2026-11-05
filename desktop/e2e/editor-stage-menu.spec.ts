@@ -88,6 +88,7 @@ test('a right click on an element selects it and opens the menu of its kind', as
     'יישור לשקף',
     'נעילה',
     'הסתרה',
+    'הצגה כמושבת',
   ]);
   // Nothing was copied in this window yet.
   await expect(item(page, 'הדבקה')).toBeDisabled();
@@ -191,6 +192,28 @@ test('lock and hide from the menu', async ({ page }) => {
   await expectOneStep(page, () => item(page, 'הסתרה').click());
   expect((await elements(page)).find((e) => e.id === 'e_c')!.hidden).toBe(true);
   await expect(onStage(page, 'e_c')).toHaveCount(0);
+});
+
+test('shown as disabled and back, from the menu and from the toolbar', async ({ page }) => {
+  await rightClick(page, onStage(page, 'e_b'));
+  await expectOneStep(page, () => item(page, 'הצגה כמושבת').click());
+  expect((await elements(page)).find((e) => e.id === 'e_b')!.disabled).toBe(true);
+  // Only the look: still selected, and drawn grey.
+  expect(await selected(page)).toEqual(['e_b']);
+  await expect(onStage(page, 'e_b')).toHaveAttribute('data-slidr-disabled', '');
+  await rightClick(page, onStage(page, 'e_b'));
+  await expectOneStep(page, () => item(page, 'הצגה כפעיל').click());
+  expect((await elements(page)).find((e) => e.id === 'e_b')!.disabled).toBeUndefined();
+  await page.keyboard.press('Escape');
+
+  // The button beside the selection is pressed while all of it is shown so.
+  await select(page, ['e_a', 'e_c']);
+  const button = toolbar(page).getByRole('button', { name: 'הצגה כמושבת' });
+  await expect(button).toHaveAttribute('aria-pressed', 'false');
+  await expectOneStep(page, () => button.click());
+  const all = await elements(page);
+  expect(all.filter((e) => e.disabled).map((e) => e.id)).toEqual(['e_a', 'e_c']);
+  await expect(button).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('several elements can be grouped, and a group entered or taken apart', async ({ page }) => {

@@ -35,7 +35,7 @@
 #[cfg(windows)]
 #[allow(unsafe_code)]
 // The COM call into WebView2 (ADR-003, "Cost"); `import_window/network.rs`,
-// `fonts/directwrite.rs` and `show_screen/win32.rs` are the other three.
+// `fonts/directwrite.rs`, `show_screen/win32.rs` and `screen_color/win32.rs` are the other four.
 mod webview2;
 
 use std::{

@@ -69,6 +69,7 @@
       "signingIn": "Conclua o login na janela que se abriu. Depois, continuamos aqui.",
       "installDescription": "{{name}} não está instalado neste computador. Com a sua aprovação, vamos baixá-lo e instalá-lo com o Instalador de Aplicativo do Windows e depois continuar aqui.",
       "installDescriptionNpm": "{{name}} não está instalado neste computador. Com a sua aprovação, vamos instalá-lo com o npm (se o Node.js estiver faltando, ele será instalado antes com o Instalador de Aplicativo do Windows) e depois continuar aqui.",
+      "installDescriptionLibrary": "{{name}} não está instalado neste computador. Com a sua aprovação, vamos baixá-lo da biblioteca da sua organização, instalá-lo e depois continuar aqui.",
       "install": "Aprovar e instalar",
       "signInDescription": "Entre na sua conta para carregar os modelos disponíveis.",
       "signIn": "Entrar",
@@ -613,7 +614,9 @@
       "paragraph": "Parágrafo {{n}} de {{total}}",
       "row": "{{effect}} em {{name}}",
       "original": "Movimento original",
-      "originalHint": "O movimento que o arquivo importado reproduzia, tal como ele o descreveu. Escolher outro efeito o substitui."
+      "originalHint": "O movimento que o arquivo importado reproduzia, tal como ele o descreveu. Escolher outro efeito o substitui.",
+      "disableHint": "O objeto fica cinza e esmaecido até uma animação “Ativar”. Para que ele apareça desativado desde a abertura do slide, escolha “Mostrar como desativado” nele.",
+      "enableHint": "O objeto volta à sua aparência habitual e continua assim. Para que ele apareça desativado até esta animação, escolha “Mostrar como desativado” nele."
     },
     "group": {
       "leadIn": "Ao abrir o slide",
@@ -660,7 +663,9 @@
         "heartbeat": "Batimento",
         "flicker": "Tremeluzir",
         "float": "Flutuar",
-        "tilt": "Inclinar"
+        "tilt": "Inclinar",
+        "disable": "Desativar",
+        "enable": "Ativar"
       },
       "exit": {
         "disappear": "Desaparecer",
@@ -804,6 +809,8 @@
       "lock": "Bloquear",
       "unlock": "Desbloquear",
       "hide": "Ocultar",
+      "disable": "Mostrar como desativado",
+      "enable": "Mostrar como ativo",
       "duplicate": "Duplicar",
       "pasteStyle": "Colar estilo",
       "delete": "Excluir",
@@ -862,6 +869,7 @@
       "order": "Ordem das camadas",
       "lock": "Bloquear",
       "visibility": "Ocultar e mostrar",
+      "disabled": "Mostrar como desativado ou ativo",
       "rename": "Renomear",
       "paste": "Colar",
       "cut": "Recortar",
@@ -1050,7 +1058,10 @@
       "insert": "Inserir ilustração",
       "frame": "Inserir moldura",
       "reframe": "Colocar imagem na moldura",
-      "cards": "Inserir conjunto de cartões"
+      "cards": "Inserir conjunto de cartões",
+      "animation": "Inserir animação",
+      "background": "Aplicar plano de fundo",
+      "motion": "Alterar movimento"
     },
     "collection": {
       "cards": "Conjuntos de cartões",
@@ -1059,7 +1070,9 @@
       "emoji": "Emojis",
       "icons": "Ícones",
       "frames": "Molduras",
-      "tables": "Tabelas"
+      "tables": "Tabelas",
+      "animations": "Animações",
+      "backgrounds": "Planos de fundo"
     },
     "designs": {
       "title": "Slides prontos",
@@ -1466,6 +1479,110 @@
       "ready": "Tamanhos prontos",
       "custom": "Outro tamanho",
       "size": "{{rows}} linhas por {{cols}} colunas"
+    },
+    "animations": {
+      "search": "Pesquisar animações",
+      "searchPlaceholder": "Pesquisar animações…",
+      "hint": "Clique em uma animação para adicioná-la ao slide. Ela se move sozinha, e você pode movê-la, redimensioná-la e girá-la como qualquer objeto.",
+      "group": {
+        "basic": "Formas animadas",
+        "path": "Por um caminho",
+        "spin": "Giro",
+        "scale": "Crescer e pulsar",
+        "lines": "Linhas e ondas",
+        "particles": "Partículas e redes"
+      },
+      "name": {
+        "orbit": "Órbita",
+        "conveyor": "Caixas em um caminho",
+        "trace": "Trilha de circuito",
+        "atom": "Átomo",
+        "shuttle": "Ponto em uma linha",
+        "hexagon": "Hexágonos girando",
+        "rings": "Anéis girando",
+        "radar": "Radar",
+        "ripple": "Ondulações",
+        "breathe": "Forma que respira",
+        "bars": "Barras subindo",
+        "waves": "Ondas",
+        "draw": "Seta desenhada",
+        "flowArrow": "Conector que flui",
+        "heartbeat": "Batimento",
+        "network": "Rede",
+        "converge": "Partículas se reunindo",
+        "float": "Bolhas subindo"
+      }
+    },
+    "backgrounds": {
+      "hint": "Clique em um plano de fundo para aplicá-lo ao slide ou a todos os slides selecionados. As cores vêm do modelo, e a ferramenta “Plano de fundo” leva de volta ao plano de fundo do modelo.",
+      "animated": "Planos de fundo em movimento",
+      "still": "Planos de fundo calmos",
+      "name": {
+        "flow": "Fluxo de circuito",
+        "waves": "Ondas",
+        "converge": "Convergência",
+        "orbit": "Órbitas",
+        "radar": "Radar",
+        "network": "Rede",
+        "drift": "Luz flutuante",
+        "particles": "Partículas subindo",
+        "dots": "Grade de pontos",
+        "contours": "Curvas de nível",
+        "arcs": "Arcos no canto"
+      }
+    },
+    "animatedShapes": {
+      "title": "Formas animadas",
+      "hint": "Formas comuns que repetem um movimento. Cor, contorno e tamanho são editados como em qualquer forma, e o movimento com a ferramenta Movimento.",
+      "more": "Todas as animações",
+      "name": {
+        "ring": "Anel girando",
+        "hexagon": "Hexágono girando",
+        "star": "Estrela girando",
+        "octagon": "Octógono girando",
+        "square": "Quadrado que gira e descansa",
+        "pulse": "Círculo pulsante",
+        "heart": "Coração batendo",
+        "float": "Círculo flutuante",
+        "arrow": "Seta balançando",
+        "blink": "Ponto piscando"
+      }
+    },
+    "motion": {
+      "title": "Movimento",
+      "piece": "Velocidade da animação",
+      "loop": "Movimento repetido",
+      "kind": {
+        "none": "Nenhum",
+        "spin": "Girar",
+        "pulse": "Pulsar",
+        "float": "Flutuar",
+        "swing": "Balançar",
+        "blink": "Piscar"
+      },
+      "speed": "Velocidade",
+      "pace": {
+        "slow": "Lenta",
+        "medium": "Média",
+        "fast": "Rápida"
+      },
+      "round": "Segundos por volta",
+      "rhythm": "Ritmo",
+      "rhythmKind": {
+        "steady": "Constante",
+        "smooth": "Suave",
+        "pause": "Com pausas"
+      },
+      "direction": "Direção",
+      "clockwise": "Sentido horário",
+      "counterclockwise": "Sentido anti-horário",
+      "amount": {
+        "pulse": "Tamanho da pulsação",
+        "float": "Altura da flutuação",
+        "swing": "Ângulo do balanço",
+        "blink": "Intensidade da piscada"
+      },
+      "hint": "O movimento se repete enquanto o slide é exibido: no editor, na apresentação e em um arquivo exportado."
     }
   },
   "export": {
@@ -2328,6 +2445,11 @@
       "blur": "Desfoque",
       "dim": "Escurecer",
       "applyAll": "Aplicar a todos os slides",
+      "noDrawing": "Remover o desenho do plano de fundo",
+      "drawingColours": "Cores do desenho",
+      "drawingColour": "Cor {{n}} do desenho",
+      "speed": "Velocidade do movimento",
+      "drawingOpacity": "Opacidade do desenho",
       "reset": "Voltar ao plano de fundo do tema"
     },
     "groups": {
@@ -2546,6 +2668,7 @@
       "installTitle": "Instalar {{name}}?",
       "installDescription": "O aplicativo vai baixar e instalar {{name}} com o Instalador de Aplicativo do Windows. Em seguida, verificaremos a conexão e pediremos que você entre na sua conta, se necessário.",
       "installDescriptionNpm": "O aplicativo vai instalar {{name}} com o npm. Se o Node.js estiver faltando, ele será instalado antes com o Instalador de Aplicativo do Windows. Em seguida, verificaremos a conexão e pediremos que você entre na sua conta, se necessário.",
+      "installDescriptionLibrary": "O aplicativo vai baixar {{name}} da biblioteca da sua organização e instalá-lo neste computador. Em seguida, verificaremos a conexão e pediremos que você entre na sua conta, se necessário.",
       "approveInstall": "Aprovar e instalar",
       "chooseModel": "Escolha um modelo",
       "chooseEffort": "Escolha um nível de esforço",

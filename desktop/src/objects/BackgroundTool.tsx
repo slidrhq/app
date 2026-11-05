@@ -9,23 +9,41 @@ import {
   PopoverTrigger,
   Separator,
 } from '@slidr/ui';
-import { CopyCheck, PaintBucket, RotateCcw } from '@slidr/ui/icons';
+import { CopyCheck, Eraser, PaintBucket, RotateCcw } from '@slidr/ui/icons';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useGestureTx } from '../controls';
+import { ColorField, useGestureTx } from '../controls';
+import { PIECE_SPEEDS } from '../elements/motion';
 import { useDeck, useEditor } from '../shell';
 import {
   applyToAllCommands,
+  drawingColour,
+  drawingColours,
+  drawingOpacity,
+  drawingPictures,
+  drawingSpeed,
   inheritedBackground,
   variantIndex,
   withAdjust,
+  withDrawingColour,
+  withDrawingOpacity,
+  withDrawingSpeed,
   withFill,
+  withoutDrawing,
 } from './background';
 import { FillEditor } from './FillEditor';
 import { BackgroundSwatch, Hint, SliderField } from './parts';
+import { svgColors } from './svgImport';
 import { useCurrentSlide } from './target';
 
 /** The strongest blur the slider offers, in slide pixels. */
 const MAX_BLUR = 80;
+
+/** The colours of a drawing listed at once, as for an SVG in row B. */
+const MAX_COLOURS = 12;
+
+/** The faintest a drawing is drawn: under it, it is no longer seen, and the tool removes it. */
+const MIN_OPACITY = 10;
 
 /** The width of a choice, in pixels: Tailwind's `w-16`. Its height is the slide's shape. */
 const CHOICE_WIDTH = 64;
@@ -58,6 +76,80 @@ function BackgroundChoice({
         <BackgroundSwatch background={background} width={CHOICE_WIDTH} />
       </button>
     </Hint>
+  );
+}
+
+/**
+ * The drawing of the background (ADR-125, ADR-129): the colours it is drawn in, how fast a
+ * background of Elements moves, and how strong it is. Nothing selects the drawing on the stage,
+ * so this is where it is set. Each change is a step of a gesture of `onChange`, closed by
+ * `onCommit`.
+ */
+function DrawingFields({
+  background,
+  onChange,
+  onCommit,
+}: {
+  background: Background;
+  onChange: (next: Background) => void;
+  onCommit: () => void;
+}) {
+  const { t } = useTranslation('objects');
+  const { elements } = background;
+  // A background of Elements replaces the colours that stand for the theme's; a drawing whose
+  // pictures replace none lists the colours its markup is drawn in, as row B does for an SVG.
+  // The drawing alone decides: a change of the fill lists the same colours.
+  const colours = useMemo(() => {
+    const replaced = drawingColours({ elements });
+    if (replaced.length) return replaced.slice(0, MAX_COLOURS);
+    const drawn = drawingPictures({ elements }).flatMap((picture) => svgColors(picture.markup!));
+    return [...new Set(drawn)].filter((c) => c !== 'currentcolor').slice(0, MAX_COLOURS);
+  }, [elements]);
+  if (!elements?.length) return null;
+  const speed = drawingSpeed(background);
+  const opacity = drawingOpacity(background) ?? 1;
+  return (
+    <div data-testid="background-drawing" className="flex flex-col gap-3">
+      {colours.length > 0 && (
+        <Field label={t('background.drawingColours')}>
+          <div className="flex flex-wrap gap-2">
+            {colours.map((colour, i) => (
+              <div key={colour} data-colour={colour}>
+                <ColorField
+                  value={drawingColour(background, colour)}
+                  label={t('background.drawingColour', { n: i + 1 })}
+                  size="sm"
+                  onChange={(color) =>
+                    color && onChange(withDrawingColour(background, colour, color))
+                  }
+                  onGestureEnd={onCommit}
+                />
+              </div>
+            ))}
+          </div>
+        </Field>
+      )}
+      {speed !== undefined && (
+        <SliderField
+          label={t('background.speed')}
+          value={Math.round(speed * 100)}
+          min={PIECE_SPEEDS.min * 100}
+          max={PIECE_SPEEDS.max * 100}
+          step={5}
+          unit="%"
+          onChange={(percent) => onChange(withDrawingSpeed(background, percent / 100))}
+          onCommit={onCommit}
+        />
+      )}
+      <SliderField
+        label={t('background.drawingOpacity')}
+        value={Math.round(opacity * 100)}
+        min={MIN_OPACITY}
+        unit="%"
+        onChange={(percent) => onChange(withDrawingOpacity(background, percent / 100))}
+        onCommit={onCommit}
+      />
+    </div>
   );
 }
 
@@ -158,6 +250,12 @@ export function BackgroundTool() {
               />
             </>
           )}
+          {background.elements?.length ? (
+            <>
+              <Separator />
+              <DrawingFields background={background} onChange={change} onCommit={tx.end} />
+            </>
+          ) : null}
           <Separator />
           <div className="flex flex-col items-start gap-1">
             <Button
@@ -172,6 +270,18 @@ export function BackgroundTool() {
             >
               {t('background.applyAll')}
             </Button>
+            {/* The drawing of a background is no object to select (ADR-125): this takes it
+                off this slide, which keeps the ground under it. */}
+            {background.elements?.length ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={Eraser}
+                onClick={() => set(withoutDrawing(background))}
+              >
+                {t('background.noDrawing')}
+              </Button>
+            ) : null}
             <Button
               variant="ghost"
               size="sm"

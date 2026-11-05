@@ -5,7 +5,7 @@
 use std::sync::Arc;
 
 use super::{AgentHarness, mock::MockHarness};
-use crate::system_settings::Policy;
+use crate::{custom_agents::CustomAgents, system_settings::Policy};
 
 // Declared here rather than in `mod.rs`, so the generic layer does not name it.
 #[path = "claude_code.rs"]
@@ -35,14 +35,21 @@ pub fn builtin() -> Vec<Arc<dyn AgentHarness>> {
 
 /// The harnesses the organization's settings offer: the built-in ones and its own agents, after
 /// them, those it offers alone, its default first. Without settings, the built-in ones. The mock
-/// is offered whatever they say, as it is for the tests alone.
-pub fn offered(policy: Option<&Policy>) -> Vec<Arc<dyn AgentHarness>> {
+/// is offered whatever they say, as it is for the tests alone. An agent of its own that comes as a
+/// package of its library is installed into the folders of `packages` (ADR-125).
+pub fn offered(
+    policy: Option<&Policy>,
+    packages: &Arc<CustomAgents>,
+) -> Vec<Arc<dyn AgentHarness>> {
     let mut harnesses = builtin();
     let Some(policy) = policy else {
         return harnesses;
     };
     harnesses.extend(policy.agents.custom.iter().map(|agent| {
-        Arc::new(custom_cli::CustomCliHarness::new(agent.clone())) as Arc<dyn AgentHarness>
+        Arc::new(custom_cli::CustomCliHarness::new(
+            agent.clone(),
+            Arc::clone(packages),
+        )) as Arc<dyn AgentHarness>
     }));
     policy.agents.offer.arrange(
         harnesses,
@@ -56,6 +63,10 @@ mod tests {
     use serde_json::json;
 
     use super::*;
+
+    fn offered(policy: Option<&Policy>) -> Vec<Arc<dyn AgentHarness>> {
+        super::offered(policy, &CustomAgents::new(std::path::PathBuf::new(), None))
+    }
 
     fn ids(harnesses: &[Arc<dyn AgentHarness>]) -> Vec<String> {
         harnesses

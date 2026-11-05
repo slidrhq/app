@@ -90,6 +90,7 @@ interface Node {
   name?: string;
   locked?: boolean;
   hidden?: boolean;
+  disabled?: boolean;
   assetId?: string;
   children?: Node[];
 }

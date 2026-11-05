@@ -108,6 +108,14 @@ describe('steps', () => {
     expect(withPreset(wipe, 'flyIn').direction).toBe('start');
   });
 
+  it('taking a text out of use goes by paragraph or whole, never word by word', () => {
+    const byWord = step('a', { category: 'emphasis', preset: 'pulse', textBy: 'word' });
+    expect('textBy' in withPreset(byWord, 'disable')).toBe(false);
+    const byParagraph = { ...byWord, textBy: 'paragraph' as const };
+    expect(withPreset(byParagraph, 'enable').textBy).toBe('paragraph');
+    expect(withPreset(byWord, 'flash').textBy).toBe('word');
+  });
+
   it('moves a step before another, or to the end', () => {
     const timeline = [step('a'), step('b'), step('c')];
     const ids = (list: readonly AnimationStep[]) => list.map((s) => s.id).join('');

@@ -1,0 +1,170 @@
+import { expect, test, type Page } from '@playwright/test';
+import type { SvgElement } from '@slidr/model';
+import {
+  currentSlide,
+  deck,
+  onStage,
+  openApp,
+  pageProblems,
+  selected,
+  undo,
+  undoDepth,
+} from './objects-helpers';
+
+/*
+ * The animations and the backgrounds of Elements (ADR-127): pictures that move by themselves.
+ * An animation lands on the slide as an object of its own, which moves, resizes and turns as any
+ * other; a background goes behind the slide, its drawing over the slide's ground. Their tiles are
+ * small slides in the deck's theme, still until the pointer is on them.
+ */
+
+test.afterEach(({ page }) => {
+  expect(pageProblems(page)).toEqual([]);
+});
+
+async function openCollection(page: Page, id: 'animations' | 'backgrounds', lang: 'he' | 'en') {
+  await openApp(page, { lang });
+  await page.getByTestId('activity-bar').locator('[data-panel="elements"]').click();
+  const panel = page.getByTestId('elements-panel');
+  await panel.locator(`[data-collection="${id}"]`).click();
+  await expect(panel.locator(`[data-collection-view="${id}"]`)).toBeVisible();
+  return panel;
+}
+
+/** What moves a picture on the stage: its CSS animations, and its SMIL timeline running. */
+async function motionOf(page: Page, elementId: string) {
+  return onStage(page, elementId)
+    .locator('[data-slidr-svg]')
+    .evaluate((host) => {
+      const root = host.shadowRoot!;
+      const svg = root.querySelector('svg')!;
+      return {
+        css: root.getAnimations().length,
+        smil: svg.querySelectorAll('animate, animateMotion, animateTransform').length,
+        paused: svg.animationsPaused(),
+      };
+    });
+}
+
+test('an animation lands in the middle of the slide, selected, and moves there', async ({
+  page,
+}) => {
+  const panel = await openCollection(page, 'animations', 'en');
+  const view = panel.locator('[data-collection-view="animations"]');
+  // The animated shapes of ADR-128, then the five groups of pictures.
+  await expect(view.locator('section[data-group]')).toHaveCount(6);
+  await expect(view.locator('[data-animation]')).toHaveCount(18);
+  await expect(view.getByRole('button', { name: 'Orbit', exact: true })).toBeVisible();
+  await page
+    .getByTestId('tool-panel')
+    .screenshot({ path: 'test-results/elements/animations-en.png' });
+
+  const before = await undoDepth(page);
+  await view.locator('[data-animation="orbit"]').click();
+  const element = await selected<SvgElement>(page);
+  expect(element.type).toBe('svg');
+  expect(element.name).toBe('animation-orbit');
+  expect(element.colorOverrides).toMatchObject({ '#15213f': { token: 'text' } });
+  expect(element.frame.x + element.frame.w / 2).toBeCloseTo(960, 0);
+  expect(element.frame.y + element.frame.h / 2).toBeCloseTo(540, 0);
+  expect(await undoDepth(page)).toBe(before + 1);
+  // It moves on the stage: its stylesheet turns the rings, and SMIL takes the dots round.
+  const motion = await motionOf(page, element.id);
+  expect(motion.css).toBeGreaterThan(0);
+  expect(motion.smil).toBeGreaterThan(0);
+  expect(motion.paused).toBe(false);
+
+  // An arrow runs in the reading direction of the deck: mirrored in one that reads from the right.
+  await view.locator('[data-animation="flowArrow"]').click();
+  const arrow = await selected<SvgElement>(page);
+  expect(arrow.name).toBe('animation-flowArrow');
+  expect(arrow.flipH).toBe((await deck(page)).meta.dir === 'rtl' ? true : undefined);
+  // Beside the first one, not on it.
+  expect(arrow.frame).not.toEqual(element.frame);
+
+  await undo(page);
+  await undo(page);
+  expect((await currentSlide(page)).elements.some((e) => e.name?.startsWith('animation-'))).toBe(
+    false,
+  );
+});
+
+test('an animation tile is still, and moves while the pointer is on it', async ({ page }) => {
+  const panel = await openCollection(page, 'animations', 'he');
+  // The app opens with motion off for the other tests: this one is about motion.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const tile = panel.locator('[data-animation="atom"]');
+  const paused = () =>
+    tile
+      .locator('[data-slidr-svg]')
+      .evaluate((host) => host.shadowRoot!.querySelector('svg')!.animationsPaused());
+  await expect.poll(paused).toBe(true);
+  await tile.hover();
+  await expect.poll(paused).toBe(false);
+  await panel.getByTestId('animations-query').hover();
+  await expect.poll(paused).toBe(true);
+  await page
+    .getByTestId('tool-panel')
+    .screenshot({ path: 'test-results/elements/animations-he.png' });
+});
+
+test('a background goes behind the slide over its ground, and the Background tool sees it', async ({
+  page,
+}) => {
+  const panel = await openCollection(page, 'backgrounds', 'he');
+  const view = panel.locator('[data-collection-view="backgrounds"]');
+  await expect(view.locator('[data-background]')).toHaveCount(11);
+  await expect(view.locator('section[data-group="animated"] [data-background]')).toHaveCount(8);
+  await page
+    .getByTestId('tool-panel')
+    .screenshot({ path: 'test-results/elements/backgrounds-he.png' });
+
+  const ground = (await currentSlide(page)).background;
+  const before = await undoDepth(page);
+  await view.locator('[data-background="waves"]').click();
+  await expect
+    .poll(async () => (await currentSlide(page)).background?.elements?.[0]?.name)
+    .toBe('background-waves');
+  const background = (await currentSlide(page)).background!;
+  const drawing = background.elements![0] as SvgElement;
+  expect(drawing.frame).toEqual({ x: 0, y: 0, w: 1920, h: 1080 });
+  // Beside the text: on the left, as drawn, in a deck that reads from the right.
+  expect(drawing.flipH).toBe((await deck(page)).meta.dir === 'ltr' ? true : undefined);
+  expect(await undoDepth(page)).toBe(before + 1);
+  await expect(view.locator('[data-background="waves"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(view.locator('[data-background="flow"]')).toHaveAttribute('aria-pressed', 'false');
+  // Drawn behind the slide, and moving there: nothing on the stage selects it.
+  const stage = page.getByTestId('stage-frame');
+  await expect(stage.locator('[data-slidr-svg]').first()).toBeAttached();
+  const smil = await stage
+    .locator('[data-slidr-svg]')
+    .first()
+    .evaluate((host) => host.shadowRoot!.querySelectorAll('animate').length);
+  expect(smil).toBe(7);
+  await page.screenshot({ path: 'test-results/elements/backgrounds-on-stage-he.png' });
+
+  // Another one takes its place; undo gives back the slide's ground as it was.
+  await view.locator('[data-background="orbit"]').click();
+  await expect
+    .poll(async () => (await currentSlide(page)).background?.elements?.map((e) => e.name))
+    .toEqual(['background-orbit']);
+  await undo(page);
+  await undo(page);
+  expect((await currentSlide(page)).background).toEqual(ground);
+});
+
+test('one search on the first screen finds animations and backgrounds too', async ({ page }) => {
+  await openApp(page, { lang: 'he' });
+  await page.getByTestId('activity-bar').locator('[data-panel="elements"]').click();
+  const panel = page.getByTestId('elements-panel');
+  await panel.getByTestId('elements-query').fill('גלים');
+  const found = panel.getByTestId('elements-found');
+  // The search waits for every collection of the media library; the animations come after them.
+  await expect(found).toBeVisible({ timeout: 30_000 });
+  await found.locator('[data-group="animations"]').scrollIntoViewIfNeeded();
+  await expect(found.locator('[data-group="animations"] [data-animation="waves"]')).toBeVisible();
+  await expect(found.locator('[data-group="backgrounds"] [data-background="waves"]')).toBeVisible();
+  await panel.getByTestId('elements-query').fill('orbit');
+  await expect(found.locator('[data-animation="orbit"]')).toBeVisible();
+  await expect(found.locator('[data-background="orbit"]')).toBeVisible();
+});

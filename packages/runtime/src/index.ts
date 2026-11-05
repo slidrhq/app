@@ -21,6 +21,12 @@ export {
 } from './presets';
 export { keyframesOfRule, slideKeyframes } from './keyframes';
 export {
+  DISABLED_ATTRIBUTE,
+  DISABLED_FILTER,
+  DISABLED_GRAYSCALE,
+  DISABLED_OPACITY,
+} from './disabled';
+export {
   defaultTransitionDirection,
   transitionTypes,
   transitionTurns,

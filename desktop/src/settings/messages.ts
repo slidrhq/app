@@ -67,6 +67,8 @@ export const he = {
       'האפליקציה תוריד ותתקין את {{name}} באמצעות Windows App Installer. לאחר ההתקנה נבדוק את החיבור ונבקש התחברות לחשבון לפי הצורך.',
     installDescriptionNpm:
       'האפליקציה תתקין את {{name}} באמצעות npm, ואם Node.js חסר תתקין אותו קודם באמצעות Windows App Installer. לאחר ההתקנה נבדוק את החיבור ונבקש התחברות לחשבון לפי הצורך.',
+    installDescriptionLibrary:
+      'האפליקציה תוריד את {{name}} מהספרייה של הארגון ותתקין אותו במחשב. לאחר ההתקנה נבדוק את החיבור ונבקש התחברות לחשבון לפי הצורך.',
     approveInstall: 'אישור והתקנה',
     chooseModel: 'בחרו מודל',
     chooseEffort: 'בחרו רמת מאמץ',
@@ -166,6 +168,8 @@ export const en: Messages<typeof he> = {
       'The app will download and install {{name}} using Windows App Installer. We will then check the connection and ask you to sign in if needed.',
     installDescriptionNpm:
       'The app will install {{name}} with npm, installing Node.js first using Windows App Installer if it is missing. We will then check the connection and ask you to sign in if needed.',
+    installDescriptionLibrary:
+      'The app will download {{name}} from your organization’s library and install it on this computer. We will then check the connection and ask you to sign in if needed.',
     approveInstall: 'Approve and install',
     chooseModel: 'Choose a model',
     chooseEffort: 'Choose an effort',

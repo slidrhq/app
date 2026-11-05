@@ -55,6 +55,23 @@ sample is drawn, draws a scene as its parts rather than as one drawing the size 
 keeps its drawings clear of the foot. The check fails a template whose layouts keep their drawings,
 and lists the grounds that stay, to look at.
 
+A drawing that is a layout's atmosphere rather than its content, such as Zerem's stream, belongs to
+the layout's background (`Background.elements`, ADR-125). A slide drops it by taking another
+background, and nothing selects it. A template authored here puts it there with `toBackground`
+(`builtin/kit.ts`) after `withObjects`. For a template that exists only as the library's catalog,
+the same function rewrites the catalog:
+
+```sh
+node src/authoring/tools/run-ts.mjs src/authoring/tools/to-background.ts \
+  <catalog.json> <out.json> <template id> <object id>...
+```
+
+It moves the objects in the layouts of both directions and takes their copies off the sample
+slides. It refuses a move that would change the picture: a drawing over a decoration or over an
+object under it, or a sample copy that was changed or is animated. The library writes no other file
+from the catalog, so `templates/<id>/template.json` (the template without its sample and assets,
+as `templateFiles` in `desktop/build/media.ts` writes it) is published with it.
+
 To look at it, bring up the dev server (`pnpm dev`, on port 1420, which reads the published
 library), then take screenshots of the review page (`desktop/dev/review.html`):
 

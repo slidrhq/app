@@ -16,9 +16,10 @@ export interface HarnessLook {
   /**
    * `winget`: Windows App Installer installs the CLI. `npm`: npm installs it, and Windows App
    * Installer first installs Node.js when npm is missing (Gemini CLI is published on npm only).
-   * `organization`: the organization installs it; the app does not.
+   * `library`: the app downloads its package from the organization's library, and from nowhere
+   * else (ADR-125). `organization`: the organization installs it; the app does not.
    */
-  installer: 'winget' | 'npm' | 'organization';
+  installer: 'winget' | 'npm' | 'library' | 'organization';
 }
 
 /** The tints an agent of the organization's may take, each its classes, written out whole. */
@@ -74,7 +75,13 @@ export function harnessLook(id: string): HarnessLook | undefined {
     name: agent.name,
     ...(agent.glyph ? { glyph: agent.glyph } : {}),
     tone: TONES[agent.tone ?? ''] ?? TONES.violet!,
-    installer: !agent.install ? 'organization' : 'npm' in agent.install ? 'npm' : 'winget',
+    installer: !agent.install
+      ? 'organization'
+      : 'package' in agent.install
+        ? 'library'
+        : 'npm' in agent.install
+          ? 'npm'
+          : 'winget',
   };
 }
 
@@ -91,4 +98,17 @@ export function installsWithNpm(id: string | undefined): boolean {
 /** Whether the organization installs the CLI of a harness, and the app offers no installation. */
 export function installedByOrganization(id: string | undefined): boolean {
   return !!id && harnessLook(id)?.installer === 'organization';
+}
+
+/** The key of what an approval of a harness's installation says it does, as its CLI is installed. */
+export type InstallDescription =
+  'installDescription' | 'installDescriptionNpm' | 'installDescriptionLibrary';
+
+export function installDescription(id: string | undefined): InstallDescription {
+  const installer = id ? harnessLook(id)?.installer : undefined;
+  return installer === 'library'
+    ? 'installDescriptionLibrary'
+    : installer === 'npm'
+      ? 'installDescriptionNpm'
+      : 'installDescription';
 }

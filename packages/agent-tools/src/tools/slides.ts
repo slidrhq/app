@@ -1,11 +1,11 @@
-import { Archetype, Background, duplicateSlide, Transition } from '@slidr/model';
+import { Archetype, duplicateSlide, Transition } from '@slidr/model';
 import { transitionTypes } from '@slidr/runtime/names';
 import { z } from 'zod';
 import { getSlide } from '../lookup';
 import { markdownToRichText } from '../markdown';
 import { DeckApiError, defineTool } from '../tool';
 import { checkTransitionType } from './content';
-import { about, afterSlide, indexAfter } from './shared';
+import { about, AgentBackground, afterSlide, indexAfter } from './shared';
 
 export const slideUpdate = defineTool({
   name: 'slide_update',
@@ -19,7 +19,7 @@ export const slideUpdate = defineTool({
       .optional()
       .describe('What kind of slide this is, for a slide without a layout.'),
     background: about(
-      Background.nullable(),
+      AgentBackground.nullable(),
       'Overrides the theme background; null goes back to it.',
     ).optional(),
     notes: z

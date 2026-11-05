@@ -105,6 +105,7 @@ describe('presets', () => {
       known: true,
       directional: true,
       direction: 'end',
+      textBy: ['all', 'paragraph', 'word', 'char'],
     });
     expect(describePreset('exit', 'flyOut').direction).toBe('down');
     expect(describePreset('entrance', 'swoosh').known).toBe(false);
@@ -158,6 +159,26 @@ describe('presets', () => {
     expect(found.preset).toBe(findPreset('entrance', 'fade').preset);
   });
 
+  it('takes a part out of use and back, a whole element or a paragraph at a time', () => {
+    expect(animationPresets.emphasis).toEqual(expect.arrayContaining(['disable', 'enable']));
+    expect(findPreset('emphasis', 'disable').preset.disables).toBe(true);
+    expect(findPreset('emphasis', 'enable').preset.disables).toBe(false);
+    // Every other preset leaves the part as it found it.
+    const others = animationPresets.emphasis.filter(
+      (name) => name !== 'disable' && name !== 'enable',
+    );
+    expect(
+      others.filter((name) => findPreset('emphasis', name).preset.disables !== undefined),
+    ).toEqual([]);
+    expect(describePreset('emphasis', 'disable').textBy).toEqual(['all', 'paragraph']);
+    expect(describePreset('emphasis', 'pulse').textBy).toEqual([
+      'all',
+      'paragraph',
+      'word',
+      'char',
+    ]);
+  });
+
   it('gives inline text a preset it can play', () => {
     const zoom = findPreset('entrance', 'zoom').preset;
     expect(inlinePreset('entrance', zoom)).toBe(findPreset('entrance', 'fade').preset);
@@ -191,6 +212,22 @@ describe('toKeyframes', () => {
     const blur = findPreset('entrance', 'blur').preset.frames(input('up', 'ltr'));
     const filter = 'drop-shadow(0 4px 8px black)';
     expect(toKeyframes(blur, { ...boxPart, filter })[0]?.filter).toBe(`${filter} blur(24px)`);
+  });
+
+  it('greys a part out of use after the filter it has, and back', () => {
+    const filter = 'drop-shadow(0 4px 8px black)';
+    const disable = findPreset('emphasis', 'disable').preset.frames(input('up', 'ltr'));
+    expect(toKeyframes(disable, { ...boxPart, filter }).map((k) => k.filter)).toEqual([
+      `${filter} grayscale(0) opacity(1)`,
+      `${filter} grayscale(1) opacity(0.4)`,
+    ]);
+    const enable = findPreset('emphasis', 'enable').preset.frames(input('up', 'ltr'));
+    expect(toKeyframes(enable, boxPart).map((k) => k.filter)).toEqual([
+      'grayscale(1) opacity(0.4)',
+      'grayscale(0) opacity(1)',
+    ]);
+    // Only the filter: the part's opacity is its own, and other animations may move it.
+    expect(toKeyframes(disable, boxPart)[1]).not.toHaveProperty('opacity');
   });
 
   it('moves further inside shrunken text, where a pixel is smaller', () => {

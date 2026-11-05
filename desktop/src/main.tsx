@@ -5,6 +5,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { isTauri } from '@tauri-apps/api/core';
 import { App } from './App';
+import { installEyedropper } from './controls/screenColor';
 import { tauriStorage } from './document/tauriStorage';
 import { registerBuiltinFonts } from './fonts';
 import { currentLanguage, offerLanguages } from './i18n';
@@ -22,6 +23,8 @@ shareScriptNonce();
 // The fonts decks are set in (ADR-009): without them the Stage draws every slide in a fallback
 // font, while the capture window, which registers them, shows the agent the real one.
 registerBuiltinFonts();
+// The colour pickers' eyedropper, from the core: WebView2's own does nothing.
+installEyedropper();
 
 const editor = createEditor({
   lang: currentLanguage(),

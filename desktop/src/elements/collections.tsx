@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { contentLanguageOf } from '@slidr/model';
-import { extraShapes } from '@slidr/renderer';
+import { AMBIENT_KEYFRAMES, extraShapes } from '@slidr/renderer';
 import {
   Flag,
   Hand,
@@ -30,6 +30,7 @@ import {
   Button,
   cx,
   EmptyState,
+  Icon,
   IconButton,
   Input,
   SegmentedControl,
@@ -46,10 +47,13 @@ import {
 } from '../media/icons/search';
 import { insertCard, insertLine, insertShape } from '../objects/insert';
 import { LINE_KINDS, shapeLibrary, type LineKind } from '../objects/shapes';
-import { scrollerOf, useDeck, useEditor } from '../shell';
+import { scrollerOf, tell, useDeck, useEditor } from '../shell';
 import { insertTable } from '../table/insert';
 import { TableInsert } from '../table/TableInsert';
-import { CardArt, LineArt, ShapeArt, ShapeInks } from './shapeArt';
+import { insertMotionShape } from './insert';
+import { MOTION_SHAPES, type MotionShape } from './motionShapes';
+import { KIND_ICONS } from './MotionTool';
+import { CardArt, LineArt, MotionShapeArt, ShapeArt, ShapeInks } from './shapeArt';
 import { ListEnd, StickerGrid } from './StickerGrid';
 import {
   EMOJI_GROUPS,
@@ -61,6 +65,7 @@ import {
   type GraphicStyle,
   type Sticker,
 } from './stickers';
+import type { CollectionId } from './tiles';
 
 /* What each collection of Elements shows once it is opened. */
 
@@ -492,6 +497,81 @@ function ShapeTiles({
   );
 }
 
+/**
+ * Opens another collection of Elements in place of the one that is open: the Shapes collection
+ * leads to the animations from its animated shapes.
+ */
+export const OpenCollectionContext = createContext<(id: CollectionId) => void>(() => {});
+
+/** Whether whoever uses the app asked the system for less motion. */
+const lessMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function MotionShapeTile({ shape, rtl }: { shape: MotionShape; rtl: boolean }) {
+  const { t } = useTranslation('elements');
+  const editor = useEditor();
+  const [playing, setPlaying] = useState(false);
+  const name = t(`animatedShapes.name.${shape.id}`);
+  const play = (on: boolean) => setPlaying(on && !lessMotion());
+  return (
+    <Tooltip content={name}>
+      <button
+        type="button"
+        aria-label={name}
+        data-motion-shape={shape.id}
+        className={cx(tile, 'relative')}
+        onClick={() => {
+          if (!insertMotionShape(editor, shape)) void tell(t('noSlide', { ns: 'media' }));
+        }}
+        onPointerEnter={() => play(true)}
+        onPointerLeave={() => play(false)}
+        onFocus={() => play(true)}
+        onBlur={() => play(false)}
+      >
+        <MotionShapeArt shape={shape} rtl={rtl} playing={playing} className={tileArt} />
+        {/* What it does, while it stands still: the picture of its kind of motion. */}
+        <span className="pointer-events-none absolute end-1 bottom-1 text-ui-fg-subtle transition-opacity group-hover:opacity-0 [&>svg]:size-3">
+          <Icon icon={KIND_ICONS[shape.ambient.kind]} />
+        </span>
+      </button>
+    </Tooltip>
+  );
+}
+
+/**
+ * The animated shapes of Elements (ADR-128) as a group of the Shapes collection: still, each
+ * moving while the pointer or the keyboard is on it, and the way to every other animation.
+ */
+function MotionShapeTiles({ rtl }: { rtl: boolean }) {
+  const { t } = useTranslation('elements');
+  const open = useContext(OpenCollectionContext);
+  const title = t('animatedShapes.title');
+  return (
+    <section
+      role="group"
+      aria-label={title}
+      className="shape-group"
+      data-tiles={MOTION_SHAPES.length}
+      data-testid="elements-motion-shapes"
+    >
+      <style>{AMBIENT_KEYFRAMES}</style>
+      <div className="col-span-full flex items-center gap-2 py-1">
+        <h4 className="min-w-0 flex-1 truncate text-sm font-semibold text-ui-fg">{title}</h4>
+        <Button
+          variant="ghost"
+          size="sm"
+          data-testid="elements-more-animations"
+          onClick={() => open('animations')}
+        >
+          {t('animatedShapes.more')}
+        </Button>
+      </div>
+      {MOTION_SHAPES.map((shape) => (
+        <MotionShapeTile key={shape.id} shape={shape} rtl={rtl} />
+      ))}
+    </section>
+  );
+}
+
 /** A piece of the Shapes collection as its search finds it. */
 export interface FoundShape extends SearchWords {
   /** `shape:<preset>`, `line:<kind>` or `card`: its key in the library's tags too. */
@@ -629,6 +709,8 @@ export function ShapesCollection() {
   return (
     <div className="element-grid" data-size="shape" data-testid="elements-shapes">
       <ShapeInks />
+      {/* The animated shapes first (ADR-128): the basic group of the library is long. */}
+      <MotionShapeTiles rtl={rtl} />
       {groups.map(({ group, presets }) => (
         <ShapeTiles key={group} title={t(`library.${group}`)} tiles={presets.length}>
           {presets.map((preset) => (

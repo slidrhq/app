@@ -71,7 +71,7 @@ import { MarkdownView } from './MarkdownView';
 import { he } from './messages';
 import { ModelPicker } from './ModelPicker';
 import { ChatSetup, useChatSetup } from './ChatSetup';
-import { harnessName, installsWithNpm } from '../agent/harnessLook';
+import { harnessName, installDescription } from '../agent/harnessLook';
 import { OutlineAnswer, OutlineCard } from './Outline';
 import { aiOf, navigateTo, setFollow, useAiPreferences } from './runtime';
 import { DECK } from './sessions';
@@ -419,12 +419,7 @@ function ProblemCard({
           {fixed
             ? t('repair.fixedBody')
             : descriptor && kind === 'not_installed'
-              ? t(
-                  installsWithNpm(descriptor.id)
-                    ? 'setup.installDescriptionNpm'
-                    : 'setup.installDescription',
-                  { name: harnessName(descriptor) },
-                )
+              ? t(`setup.${installDescription(descriptor.id)}`, { name: harnessName(descriptor) })
               : t(`problem.${kind}.body`)}
         </p>
         {descriptor && busy && (

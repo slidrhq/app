@@ -42,11 +42,12 @@ export interface SlideContext extends Drawn {
   /** Behind everything: the slide's own background, else its layout's, else the theme's. */
   background: Background;
   /**
-   * What the slide's layout draws under it: its decorations, placed by their frames (the
-   * renderer gives them no element id, so nothing measures them). The logo is left out: it is
-   * on every slide and says nothing about this one. A rule about what was written on the slide
-   * reads `items`; a rule about what the slide looks like reads the layout as well, since a
-   * slide built on a layout as the template drew it is as full as the template made it.
+   * What is drawn under the slide: the drawing of the background it shows (ADR-125) and its
+   * layout's decorations, placed by their frames (the renderer gives them no element id, so
+   * nothing measures them). The logo is left out: it is on every slide and says nothing about
+   * this one. A rule about what was written on the slide reads `items`; a rule about what the
+   * slide looks like reads the layout as well, since a slide built on a layout as the template
+   * drew it is as full as the template made it.
    */
   layout: Drawn;
   /**

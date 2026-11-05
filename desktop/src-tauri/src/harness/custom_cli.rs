@@ -4,8 +4,13 @@
 //! process each, as the one-shot CLIs' are (`one_shot.rs`). The request goes on standard input, the
 //! protocol's events come on standard output, one JSON object a line, and the app's tools are
 //! reached over MCP. Stopping a turn ends its process; the next turn resumes the conversation.
+//!
+//! An agent may come as a package of the organization's library (ADR-125), installed into a folder
+//! of its own (`custom_agents.rs`): its program is then looked for in that folder first, and
+//! `%SLIDR_AGENT_DIR%` in its program, arguments and environment is the folder.
 
 use std::{
+    collections::BTreeMap,
     io,
     path::{Path, PathBuf},
     process::Stdio,
@@ -28,12 +33,13 @@ use tokio::{
 
 use super::one_shot::Launch;
 use crate::{
+    custom_agents::CustomAgents,
     harness::{
         ATTACHMENTS, AgentError, AgentErrorKind, AgentEvent, AgentHarness, AgentSession,
         Capabilities, EventSink, HarnessDescriptor, HarnessState, HarnessStatus, ModelOption,
         Result, SessionConfig, ToolSource, TurnOutcome, UserTurn, setup,
     },
-    system_settings::{CustomAgent, Install},
+    system_settings::{AGENT_DIR, CustomAgent, Install},
 };
 
 /// The version of the protocol the app speaks.
@@ -52,6 +58,37 @@ const PROTOCOL_ENV: &str = "SLIDR_PROTOCOL";
 const STDERR_LINES: usize = 20;
 /// The longest summary of a tool call (§6.5).
 const SUMMARY_CHARS: usize = 300;
+
+/// `%SLIDR_AGENT_DIR%`, as the settings write it: in any case, as Windows reads a variable.
+fn home_token() -> String {
+    format!("%{AGENT_DIR}%").to_ascii_lowercase()
+}
+
+/// What follows `%SLIDR_AGENT_DIR%` at the start of `value`.
+fn after_home(value: &str) -> Option<&str> {
+    let token = home_token();
+    value
+        .get(..token.len())
+        .filter(|start| start.eq_ignore_ascii_case(&token))
+        .map(|_| &value[token.len()..])
+}
+
+/// `value` with `%SLIDR_AGENT_DIR%` written as `home` wherever it is.
+fn with_home(value: &str, home: &Path) -> String {
+    let token = home_token();
+    // Lowercase ASCII keeps every byte where it was, so a place in it is a place in `value`.
+    let lower = value.to_ascii_lowercase();
+    let home = home.to_string_lossy();
+    let mut written = String::with_capacity(value.len());
+    let mut at = 0;
+    while let Some(found) = lower[at..].find(&token) {
+        written.push_str(&value[at..at + found]);
+        written.push_str(&home);
+        at += found + token.len();
+    }
+    written.push_str(&value[at..]);
+    written
+}
 
 /// `%NAME%` at the start of a path, as the environment has it.
 fn expand(command: &str) -> Option<PathBuf> {
@@ -142,11 +179,36 @@ fn npm_launch(package: &str, command: &str) -> Option<Launch> {
     None
 }
 
-/// How the agent's CLI is started on this machine; none when it is not installed. An absolute
-/// path is the program itself. A name is looked for where the app finds the CLIs it installs:
-/// npm's package, as Node.js on its script, and WinGet's folders.
-pub(crate) fn launch(agent: &CustomAgent) -> Option<Launch> {
+/// How the agent's CLI is started on this machine; none when it is not installed. With `home`,
+/// the folder its package is installed in, a path within the package is the program there, and a
+/// name is looked for there first. An absolute path is the program itself. A name is looked for
+/// where the app finds the CLIs it installs: npm's package, as Node.js on its script, and
+/// WinGet's folders.
+pub(crate) fn launch(agent: &CustomAgent, home: Option<&Path>) -> Option<Launch> {
     let command = agent.command.as_str();
+    if let Some(home) = home {
+        let within = match after_home(command) {
+            Some(rest) => Some(rest.trim_start_matches(['\\', '/'])),
+            None if !command.contains(['%', ':']) && !command.starts_with(['\\', '/']) => {
+                Some(command)
+            }
+            None => None,
+        };
+        if let Some(within) = within.filter(|within| !within.is_empty()) {
+            let mut program = home.join(within);
+            if cfg!(windows) && program.extension().is_none() {
+                program.set_extension("exe");
+            }
+            if program.is_file() {
+                return Some(Launch::new(program));
+            }
+            // A path within the package that it does not have is nowhere else; a name may be a
+            // program of this machine, as `pwsh.exe` for a script the package holds.
+            if within.contains(['\\', '/']) {
+                return None;
+            }
+        }
+    }
     if command.contains(['\\', '/', '%', ':']) {
         let program = expand(command)?;
         return program.is_file().then(|| Launch::new(program));
@@ -207,16 +269,54 @@ impl Default for Caps {
 /// An agent of the organization's own.
 pub struct CustomCliHarness {
     agent: CustomAgent,
+    /// The agents' folders, where an agent that comes as a package is installed (ADR-125).
+    packages: Arc<CustomAgents>,
     /// What its CLI said of itself when it was last probed.
     described: Mutex<Option<Caps>>,
 }
 
 impl CustomCliHarness {
-    pub fn new(agent: CustomAgent) -> Self {
+    pub fn new(agent: CustomAgent, packages: Arc<CustomAgents>) -> Self {
         Self {
             agent,
+            packages,
             described: Mutex::new(None),
         }
+    }
+
+    /// The folder its package is installed in, when it comes as one.
+    fn home(&self) -> Option<PathBuf> {
+        self.agent
+            .package()
+            .map(|_| self.packages.folder(&self.agent.id))
+    }
+
+    /// Its arguments, `%SLIDR_AGENT_DIR%` written as its folder.
+    fn arguments(&self) -> Vec<String> {
+        match self.home() {
+            Some(home) => self
+                .agent
+                .args
+                .iter()
+                .map(|arg| with_home(arg, &home))
+                .collect(),
+            None => self.agent.args.clone(),
+        }
+    }
+
+    /// Its environment, `%SLIDR_AGENT_DIR%` written as its folder, which is in it too.
+    fn environment(&self) -> BTreeMap<String, String> {
+        let Some(home) = self.home() else {
+            return self.agent.env.clone();
+        };
+        let mut env: BTreeMap<String, String> = self
+            .agent
+            .env
+            .iter()
+            .map(|(name, value)| (name.clone(), with_home(value, &home)))
+            .collect();
+        env.insert(AGENT_DIR.into(), home.to_string_lossy().into_owned());
+        env
     }
 
     /// The CLI started on one of the protocol's subcommands, with the agent's own arguments and
@@ -225,9 +325,9 @@ impl CustomCliHarness {
         let mut command = Command::new(&launch.program);
         command
             .args(&launch.script)
-            .args(&self.agent.args)
+            .args(self.arguments())
             .args(["slidr", subcommand])
-            .envs(&self.agent.env)
+            .envs(self.environment())
             .env(PROTOCOL_ENV, PROTOCOL.to_string())
             .env_remove(TOKEN_ENV)
             .kill_on_drop(true);
@@ -237,7 +337,15 @@ impl CustomCliHarness {
     }
 
     fn launch(&self) -> Result<Launch> {
-        launch(&self.agent).ok_or_else(|| {
+        let found = match self.home() {
+            // A package that is not installed is not there, whatever its program names.
+            Some(home) => self
+                .packages
+                .installed(&self.agent.id)
+                .and_then(|_| launch(&self.agent, Some(&home))),
+            None => launch(&self.agent, None),
+        };
+        found.ok_or_else(|| {
             AgentError::new(
                 AgentErrorKind::NotInstalled,
                 format!("{} is not installed on this computer.", self.agent.name),
@@ -438,6 +546,12 @@ impl AgentHarness for CustomCliHarness {
             };
             make(state, None, None, Some(error.message))
         };
+        // A package installed is brought up to date with the library, in the background; this
+        // probe, and the turns until it is over, go by what is installed.
+        if let Some(package) = self.agent.package() {
+            self.packages
+                .update(&self.agent.id, &self.agent.name, package);
+        }
         let description = match self.ask("describe", SETUP_TIMEOUT).await {
             Ok(value) => serde_json::from_value::<Description>(value).unwrap_or_default(),
             Err(error) => return unavailable(error),
@@ -512,6 +626,7 @@ impl AgentHarness for CustomCliHarness {
         Ok(Box::new(CustomSession {
             harness: Arc::new(Self {
                 agent: self.agent.clone(),
+                packages: Arc::clone(&self.packages),
                 described: Mutex::new(Some(self.capabilities())),
             }),
             known: Arc::new(AtomicBool::new(config.resume.is_some())),
@@ -533,6 +648,12 @@ impl AgentHarness for CustomCliHarness {
 
     async fn install(&self) -> Option<Result<()>> {
         Some(match &self.agent.install {
+            // From the organization's library, and from nowhere else (ADR-125).
+            Some(Install::Package { package, .. }) => {
+                self.packages
+                    .install(&self.agent.id, &self.agent.name, package)
+                    .await
+            }
             Some(install) => setup::install_package(install).await,
             None => Err(AgentError::new(
                 AgentErrorKind::NotInstalled,
@@ -556,9 +677,9 @@ impl AgentHarness for CustomCliHarness {
                 .iter()
                 .map(|script| script.to_string_lossy().into_owned()),
         );
-        start.extend(self.agent.args.iter().cloned());
+        start.extend(self.arguments());
         start.extend(["slidr".into(), "login".into()]);
-        let mut env = self.agent.env.clone();
+        let mut env = self.environment();
         env.insert(PROTOCOL_ENV.into(), PROTOCOL.to_string());
         Some(setup::sign_in_terminal(&start, &env).await)
     }
@@ -959,6 +1080,111 @@ mod tests {
         }
     }
 
+    /// The harness of an agent that does not come as a package: it has no folder of its own.
+    fn without_packages(agent: CustomAgent) -> CustomCliHarness {
+        CustomCliHarness::new(agent, CustomAgents::new(PathBuf::new(), None))
+    }
+
+    #[tokio::test]
+    async fn an_agent_of_a_package_is_installed_from_the_library_and_runs_from_its_folder()
+    -> TestResult {
+        use crate::custom_agents::testing::{Library, zip_of};
+
+        const PACKAGE: &str = "system/agents/acme.zip";
+        let script = std::fs::read(FAKE)?;
+        let served = Library::serve().await;
+        served.put(
+            PACKAGE,
+            zip_of(&[("agent/fake-cli.mjs", script.as_slice())]),
+        );
+        let (cache, home, store, work) = (
+            tempfile::tempdir()?,
+            tempfile::tempdir()?,
+            tempfile::tempdir()?,
+            tempfile::tempdir()?,
+        );
+        let packages = CustomAgents::new(
+            home.path().join("custom_agents"),
+            Some(served.start(cache.path()).await),
+        );
+        // Node.js, a program of this machine, on the script of the package.
+        let mut acme = agent(store.path(), "ready");
+        acme.args = vec!["%SLIDR_AGENT_DIR%/agent/fake-cli.mjs".into()];
+        acme.env
+            .insert("ACME_REGION".into(), "%slidr_agent_dir%".into());
+        acme.install = Some(Install::Package {
+            package: PACKAGE.into(),
+            sha256: "ab".repeat(32),
+            size: 1,
+        });
+        let harness = CustomCliHarness::new(acme, Arc::clone(&packages));
+        assert_eq!(harness.probe().await.state, HarnessState::NotInstalled);
+
+        harness.install().await.ok_or("no installation")??;
+        let folder = home.path().join("custom_agents").join("acme");
+        assert!(folder.join("agent").join("fake-cli.mjs").is_file());
+        let status = harness.probe().await;
+        assert_eq!(status.state, HarnessState::Ready, "{:?}", status.detail);
+
+        // Its arguments and environment name its folder, and so does the variable of its own.
+        let (sink, mut events) = EventSink::channel();
+        let mut session = harness.start(config(work.path()), sink).await?;
+        session.send(UserTurn::text("hello")).await?;
+        let seen = turn_events(&mut events).await;
+        assert_eq!(
+            seen.last(),
+            Some(&AgentEvent::TurnCompleted {
+                outcome: TurnOutcome::Completed
+            })
+        );
+        let probe: Value = serde_json::from_slice(&std::fs::read(
+            work.path().join(ATTACHMENTS).join("probe.json"),
+        )?)?;
+        let at = |key: &str| probe[key].as_str().map(PathBuf::from);
+        assert_eq!(at("agentDir"), Some(folder.clone()));
+        assert_eq!(at("region"), Some(folder.clone()));
+        let ran = at("script").ok_or("no script")?;
+        assert_eq!(
+            std::fs::canonicalize(ran)?,
+            std::fs::canonicalize(folder.join("agent").join("fake-cli.mjs"))?
+        );
+        session.close().await?;
+        Ok(())
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn a_program_is_found_within_its_package_first() -> TestResult {
+        let home = tempfile::tempdir()?;
+        std::fs::create_dir_all(home.path().join("bin"))?;
+        let program = home.path().join("bin").join("acme.exe");
+        std::fs::write(&program, b"MZ")?;
+        std::fs::write(home.path().join("root.exe"), b"MZ")?;
+        let mut acme = agent(home.path(), "ready");
+        let found = |acme: &CustomAgent| launch(acme, Some(home.path())).map(|l| l.program);
+        for command in [
+            "bin\\acme.exe",
+            "bin/acme.exe",
+            "%SLIDR_AGENT_DIR%\\bin\\acme.exe",
+        ] {
+            acme.command = command.into();
+            assert_eq!(found(&acme), Some(program.clone()), "{command}");
+        }
+        acme.command = "root.exe".into();
+        assert_eq!(found(&acme), Some(home.path().join("root.exe")));
+        // A path within the package that it does not have is not looked for anywhere else.
+        acme.command = "bin\\other.exe".into();
+        assert_eq!(found(&acme), None);
+        assert_eq!(
+            with_home(
+                "-File %Slidr_Agent_Dir%\\a.ps1 %SLIDR_AGENT_DIR%",
+                Path::new("C:\\A")
+            ),
+            "-File C:\\A\\a.ps1 C:\\A"
+        );
+        Ok(())
+    }
+
     async fn turn_events(events: &mut UnboundedReceiver<AgentEvent>) -> Vec<AgentEvent> {
         let mut seen = Vec::new();
         while let Ok(Some(event)) = timeout(Duration::from_secs(30), events.recv()).await {
@@ -986,7 +1212,7 @@ mod tests {
     #[tokio::test]
     async fn the_cli_says_what_it_is_and_lists_its_models() -> TestResult {
         let store = tempfile::tempdir()?;
-        let harness = CustomCliHarness::new(agent(store.path(), "ready"));
+        let harness = without_packages(agent(store.path(), "ready"));
         let status = harness.probe().await;
         assert_eq!(status.state, HarnessState::Ready, "{:?}", status.detail);
         assert_eq!(status.version.as_deref(), Some("0.4.2"));
@@ -1007,7 +1233,7 @@ mod tests {
         );
         assert_eq!(models[1].effort_levels, None);
 
-        let signed_out = CustomCliHarness::new(agent(store.path(), "not_logged_in"));
+        let signed_out = without_packages(agent(store.path(), "not_logged_in"));
         assert_eq!(signed_out.probe().await.state, HarnessState::NotLoggedIn);
         let refused = signed_out.models().await.ok_or("no answer")?;
         assert_eq!(
@@ -1021,12 +1247,12 @@ mod tests {
     async fn a_cli_that_is_not_there_is_not_installed() {
         let mut missing = agent(Path::new("."), "ready");
         missing.command = "C:\\Nowhere\\acme-agent-that-is-not-there.exe".into();
-        let harness = CustomCliHarness::new(missing.clone());
+        let harness = without_packages(missing.clone());
         assert_eq!(harness.probe().await.state, HarnessState::NotInstalled);
         missing.command = "acme-agent-that-is-not-there".into();
-        assert!(launch(&missing).is_none());
+        assert!(launch(&missing, None).is_none());
         // Without a way to install it, the organization does.
-        let refused = CustomCliHarness::new(missing).install().await;
+        let refused = without_packages(missing).install().await;
         assert_eq!(
             refused
                 .and_then(|result| result.err())
@@ -1039,7 +1265,7 @@ mod tests {
     async fn a_turn_sends_the_request_and_maps_the_events_one_to_one() -> TestResult {
         let store = tempfile::tempdir()?;
         let work = tempfile::tempdir()?;
-        let harness = CustomCliHarness::new(agent(store.path(), "ready"));
+        let harness = without_packages(agent(store.path(), "ready"));
         harness.probe().await;
         let (sink, mut events) = EventSink::channel();
         let mut session = harness.start(config(work.path()), sink).await?;
@@ -1130,7 +1356,7 @@ mod tests {
     async fn an_id_the_cli_has_is_given_up_and_one_it_lacks_ends_the_conversation() -> TestResult {
         let store = tempfile::tempdir()?;
         let work = tempfile::tempdir()?;
-        let harness = CustomCliHarness::new(agent(store.path(), "ready"));
+        let harness = without_packages(agent(store.path(), "ready"));
         // A conversation the CLI stored before the model answered.
         let taken = uuid::Uuid::new_v4().to_string();
         std::fs::write(store.path().join(format!("{taken}.json")), "{}")?;
@@ -1154,7 +1380,7 @@ mod tests {
         // A new session that lands on that id starts once more under another.
         let (sink, mut events) = EventSink::channel();
         let mut session = CustomSession {
-            harness: Arc::new(CustomCliHarness::new(agent(store.path(), "ready"))),
+            harness: Arc::new(without_packages(agent(store.path(), "ready"))),
             config: config(work.path()),
             sink,
             native: Arc::new(Mutex::new(taken.clone())),
@@ -1190,7 +1416,7 @@ mod tests {
     async fn a_turn_is_stopped_by_ending_its_process_and_a_crash_says_why() -> TestResult {
         let store = tempfile::tempdir()?;
         let work = tempfile::tempdir()?;
-        let harness = CustomCliHarness::new(agent(store.path(), "ready"));
+        let harness = without_packages(agent(store.path(), "ready"));
         let (sink, mut events) = EventSink::channel();
         let mut session = harness.start(config(work.path()), sink).await?;
         session.send(UserTurn::text("hang")).await?;

@@ -5,6 +5,10 @@ import type { Target } from '../objects/target';
 import { focusStage, type Editor } from '../shell';
 import { newCardSet, type CardSetId, type Reading } from './cardSets';
 import { framedElement, frameSizeOn, loadFrames, reframe, type PhotoFrame } from './frames';
+import { backgroundCommands, motionElement } from './motion';
+import type { MotionBackground } from './motionBackgrounds';
+import type { MotionPiece } from './motionPieces';
+import { motionShapeElement, type MotionShape } from './motionShapes';
 import { rememberSticker, type RecentSticker } from './recent';
 
 /** The side of a new graphic or emoji on the slide, in slide pixels. */
@@ -95,4 +99,58 @@ export async function framePicture(
   editor.bus.dispatch(command, { label: i18n.t('elements:history.reframe') });
   editor.selection.getState().selectElements([select]);
   focusStage();
+}
+
+/**
+ * Places an animation of Elements in the middle of the current slide: a picture that moves by
+ * itself, in the theme's colours, which moves, resizes and turns as any other object. It ends
+ * selected. One undo step.
+ */
+export function insertMotion(editor: Editor, piece: MotionPiece): boolean {
+  const slideId = editor.selection.getState().currentSlideId;
+  if (!slideId) return false;
+  const { deck } = editor.bus;
+  const taken: Frame[] = findSlide(deck, slideId)?.elements.map((e) => e.frame) ?? [];
+  const element = motionElement(piece, deck, taken);
+  editor.bus.dispatch(
+    { type: 'element.add', slideId, element },
+    { label: i18n.t('elements:history.animation') },
+  );
+  editor.selection.getState().selectElements([element.id]);
+  focusStage();
+  return true;
+}
+
+/**
+ * Places an animated shape of Elements in the middle of the current slide (ADR-128): a shape of
+ * the library, in the theme's colours, that repeats its motion. It ends selected, so its motion
+ * and its look can be changed in row B at once. One undo step.
+ */
+export function insertMotionShape(editor: Editor, shape: MotionShape): boolean {
+  const slideId = editor.selection.getState().currentSlideId;
+  if (!slideId) return false;
+  const { deck } = editor.bus;
+  const taken: Frame[] = findSlide(deck, slideId)?.elements.map((e) => e.frame) ?? [];
+  const element = motionShapeElement(shape, deck, taken);
+  editor.bus.dispatch(
+    { type: 'element.add', slideId, element },
+    { label: i18n.t('elements:history.animation') },
+  );
+  editor.selection.getState().selectElements([element.id]);
+  focusStage();
+  return true;
+}
+
+/**
+ * Gives the current slide a background of Elements, and with it every other slide selected in
+ * the filmstrip: the ground the slide shows, under the background's drawing. One undo step.
+ */
+export function applyMotionBackground(editor: Editor, background: MotionBackground): boolean {
+  const { currentSlideId, selectedSlideIds } = editor.selection.getState();
+  if (!currentSlideId) return false;
+  const slideIds = selectedSlideIds.includes(currentSlideId) ? selectedSlideIds : [currentSlideId];
+  const commands = backgroundCommands(editor.bus.deck, slideIds, background);
+  if (commands.length === 0) return false;
+  editor.bus.batch(commands, { label: i18n.t('elements:history.background') });
+  return true;
 }

@@ -10,7 +10,7 @@ import {
   harnessLook,
   harnessName,
   installedByOrganization,
-  installsWithNpm,
+  installDescription,
 } from '../agent/harnessLook';
 import { chooseHarness, chosenHarness, setAgentSettings, useAgentSettings } from '../settings';
 import { defaultAgent } from '../settings/systemSettings';
@@ -299,12 +299,9 @@ export function ChatSetup({
               {state?.busy && <p>{t(`setup.${state.busy}`)}</p>}
               {action === 'install' && (
                 <p>
-                  {t(
-                    installsWithNpm(descriptor.id)
-                      ? 'setup.installDescriptionNpm'
-                      : 'setup.installDescription',
-                    { name: harnessName(descriptor) },
-                  )}
+                  {t(`setup.${installDescription(descriptor.id)}`, {
+                    name: harnessName(descriptor),
+                  })}
                 </p>
               )}
               {action === 'login' && <p>{t('setup.signInDescription')}</p>}

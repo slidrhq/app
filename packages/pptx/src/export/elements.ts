@@ -12,6 +12,7 @@ import type {
   TextElement,
   VideoElement,
 } from '@slidr/model';
+import { DISABLED_LOOK } from '@slidr/model';
 import { isBoxPreset, linePath, presetPath, scalePath } from '@slidr/renderer';
 import { REL, type PartRels } from '../opc';
 import { soundIcon, videoStill } from '../png';
@@ -60,6 +61,8 @@ interface Placement {
   dx: number;
   dy: number;
   alpha: number;
+  /** Inside a group shown as out of use, which has faded what is in it already. */
+  disabled?: boolean;
 }
 
 const absolute = (frame: Frame, at: Placement): Frame => ({
@@ -826,6 +829,7 @@ async function groupXml(
     dx: frame.x,
     dy: frame.y,
     alpha: at.alpha * e.opacity,
+    ...(at.disabled ? { disabled: true } : {}),
   });
   return el(
     'p:grpSp',
@@ -845,8 +849,14 @@ async function elementXml(
   e: Element,
   ctx: ExportContext,
   part: PartWriter,
-  at: Placement,
+  placed: Placement,
 ): Promise<string | undefined> {
+  // Shown as out of use: PowerPoint has no grey for every kind of shape, so it is faded as the
+  // renderer fades it, and only once, a group with what is in it.
+  const at =
+    e.disabled && !placed.disabled
+      ? { ...placed, alpha: placed.alpha * DISABLED_LOOK.opacity, disabled: true }
+      : placed;
   switch (e.type) {
     case 'text':
       return textXml(e, ctx, part, at);

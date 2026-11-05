@@ -140,6 +140,36 @@ export function setHidden(editor: Editor, elementIds: readonly string[], hidden:
   }
 }
 
+/**
+ * Shows elements of the current slide as out of use, or in use again. Only the look: a group shown
+ * so is grey with everything in it, and stays selected and editable like any other element.
+ */
+export function setDisabled(
+  editor: Editor,
+  elementIds: readonly string[],
+  disabled: boolean,
+): void {
+  const slideId = editor.selection.getState().currentSlideId;
+  if (!slideId) return;
+  send(
+    editor,
+    elementIds.map((id) => updateElement(slideId, id, { disabled: disabled ? true : null })),
+    label('history.disabled'),
+  );
+}
+
+/** Whether every one of the elements is shown as out of use. */
+export const allDisabled = (elements: readonly Element[]): boolean =>
+  elements.length > 0 && elements.every((element) => element.disabled);
+
+/** Shows the selection as out of use, or in use again when all of it is shown so already. */
+export function toggleDisabled(editor: Editor): boolean {
+  const at = target(editor);
+  if (!at) return false;
+  setDisabled(editor, at.ids, !allDisabled(at.elements));
+  return true;
+}
+
 /** Locks the selection, or unlocks it when all of it is locked. */
 export function toggleLock(editor: Editor): boolean {
   const at = target(editor);

@@ -96,6 +96,19 @@ describe('L05: text contrast below AA', () => {
     expect(finding?.message).toMatch(/put a darker shape or overlay under the text\.$/);
   });
 
+  it('leaves alone text shown out of use, faint on purpose, by itself or in its group', () => {
+    const faint = drawn({ color: grey(0xbb) });
+    expect(check('L05', [{ ...label, disabled: true }], faint)).toEqual([]);
+    const card = createElement.group({
+      id: 'e_card',
+      frame,
+      disabled: true,
+      children: [{ ...label, frame: { ...frame, x: 0, y: 0 } }],
+    });
+    expect(check('L05', [card], faint)).toEqual([]);
+    expect(check('L05', [label], faint)).toHaveLength(1);
+  });
+
   it('takes translucent text as it looks', () => {
     // Black at 40% over white is #999999: 2.84:1.
     const [finding] = check('L05', [label], drawn({ color: BLACK, alpha: 0.4 }));

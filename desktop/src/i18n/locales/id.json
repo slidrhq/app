@@ -67,6 +67,7 @@
       "signingIn": "Selesaikan proses masuk di jendela yang terbuka. Setelah itu, kita akan melanjutkan di sini.",
       "installDescription": "{{name}} belum terinstal di komputer ini. Dengan persetujuan Anda, kami akan mengunduh dan menginstalnya menggunakan Windows App Installer, lalu melanjutkan di sini.",
       "installDescriptionNpm": "{{name}} belum terinstal di komputer ini. Dengan persetujuan Anda, kami akan menginstalnya menggunakan npm, dan jika Node.js belum ada, kami akan menginstalnya terlebih dahulu menggunakan Windows App Installer, lalu melanjutkan di sini.",
+      "installDescriptionLibrary": "{{name}} belum terinstal di komputer ini. Dengan persetujuan Anda, kami akan mengunduhnya dari pustaka organisasi Anda dan menginstalnya, lalu melanjutkan di sini.",
       "install": "Setujui dan instal",
       "signInDescription": "Masuk ke akun Anda untuk memuat model yang tersedia.",
       "signIn": "Masuk",
@@ -611,7 +612,9 @@
       "paragraph": "Paragraf {{n}} dari {{total}}",
       "row": "{{effect}} pada {{name}}",
       "original": "Gerakan asli",
-      "originalHint": "Gerakan yang diputar oleh file impor, persis seperti yang ditulisnya. Memilih efek lain akan menggantikannya."
+      "originalHint": "Gerakan yang diputar oleh file impor, persis seperti yang ditulisnya. Memilih efek lain akan menggantikannya.",
+      "disableHint": "Objek tetap abu-abu dan pudar sampai ada animasi “Aktifkan”. Agar objek tampak nonaktif sejak slide dibuka, pilih “Tampilkan sebagai nonaktif” pada objek itu.",
+      "enableHint": "Objek kembali ke tampilan biasanya dan tetap begitu. Agar objek tampak nonaktif sampai animasi ini, pilih “Tampilkan sebagai nonaktif” pada objek itu."
     },
     "group": {
       "leadIn": "Saat slide dibuka",
@@ -658,7 +661,9 @@
         "heartbeat": "Detak jantung",
         "flicker": "Berkedip",
         "float": "Melayang",
-        "tilt": "Miring"
+        "tilt": "Miring",
+        "disable": "Nonaktifkan",
+        "enable": "Aktifkan"
       },
       "exit": {
         "disappear": "Menghilang",
@@ -802,6 +807,8 @@
       "lock": "Kunci",
       "unlock": "Buka kunci",
       "hide": "Sembunyikan",
+      "disable": "Tampilkan sebagai nonaktif",
+      "enable": "Tampilkan sebagai aktif",
       "duplicate": "Duplikat",
       "pasteStyle": "Tempel gaya",
       "delete": "Hapus",
@@ -860,6 +867,7 @@
       "order": "Urutan lapisan",
       "lock": "Kunci",
       "visibility": "Sembunyikan dan tampilkan",
+      "disabled": "Tampilkan sebagai nonaktif atau aktif",
       "rename": "Ganti nama",
       "paste": "Tempel",
       "cut": "Potong",
@@ -1042,7 +1050,10 @@
       "insert": "Sisipkan grafik",
       "frame": "Sisipkan bingkai",
       "reframe": "Masukkan gambar ke bingkai",
-      "cards": "Sisipkan set kartu"
+      "cards": "Sisipkan set kartu",
+      "animation": "Sisipkan animasi",
+      "background": "Terapkan latar belakang",
+      "motion": "Ubah gerakan"
     },
     "collection": {
       "cards": "Set kartu",
@@ -1051,7 +1062,9 @@
       "emoji": "Emoji",
       "icons": "Ikon",
       "frames": "Bingkai",
-      "tables": "Tabel"
+      "tables": "Tabel",
+      "animations": "Animasi",
+      "backgrounds": "Latar belakang"
     },
     "designs": {
       "title": "Slide siap pakai",
@@ -1458,6 +1471,110 @@
       "ready": "Ukuran siap pakai",
       "custom": "Ukuran lain",
       "size": "{{rows}} baris × {{cols}} kolom"
+    },
+    "animations": {
+      "search": "Cari animasi",
+      "searchPlaceholder": "Cari animasi…",
+      "hint": "Klik sebuah animasi untuk menambahkannya ke slide. Animasi bergerak sendiri, dan Anda dapat memindahkan, mengubah ukuran, serta memutarnya seperti objek lain.",
+      "group": {
+        "basic": "Bentuk animasi",
+        "path": "Di sepanjang lintasan",
+        "spin": "Berputar",
+        "scale": "Membesar dan berdenyut",
+        "lines": "Garis dan gelombang",
+        "particles": "Partikel dan jaringan"
+      },
+      "name": {
+        "orbit": "Orbit",
+        "conveyor": "Kotak di lintasan",
+        "trace": "Jalur sirkuit",
+        "atom": "Atom",
+        "shuttle": "Titik di garis",
+        "hexagon": "Segi enam berputar",
+        "rings": "Cincin berputar",
+        "radar": "Radar",
+        "ripple": "Riak",
+        "breathe": "Bentuk bernapas",
+        "bars": "Batang naik",
+        "waves": "Gelombang",
+        "draw": "Panah tergambar",
+        "flowArrow": "Penghubung mengalir",
+        "heartbeat": "Detak jantung",
+        "network": "Jaringan",
+        "converge": "Partikel berkumpul",
+        "float": "Gelembung naik"
+      }
+    },
+    "backgrounds": {
+      "hint": "Klik sebuah latar belakang untuk menerapkannya ke slide, atau ke semua slide yang Anda pilih. Warnanya berasal dari templat, dan alat “Latar belakang” membawa Anda kembali ke latar belakang templat.",
+      "animated": "Latar belakang bergerak",
+      "still": "Latar belakang tenang",
+      "name": {
+        "flow": "Aliran sirkuit",
+        "waves": "Gelombang",
+        "converge": "Berkumpul",
+        "orbit": "Orbit",
+        "radar": "Radar",
+        "network": "Jaringan",
+        "drift": "Cahaya melayang",
+        "particles": "Partikel naik",
+        "dots": "Kisi titik",
+        "contours": "Garis kontur",
+        "arcs": "Busur di sudut"
+      }
+    },
+    "animatedShapes": {
+      "title": "Bentuk animasi",
+      "hint": "Bentuk biasa yang mengulang suatu gerakan. Warna, garis tepi, dan ukurannya diedit seperti bentuk lain, dan gerakannya dengan alat Gerakan.",
+      "more": "Semua animasi",
+      "name": {
+        "ring": "Cincin berputar",
+        "hexagon": "Segi enam berputar",
+        "star": "Bintang berputar",
+        "octagon": "Segi delapan berputar",
+        "square": "Persegi yang berputar lalu diam",
+        "pulse": "Lingkaran berdenyut",
+        "heart": "Hati berdenyut",
+        "float": "Lingkaran melayang",
+        "arrow": "Panah bergoyang",
+        "blink": "Titik berkedip"
+      }
+    },
+    "motion": {
+      "title": "Gerakan",
+      "piece": "Kecepatan animasi",
+      "loop": "Gerakan berulang",
+      "kind": {
+        "none": "Tidak ada",
+        "spin": "Putar",
+        "pulse": "Denyut",
+        "float": "Melayang",
+        "swing": "Ayun",
+        "blink": "Kedip"
+      },
+      "speed": "Kecepatan",
+      "pace": {
+        "slow": "Lambat",
+        "medium": "Sedang",
+        "fast": "Cepat"
+      },
+      "round": "Detik per putaran",
+      "rhythm": "Irama",
+      "rhythmKind": {
+        "steady": "Tetap",
+        "smooth": "Halus",
+        "pause": "Dengan jeda"
+      },
+      "direction": "Arah",
+      "clockwise": "Searah jarum jam",
+      "counterclockwise": "Berlawanan arah jarum jam",
+      "amount": {
+        "pulse": "Besar denyut",
+        "float": "Tinggi melayang",
+        "swing": "Sudut ayunan",
+        "blink": "Kekuatan kedipan"
+      },
+      "hint": "Gerakan berulang selama slide ditampilkan: di editor, saat presentasi, dan dalam file yang diekspor."
     }
   },
   "export": {
@@ -2316,6 +2433,11 @@
       "blur": "Kabur",
       "dim": "Redupkan",
       "applyAll": "Terapkan ke semua slide",
+      "noDrawing": "Hapus gambar latar belakang",
+      "drawingColours": "Warna gambar",
+      "drawingColour": "Warna gambar {{n}}",
+      "speed": "Kecepatan gerak",
+      "drawingOpacity": "Opasitas gambar",
       "reset": "Kembali ke latar belakang tema"
     },
     "groups": {
@@ -2534,6 +2656,7 @@
       "installTitle": "Instal {{name}}?",
       "installDescription": "Aplikasi akan mengunduh dan menginstal {{name}} menggunakan Windows App Installer. Setelah itu, kami akan memeriksa koneksi dan meminta Anda masuk jika diperlukan.",
       "installDescriptionNpm": "Aplikasi akan menginstal {{name}} menggunakan npm, dan jika Node.js belum ada, aplikasi akan menginstalnya terlebih dahulu menggunakan Windows App Installer. Setelah itu, kami akan memeriksa koneksi dan meminta Anda masuk jika diperlukan.",
+      "installDescriptionLibrary": "Aplikasi akan mengunduh {{name}} dari pustaka organisasi Anda dan menginstalnya di komputer ini. Setelah itu, kami akan memeriksa koneksi dan meminta Anda masuk jika diperlukan.",
       "approveInstall": "Setujui dan instal",
       "chooseModel": "Pilih model",
       "chooseEffort": "Pilih tingkat upaya",

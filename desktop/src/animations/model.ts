@@ -107,10 +107,16 @@ export function withCategory(step: AnimationStep, category: Category): Animation
   return withPreset({ ...step, category }, preset);
 }
 
+/**
+ * A step with another preset. A direction only stays where the new preset takes one, and a way of
+ * taking the text only where it takes that way: one that disables takes no word or letter.
+ */
 export function withPreset(step: AnimationStep, preset: string): AnimationStep {
   const next: AnimationStep = { ...step, preset };
   const category = playable(step.category);
-  if (!category || !describePreset(category, preset).directional) delete next.direction;
+  const info = category ? describePreset(category, preset) : undefined;
+  if (!info?.directional) delete next.direction;
+  if (next.textBy && info && !info.textBy.includes(next.textBy)) delete next.textBy;
   return next;
 }
 

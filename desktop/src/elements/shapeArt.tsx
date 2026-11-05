@@ -1,7 +1,9 @@
 import { Fragment, useMemo } from 'react';
+import { ambientAnimation, presetPath } from '@slidr/renderer';
 import { cx } from '@slidr/ui';
 import { CARD_GLYPH } from '../objects/card';
 import { GLYPH_BOX, LINE_GLYPHS, shapeGlyph, type LineKind } from '../objects/shapes';
+import { motionShapePreset, type MotionShape } from './motionShapes';
 
 /* Shape and line previews use neutral black. The separate card preview keeps its accent ink. */
 
@@ -150,4 +152,69 @@ export function CardArt({
       />
     </svg>
   );
+}
+
+/** The width of an outline in a tile's glyph, as `LineArt` draws a line. */
+const GLYPH_OUTLINE = 1.7;
+
+/**
+ * An animated shape drawn small, in the neutral black of the other shapes: filled, or its
+ * outline whole or in dashes. While `playing`, it moves as it does on a slide, over a reach
+ * scaled down with it, so a float stays in its tile.
+ */
+export function MotionShapeArt({
+  shape,
+  rtl,
+  playing,
+  className,
+}: {
+  shape: MotionShape;
+  rtl: boolean;
+  playing: boolean;
+  className?: string;
+}) {
+  const glyph = useMemo(() => motionGlyph(shape, rtl), [shape, rtl]);
+  if (!glyph) return null;
+  // As large against the others as it lands on a slide: the blinking dot is small.
+  const size = Math.max(0.5, Math.min(1, shape.side / 260));
+  const { ambient } = shape;
+  const motion =
+    ambient.kind === 'float'
+      ? { ...ambient, amount: ((ambient.amount ?? 16) * 18) / shape.side }
+      : ambient;
+  const outlined = shape.look !== 'fill';
+  return (
+    <svg aria-hidden viewBox={box} className={cx(picture, className)}>
+      <g style={playing ? ambientAnimation(motion) : undefined}>
+        <path
+          d={glyph.d}
+          transform={`translate(12 12) scale(${size}) translate(${glyph.x - 12} ${glyph.y - 12})`}
+          fill={outlined ? 'none' : '#111111'}
+          stroke={outlined ? '#111111' : 'none'}
+          strokeWidth={outlined ? GLYPH_OUTLINE / size : 0}
+          strokeDasharray={shape.look === 'dashed' ? `${2.4 / size} ${2 / size}` : undefined}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
+/** The longest side of a glyph in its box of 24, as the shapes of the library are drawn. */
+const GLYPH_INK = 18;
+
+/**
+ * The glyph of an animated shape: the library's, or in proportions of its own (a square of the
+ * rounded box, which the library draws wide).
+ */
+function motionGlyph(shape: MotionShape, rtl: boolean) {
+  const preset = motionShapePreset(shape, rtl ? 'rtl' : 'ltr');
+  if (!shape.aspect) return shapeGlyph(preset);
+  const [w, h] =
+    shape.aspect >= 1
+      ? [GLYPH_INK, GLYPH_INK / shape.aspect]
+      : [GLYPH_INK * shape.aspect, GLYPH_INK];
+  const path = presetPath(preset, w, h);
+  return path && { ...path, x: (24 - w) / 2, y: (24 - h) / 2 };
 }

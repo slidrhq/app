@@ -235,6 +235,17 @@ describe('L16: a slide without a visual element', () => {
     });
   });
 
+  it('counts the drawing of the background the slide shows, and only while it shows it (ADR-125)', () => {
+    const ground = { fill: { kind: 'solid' as const, color: { token: 'bg' as const } } };
+    const drawn = { ...ground, elements: [createElement.shape({ id: 'd_card', frame: box })] };
+    const layouts = [{ ...layoutOf('cards', drawn), decorations: [] }];
+    const on = (slide: Partial<Slide>) =>
+      check('L16', [title], {}, { slide: { layoutId: 'l_1', ...slide }, deck: { layouts } });
+    expect(on({})).toEqual([]);
+    // Another background leaves the layout's drawing, and the slide is text alone again.
+    expect(on({ background: ground })).toHaveLength(1);
+  });
+
   it('counts a group of bars as one drawing, on the slide and in its layout', () => {
     const bar = (id: string, y: number) =>
       createElement.shape({ id, frame: { x: 0, y, w: 300, h: 14 } });

@@ -69,6 +69,7 @@
       "signingIn": "Completa l'accesso nella finestra che si è aperta. Poi continueremo qui.",
       "installDescription": "{{name}} non è installato su questo computer. Con la tua approvazione, lo scaricheremo e installeremo tramite Windows App Installer, poi continueremo qui.",
       "installDescriptionNpm": "{{name}} non è installato su questo computer. Con la tua approvazione, lo installeremo tramite npm (se manca Node.js, lo installeremo prima tramite Windows App Installer), poi continueremo qui.",
+      "installDescriptionLibrary": "{{name}} non è installato su questo computer. Con la tua approvazione, lo scaricheremo dalla libreria della tua organizzazione e lo installeremo, poi continueremo qui.",
       "install": "Approva e installa",
       "signInDescription": "Accedi al tuo account per caricare i modelli disponibili.",
       "signIn": "Accedi",
@@ -613,7 +614,9 @@
       "paragraph": "Paragrafo {{n}} di {{total}}",
       "row": "{{effect}}: {{name}}",
       "original": "Movimento originale",
-      "originalHint": "Il movimento riprodotto dal file importato, così come vi era scritto. Se scegli un altro effetto, lo sostituisce."
+      "originalHint": "Il movimento riprodotto dal file importato, così come vi era scritto. Se scegli un altro effetto, lo sostituisce.",
+      "disableHint": "L'oggetto resta grigio e sbiadito fino a un'animazione “Attiva”. Per mostrarlo disattivato fin dall'apertura della diapositiva, scegli “Mostra come disattivato” sull'oggetto.",
+      "enableHint": "L'oggetto torna al suo aspetto abituale e lo mantiene. Per mostrarlo disattivato fino a questa animazione, scegli “Mostra come disattivato” sull'oggetto."
     },
     "group": {
       "leadIn": "All'apertura della diapositiva",
@@ -660,7 +663,9 @@
         "heartbeat": "Battito cardiaco",
         "flicker": "Sfarfallio",
         "float": "Fluttuazione",
-        "tilt": "Inclinazione"
+        "tilt": "Inclinazione",
+        "disable": "Disattiva",
+        "enable": "Attiva"
       },
       "exit": {
         "disappear": "Scomparsa",
@@ -804,6 +809,8 @@
       "lock": "Blocca",
       "unlock": "Sblocca",
       "hide": "Nascondi",
+      "disable": "Mostra come disattivato",
+      "enable": "Mostra come attivo",
       "duplicate": "Duplica",
       "pasteStyle": "Incolla stile",
       "delete": "Elimina",
@@ -862,6 +869,7 @@
       "order": "Ordine dei livelli",
       "lock": "Blocca",
       "visibility": "Nascondi e mostra",
+      "disabled": "Mostra come disattivato o attivo",
       "rename": "Rinomina",
       "paste": "Incolla",
       "cut": "Taglia",
@@ -1050,7 +1058,10 @@
       "insert": "Inserisci grafica",
       "frame": "Inserisci cornice",
       "reframe": "Inserisci immagine nella cornice",
-      "cards": "Inserisci set di schede"
+      "cards": "Inserisci set di schede",
+      "animation": "Inserisci animazione",
+      "background": "Applica sfondo",
+      "motion": "Modifica movimento"
     },
     "collection": {
       "cards": "Set di schede",
@@ -1059,7 +1070,9 @@
       "emoji": "Emoji",
       "icons": "Icone",
       "frames": "Cornici",
-      "tables": "Tabelle"
+      "tables": "Tabelle",
+      "animations": "Animazioni",
+      "backgrounds": "Sfondi"
     },
     "designs": {
       "title": "Diapositive pronte",
@@ -1466,6 +1479,110 @@
       "ready": "Dimensioni pronte",
       "custom": "Altra dimensione",
       "size": "{{rows}} righe per {{cols}} colonne"
+    },
+    "animations": {
+      "search": "Cerca animazioni",
+      "searchPlaceholder": "Cerca animazioni…",
+      "hint": "Fai clic su un’animazione per aggiungerla alla diapositiva. Si muove da sola, e puoi spostarla, ridimensionarla e ruotarla come qualsiasi oggetto.",
+      "group": {
+        "basic": "Forme animate",
+        "path": "Lungo un percorso",
+        "spin": "Rotazione",
+        "scale": "Crescita e pulsazione",
+        "lines": "Linee e onde",
+        "particles": "Particelle e reti"
+      },
+      "name": {
+        "orbit": "Orbita",
+        "conveyor": "Scatole su un percorso",
+        "trace": "Circuito",
+        "atom": "Atomo",
+        "shuttle": "Punto su una linea",
+        "hexagon": "Esagoni che ruotano",
+        "rings": "Anelli che ruotano",
+        "radar": "Radar",
+        "ripple": "Onde concentriche",
+        "breathe": "Forma che respira",
+        "bars": "Barre che salgono",
+        "waves": "Onde",
+        "draw": "Freccia disegnata",
+        "flowArrow": "Connettore che scorre",
+        "heartbeat": "Battito",
+        "network": "Rete",
+        "converge": "Particelle che si radunano",
+        "float": "Bolle che salgono"
+      }
+    },
+    "backgrounds": {
+      "hint": "Fai clic su uno sfondo per applicarlo alla diapositiva o a tutte quelle selezionate. I colori vengono dal modello, e lo strumento «Sfondo» riporta allo sfondo del modello.",
+      "animated": "Sfondi in movimento",
+      "still": "Sfondi calmi",
+      "name": {
+        "flow": "Flusso di circuito",
+        "waves": "Onde",
+        "converge": "Convergenza",
+        "orbit": "Orbite",
+        "radar": "Radar",
+        "network": "Rete",
+        "drift": "Luce fluttuante",
+        "particles": "Particelle che salgono",
+        "dots": "Griglia di punti",
+        "contours": "Curve di livello",
+        "arcs": "Archi nell’angolo"
+      }
+    },
+    "animatedShapes": {
+      "title": "Forme animate",
+      "hint": "Forme normali che ripetono un movimento. Colore, contorno e dimensioni si modificano come per ogni forma, e il movimento con lo strumento Movimento.",
+      "more": "Tutte le animazioni",
+      "name": {
+        "ring": "Anello che ruota",
+        "hexagon": "Esagono che ruota",
+        "star": "Stella che ruota",
+        "octagon": "Ottagono che ruota",
+        "square": "Quadrato che ruota e si ferma",
+        "pulse": "Cerchio pulsante",
+        "heart": "Cuore che batte",
+        "float": "Cerchio fluttuante",
+        "arrow": "Freccia che oscilla",
+        "blink": "Punto lampeggiante"
+      }
+    },
+    "motion": {
+      "title": "Movimento",
+      "piece": "Velocità dell’animazione",
+      "loop": "Movimento ripetuto",
+      "kind": {
+        "none": "Nessuno",
+        "spin": "Rotazione",
+        "pulse": "Pulsazione",
+        "float": "Fluttuazione",
+        "swing": "Oscillazione",
+        "blink": "Lampeggio"
+      },
+      "speed": "Velocità",
+      "pace": {
+        "slow": "Lenta",
+        "medium": "Media",
+        "fast": "Veloce"
+      },
+      "round": "Secondi per giro",
+      "rhythm": "Ritmo",
+      "rhythmKind": {
+        "steady": "Costante",
+        "smooth": "Morbido",
+        "pause": "Con pause"
+      },
+      "direction": "Direzione",
+      "clockwise": "In senso orario",
+      "counterclockwise": "In senso antiorario",
+      "amount": {
+        "pulse": "Ampiezza della pulsazione",
+        "float": "Altezza della fluttuazione",
+        "swing": "Angolo di oscillazione",
+        "blink": "Intensità del lampeggio"
+      },
+      "hint": "Il movimento si ripete finché la diapositiva è visibile: nell’editor, nella presentazione e in un file esportato."
     }
   },
   "export": {
@@ -2328,6 +2445,11 @@
       "blur": "Sfocatura",
       "dim": "Oscuramento",
       "applyAll": "Applica a tutte le diapositive",
+      "noDrawing": "Rimuovi il disegno dello sfondo",
+      "drawingColours": "Colori del disegno",
+      "drawingColour": "Colore {{n}} del disegno",
+      "speed": "Velocità del movimento",
+      "drawingOpacity": "Opacità del disegno",
       "reset": "Torna allo sfondo del tema"
     },
     "groups": {
@@ -2546,6 +2668,7 @@
       "installTitle": "Installare {{name}}?",
       "installDescription": "L'app scaricherà e installerà {{name}} tramite Windows App Installer. Poi verificheremo la connessione e, se necessario, ti chiederemo di accedere.",
       "installDescriptionNpm": "L'app installerà {{name}} tramite npm. Se manca Node.js, lo installerà prima tramite Windows App Installer. Poi verificheremo la connessione e, se necessario, ti chiederemo di accedere.",
+      "installDescriptionLibrary": "L'app scaricherà {{name}} dalla libreria della tua organizzazione e lo installerà su questo computer. Poi verificheremo la connessione e, se necessario, ti chiederemo di accedere.",
       "approveInstall": "Approva e installa",
       "chooseModel": "Scegli un modello",
       "chooseEffort": "Scegli un livello di impegno",

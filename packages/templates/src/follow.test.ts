@@ -234,6 +234,36 @@ describe('applyTemplate: what a slide holds of the theme as a copy', () => {
     });
   });
 
+  it("follows in the drawing of a background as in a layout's decorations (ADR-125)", () => {
+    const glow = () =>
+      createElement.shape({
+        id: 'e_glow',
+        frame: box(0, 0, 600, 600),
+        fill: { kind: 'css', value: glowOf(PAPER.primaryGlow) },
+        effects: { radius: paper.theme.radius },
+      });
+    const fill = { kind: 'solid' as const, color: { token: 'bg' as const } };
+    const followed = {
+      fill: { value: glowOf('color-mix(in srgb, var(--color-primary) 30%, transparent)') },
+      effects: { radius: night.theme.radius },
+    };
+
+    // A slide's own background.
+    const free = freeDeck([], { fill, elements: [glow()] });
+    const bus = switched(free);
+    expect(bus.deck.slides[0]!.background!.elements![0]).toMatchObject(followed);
+    bus.undo();
+    expect(bus.deck).toEqual(free);
+
+    // A layout's background, on a layout the deck keeps (`night` has no timeline).
+    const deck = deckFromTemplate(paper, { lang: 'en', sample: true });
+    const kept = deck.layouts.find((layout) => layout.id === 'l_paper_timeline')!;
+    kept.background = { fill, elements: [glow()] };
+    const after = switched(deck).deck.layouts.find((layout) => layout.id === kept.id)!;
+    expect(after.background!.elements![0]).toMatchObject(followed);
+    expect(after.background!.fill).toEqual(fill);
+  });
+
   it('changes nothing when the deck is switched to the theme it has', () => {
     const deck = freeDeck([
       createElement.shape({

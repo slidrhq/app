@@ -53,6 +53,8 @@ const exempt: Record<string, string> = {
   // Pictures, drawn in their own colours as a photo would be; the tiles around them are tokens.
   'desktop/src/elements/tiles.tsx': 'the pictures of the collections of Elements',
   'desktop/src/elements/shapeArt.tsx': 'the pictures of the shapes, the lines and the card',
+  'desktop/src/elements/motionKit.ts':
+    'the inks the animations of Elements are drawn in, each standing for a token of the theme (ADR-127)',
   'desktop/src/animations/effectArt.tsx':
     'the pictures of the transitions and of the animation presets',
 };

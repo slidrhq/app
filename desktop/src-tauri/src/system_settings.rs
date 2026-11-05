@@ -5,12 +5,17 @@
 //! the library, as it reads the rest of it.
 //!
 //! - It is read when the app first starts, and kept in `<app_data>/system-settings.json` with the
-//!   version of the app and the address of the library it came from. Every later start goes by
-//!   what is kept, without the network. It is read again only when the app starts as another
-//!   version, or reads another library.
+//!   address of the library it came from and the version of the app that read it (ADR-124). Every
+//!   later start goes by what is kept, at once, without waiting for the network; and reads the
+//!   library again in the background, for the next start: what the library says now is kept when
+//!   it is not what was kept, and the running app goes on by what it started with. A change in
+//!   the library so reaches each app at the start after the one that read it.
+//! - A start that reads another library than the one kept, or that has nothing kept, waits for
+//!   the library: the settings are of the library they came from. Until it has read it, it goes
+//!   by what was kept.
 //! - A library that does not have the file has no settings: the app's own defaults stand, and
-//!   that is kept too. A library that cannot be read now says nothing: what was kept before stands
-//!   for this run, and the next start reads it again.
+//!   that is kept too. A library that cannot be read now says nothing: what was kept before stands,
+//!   and the next start reads it again.
 //! - What the file names that this version does not know, or that does not hold (an agent whose
 //!   id is one of the app's own, a script for a program), is left out, and the rest stands.
 
@@ -52,8 +57,15 @@ const RESERVED: [&str; 7] = [
     "mock",
 ];
 
+/// The folder an agent's package is unpacked into (ADR-125): `%SLIDR_AGENT_DIR%` in its program,
+/// arguments and environment, and a variable of its environment.
+pub const AGENT_DIR: &str = "SLIDR_AGENT_DIR";
+
+/// Where the library keeps the agents' packages: `system/agents/<id>.zip`.
+const PACKAGES: &str = "system/agents/";
+
 /// What the app sets in an agent's environment itself (docs/custom-agent-cli.md §4).
-const OWN_ENV: [&str; 2] = ["SLIDR_PROTOCOL", "SLIDR_MCP_TOKEN"];
+const OWN_ENV: [&str; 3] = ["SLIDR_PROTOCOL", "SLIDR_MCP_TOKEN", AGENT_DIR];
 
 /// What is offered of one kind, and the one the app starts with. None offered: every one.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
@@ -133,6 +145,15 @@ pub enum Install {
     },
     /// npm's package, after Node.js when npm is missing.
     Npm { npm: String },
+    /// A package of the organization's library (ADR-125): a .zip of the CLI and every file it
+    /// needs, downloaded from the library alone and unpacked into a folder of the agent's own.
+    /// `sha256` and `size` are of the package as the settings were published; the app installs it
+    /// as the library has it at the start that installs it.
+    Package {
+        package: String,
+        sha256: String,
+        size: u64,
+    },
 }
 
 /// An agent of the organization's own: a CLI of the custom agent protocol
@@ -176,9 +197,16 @@ fn is_plain(value: &str, more: &[char], longest: usize) -> bool {
             .all(|c| c.is_ascii_alphanumeric() || more.contains(&c))
 }
 
-/// A command as the protocol takes it: an absolute path or a program's name, and not a script,
-/// which would leave the CLI running when the app ends the process it started.
-fn is_command(command: &str) -> bool {
+/// A path within an agent's package, `bin\acme.exe`: each part plain, so none of them leaves it.
+fn is_within(path: &str) -> bool {
+    path.split(['\\', '/'])
+        .all(|part| is_plain(part, &['.', '_', '-', ' '], 128))
+}
+
+/// A command as the protocol takes it: an absolute path or a program's name, or for an agent that
+/// comes as a package, a path within it; and not a script, which would leave the CLI running when
+/// the app ends the process it started.
+fn is_command(command: &str, packaged: bool) -> bool {
     let lower = command.to_ascii_lowercase();
     let script = [".cmd", ".bat", ".ps1", ".vbs", ".js"]
         .iter()
@@ -198,10 +226,27 @@ fn is_command(command: &str) -> bool {
     !script
         && command.len() <= 260
         && !command.contains('\0')
-        && (absolute || is_plain(command, &['.', '_', '-'], 260))
+        && (absolute
+            || is_plain(command, &['.', '_', '-'], 260)
+            || (packaged && is_within(command)))
+}
+
+fn is_hash(value: &str) -> bool {
+    value.len() == 64
+        && value
+            .chars()
+            .all(|c| c.is_ascii_digit() || matches!(c, 'a'..='f'))
 }
 
 impl CustomAgent {
+    /// The path of its package in the library, when it comes as one (ADR-125).
+    pub fn package(&self) -> Option<&str> {
+        match &self.install {
+            Some(Install::Package { package, .. }) => Some(package),
+            _ => None,
+        }
+    }
+
     /// Whether it is an agent the app may offer (docs/custom-agent-cli.md §3).
     fn holds(&self) -> bool {
         let glyph = self
@@ -231,13 +276,24 @@ impl CustomAgent {
                 };
                 scope.is_none_or(plain) && plain(package)
             }
+            // A .zip of the library's agents' folder, by a path the media library reads.
+            Some(Install::Package {
+                package,
+                sha256,
+                size,
+            }) => {
+                package.strip_prefix(PACKAGES).is_some_and(|name| {
+                    name.ends_with(".zip") && is_plain(name, &['.', '_', '-'], 64)
+                }) && is_hash(sha256)
+                    && *size > 0
+            }
         };
         is_id(&self.id)
             && !RESERVED.contains(&self.id.as_str())
             && !name.is_empty()
             && name.chars().count() <= 40
             && (1..=2).contains(&glyph)
-            && is_command(self.command.trim())
+            && is_command(self.command.trim(), self.package().is_some())
             && self.args.len() <= 32
             && self.env.keys().all(|key| {
                 is_plain(key, &['_'], 64)
@@ -308,9 +364,10 @@ impl Policy {
 }
 
 /// What the app keeps of the settings, and of where and when they were read.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Kept {
-    /// The version of the app that read them.
+    /// The version of the app that read them: a record, which no longer decides when they are
+    /// read again (ADR-124).
     app: String,
     /// The library they were read from.
     library: Option<String>,
@@ -318,7 +375,8 @@ struct Kept {
     settings: Option<Value>,
 }
 
-/// The settings of this run: the ones it goes by now, and whether the read of this start is over.
+/// The settings of this run: the ones it goes by now, and whether they stay so to its end (what
+/// was kept of this library from the start; else once this start has read the library).
 #[derive(Debug, Clone, Default)]
 struct Read {
     policy: Option<Arc<Policy>>,
@@ -330,13 +388,17 @@ pub struct SystemSettings {
     file: PathBuf,
     app: String,
     library: Option<String>,
+    /// What was kept when the app started: the file is written again only when the library says
+    /// something else.
+    kept: Option<Kept>,
     state: watch::Sender<Read>,
 }
 
 impl SystemSettings {
     /// The settings kept in `file`, for this version of the app reading `library`. What is kept is
-    /// gone by at once. It is all there is to read when it is of this version and this library,
-    /// or when the app has no library at all; otherwise [`Self::start`] reads the library.
+    /// gone by at once. When it is of this library, or the app has no library at all, it is what
+    /// this start goes by to the end, and [`Self::start`] reads the library only for the next
+    /// start; otherwise this start goes by what it reads.
     pub fn new(file: PathBuf, app: &str, library: Option<&Url>) -> Arc<Self> {
         let kept = std::fs::read(&file)
             .ok()
@@ -347,14 +409,13 @@ impl SystemSettings {
             .and_then(|kept| kept.settings.as_ref())
             .and_then(Policy::parse)
             .map(Arc::new);
-        let current = kept
-            .as_ref()
-            .is_some_and(|kept| kept.app == app && kept.library == library);
+        let current = kept.as_ref().is_some_and(|kept| kept.library == library);
         let done = current || library.is_none();
         Arc::new(Self {
             file,
             app: app.to_owned(),
             library,
+            kept,
             state: watch::Sender::new(Read { policy, done }),
         })
     }
@@ -376,18 +437,18 @@ impl SystemSettings {
             file: PathBuf::new(),
             app: String::new(),
             library: None,
+            kept: None,
             state: watch::Sender::new(Read { policy, done: true }),
         }))
     }
 
-    /// Reads the settings from `library` in the background, when what is kept is not of this
-    /// start's version and library.
+    /// Reads the settings from `library` in the background, at every start: for this start when
+    /// it waits for them, and for the next start in any case.
     pub fn start(self: &Arc<Self>, library: Option<Arc<MediaLibrary>>) {
-        if self.state.borrow().done {
-            return;
-        }
-        let Some(library) = library else {
-            self.state.send_modify(|read| read.done = true);
+        // Without a library, or in a development build that reads its settings from a file of this
+        // machine, there is nothing to read.
+        let (Some(library), Some(_)) = (library, self.library.as_ref()) else {
+            self.settle();
             return;
         };
         let settings = Arc::clone(self);
@@ -396,44 +457,65 @@ impl SystemSettings {
         });
     }
 
-    /// Reads the settings from the library, and keeps what it says.
+    /// Reads the settings from the library, and keeps what it says when it is not what was kept.
+    /// A start that waits for them goes by them at once; one that went by what was kept goes on by
+    /// it, and the next start goes by these.
     async fn read(&self, library: &MediaLibrary) {
         let published = match library.read_fresh(PATH).await {
             // A file that is not JSON is as good as none: the library has no settings.
             Fresh::Found(bytes) => serde_json::from_slice::<Value>(&bytes).ok(),
             Fresh::Missing => None,
             Fresh::Unavailable => {
-                // Nothing said: what was kept stands for this run, and the next start reads again.
-                self.state.send_modify(|read| read.done = true);
+                // Nothing said: what was kept stands, and the next start reads again.
+                self.settle();
                 return;
             }
         };
-        let policy = published.as_ref().and_then(Policy::parse).map(Arc::new);
         let kept = Kept {
             app: self.app.clone(),
             library: self.library.clone(),
             settings: published,
         };
-        // A failure to keep them only means they are read from the library again next time.
-        if let Ok(json) = serde_json::to_vec_pretty(&kept) {
+        // A failure to keep them only means the next start goes by what was kept before, and
+        // reads the library again.
+        if self.kept.as_ref() != Some(&kept)
+            && let Ok(json) = serde_json::to_vec_pretty(&kept)
+        {
             let _ = write_atomic(&self.file, &json);
         }
-        self.state.send_replace(Read { policy, done: true });
+        let policy = kept.settings.as_ref().and_then(Policy::parse).map(Arc::new);
+        // The settings of this run change only while it waits for them.
+        self.state.send_if_modified(|read| {
+            if read.done {
+                return false;
+            }
+            *read = Read { policy, done: true };
+            true
+        });
     }
 
-    /// The settings the app goes by now: what was kept, until the read of this start is over.
+    /// The read of this start is over, if it was not: what stands now stays.
+    fn settle(&self) {
+        self.state
+            .send_if_modified(|read| !std::mem::replace(&mut read.done, true));
+    }
+
+    /// The settings the app goes by now: what was kept, until a start that waits for the library
+    /// has read it.
     pub fn current(&self) -> Option<Arc<Policy>> {
         self.state.borrow().policy.clone()
     }
 
-    /// The settings once the read of this start is over, or what stands when it takes too long.
+    /// The settings this start goes by: at once when it goes by what was kept; else once it has
+    /// read the library, or what stands when that takes too long.
     pub async fn wait(&self) -> Option<Arc<Policy>> {
         let mut read = self.state.subscribe();
         let _ = tokio::time::timeout(WAIT, read.wait_for(|read| read.done)).await;
         self.current()
     }
 
-    /// Calls `apply` with the settings now, and again once the read of this start is over.
+    /// Calls `apply` with the settings now, and again once this start has read the library, when
+    /// it waits for it.
     pub fn apply(self: &Arc<Self>, apply: impl Fn(Option<&Policy>) + Send + Sync + 'static) {
         apply(self.current().as_deref());
         if self.state.borrow().done {
@@ -462,8 +544,8 @@ fn write_atomic(file: &Path, bytes: &[u8]) -> std::io::Result<()> {
     })
 }
 
-/// `system_settings_read()`: the settings the app goes by, once the read of this start is over;
-/// null when the organization set none.
+/// `system_settings_read()`: the settings this start goes by ([`SystemSettings::wait`]); null when
+/// the organization set none.
 #[tauri::command]
 pub async fn system_settings_read(
     settings: tauri::State<'_, Arc<SystemSettings>>,
@@ -590,6 +672,64 @@ mod tests {
     }
 
     #[test]
+    fn an_agent_may_come_as_a_package_of_the_library_with_paths_within_it() {
+        let hash = "ab".repeat(32);
+        let package = json!({ "package": "system/agents/acme.zip", "sha256": hash, "size": 2048 });
+        let with = |change: Value| {
+            let mut agent = agent();
+            agent["install"] = package.clone();
+            for (key, value) in change.as_object().into_iter().flatten() {
+                agent[key] = value.clone();
+            }
+            let mut file = published();
+            file["agents"]["custom"] = json!([agent]);
+            Policy::parse(&file).and_then(|policy| policy.agents.custom.into_iter().next())
+        };
+        let acme = with(json!({})).expect("a package holds");
+        assert_eq!(acme.package(), Some("system/agents/acme.zip"));
+        assert_eq!(
+            acme.install,
+            Some(Install::Package {
+                package: "system/agents/acme.zip".into(),
+                sha256: hash.clone(),
+                size: 2048
+            })
+        );
+        for right in [
+            json!({ "command": "acme.exe" }),
+            json!({ "command": "bin\\acme.exe" }),
+            json!({ "command": "Acme Agent/bin/acme.exe" }),
+            json!({ "command": "%SLIDR_AGENT_DIR%\\bin\\acme.exe" }),
+            json!({ "command": "pwsh.exe", "args": ["-File", "%SLIDR_AGENT_DIR%\\agent.ps1"] }),
+        ] {
+            assert!(with(right.clone()).is_some(), "{right}");
+        }
+        for wrong in [
+            json!({ "command": "..\\acme.exe" }),
+            json!({ "command": "bin\\..\\..\\acme.exe" }),
+            json!({ "command": "bin\\acme.cmd" }),
+            json!({ "command": ".hidden\\acme.exe" }),
+            json!({ "env": { "SLIDR_AGENT_DIR": "C:\\Elsewhere" } }),
+            json!({ "install": { "package": "fonts/acme.zip", "sha256": hash, "size": 1 } }),
+            json!({ "install": { "package": "system/agents/../x.zip", "sha256": hash, "size": 1 } }),
+            json!({ "install": { "package": "system/agents/acme.exe", "sha256": hash, "size": 1 } }),
+            json!({ "install": { "package": "system/agents/acme.zip", "sha256": "AB", "size": 1 } }),
+            json!({ "install": { "package": "system/agents/acme.zip", "sha256": hash, "size": 0 } }),
+        ] {
+            assert!(with(wrong.clone()).is_none(), "{wrong}");
+        }
+        // A path within a package is no command of an agent without one.
+        let mut file = published();
+        let mut plain = agent();
+        plain["command"] = json!("bin\\acme.exe");
+        file["agents"]["custom"] = json!([plain]);
+        assert_eq!(
+            Policy::parse(&file).map(|policy| policy.agents.custom.len()),
+            Some(0)
+        );
+    }
+
+    #[test]
     fn what_is_offered_comes_in_its_order_with_the_default_first() {
         let offer = Offer {
             offered: Some(vec!["b".into(), "c".into()]),
@@ -627,7 +767,7 @@ mod tests {
     }
 
     #[test]
-    fn what_was_kept_is_all_there_is_until_the_version_or_the_library_changes() -> TestResult {
+    fn what_was_kept_of_this_library_is_gone_by_without_waiting() -> TestResult {
         let dir = tempfile::tempdir()?;
         let file = dir.path().join(FILE);
         let library = Url::parse("https://media.example.org/slidr/")?;
@@ -639,16 +779,13 @@ mod tests {
             .current()
             .and_then(|policy| policy.agents.offer.chosen().map(str::to_owned));
         assert_eq!(chosen.as_deref(), Some("acme"));
-        // Another version reads again, and goes by what was kept meanwhile.
+        // Another version goes by it as well.
         let newer = SystemSettings::new(file.clone(), "0.3.0", Some(&library));
-        assert!(!done(&newer) && newer.current().is_some());
-        // So does another library.
+        assert!(done(&newer) && newer.current().is_some());
+        // Another library waits for its own, and goes by what was kept meanwhile.
         let other = Url::parse("https://other.example.org/")?;
-        assert!(!done(&SystemSettings::new(
-            file.clone(),
-            "0.2.1",
-            Some(&other)
-        )));
+        let moved = SystemSettings::new(file.clone(), "0.2.1", Some(&other));
+        assert!(!done(&moved) && moved.current().is_some());
         // Without a library, what was kept stands.
         let none = SystemSettings::new(file, "0.3.0", None);
         assert!(done(&none) && none.current().is_some());
@@ -660,7 +797,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn the_library_is_read_and_what_it_says_is_kept() -> TestResult {
+    async fn the_library_is_read_at_every_start_and_kept_for_the_next() -> TestResult {
         use sha2::Digest;
 
         use crate::net::testing::{Reply, Seen, serve};
@@ -697,9 +834,10 @@ mod tests {
         let media = tempfile::tempdir()?;
         let library = || MediaLibrary::new(base.clone(), media.path().to_path_buf());
 
-        // The first start reads the library, and keeps what it read.
+        // The first start has nothing kept: it waits for the library, goes by it, and keeps it.
         let first = library();
         let settings = SystemSettings::new(file.clone(), "0.2.1", Some(&base));
+        assert!(!done(&settings));
         let ((), ()) = tokio::join!(
             async {
                 first.refresh().await;
@@ -712,24 +850,40 @@ mod tests {
             languages,
             Some(Some(vec!["he".to_owned(), "en".to_owned()]))
         );
+
+        // A later start goes by what was kept at once, and reads the library again. What it says
+        // is what was kept, so the file is left as it was (kept here as `serde_json` writes it
+        // compact, which the app never writes).
+        keep(data.path(), "0.2.1", base.as_str(), Some(published()))?;
+        let before = std::fs::read(&file)?;
         let next = SystemSettings::new(file.clone(), "0.2.1", Some(&base));
         assert!(done(&next) && next.current().is_some());
-
-        // A new version reads it again: the library has none now, and that is kept.
-        *answer.lock().unwrap_or_else(PoisonError::into_inner) = None;
-        let second = library();
-        let newer = SystemSettings::new(file.clone(), "0.3.0", Some(&base));
+        let again = library();
         let ((), ()) = tokio::join!(
             async {
-                second.refresh().await;
+                again.refresh().await;
             },
-            newer.read(&second)
+            next.read(&again)
         );
-        assert!(newer.current().is_none());
-        let after = SystemSettings::new(file.clone(), "0.3.0", Some(&base));
+        assert_eq!(std::fs::read(&file)?, before);
+
+        // The library takes its settings away. A start goes on by what was kept, and keeps none
+        // for the next one, which goes by none.
+        *answer.lock().unwrap_or_else(PoisonError::into_inner) = None;
+        let third = library();
+        let running = SystemSettings::new(file.clone(), "0.2.1", Some(&base));
+        let ((), ()) = tokio::join!(
+            async {
+                third.refresh().await;
+            },
+            running.read(&third)
+        );
+        assert!(done(&running) && running.current().is_some());
+        let after = SystemSettings::new(file.clone(), "0.2.1", Some(&base));
         assert!(done(&after) && after.current().is_none());
 
-        // A library that cannot be read says nothing: what was kept stands, and is read again.
+        // A library that cannot be read says nothing. To a start that went by what was kept of it,
+        // what was kept stands, and stays kept.
         let gone = Url::parse("http://127.0.0.1:9/")?;
         keep(data.path(), "0.3.0", gone.as_str(), Some(published()))?;
         let unreachable = MediaLibrary::new(gone.clone(), media.path().to_path_buf());
@@ -741,6 +895,15 @@ mod tests {
             offline.read(&unreachable)
         );
         assert!(done(&offline) && offline.current().is_some());
+        let later = SystemSettings::new(file.clone(), "0.4.0", Some(&gone));
+        assert!(done(&later) && later.current().is_some());
+        // To a start that waits for it, having kept another library's: what was kept stands for
+        // this run, and the next start waits again.
+        keep(data.path(), "0.4.0", base.as_str(), Some(published()))?;
+        let moved = SystemSettings::new(file.clone(), "0.4.0", Some(&gone));
+        assert!(!done(&moved));
+        moved.read(&unreachable).await;
+        assert!(done(&moved) && moved.current().is_some());
         assert!(!done(&SystemSettings::new(file, "0.4.0", Some(&gone))));
         Ok(())
     }

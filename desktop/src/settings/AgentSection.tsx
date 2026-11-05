@@ -4,7 +4,7 @@ import { RefreshCw, Terminal } from '@slidr/ui/icons';
 import { Button, cx, Field, Icon, Select, Skeleton, Switch } from '@slidr/ui';
 import { useStore } from 'zustand';
 import { availableChoice, latestModels, modelEfforts } from '../agent/harnessSetup';
-import { harnessLook, installedByOrganization, installsWithNpm } from '../agent/harnessLook';
+import { harnessLook, installDescription, installedByOrganization } from '../agent/harnessLook';
 import type { HarnessDescriptor, HarnessState } from '../agent/agent';
 import { DEFAULT_OUTLINE } from '../agent/agentService';
 import { agentOf } from '../ai/runtime';
@@ -220,7 +220,7 @@ export function AgentSection() {
       </SettingsGroup>
       <InstallDialog
         name={descriptor?.name}
-        npm={installsWithNpm(selectedId)}
+        description={installDescription(selectedId)}
         open={!!confirmInstall && confirmInstall === selectedId}
         onClose={() => setConfirmInstall(undefined)}
         onApprove={() => selectedId && void agent.setup.run(selectedId, 'install')}

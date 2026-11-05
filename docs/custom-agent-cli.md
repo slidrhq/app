@@ -63,8 +63,10 @@ Everything else — the name, the version, what the CLI can do — the CLI says 
 | `name` | Required, 1–40 characters: the name the app shows, in place of `describe`'s. |
 | `glyph` | Optional, 1–2 characters on its mark. |
 | `tone` | Optional: `orange`, `green`, `blue`, `violet`, `teal`, `pink` or `rose`. Violet by default. |
-| `command` | An absolute path, which `%NAME%` of the environment may begin, or a program's name, looked for where the app finds the CLIs it installs (npm's package is started as Node.js on its `bin` script). |
-| `install` | Optional: `{ "winget": "<id>", "source"?: "<source>" }` or `{ "npm": "<package>" }`, run once the user approves, as for the built-in CLIs. Without it the organization installs the CLI, and the app says to ask the administrator. |
+| `command` | An absolute path, which `%NAME%` of the environment may begin, or a program's name, looked for where the app finds the CLIs it installs (npm's package is started as Node.js on its `bin` script). For an agent that comes as a package, also a path within it (`bin\acme.exe`), and a name is looked for in it first. |
+| `install` | Optional: `{ "winget": "<id>", "source"?: "<source>" }` or `{ "npm": "<package>" }`, run once the user approves, as for the built-in CLIs; or `{ "package": "system/agents/<id>.zip", "sha256", "size" }`, a .zip of the library that the app downloads from it alone and unpacks into `custom_agents/<id>/` of its local data ([ADR-125](adr/ADR-125-custom-agents-as-packages-of-the-library.md)). Without it the organization installs the CLI, and the app says to ask the administrator. |
+
+For an agent that comes as a package, `%SLIDR_AGENT_DIR%` in `command`, `args` and the values of `env` is its folder, and the app sets `SLIDR_AGENT_DIR` in its environment too (§4); the registration may not.
 
 ## 4. Rules for every start
 
@@ -76,6 +78,7 @@ Everything else — the name, the version, what the CLI can do — the CLI says 
 |---|---|---|
 | `SLIDR_PROTOCOL` | always | `1` |
 | `SLIDR_MCP_TOKEN` | `turn`, when the session has tools | The tool endpoint's bearer token. Never written to disk, to a log, or to standard output. |
+| `SLIDR_AGENT_DIR` | always, for an agent that comes as a package | The folder its package is unpacked into (ADR-125). |
 | the registration's `env` | always | as registered |
 
 **Standard input.** For `turn` and `image`: one JSON object, UTF-8, then end of file. For the other subcommands it is closed. The CLI never waits for more.

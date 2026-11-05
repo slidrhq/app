@@ -21,6 +21,10 @@ export const he = {
     row: '{{effect}} של {{name}}',
     original: 'התנועה המקורית',
     originalHint: 'התנועה שהגיעה מהקובץ המיובא, כפי שנכתבה בו. בחירת אפקט אחר מחליפה אותה.',
+    disableHint:
+      'האובייקט נשאר אפור ודהוי עד לאנימציה של ביטול השבתה. כדי שיופיע מושבת כבר בפתיחת השקף, בחרו בו "הצגה כמושבת".',
+    enableHint:
+      'האובייקט חוזר למראה הרגיל שלו ונשאר כך. כדי שיופיע מושבת עד לאנימציה הזו, בחרו בו "הצגה כמושבת".',
   },
   group: {
     leadIn: 'עם פתיחת השקף',
@@ -68,6 +72,8 @@ export const he = {
       flicker: 'ריצוד',
       float: 'ריחוף',
       tilt: 'הטיה',
+      disable: 'השבתה',
+      enable: 'ביטול השבתה',
     },
     exit: {
       disappear: 'היעלמות',
@@ -210,6 +216,10 @@ export const en: typeof he = {
     original: 'Original motion',
     originalHint:
       'The motion the imported file played, as it wrote it. Choosing another effect replaces it.',
+    disableHint:
+      'The object stays grey and faded until an Enable animation. To show it disabled from the moment the slide opens, choose "Show as disabled" on it.',
+    enableHint:
+      'The object returns to its usual look and stays so. To show it disabled until this animation, choose "Show as disabled" on it.',
   },
   group: {
     leadIn: 'When the slide opens',
@@ -257,6 +267,8 @@ export const en: typeof he = {
       flicker: 'Flicker',
       float: 'Float',
       tilt: 'Tilt',
+      disable: 'Disable',
+      enable: 'Enable',
     },
     exit: {
       disappear: 'Disappear',

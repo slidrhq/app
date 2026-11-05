@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import {
   CommandBus,
+  createBaseTheme,
   createDeck,
   createDeckStore,
   createElement,
@@ -11,6 +12,7 @@ import {
   type Deck,
   type Element,
   type ImageElement,
+  type Slide,
 } from '@slidr/model';
 import { allElementsDeck } from '@slidr/model/fixtures';
 import { act, type CSSProperties, type ReactNode } from 'react';
@@ -90,6 +92,54 @@ describe('SlideRenderer', () => {
     render(<SlideRenderer deck={deck} slide={deck.slides[0]!} />);
     expect(ids('[data-decoration-id]')).toEqual(['e_layout_bar']);
     expect(container.querySelector('[data-element-id="e_layout_bar"]')).toBeNull();
+  });
+
+  it("draws the background's drawing over its fill and under the layout, and only with it (ADR-125)", () => {
+    const bar = (id: string, x: number) =>
+      createElement.shape({ id, frame: { x, y: 100, w: 300, h: 12 } });
+    const theme = createBaseTheme();
+    const deck = createDeck({
+      theme: { ...theme, background: { ...theme.background, elements: [bar('e_theme_bar', 0)] } },
+      layouts: [
+        {
+          id: 'l_bars',
+          name: 'Bars',
+          archetype: 'section',
+          background: {
+            fill: { kind: 'solid', color: { token: 'bg' } },
+            elements: [bar('e_bar', 40)],
+          },
+          placeholders: [],
+          decorations: [bar('e_rule', 800)],
+        },
+        { id: 'l_plain', name: 'Plain', archetype: 'section', placeholders: [], decorations: [] },
+      ],
+    });
+    const show = (slide: Slide) => render(<SlideRenderer deck={deck} slide={slide} />);
+
+    show(createSlide({ id: 's_layout', layoutId: 'l_bars' }));
+    // Bottom to top: the background's drawing, then the layout's decorations.
+    expect(ids('[data-decoration-id]')).toEqual(['e_bar', 'e_rule']);
+    expect(container.querySelector('[data-element-id]')).toBeNull();
+    const background = container.querySelector('[data-slidr-background]')!;
+    const drawing = container.querySelector('[data-decoration-id="e_bar"]')!;
+    expect(
+      background.compareDocumentPosition(drawing) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    // Another background leaves the layout's drawing; the layout's decorations stay.
+    show(
+      createSlide({
+        id: 's_own',
+        layoutId: 'l_bars',
+        background: { fill: { kind: 'solid', color: { token: 'surface' } } },
+      }),
+    );
+    expect(ids('[data-decoration-id]')).toEqual(['e_rule']);
+
+    // A layout without a background of its own shows the theme's, drawing and all.
+    show(createSlide({ id: 's_plain', layoutId: 'l_plain' }));
+    expect(ids('[data-decoration-id]')).toEqual(['e_theme_bar']);
   });
 
   it('draws the text of a box in the colour of the box, and a run in the colour of its own', () => {
@@ -255,6 +305,116 @@ describe('SlideRenderer', () => {
     };
     render(<SlideRenderer deck={deck} slide={hidden} />);
     expect(container.querySelector('[data-element-id="e_line"]')).toBeNull();
+  });
+
+  it('moves an element by its ambient motion inside its box, and writes the keyframes once (ADR-128)', () => {
+    const deck = createDeck({ lang: 'en' });
+    const frame = { x: 100, y: 100, w: 200, h: 200 };
+    const still = createElement.shape({ id: 'e_still', frame });
+    const spin = createElement.shape({
+      id: 'e_spin',
+      frame,
+      rotation: 30,
+      flipH: true,
+      ambient: { kind: 'spin', duration: 4000, reverse: true },
+    });
+    const float = createElement.shape({
+      id: 'e_float',
+      frame,
+      ambient: { kind: 'float', duration: 3000, rhythm: 'pause', amount: 24 },
+    });
+    const pulse = createElement.shape({
+      id: 'e_pulse',
+      frame,
+      ambient: { kind: 'pulse', duration: 2000 },
+    });
+    const blink = createElement.shape({
+      id: 'e_blink',
+      frame,
+      ambient: { kind: 'blink', duration: 1500, amount: 0.6 },
+    });
+    render(
+      <SlideRenderer
+        deck={deck}
+        slide={createSlide({ elements: [still, spin, float, pulse, blink] })}
+      />,
+    );
+    const box = (id: string) => container.querySelector<HTMLElement>(`[data-element-id="${id}"]`)!;
+    const moving = (id: string) =>
+      box(id).querySelector<HTMLElement>(':scope > [data-slidr-ambient]');
+
+    expect(moving('e_still')).toBeNull();
+    // The box keeps its rotation; the motion is inside it, around its middle.
+    expect(box('e_spin').style.transform).toBe('rotate(30deg)');
+    const turning = moving('e_spin')!;
+    expect(turning.getAttribute('data-slidr-ambient')).toBe('spin');
+    expect(turning.style.animation).toBe('slidr-spin 4000ms linear infinite reverse');
+    expect(turning.style.width).toBe('100%');
+    expect(turning.style.height).toBe('100%');
+    // Each kind as it goes, and as far as it goes.
+    expect(moving('e_float')!.style.animation).toBe(
+      'slidr-float-pause 3000ms ease-in-out infinite',
+    );
+    expect(moving('e_float')!.style.getPropertyValue('--slidr-ambient')).toBe('-24px');
+    expect(moving('e_pulse')!.style.animation).toBe('slidr-pulse 2000ms ease-in-out infinite');
+    expect(moving('e_pulse')!.style.getPropertyValue('--slidr-ambient')).toBe('1.12');
+    expect(moving('e_blink')!.style.getPropertyValue('--slidr-ambient')).toBe('0.4');
+
+    const sheets = container.querySelectorAll('style[data-slidr-ambient]');
+    expect(sheets).toHaveLength(1);
+    for (const name of ['spin', 'float-pause', 'pulse', 'blink', 'swing', 'swing-pause']) {
+      expect(sheets[0]!.textContent).toContain(`@keyframes slidr-${name}{`);
+    }
+
+    // A slide where nothing moves writes no keyframes.
+    render(<SlideRenderer deck={deck} slide={createSlide({ elements: [still] })} />);
+    expect(container.querySelector('style[data-slidr-ambient]')).toBeNull();
+  });
+
+  it('draws an element out of use grey and faded, a group with what is in it, and nothing twice', () => {
+    const shadow = { x: 0, y: 4, blur: 8, color: { value: '#000000' } };
+    const card = createElement.shape({
+      id: 'card',
+      frame: { x: 0, y: 0, w: 200, h: 100 },
+      disabled: true,
+      effects: { shadow },
+    });
+    const styled = createElement.shape({
+      id: 'styled',
+      frame: { x: 0, y: 200, w: 200, h: 100 },
+      disabled: true,
+      css: { filter: 'sepia(1)' },
+    });
+    const inner = createElement.shape({
+      id: 'inner',
+      frame: { x: 0, y: 0, w: 50, h: 50 },
+      disabled: true,
+    });
+    const group = createElement.group({
+      id: 'group',
+      frame: { x: 400, y: 0, w: 200, h: 200 },
+      disabled: true,
+      children: [
+        inner,
+        createElement.shape({ id: 'beside', frame: { x: 60, y: 0, w: 50, h: 50 } }),
+      ],
+    });
+    const plain = createElement.shape({ id: 'plain', frame: { x: 800, y: 0, w: 50, h: 50 } });
+    const slide = createSlide({ id: 's', elements: [card, styled, group, plain] });
+    const deck = createDeck({ slides: [slide] });
+    render(<SlideRenderer deck={deck} slide={slide} />);
+    const box = (id: string) => container.querySelector<HTMLElement>(`[data-element-id="${id}"]`)!;
+    // At the end of its own filter, so its shadow fades with it.
+    expect(box('card').style.filter).toMatch(/^drop-shadow\(.+\) grayscale\(1\) opacity\(0\.4\)$/);
+    expect(box('card').hasAttribute('data-slidr-disabled')).toBe(true);
+    // After a filter of its own css, which would otherwise take its place.
+    expect(box('styled').style.filter).toBe('sepia(1) grayscale(1) opacity(0.4)');
+    expect(box('group').style.filter).toBe('grayscale(1) opacity(0.4)');
+    // Inside a group that is out of use, a part is not faded a second time.
+    expect(box('inner').style.filter).toBe('');
+    expect(box('inner').hasAttribute('data-slidr-disabled')).toBe(false);
+    expect(box('plain').style.filter).toBe('');
+    expect(box('plain').hasAttribute('data-slidr-disabled')).toBe(false);
   });
 
   it('resolves assets through the resolver, in model fields and in html markup', () => {

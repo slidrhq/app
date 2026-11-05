@@ -67,6 +67,7 @@
       "signingIn": "開いたウィンドウでサインインを完了してください。完了後、ここで続行します。",
       "installDescription": "{{name}} はこのコンピューターにインストールされていません。承認いただくと、Windows App Installer を使用してダウンロードとインストールを行い、ここで続行します。",
       "installDescriptionNpm": "{{name}} はこのコンピューターにインストールされていません。承認いただくと、npm を使用してインストールし (Node.js がない場合は先に Windows App Installer でインストールします)、ここで続行します。",
+      "installDescriptionLibrary": "{{name}} はこのコンピューターにインストールされていません。承認いただくと、組織のライブラリからダウンロードしてインストールし、ここで続行します。",
       "install": "承認してインストール",
       "signInDescription": "利用可能なモデルを読み込むには、アカウントにサインインしてください。",
       "signIn": "サインイン",
@@ -611,7 +612,9 @@
       "paragraph": "段落 {{n}}/{{total}}",
       "row": "{{effect}}（{{name}}）",
       "original": "元のモーション",
-      "originalHint": "インポートしたファイルに記述されていたとおりのモーションです。別の効果を選ぶと置き換わります。"
+      "originalHint": "インポートしたファイルに記述されていたとおりのモーションです。別の効果を選ぶと置き換わります。",
+      "disableHint": "オブジェクトは「有効化」アニメーションまで、グレーで薄く表示されたままになります。スライドを開いたときから無効に見せるには、オブジェクトで「無効として表示」を選びます。",
+      "enableHint": "オブジェクトは通常の見た目に戻り、そのまま表示されます。このアニメーションまで無効に見せるには、オブジェクトで「無効として表示」を選びます。"
     },
     "group": {
       "leadIn": "スライドの開始時",
@@ -658,7 +661,9 @@
         "heartbeat": "ハートビート",
         "flicker": "ちらつき",
         "float": "浮遊",
-        "tilt": "傾き"
+        "tilt": "傾き",
+        "disable": "無効化",
+        "enable": "有効化"
       },
       "exit": {
         "disappear": "クリア",
@@ -802,6 +807,8 @@
       "lock": "ロック",
       "unlock": "ロック解除",
       "hide": "非表示",
+      "disable": "無効として表示",
+      "enable": "有効として表示",
       "duplicate": "複製",
       "pasteStyle": "スタイルの貼り付け",
       "delete": "削除",
@@ -860,6 +867,7 @@
       "order": "重なり順",
       "lock": "ロック",
       "visibility": "表示/非表示",
+      "disabled": "無効/有効として表示",
       "rename": "名前の変更",
       "paste": "貼り付け",
       "cut": "切り取り",
@@ -1042,7 +1050,10 @@
       "insert": "グラフィックの挿入",
       "frame": "フレームの挿入",
       "reframe": "画像をフレームに配置",
-      "cards": "カードセットの挿入"
+      "cards": "カードセットの挿入",
+      "animation": "アニメーションの挿入",
+      "background": "背景の適用",
+      "motion": "動きを変更"
     },
     "collection": {
       "cards": "カードセット",
@@ -1051,7 +1062,9 @@
       "emoji": "絵文字",
       "icons": "アイコン",
       "frames": "フレーム",
-      "tables": "表"
+      "tables": "表",
+      "animations": "アニメーション",
+      "backgrounds": "背景"
     },
     "designs": {
       "title": "完成スライド",
@@ -1458,6 +1471,110 @@
       "ready": "既定のサイズ",
       "custom": "その他のサイズ",
       "size": "{{rows}} 行 × {{cols}} 列"
+    },
+    "animations": {
+      "search": "アニメーションを検索",
+      "searchPlaceholder": "アニメーションを検索…",
+      "hint": "アニメーションをクリックするとスライドに追加されます。ひとりでに動き、ほかのオブジェクトと同じように移動、サイズ変更、回転ができます。",
+      "group": {
+        "basic": "アニメーション図形",
+        "path": "軌道に沿って",
+        "spin": "回転",
+        "scale": "拡大と脈動",
+        "lines": "線と波",
+        "particles": "粒子とネットワーク"
+      },
+      "name": {
+        "orbit": "周回軌道",
+        "conveyor": "経路を進む箱",
+        "trace": "回路の配線",
+        "atom": "原子",
+        "shuttle": "線上の点",
+        "hexagon": "回る六角形",
+        "rings": "回るリング",
+        "radar": "レーダー",
+        "ripple": "波紋",
+        "breathe": "呼吸する形",
+        "bars": "伸びる棒",
+        "waves": "波",
+        "draw": "描かれる矢印",
+        "flowArrow": "流れるコネクター",
+        "heartbeat": "心拍",
+        "network": "ネットワーク",
+        "converge": "集まる粒子",
+        "float": "昇る泡"
+      }
+    },
+    "backgrounds": {
+      "hint": "背景をクリックすると、スライド、または選択したすべてのスライドに適用されます。色はテンプレートのもので、「背景」ツールでテンプレートの背景に戻せます。",
+      "animated": "動く背景",
+      "still": "静かな背景",
+      "name": {
+        "flow": "回路の流れ",
+        "waves": "波",
+        "converge": "収束",
+        "orbit": "軌道",
+        "radar": "レーダー",
+        "network": "ネットワーク",
+        "drift": "漂う光",
+        "particles": "昇る粒子",
+        "dots": "ドットグリッド",
+        "contours": "等高線",
+        "arcs": "角の円弧"
+      }
+    },
+    "animatedShapes": {
+      "title": "アニメーション図形",
+      "hint": "動きを繰り返す普通の図形です。色、枠線、サイズは他の図形と同じように編集でき、動きは「動き」ツールで編集します。",
+      "more": "すべてのアニメーション",
+      "name": {
+        "ring": "回転するリング",
+        "hexagon": "回転する六角形",
+        "star": "回転する星",
+        "octagon": "回転する八角形",
+        "square": "回って止まる四角形",
+        "pulse": "脈打つ円",
+        "heart": "鼓動するハート",
+        "float": "浮遊する円",
+        "arrow": "揺れる矢印",
+        "blink": "点滅する点"
+      }
+    },
+    "motion": {
+      "title": "動き",
+      "piece": "アニメーションの速さ",
+      "loop": "繰り返す動き",
+      "kind": {
+        "none": "なし",
+        "spin": "回転",
+        "pulse": "脈動",
+        "float": "浮遊",
+        "swing": "揺れ",
+        "blink": "点滅"
+      },
+      "speed": "速さ",
+      "pace": {
+        "slow": "遅い",
+        "medium": "普通",
+        "fast": "速い"
+      },
+      "round": "1周の秒数",
+      "rhythm": "リズム",
+      "rhythmKind": {
+        "steady": "一定",
+        "smooth": "なめらか",
+        "pause": "休止あり"
+      },
+      "direction": "向き",
+      "clockwise": "時計回り",
+      "counterclockwise": "反時計回り",
+      "amount": {
+        "pulse": "脈動の大きさ",
+        "float": "浮遊の高さ",
+        "swing": "揺れの角度",
+        "blink": "点滅の強さ"
+      },
+      "hint": "スライドが表示されている間、動きは繰り返されます。エディター、スライドショー、エクスポートしたファイルでも同じです。"
     }
   },
   "export": {
@@ -2316,6 +2433,11 @@
       "blur": "ぼかし",
       "dim": "暗くする",
       "applyAll": "すべてのスライドに適用",
+      "noDrawing": "背景の描画を削除",
+      "drawingColours": "描画の色",
+      "drawingColour": "描画の色 {{n}}",
+      "speed": "動きの速さ",
+      "drawingOpacity": "描画の不透明度",
       "reset": "テーマの背景に戻す"
     },
     "groups": {
@@ -2534,6 +2656,7 @@
       "installTitle": "{{name}} をインストールしますか？",
       "installDescription": "Windows App Installer を使用して {{name}} をダウンロードし、インストールします。その後、接続を確認し、必要に応じてサインインをお願いします。",
       "installDescriptionNpm": "npm を使用して {{name}} をインストールします。Node.js がない場合は、先に Windows App Installer でインストールします。その後、接続を確認し、必要に応じてサインインをお願いします。",
+      "installDescriptionLibrary": "{{name}} を組織のライブラリからダウンロードし、このコンピューターにインストールします。その後、接続を確認し、必要に応じてサインインをお願いします。",
       "approveInstall": "承認してインストール",
       "chooseModel": "モデルを選択",
       "chooseEffort": "推論レベルを選択",

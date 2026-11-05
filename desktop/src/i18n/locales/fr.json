@@ -69,6 +69,7 @@
       "signingIn": "Terminez la connexion dans la fenêtre qui s’est ouverte. Nous continuerons ici ensuite.",
       "installDescription": "{{name}} n’est pas installé sur cet ordinateur. Avec votre accord, nous allons le télécharger et l’installer à l’aide de Windows App Installer, puis continuer ici.",
       "installDescriptionNpm": "{{name}} n’est pas installé sur cet ordinateur. Avec votre accord, nous allons l’installer avec npm (en installant d’abord Node.js à l’aide de Windows App Installer s’il manque), puis continuer ici.",
+      "installDescriptionLibrary": "{{name}} n’est pas installé sur cet ordinateur. Avec votre accord, nous allons le télécharger depuis la bibliothèque de votre organisation et l’installer, puis continuer ici.",
       "install": "Approuver et installer",
       "signInDescription": "Connectez-vous à votre compte pour charger les modèles disponibles.",
       "signIn": "Se connecter",
@@ -613,7 +614,9 @@
       "paragraph": "Paragraphe {{n}} sur {{total}}",
       "row": "{{effect}} : {{name}}",
       "original": "Mouvement d’origine",
-      "originalHint": "Le mouvement joué par le fichier importé, tel qu’il l’avait écrit. Choisir un autre effet le remplace."
+      "originalHint": "Le mouvement joué par le fichier importé, tel qu’il l’avait écrit. Choisir un autre effet le remplace.",
+      "disableHint": "L’objet reste gris et estompé jusqu’à une animation « Activer ». Pour qu’il apparaisse désactivé dès l’ouverture de la diapositive, choisissez « Afficher comme désactivé » sur cet objet.",
+      "enableHint": "L’objet retrouve son aspect habituel et le garde. Pour qu’il apparaisse désactivé jusqu’à cette animation, choisissez « Afficher comme désactivé » sur cet objet."
     },
     "group": {
       "leadIn": "À l’ouverture de la diapositive",
@@ -660,7 +663,9 @@
         "heartbeat": "Battement de cœur",
         "flicker": "Scintiller",
         "float": "Flotter",
-        "tilt": "Incliner"
+        "tilt": "Incliner",
+        "disable": "Désactiver",
+        "enable": "Activer"
       },
       "exit": {
         "disappear": "Disparaître",
@@ -804,6 +809,8 @@
       "lock": "Verrouiller",
       "unlock": "Déverrouiller",
       "hide": "Masquer",
+      "disable": "Afficher comme désactivé",
+      "enable": "Afficher comme actif",
       "duplicate": "Dupliquer",
       "pasteStyle": "Coller le style",
       "delete": "Supprimer",
@@ -862,6 +869,7 @@
       "order": "Ordre des calques",
       "lock": "Verrouiller",
       "visibility": "Masquer et afficher",
+      "disabled": "Afficher comme désactivé ou actif",
       "rename": "Renommer",
       "paste": "Coller",
       "cut": "Couper",
@@ -1050,7 +1058,10 @@
       "insert": "Insérer une illustration",
       "frame": "Insérer un cadre",
       "reframe": "Placer l’image dans le cadre",
-      "cards": "Insérer un jeu de cartes"
+      "cards": "Insérer un jeu de cartes",
+      "animation": "Insérer une animation",
+      "background": "Appliquer un arrière-plan",
+      "motion": "Modifier le mouvement"
     },
     "collection": {
       "cards": "Jeux de cartes",
@@ -1059,7 +1070,9 @@
       "emoji": "Emoji",
       "icons": "Icônes",
       "frames": "Cadres",
-      "tables": "Tableaux"
+      "tables": "Tableaux",
+      "animations": "Animations",
+      "backgrounds": "Arrière-plans"
     },
     "designs": {
       "title": "Diapositives prêtes",
@@ -1466,6 +1479,110 @@
       "ready": "Tailles prêtes à l’emploi",
       "custom": "Autre taille",
       "size": "{{rows}} lignes sur {{cols}} colonnes"
+    },
+    "animations": {
+      "search": "Rechercher des animations",
+      "searchPlaceholder": "Rechercher une animation…",
+      "hint": "Cliquez sur une animation pour l’ajouter à la diapositive. Elle bouge d’elle-même, et vous pouvez la déplacer, la redimensionner et la faire pivoter comme tout objet.",
+      "group": {
+        "basic": "Formes animées",
+        "path": "Sur un parcours",
+        "spin": "Rotation",
+        "scale": "Croissance et pulsation",
+        "lines": "Lignes et ondes",
+        "particles": "Particules et réseaux"
+      },
+      "name": {
+        "orbit": "Orbite",
+        "conveyor": "Boîtes sur un parcours",
+        "trace": "Circuit imprimé",
+        "atom": "Atome",
+        "shuttle": "Point sur une ligne",
+        "hexagon": "Hexagones qui tournent",
+        "rings": "Anneaux qui tournent",
+        "radar": "Radar",
+        "ripple": "Ondes concentriques",
+        "breathe": "Forme qui respire",
+        "bars": "Barres qui montent",
+        "waves": "Vagues",
+        "draw": "Flèche dessinée",
+        "flowArrow": "Connecteur fluide",
+        "heartbeat": "Battement de cœur",
+        "network": "Réseau",
+        "converge": "Particules qui se rassemblent",
+        "float": "Bulles qui montent"
+      }
+    },
+    "backgrounds": {
+      "hint": "Cliquez sur un arrière-plan pour l’appliquer à la diapositive, ou à toutes les diapositives sélectionnées. Ses couleurs viennent du modèle, et l’outil « Arrière-plan » ramène à l’arrière-plan du modèle.",
+      "animated": "Arrière-plans animés",
+      "still": "Arrière-plans calmes",
+      "name": {
+        "flow": "Flux de circuit",
+        "waves": "Vagues",
+        "converge": "Convergence",
+        "orbit": "Orbites",
+        "radar": "Radar",
+        "network": "Réseau",
+        "drift": "Lumière flottante",
+        "particles": "Particules qui montent",
+        "dots": "Grille de points",
+        "contours": "Courbes de niveau",
+        "arcs": "Arcs en coin"
+      }
+    },
+    "animatedShapes": {
+      "title": "Formes animées",
+      "hint": "Des formes ordinaires qui répètent un mouvement. Leur couleur, leur contour et leur taille se modifient comme pour toute forme, et leur mouvement avec l’outil Mouvement.",
+      "more": "Toutes les animations",
+      "name": {
+        "ring": "Anneau qui tourne",
+        "hexagon": "Hexagone qui tourne",
+        "star": "Étoile qui tourne",
+        "octagon": "Octogone qui tourne",
+        "square": "Carré qui tourne et se repose",
+        "pulse": "Cercle qui bat",
+        "heart": "Cœur qui bat",
+        "float": "Cercle flottant",
+        "arrow": "Flèche qui oscille",
+        "blink": "Point clignotant"
+      }
+    },
+    "motion": {
+      "title": "Mouvement",
+      "piece": "Vitesse de l’animation",
+      "loop": "Mouvement répété",
+      "kind": {
+        "none": "Aucun",
+        "spin": "Rotation",
+        "pulse": "Pulsation",
+        "float": "Flottement",
+        "swing": "Balancement",
+        "blink": "Clignotement"
+      },
+      "speed": "Vitesse",
+      "pace": {
+        "slow": "Lente",
+        "medium": "Moyenne",
+        "fast": "Rapide"
+      },
+      "round": "Secondes par tour",
+      "rhythm": "Rythme",
+      "rhythmKind": {
+        "steady": "Régulier",
+        "smooth": "Doux",
+        "pause": "Avec pauses"
+      },
+      "direction": "Sens",
+      "clockwise": "Sens horaire",
+      "counterclockwise": "Sens antihoraire",
+      "amount": {
+        "pulse": "Ampleur de la pulsation",
+        "float": "Hauteur du flottement",
+        "swing": "Angle du balancement",
+        "blink": "Intensité du clignotement"
+      },
+      "hint": "Le mouvement se répète tant que la diapositive est affichée : dans l’éditeur, en présentation et dans un fichier exporté."
     }
   },
   "export": {
@@ -2328,6 +2445,11 @@
       "blur": "Flou",
       "dim": "Assombrir",
       "applyAll": "Appliquer à toutes les diapositives",
+      "noDrawing": "Retirer le dessin de l’arrière-plan",
+      "drawingColours": "Couleurs du dessin",
+      "drawingColour": "Couleur {{n}} du dessin",
+      "speed": "Vitesse du mouvement",
+      "drawingOpacity": "Opacité du dessin",
       "reset": "Revenir à l’arrière-plan du thème"
     },
     "groups": {
@@ -2546,6 +2668,7 @@
       "installTitle": "Installer {{name}} ?",
       "installDescription": "L’application va télécharger et installer {{name}} à l’aide de Windows App Installer. Nous vérifierons ensuite la connexion et vous demanderons de vous connecter si nécessaire.",
       "installDescriptionNpm": "L’application va installer {{name}} avec npm. Si Node.js manque, elle l’installera d’abord à l’aide de Windows App Installer. Nous vérifierons ensuite la connexion et vous demanderons de vous connecter si nécessaire.",
+      "installDescriptionLibrary": "L’application va télécharger {{name}} depuis la bibliothèque de votre organisation et l’installer sur cet ordinateur. Nous vérifierons ensuite la connexion et vous demanderons de vous connecter si nécessaire.",
       "approveInstall": "Approuver et installer",
       "chooseModel": "Choisir un modèle",
       "chooseEffort": "Choisir un niveau d’effort",

@@ -15,6 +15,8 @@ export const COLLECTIONS = [
   'icons',
   'frames',
   'tables',
+  'animations',
+  'backgrounds',
 ] as const;
 
 export type CollectionId = (typeof COLLECTIONS)[number];
@@ -189,6 +191,57 @@ const TILES: Record<CollectionId, TileArt> = {
             stroke="#fb7185"
             strokeWidth="1.6"
           />
+        </g>
+      </>
+    ),
+  },
+  animations: {
+    front: ['#7dd3fc', '#0284c7'],
+    back: ['#fde68a', '#f59e0b'],
+    art: () => (
+      <>
+        <circle
+          cx="51"
+          cy="51"
+          r="19"
+          fill="none"
+          stroke={WHITE}
+          strokeWidth="2.5"
+          strokeDasharray="4 4.6"
+          strokeLinecap="round"
+          opacity=".85"
+        />
+        <circle cx="51" cy="51" r="8.5" fill={WHITE} />
+        {/* The satellite goes a third of the way round while the pointer is on the tile. */}
+        <g className="origin-[51px_51px] transition-[rotate] duration-500 ease-standard group-hover:rotate-[120deg]">
+          <circle cx="51" cy="32" r="5" fill="#fde047" stroke="#0369a1" strokeWidth="1.6" />
+        </g>
+        <path
+          d="M28.5 64.5a26 26 0 0 0 9 9.5"
+          fill="none"
+          stroke={WHITE}
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          opacity=".6"
+        />
+      </>
+    ),
+  },
+  backgrounds: {
+    front: ['#a5b4fc', '#4f46e5'],
+    back: ['#5eead4', '#14b8a6'],
+    art: (id) => (
+      <>
+        <defs>
+          <clipPath id={`${id}-slide`}>
+            <rect x="25" y="33" width="52" height="36" rx="5" />
+          </clipPath>
+        </defs>
+        <rect x="25" y="33" width="52" height="36" rx="5" fill={WHITE} />
+        <g clipPath={`url(#${id}-slide)`} fill="none" strokeLinecap="round">
+          <circle cx="64" cy="43" r="9" fill="#e0e7ff" />
+          <path d="M22 58c8-9 15 5 24-2s15 3 33-8" stroke="#6366f1" strokeWidth="2.6" />
+          <path d="M22 64c9-6 16 3 25-2s15 2 32-6" stroke="#a5b4fc" strokeWidth="2" />
         </g>
       </>
     ),

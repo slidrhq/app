@@ -1,9 +1,19 @@
-import { createElement, type Element, type Layout } from '@slidr/model';
+import { createElement, createSlide, layoutObjects, type Element, type Layout } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
+import { nightTemplate } from '../fixtures';
 import { mirrorLayout } from '../mirror';
-import type { Template } from '../template';
+import { Template } from '../template';
 import { builtInAvailable, builtInTemplates, tzukTemplate } from './index';
-import { at, lockedDrawings, pageNumber, rect, solid, token, withObjects } from './kit';
+import {
+  at,
+  lockedDrawings,
+  pageNumber,
+  rect,
+  solid,
+  token,
+  toBackground,
+  withObjects,
+} from './kit';
 
 /* What of a built-in layout becomes the slide's own (`withObjects`, ADR-094). */
 
@@ -100,5 +110,86 @@ describe('the drawings a layout keeps', () => {
     expect(ids(lockedDrawings([given([courtyard, number])]).get('l_test_cards'))).toEqual([
       'd_courtyard',
     ]);
+  });
+});
+
+/* A drawing given to the background of its layout (`toBackground`, ADR-125). */
+describe('a drawing given to the background', () => {
+  const lanes = createElement.group({
+    id: 'o_lanes',
+    frame: { x: 0, y: 150, w: 800, h: 770 },
+    children: [rect('o_lane', { x: 0, y: 0, w: 300, h: 12 }, solid(token('primary')))],
+  });
+  const card = rect('o_card', { x: 1000, y: 300, w: 600, h: 400 }, solid(token('surface')));
+  const mark = rect('d_mark', { x: 1760, y: 90, w: 60, h: 40 }, solid(token('accent')));
+  const ground = { fill: { kind: 'solid' as const, color: { token: 'bg' as const } } };
+
+  function drawn(objects: Element[], background?: Layout['background']): Template {
+    const theme = nightTemplate().theme;
+    const hero: Layout = {
+      ...layout([mark]),
+      id: 'l_hero',
+      archetype: 'hero',
+      ...(background ? { background } : {}),
+      objects,
+    };
+    const slide = createSlide({ id: 's_hero', layoutId: 'l_hero' });
+    slide.elements = layoutObjects(hero, slide.id, new Set());
+    return { theme, dir: 'rtl', layouts: [hero], flipped: [mirrorLayout(hero)], sample: [slide] };
+  }
+
+  it('leaves the objects for the background, in both directions, and the sample loses its copies', () => {
+    const moved = toBackground(drawn([lanes, card], ground), ['o_lanes']);
+    const [hero] = moved.layouts;
+    expect(hero!.background).toEqual({ ...ground, elements: [lanes] });
+    expect(ids(hero!.objects)).toEqual(['o_card']);
+    expect(ids(hero!.decorations)).toEqual(['d_mark']);
+    expect(moved.flipped![0]!.background!.elements).toEqual([
+      mirrorLayout(drawn([lanes]).layouts[0]!).objects![0],
+    ]);
+    expect(ids(moved.flipped![0]!.objects)).toEqual(['o_card']);
+    expect(ids(moved.sample![0]!.elements)).toEqual(['s_hero_o_card']);
+    // The template is still one: the parse holds it to the schema and the sample to its layouts.
+    expect(Template.parse(moved)).toEqual(moved);
+  });
+
+  it("gives a layout without a background of its own the theme's to hold the drawing", () => {
+    const moved = toBackground(drawn([lanes]), ['o_lanes']);
+    expect(moved.layouts[0]!.background).toEqual({ ...moved.theme.background, elements: [lanes] });
+    expect(moved.layouts[0]!.objects).toBeUndefined();
+  });
+
+  it('refuses what would change the picture, and an object no layout has', () => {
+    // Drawn over a decoration, or over an object under it: in the background it would be under.
+    const overMark = { ...card, id: 'o_over', frame: { x: 1700, y: 60, w: 200, h: 100 } };
+    expect(() => toBackground(drawn([overMark], ground), ['o_over'])).toThrow(/"d_mark"/);
+    const onCard = { ...lanes, id: 'o_on', frame: { x: 1100, y: 400, w: 200, h: 100 } };
+    expect(() => toBackground(drawn([card, onCard], ground), ['o_on'])).toThrow(/"o_card"/);
+    // Moved together, the order between them stays.
+    expect(
+      toBackground(drawn([card, onCard], ground), ['o_card', 'o_on']).layouts[0]!.background!
+        .elements,
+    ).toEqual([card, onCard]);
+    expect(() => toBackground(drawn([lanes], ground), ['o_nowhere'])).toThrow(/o_nowhere/);
+  });
+
+  it('refuses a sample slide whose copy was changed or is animated', () => {
+    const moved = drawn([lanes], ground);
+    moved.sample![0]!.elements[0]!.frame.x = 40;
+    expect(() => toBackground(moved, ['o_lanes'])).toThrow(/s_hero_o_lanes/);
+    const animated = drawn([lanes], ground);
+    animated.sample![0]!.timeline = [
+      {
+        id: 'a_lanes',
+        elementId: 's_hero_o_lanes',
+        trigger: 'onClick',
+        category: 'entrance',
+        preset: 'fade',
+        duration: 400,
+        delay: 0,
+        easing: 'ease-out',
+      },
+    ];
+    expect(() => toBackground(animated, ['o_lanes'])).toThrow(/animated/);
   });
 });

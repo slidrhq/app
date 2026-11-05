@@ -3,6 +3,7 @@ import {
   updateElement,
   type Color,
   type Command,
+  type Element,
   type Frame,
   type Paragraph,
   type Run,
@@ -250,15 +251,35 @@ function fixOf(ctx: SlideContext, item: Item, worst: Faint): Command[] | undefin
 }
 
 /**
+ * The ids of the elements shown as out of use (`disabled`), and of everything inside a group that
+ * is: their text is faint on purpose, as a control that cannot be used is.
+ */
+export function outOfUse(
+  elements: readonly Element[],
+  into = new Set<string>(),
+  under = false,
+): Set<string> {
+  for (const element of elements) {
+    const off = under || Boolean(element.disabled);
+    if (off) into.add(element.id);
+    if (element.type === 'group') outOfUse(element.children, into, off);
+  }
+  return into;
+}
+
+/**
  * L05: text whose contrast against what is really under it is below WCAG AA. The text a chart
- * draws is judged by the user's rule of the same number (see `chart.ts`).
+ * draws is judged by the user's rule of the same number (see `chart.ts`). Text shown as out of
+ * use is faint on purpose, and is not judged.
  */
 export const L05: Rule = {
   id: 'L05',
   severity: 'error',
   agent: true,
   check(ctx) {
+    const faintOnPurpose = outOfUse(ctx.slide.elements);
     return ctx.items.flatMap((item): Problem[] => {
+      if (faintOnPurpose.has(item.element.id)) return [];
       // One finding per element: its worst span, relative to what that span needs.
       const worst = item.element.type === 'chart' ? undefined : faintest(item);
       if (!worst) return [];

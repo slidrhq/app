@@ -17,6 +17,8 @@ import {
   AlignStartHorizontal,
   AlignStartVertical,
   AlignVerticalSpaceAround,
+  Ban,
+  CircleCheck,
   ClipboardPaste,
   Copy,
   CopyPlus,
@@ -36,15 +38,17 @@ import {
   Ungroup,
   type LucideIcon,
 } from '@slidr/ui/icons';
-import { abilities, type Abilities } from '../arrange/abilities';
+import { abilities, selectedElements, type Abilities } from '../arrange/abilities';
 import {
   align,
+  allDisabled,
   distribute,
   duplicate,
   group,
   hide,
   remove,
   reorder,
+  toggleDisabled,
   toggleLock,
   ungroup,
 } from '../arrange/actions';
@@ -68,6 +72,8 @@ import { ORDER_MOVES } from './SelectionToolbar';
 interface MenuTarget {
   editor: Editor;
   slide: Slide | undefined;
+  /** The selected elements that are on the slide. */
+  elements: Element[];
   /** The one selected element; undefined for none and for several. */
   single: Element | undefined;
   can: Abilities;
@@ -82,10 +88,12 @@ function useMenuTarget(): MenuTarget {
   const editingId = useSelection((s) => s.editingElementId);
   const slide = useDeck((s) => (slideId ? findSlide(s.deck, slideId) : undefined));
   const can = useMemo(() => abilities(slide, ids), [slide, ids]);
+  const elements = useMemo(() => selectedElements(slide, ids), [slide, ids]);
   const single = slide && ids.length === 1 && ids[0] ? findElement(slide, ids[0]) : undefined;
   return {
     editor,
     slide,
+    elements,
     single,
     can,
     inTable: single?.type === 'table' && editingId === single.id,
@@ -322,12 +330,13 @@ export function GroupItems(_: ContextToolProps) {
   );
 }
 
-/* ---------------------------------------------------------------- lock and hide */
+/* ---------------------------------------------------------------- lock, hide and disable */
 
 export function StateItems(_: ContextToolProps) {
   const { t } = useTranslation();
-  const { editor, can, inTable } = useMenuTarget();
+  const { editor, elements, can, inTable } = useMenuTarget();
   if (can.count === 0 || inTable) return null;
+  const disabled = allDisabled(elements);
   return (
     <>
       <ContextMenuItem icon={can.allLocked ? LockOpen : Lock} onSelect={() => toggleLock(editor)}>
@@ -335,6 +344,10 @@ export function StateItems(_: ContextToolProps) {
       </ContextMenuItem>
       <ContextMenuItem icon={EyeOff} onSelect={() => hide(editor)}>
         {t('arrange:menu.hide')}
+      </ContextMenuItem>
+      {/* Only the look: a locked element may be shown out of use too, as it may be hidden. */}
+      <ContextMenuItem icon={disabled ? CircleCheck : Ban} onSelect={() => toggleDisabled(editor)}>
+        {disabled ? t('arrange:menu.enable') : t('arrange:menu.disable')}
       </ContextMenuItem>
     </>
   );

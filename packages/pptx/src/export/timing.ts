@@ -1,4 +1,4 @@
-import type { AnimationStep, Slide } from '@slidr/model';
+import { DISABLED_LOOK, findElement, type AnimationStep, type Slide } from '@slidr/model';
 import { el } from '../xml';
 import type { ExportContext } from './context';
 
@@ -279,7 +279,38 @@ function exit(step: AnimationStep, rtl: boolean, ctx: ExportContext): Effect {
   }
 }
 
-function emphasis(step: AnimationStep, ctx: ExportContext): Effect {
+/**
+ * PowerPoint's "Transparency": the shape is faded to `opacity` and stays so. What the app does to
+ * an element it takes out of use, but for the grey, which PowerPoint has for pictures alone.
+ */
+const transparency = (opacity: number): Effect => ({
+  presetID: 9,
+  presetSubtype: 0,
+  behaviours: (spid, dur, ids) =>
+    el(
+      'p:set',
+      {},
+      el(
+        'p:cBhvr',
+        {},
+        el('p:cTn', { id: ids(), dur, fill: 'hold' }),
+        target(spid),
+        el('p:attrNameLst', {}, '<p:attrName>style.opacity</p:attrName>'),
+      ),
+      el('p:to', {}, el('p:strVal', { val: String(opacity) })),
+    ),
+});
+
+function emphasis(step: AnimationStep, slide: Slide, ctx: ExportContext): Effect {
+  if (step.preset === 'disable') return transparency(DISABLED_LOOK.opacity);
+  if (step.preset === 'enable') {
+    // An element drawn out of use is written faded (`elements.ts`): bringing it back would take a
+    // shape of full opacity, which the file does not have.
+    if (findElement(slide, step.elementId)?.disabled) {
+      ctx.warn('animation-approximated', step.preset);
+    }
+    return transparency(1);
+  }
   if (step.preset !== 'pulse' && step.preset !== 'growShrink') {
     ctx.warn('animation-approximated', step.preset);
   }
@@ -353,7 +384,7 @@ export function timingXml(slide: Slide, ctx: ExportContext, shapeIds?: ShapeIds)
             ? entrance(step, rtl, ctx)
             : step.category === 'exit'
               ? exit(step, rtl, ctx)
-              : emphasis(step, ctx);
+              : emphasis(step, slide, ctx);
         if (step.category !== 'emphasis' && shape.text) builds.add(spid);
         const nodeType =
           step.trigger === 'onClick'

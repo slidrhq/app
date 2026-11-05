@@ -625,6 +625,11 @@ pub(crate) async fn install_package(install: &Install) -> Result<()> {
             };
             run_installer(command(program).args(["install", "--global", npm.as_str()])).await
         }
+        // A package of the library is the harness's to install, from the library (ADR-125).
+        Install::Package { .. } => Err(AgentError::new(
+            AgentErrorKind::Internal,
+            "A package of the organization's library is installed from the library.",
+        )),
     }
 }
 

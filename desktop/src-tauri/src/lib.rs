@@ -4,6 +4,7 @@
 mod assets;
 mod capture;
 mod commands;
+mod custom_agents;
 mod error;
 mod fonts;
 mod harness;
@@ -12,6 +13,7 @@ mod image_providers;
 mod import_window;
 mod media_library;
 mod net;
+mod screen_color;
 mod secrets;
 mod settings;
 mod show_screen;
@@ -76,11 +78,18 @@ pub fn run() {
             app.manage(Arc::clone(&harnesses));
             app.manage(tool_bridge::ToolBridge::new());
             let (images, stock) = manage_media(app, &root);
+            // The organization's agents that come as packages of its library, each installed into
+            // a folder of its own on this machine (ADR-125).
+            let packages = custom_agents::CustomAgents::new(
+                app.path().app_local_data_dir()?.join(custom_agents::FOLDER),
+                library.clone(),
+            );
             // What the organization offers, now from what was kept, and again once this start
-            // has read its library, when it reads it (ADR-117).
+            // has read its library, when it waits for it (ADR-117, ADR-124). Every start reads
+            // the library in the background, and keeps what it says for the next one.
             system.apply(move |policy| {
                 harnesses.offer(
-                    harness::offered(policy),
+                    harness::offered(policy, &packages),
                     policy.is_none_or(system_settings::Policy::web_allowed),
                 );
                 images.set_offer(policy.map(|p| p.images.clone()).unwrap_or_default());
@@ -186,6 +195,7 @@ pub fn run() {
             image_process::ipc::image_upscale_cancel,
             image_process::ipc::image_upscale_status,
             show_screen::show_screen_set,
+            screen_color::screen_pick_color,
             system_settings::system_settings_read,
         ]))
         .build(tauri::generate_context!())

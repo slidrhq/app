@@ -250,6 +250,133 @@ describe('PowerPoint export', () => {
     expect(result.warnings.some((w) => w.code === 'fonts')).toBe(true);
   });
 
+  it("draws a background's drawing where the background is, and not on a slide with its own (ADR-125)", async () => {
+    const shape = (name: string) =>
+      createElement.shape({ id: `e_${name}`, name, frame: { x: 40, y: 100, w: 300, h: 12 } });
+    const names = (part: XmlElement) => descendants(part, 'p:cNvPr').map((c) => c.attrs.name);
+    const fill = { kind: 'solid' as const, color: { token: 'bg' as const } };
+
+    // A layout's background.
+    const deck = createDeck({
+      layouts: [
+        {
+          id: 'l_bars',
+          name: 'Bars',
+          archetype: 'section',
+          background: { fill, elements: [shape('Bar')] },
+          placeholders: [],
+          decorations: [shape('Rule')],
+        },
+      ],
+      slides: [
+        createSlide({ id: 's_1', layoutId: 'l_bars' }),
+        createSlide({ id: 's_2', layoutId: 'l_bars', background: { fill } }),
+      ],
+    });
+    const { xml } = await exported(deck);
+    const layout = await xml('ppt/slideLayouts/slideLayout1.xml');
+    expect(names(layout).filter((n) => n === 'Bar' || n === 'Rule')).toEqual(['Bar', 'Rule']);
+    const shown = await xml('ppt/slides/slide1.xml');
+    expect(shown.attrs.showMasterSp).toBeUndefined();
+    expect(names(shown)).not.toContain('Bar');
+    // Its own background: the layout's shapes hidden, its decorations drawn by the slide.
+    const own = await xml('ppt/slides/slide2.xml');
+    expect(own.attrs.showMasterSp).toBe('0');
+    expect(names(own)).toContain('Rule');
+    expect(names(own)).not.toContain('Bar');
+
+    // The theme's background: drawn by the master, hidden by a layout with a background of its own.
+    const themed = createDeck({
+      layouts: [
+        {
+          id: 'l_own',
+          name: 'Own',
+          archetype: 'section',
+          background: { fill },
+          placeholders: [],
+          decorations: [],
+        },
+        { id: 'l_plain', name: 'Plain', archetype: 'section', placeholders: [], decorations: [] },
+      ],
+      slides: [
+        createSlide({ id: 's_1', layoutId: 'l_own' }),
+        createSlide({ id: 's_2', layoutId: 'l_plain' }),
+      ],
+    });
+    themed.theme.background = { ...themed.theme.background, elements: [shape('Theme bar')] };
+    const parts = await exported(themed);
+    expect(names(await parts.xml('ppt/slideMasters/slideMaster1.xml'))).toContain('Theme bar');
+    expect((await parts.xml('ppt/slideLayouts/slideLayout1.xml')).attrs.showMasterSp).toBe('0');
+    expect(
+      (await parts.xml('ppt/slideLayouts/slideLayout2.xml')).attrs.showMasterSp,
+    ).toBeUndefined();
+  });
+
+  it('fades an element shown out of use, a group with what is in it once, and its animations too', async () => {
+    const fill = { kind: 'solid' as const, color: { value: '#2266aa' } };
+    const shape = (id: string, x: number, init = {}) =>
+      createElement.shape({ id, name: id, frame: { x, y: 100, w: 100, h: 100 }, fill, ...init });
+    const deck = createDeck({
+      slides: [
+        createSlide({
+          id: 's_1',
+          elements: [
+            shape('card', 0, { disabled: true }),
+            createElement.group({
+              id: 'group',
+              frame: { x: 200, y: 0, w: 300, h: 300 },
+              disabled: true,
+              children: [shape('inner', 0, { disabled: true }), shape('beside', 150)],
+            }),
+            shape('plain', 600),
+          ],
+          timeline: [
+            {
+              id: 'a_1',
+              elementId: 'plain',
+              trigger: 'onClick',
+              category: 'emphasis',
+              preset: 'disable',
+              duration: 500,
+              delay: 0,
+              easing: 'ease-out',
+            },
+            {
+              id: 'a_2',
+              elementId: 'card',
+              trigger: 'onClick',
+              category: 'emphasis',
+              preset: 'enable',
+              duration: 500,
+              delay: 0,
+              easing: 'ease-out',
+            },
+          ],
+        }),
+      ],
+    });
+    const { xml, result } = await exported(deck);
+    const slide = await xml('ppt/slides/slide1.xml');
+    const alphaOf = (name: string) => {
+      const sp = descendants(slide, 'p:sp').find(
+        (s) => descendants(s, 'p:cNvPr')[0]?.attrs.name === name,
+      );
+      expect(sp, name).toBeDefined();
+      return sp && descendants(sp, 'a:alpha')[0]?.attrs.val;
+    };
+    expect(alphaOf('card')).toBe('40000');
+    // Inside the group, as on the slide: faded with the group, and not again.
+    expect(alphaOf('inner')).toBe('40000');
+    expect(alphaOf('beside')).toBe('40000');
+    expect(alphaOf('plain')).toBeUndefined();
+    // PowerPoint's "Transparency": out of use, and back.
+    const effects = descendants(slide, 'p:cTn').filter((c) => c.attrs.presetClass === 'emph');
+    expect(effects.map((c) => c.attrs.presetID)).toEqual(['9', '9']);
+    expect(descendants(slide, 'p:strVal').map((v) => v.attrs.val)).toEqual(['0.4', '1']);
+    // The element drawn faded cannot come back in the file: that is said.
+    expect(result.warnings.some((w) => w.code === 'animation-approximated')).toBe(true);
+  });
+
   it('leaves transitions and animations out when asked to', async () => {
     const { xml } = await exported(fixtureDecks.allElementsDeck(), { animations: false });
     const slide = await xml('ppt/slides/slide1.xml');

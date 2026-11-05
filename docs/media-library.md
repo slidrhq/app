@@ -119,7 +119,7 @@ An organization that would manage its library, and not only read a copy of it, i
 
 A library may also say what the apps that read it offer: which agents, the organization's own among them, and the one a first setup starts from; the languages of the interface and its default; web access for the agent; the image providers and the photo libraries ([ADR-117](adr/ADR-117-system-settings-from-the-library.md)). Its admins set them on the library's page, **System settings** (the library's README, "System settings"), which publishes them as one file of the media, `system/settings.json`.
 
-An app reads the file when it first starts, keeps it in `%APPDATA%\<identifier>\system-settings.json` with its own version and the library's address, and reads the library again only when it starts as another version, or reads another library. A change made in the library reaches each machine with the next version of the app. Without the file, the app goes by its own defaults. The file is public to whoever reads the library, so it holds nothing secret.
+An app reads the file when it first starts, and keeps it in `%APPDATA%\<identifier>\system-settings.json` with the library's address and its own version. Every later start goes by what it kept, without waiting for the network, and reads the library again in the background: what it says is kept for the next start when it changed ([ADR-124](adr/ADR-124-system-settings-read-at-every-start.md)). A change made in the library so reaches each machine at its next start, and holds from the start after. An app that reads another library than the one it kept waits for that library's file. Without the file, the app goes by its own defaults. The file is public to whoever reads the library, so it holds nothing secret.
 
 ### A copy
 

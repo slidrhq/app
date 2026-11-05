@@ -15,7 +15,7 @@ import { seatAlign } from './align';
 import { applyTemplate, changeDirection, deckFromTemplate, layoutsDirection } from './deck';
 import { nightTemplate, paperTemplate } from './fixtures';
 import { copyJson } from './json';
-import { mirrorLayout } from './mirror';
+import { mirrorElement, mirrorLayout } from './mirror';
 import { matchLayout, seatsOf } from './relayout';
 import { layoutsFor } from './template';
 
@@ -495,6 +495,39 @@ describe('changeDirection', () => {
       expect(bus.deck).toEqual(deck);
       expect(changeDirection(deck, deck.meta.dir)).toEqual([]);
     }
+  });
+
+  it('turns the drawing of every background, and leaves the fills of the theme (ADR-125)', () => {
+    const deck = workedDeck('he');
+    const bar = (id: string) => createElement.shape({ id, frame: box(40, 100, 300, 12) });
+    const { theme } = deck;
+    theme.background = { ...theme.background, elements: [bar('e_theme')] };
+    theme.backgroundVariants = [
+      ...theme.backgroundVariants,
+      { fill: { kind: 'solid', color: { token: 'surface' } }, elements: [bar('e_variant')] },
+    ];
+    const layout = deck.layouts[0]!;
+    layout.background = {
+      fill: { kind: 'solid', color: { token: 'bg' } },
+      elements: [bar('e_layout')],
+    };
+    const hero = deck.slides[0]!;
+    hero.background = { ...hero.background!, elements: [bar('e_slide')] };
+
+    const bus = run(deck, changeDirection(deck, 'ltr'));
+    const there = bus.deck;
+    const turned = mirrorElement(bar('e_theme'));
+    expect(there.theme.background).toEqual({ ...deck.theme.background, elements: [turned] });
+    expect(there.theme.backgroundVariants.at(-1)!.elements![0]!.frame).toEqual(turned.frame);
+    // The variants without a drawing are what they were.
+    expect(there.theme.backgroundVariants.slice(0, -1)).toEqual(
+      theme.backgroundVariants.slice(0, -1),
+    );
+    expect(there.layouts[0]!.background!.elements![0]!.frame).toEqual(turned.frame);
+    expect(there.slides[0]!.background!.elements![0]!.frame).toEqual(turned.frame);
+    expect(bus.undoStack).toHaveLength(1);
+
+    expect(run(there, changeDirection(there, 'rtl')).deck).toEqual(deck);
   });
 
   it('takes elements with their placeholders, and mirrors the rest where it stands', () => {

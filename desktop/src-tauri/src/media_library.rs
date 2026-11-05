@@ -73,6 +73,10 @@ const MANIFEST_TIMEOUT: Duration = Duration::from_secs(8);
 /// How long one file may take to come: the largest are catalogs of a few megabytes.
 const FILE_TIMEOUT: Duration = Duration::from_secs(60);
 
+/// How long a large file may take to come ([`MediaLibrary::fetch_fresh`]): an agent's package is
+/// up to 95 MiB, and the network of an organization may be slow.
+const LARGE_FILE_TIMEOUT: Duration = Duration::from_secs(15 * 60);
+
 /// How long a request waits for the manifest of this start when one from before is at hand.
 /// Online the new one is there well before; offline the old one is answered without delay.
 const WAIT_WITH_MANIFEST: Duration = Duration::from_millis(1500);
@@ -137,6 +141,21 @@ pub enum Fresh {
     /// The library, as it was published when the app started, does not have it.
     Missing,
     /// It cannot be said now: no network, no manifest of this start, or a site whose file is not
+    /// the one its manifest names.
+    Unavailable,
+}
+
+/// What fetching a large file with the manifest of this start came to
+/// ([`MediaLibrary::fetch_fresh`]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Fetched {
+    /// The file the manifest of this start names: its bytes, checked against it, and its SHA-256.
+    New(Vec<u8>, String),
+    /// The manifest of this start names the very file the caller has: nothing was downloaded.
+    Same,
+    /// The library, as it was published when the app started, does not have it.
+    Missing,
+    /// It cannot be had now: no network, no manifest of this start, or a site whose file is not
     /// the one its manifest names.
     Unavailable,
 }
@@ -211,7 +230,7 @@ fn policy_url() -> Option<String> {
 
 /// The string `MediaLibraryUrl` under `SOFTWARE\Policies\Slidr` of `root`, if it is one. None
 /// when the key or value is absent or is not a string. Read through `windows-registry`, the safe
-/// wrapper of the `windows` crates, since the app keeps `unsafe` to its four places (Cargo.toml).
+/// wrapper of the `windows` crates, since the app keeps `unsafe` to its five places (Cargo.toml).
 #[cfg(windows)]
 fn read_policy_value(root: &windows_registry::Key) -> Option<String> {
     root.open(r"SOFTWARE\Policies\Slidr")
@@ -360,15 +379,7 @@ impl MediaLibrary {
     /// with one kept from before, which may not have it yet. What a missing file means is then
     /// what the library says, and a library that could not be read says nothing.
     pub async fn read_fresh(&self, path: &str) -> Fresh {
-        let mut refreshed = self.refreshed.subscribe();
-        // The manifest's own timeout bounds it; a little more for the answer to arrive.
-        let wait = MANIFEST_TIMEOUT + Duration::from_secs(1);
-        let _ = tokio::time::timeout(wait, refreshed.wait_for(|done| *done)).await;
-        let outcome = *self.outcome.read().unwrap_or_else(PoisonError::into_inner);
-        if !matches!(outcome, Some(Refresh::Changed | Refresh::Same)) {
-            return Fresh::Unavailable;
-        }
-        let Some(current) = self.current() else {
+        let Some(current) = self.fresh_manifest().await else {
             return Fresh::Unavailable;
         };
         let Some(entry) = current.manifest.files.get(path) else {
@@ -378,6 +389,38 @@ impl MediaLibrary {
             Ok(bytes) if matches(entry, &bytes) => Fresh::Found(bytes),
             Ok(_) | Err(_) => Fresh::Unavailable,
         }
+    }
+
+    /// A large file of the library as it is published now, as [`Self::read_fresh`] reads one,
+    /// unless it is the very file `have` names by its SHA-256. It is not kept in the cache:
+    /// whoever asks for it keeps what it makes of it (an agent's package, ADR-125).
+    pub async fn fetch_fresh(&self, path: &str, have: Option<&str>) -> Fetched {
+        let Some(current) = self.fresh_manifest().await else {
+            return Fetched::Unavailable;
+        };
+        let Some(entry) = current.manifest.files.get(path) else {
+            return Fetched::Missing;
+        };
+        if have == Some(entry.sha256.as_str()) {
+            return Fetched::Same;
+        }
+        match self.download(path, LARGE_FILE_TIMEOUT).await {
+            Ok(bytes) if matches(entry, &bytes) => Fetched::New(bytes, entry.sha256.clone()),
+            Ok(_) | Err(_) => Fetched::Unavailable,
+        }
+    }
+
+    /// The manifest of this start, once it is read; none when it could not be.
+    async fn fresh_manifest(&self) -> Option<Arc<Current>> {
+        let mut refreshed = self.refreshed.subscribe();
+        // The manifest's own timeout bounds it; a little more for the answer to arrive.
+        let wait = MANIFEST_TIMEOUT + Duration::from_secs(1);
+        let _ = tokio::time::timeout(wait, refreshed.wait_for(|done| *done)).await;
+        let outcome = *self.outcome.read().unwrap_or_else(PoisonError::into_inner);
+        if !matches!(outcome, Some(Refresh::Changed | Refresh::Same)) {
+            return None;
+        }
+        self.current()
     }
 
     /// The answer of the protocol to a request.

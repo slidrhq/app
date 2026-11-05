@@ -760,7 +760,11 @@ function StepEditor({
             value={step.textBy ?? 'all'}
             // "All at once" is what a step without the field means: it is stored as absent.
             onValueChange={(textBy) => set({ textBy: textBy === 'all' ? undefined : textBy })}
-            options={TEXT_BY.map((value) => ({ value, label: t(`textBy.${value}`) }))}
+            // Only the ways the preset takes a text: one that disables, a paragraph at a time.
+            options={TEXT_BY.filter((value) => info.textBy.includes(value)).map((value) => ({
+              value,
+              label: t(`textBy.${value}`),
+            }))}
           />
         </Field>
       )}
@@ -776,6 +780,11 @@ function StepEditor({
       </Field>
       {keyframesOf(step.preset) && (
         <p className="col-span-2 text-xs text-ui-fg-muted">{t('panel.originalHint')}</p>
+      )}
+      {info.disables !== undefined && (
+        <p className="col-span-2 text-xs text-ui-fg-muted">
+          {t(info.disables ? 'panel.disableHint' : 'panel.enableHint')}
+        </p>
       )}
     </div>
   );

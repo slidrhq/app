@@ -80,13 +80,15 @@ export function lintSlide(
   };
   lock(slide.elements, false);
   const layout = slide.layoutId ? deck.layouts.find((l) => l.id === slide.layoutId) : undefined;
-  const decorations = layout?.decorations ?? [];
+  const background = slide.background ?? layout?.background ?? deck.theme.background;
+  // Under the slide: the drawing of its background (ADR-125), then its layout's decorations.
+  const under = [...(background.elements ?? []), ...(layout?.decorations ?? [])];
   const ctx: SlideContext = {
     deck,
     slide,
     ...drawn(slide.elements, items),
-    background: slide.background ?? layout?.background ?? deck.theme.background,
-    layout: drawn(decorations, placed(decorations, 0, 0, [])),
+    background,
+    layout: drawn(under, placed(under, 0, 0, [])),
     tops,
     turned,
     locked,

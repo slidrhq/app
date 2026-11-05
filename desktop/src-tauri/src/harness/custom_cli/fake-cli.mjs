@@ -67,6 +67,8 @@ switch (subcommand) {
       JSON.stringify({
         request,
         argv: process.argv.slice(2),
+        script: process.argv[1],
+        agentDir: process.env.SLIDR_AGENT_DIR,
         protocol: process.env.SLIDR_PROTOCOL,
         token: process.env.SLIDR_MCP_TOKEN,
         region: process.env.ACME_REGION,

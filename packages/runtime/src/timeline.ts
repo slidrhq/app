@@ -6,6 +6,7 @@ import {
   type ChartBuild,
 } from './charts';
 import { safeEasing, slideDirection, travel, type Dir } from './direction';
+import { DISABLED_FILTER, drawnDisabled, joinFilters, withoutDisabled } from './disabled';
 import { onOwnLook, slideKeyframes, type OwnLook } from './keyframes';
 import { keyframesOf } from './names';
 import {
@@ -14,6 +15,7 @@ import {
   inlinePreset,
   toKeyframes,
   type Box,
+  type Frame,
   type Preset,
 } from './presets';
 import { schedule, type Group } from './schedule';
@@ -29,10 +31,11 @@ import type { AnimationStep, Size, Trigger, Warn } from './types';
  * preview on the slide it is editing. The one exception is the text of a word or character
  * animation, which is wrapped while its group plays (see `text.ts`).
  *
- * Between groups the only thing a slide remembers is which targets are hidden: one that waits for
- * its entrance, or one that has left. That set is known for every point of the timeline in
- * advance, so going back a step, or arriving at a slide from the one after it, sets the state
- * directly instead of replaying anything.
+ * Between groups a slide remembers two things: which targets are hidden (one that waits for its
+ * entrance, or one that has left), and which are out of use (one that a `disable` step greyed, or
+ * one the renderer drew so, until an `enable` step; see `disabled.ts`). Both are known for every
+ * point of the timeline in advance, so going back a step, or arriving at a slide from the one after
+ * it, sets the state directly instead of replaying anything.
  *
  * A chart is the one thing on a slide that animates itself: the runtime tells it when to build,
  * and where it stands before and after (see `charts.ts`).
@@ -97,6 +100,8 @@ interface Effect {
   trigger: Trigger;
   delay: number;
   span: number;
+  /** For a step that takes its target out of use (true) or back into use (false). */
+  disables?: boolean;
 }
 
 /** The whole text never takes longer than this to start, however long it is. */
@@ -138,15 +143,22 @@ function resolveEffects(root: HTMLElement, steps: readonly AnimationStep[], warn
       : findPreset(kind, step.preset);
     if (!known) warn(`Animation ${step.id}: unknown ${kind} preset "${step.preset}"`);
     if (own && !custom) warn(`Animation ${step.id}: the slide has no @keyframes "${own}"`);
+    const disables = own ? undefined : preset.disables;
     const base = {
       step,
       kind,
       preset,
       ...(custom ? { custom } : {}),
+      ...(disables !== undefined ? { disables } : {}),
       trigger: step.trigger,
       delay: step.delay,
     };
-    const by = step.textBy ?? 'all';
+    // A part stays out of use when its step is over, and the words and letters of a text do not
+    // stay apart (see `text.ts`): such a step takes a whole element, or a paragraph at a time.
+    const by =
+      disables !== undefined && (step.textBy === 'word' || step.textBy === 'char')
+        ? 'all'
+        : (step.textBy ?? 'all');
     if (by === 'paragraph') {
       // Every paragraph is an effect of its own with the step's trigger: a step that starts on
       // a click brings its paragraphs in one click at a time.
@@ -217,6 +229,58 @@ function hiddenStates(groups: readonly Group[], effects: readonly Effect[]): Set
 }
 
 /**
+ * The slots of a group that take a part out of use or back, in the order they start: the order
+ * their animations are made in, so the one that starts last is the one that shows at the end.
+ */
+function switchesOf(group: Group, effects: readonly Effect[]): Group['slots'] {
+  return group.slots
+    .filter((slot) => (effects[slot.index] as Effect).disables !== undefined)
+    .sort((a, b) => a.start - b.start);
+}
+
+/**
+ * The targets that are out of use before the lead-in and after every group: those the renderer drew
+ * so, until a step takes them back into use, and those a step took out of use.
+ */
+function disabledStates(groups: readonly Group[], effects: readonly Effect[]): Set<HTMLElement>[] {
+  const initial = new Set<HTMLElement>();
+  for (const effect of effects) {
+    if (effect.disables !== undefined && drawnDisabled(effect.target)) initial.add(effect.target);
+  }
+  const states = [initial];
+  for (const group of groups) {
+    const next = new Set(states[states.length - 1]);
+    for (const slot of switchesOf(group, effects)) {
+      const { target, disables } = effects[slot.index] as Effect;
+      if (disables) next.add(target);
+      else next.delete(target);
+    }
+    states.push(next);
+  }
+  return states;
+}
+
+/** The filter a part shows now, as the browser computes it; empty for none. */
+function filterOf(node: HTMLElement): string {
+  const { filter } = getComputedStyle(node);
+  return filter && filter !== 'none' ? filter : '';
+}
+
+/** The filter of a part in use, from the one it shows and whether that one is out of use. */
+const inUse = (shown: string, disabled: boolean): string =>
+  disabled ? withoutDisabled(shown) : shown;
+
+/**
+ * Keeps a part in use or out of use where the renderer drew it the other way. Its filter is read
+ * as the renderer drew it: nothing else may be holding it.
+ */
+function holdUse(node: HTMLElement, disabled: boolean): Animation {
+  const own = inUse(filterOf(node), drawnDisabled(node));
+  const filter = (disabled ? joinFilters(own, DISABLED_FILTER) : own) || 'none';
+  return node.animate({ filter: [filter, filter] }, { duration: 0, fill: 'forwards' });
+}
+
+/**
  * When each chart of the slide builds: on the first entrance of the element it is in, over the
  * length of that step, or with the lead-in when nothing brings its element in.
  */
@@ -272,6 +336,11 @@ export function createTimeline(
   const effects = resolveEffects(root, steps, warn);
   const groups = schedule(effects);
   const states = hiddenStates(groups, effects);
+  const uses = disabledStates(groups, effects);
+  /** The parts a step takes out of use or back. */
+  const switching = new Set(
+    effects.filter((effect) => effect.disables !== undefined).map((effect) => effect.target),
+  );
   const builds = chartBuilds(root, groups, effects);
   /** How long a group lasts, the charts that build in it included. */
   const lengthOf = (index: number): number =>
@@ -281,6 +350,8 @@ export function createTimeline(
       groups[index]?.duration ?? 0,
     );
   const holds = new Map<HTMLElement, Animation>();
+  /** What keeps a part in use or out of use between groups, where the renderer drew it otherwise. */
+  const useHolds: Animation[] = [];
   let run: Run | undefined;
 
   function end(current: Run): void {
@@ -299,6 +370,7 @@ export function createTimeline(
     }
     for (const hold of holds.values()) hold.cancel();
     holds.clear();
+    for (const hold of useHolds.splice(0)) hold.cancel();
   }
 
   function clear(): void {
@@ -308,7 +380,14 @@ export function createTimeline(
 
   function apply(done: number): void {
     stop();
-    const state = states[Math.min(Math.max(done, 0), states.length - 1)] as Set<HTMLElement>;
+    const at = Math.min(Math.max(done, 0), states.length - 1);
+    // Read while nothing holds a filter: as the renderer drew it.
+    const disabled = uses[at] as Set<HTMLElement>;
+    for (const node of switching) {
+      const out = disabled.has(node);
+      if (out !== drawnDisabled(node)) useHolds.push(holdUse(node, out));
+    }
+    const state = states[at] as Set<HTMLElement>;
     for (const node of state) {
       const hold = hide(node, 0, Infinity);
       if (hold) holds.set(node, hold);
@@ -392,6 +471,8 @@ export function createTimeline(
 
     for (const slot of group.slots) {
       const effect = effects[slot.index] as Effect;
+      // Played below, in the order they start.
+      if (effect.disables !== undefined) continue;
       const { step } = effect;
       const split = effect.by !== 'self';
       const parts = partsOf(effect);
@@ -435,6 +516,39 @@ export function createTimeline(
           }),
         );
       });
+    }
+
+    // Parts going out of use or back, each from where it stands: as the group found it, or as a
+    // step before it in the group left it. A part that is there already does not flash the other
+    // way. It stays as the step leaves it until the group ends, and is then held so (`apply`).
+    const disabledBefore = uses[index] as Set<HTMLElement>;
+    const standing = new Map<HTMLElement, boolean>();
+    for (const slot of switchesOf(group, effects)) {
+      const effect = effects[slot.index] as Effect;
+      const { step, target } = effect;
+      const was = standing.get(target) ?? disabledBefore.has(target);
+      const will = effect.disables as boolean;
+      standing.set(target, will);
+      const own = looks.get(target) as OwnLook;
+      const frames: Frame[] = [
+        { offset: 0, disabled: was ? 1 : 0 },
+        { offset: 1, disabled: will ? 1 : 0 },
+      ];
+      const keyframes = toKeyframes(frames, {
+        box: true,
+        opacity: own.opacity,
+        // The look starts from the part in use: what the group found, without the grey.
+        filter: inUse(own.filter, disabledBefore.has(target)),
+        unit: 1,
+      });
+      add(
+        target.animate(keyframes, {
+          duration: step.duration,
+          delay: slot.start,
+          easing: safeEasing(step.easing),
+          fill: 'forwards',
+        }),
+      );
     }
 
     for (const build of builds) {

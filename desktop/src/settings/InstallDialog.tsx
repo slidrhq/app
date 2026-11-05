@@ -1,20 +1,22 @@
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogContent } from '@slidr/ui';
+import type { InstallDescription } from '../agent/harnessLook';
 
 /**
  * The approval a CLI's installation needs before `HarnessSetup.run(id, 'install')`: asked for the
- * agent's harness, and for the CLI an image provider runs on. `npm`: the CLI is installed with
- * npm, after Node.js when it is missing, and the approval says so.
+ * agent's harness, and for the CLI an image provider runs on. `description` says how the CLI is
+ * installed (`installDescription` of `harnessLook.ts`): by Windows App Installer; with npm, after
+ * Node.js when it is missing; or from the organization's library (ADR-125).
  */
 export function InstallDialog({
   name,
-  npm = false,
+  description = 'installDescription',
   open,
   onClose,
   onApprove,
 }: {
   name: string | undefined;
-  npm?: boolean;
+  description?: InstallDescription;
   open: boolean;
   onClose: () => void;
   onApprove: () => void;
@@ -24,7 +26,7 @@ export function InstallDialog({
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent
         title={t('agent.installTitle', { name })}
-        description={t(npm ? 'agent.installDescriptionNpm' : 'agent.installDescription', { name })}
+        description={t(`agent.${description}`, { name })}
         closeLabel={t('keys.cancel')}
         footer={
           <>

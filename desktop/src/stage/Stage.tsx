@@ -2597,6 +2597,11 @@ export function Stage({
               transform: `scale(${scale})`,
             }}
           >
+            {/* What is being edited stands still, at rest: text that turns cannot be typed in,
+                nor a picture cropped (ADR-128). */}
+            {editingId ? (
+              <style>{`[data-element-id="${CSS.escape(editingId)}"] [data-slidr-ambient]{animation:none!important}`}</style>
+            ) : null}
             {preview && previewSlide ? (
               <SlideRenderer
                 deck={preview}

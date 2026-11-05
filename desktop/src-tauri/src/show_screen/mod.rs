@@ -12,8 +12,9 @@ use tauri::{Runtime, Window};
 use crate::error::{AppError, Result};
 
 #[cfg(windows)]
-// A few calls into Win32: one of the app's four places for `unsafe`, with
-// `capture/webview2.rs`, `import_window/network.rs` and `fonts/directwrite.rs`.
+// A few calls into Win32: one of the app's five places for `unsafe`, with
+// `capture/webview2.rs`, `import_window/network.rs`, `fonts/directwrite.rs` and
+// `screen_color/win32.rs`.
 #[allow(unsafe_code)]
 mod win32;
 

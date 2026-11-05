@@ -68,6 +68,7 @@
       "signingIn": "Açılan pencerede oturum açma işlemini tamamlayın. Ardından burada devam edeceğiz.",
       "installDescription": "{{name}} bu bilgisayarda yüklü değil. Onay verirseniz Windows App Installer ile indirip yükleyeceğiz, ardından burada devam edeceğiz.",
       "installDescriptionNpm": "{{name}} bu bilgisayarda yüklü değil. Onay verirseniz npm ile yükleyeceğiz (Node.js yoksa önce Windows App Installer ile onu yükleyeceğiz), ardından burada devam edeceğiz.",
+      "installDescriptionLibrary": "{{name}} bu bilgisayarda yüklü değil. Onay verirseniz kuruluşunuzun kitaplığından indirip yükleyeceğiz, ardından burada devam edeceğiz.",
       "install": "Onayla ve yükle",
       "signInDescription": "Kullanılabilir modelleri yüklemek için hesabınızda oturum açın.",
       "signIn": "Oturum aç",
@@ -612,7 +613,9 @@
       "paragraph": "Paragraf {{n}} / {{total}}",
       "row": "{{name}}: {{effect}}",
       "original": "Özgün hareket",
-      "originalHint": "İçeri aktarılan dosyanın oynattığı hareket, dosyada yazıldığı haliyle. Başka bir efekt seçerseniz bunun yerini alır."
+      "originalHint": "İçeri aktarılan dosyanın oynattığı hareket, dosyada yazıldığı haliyle. Başka bir efekt seçerseniz bunun yerini alır.",
+      "disableHint": "Nesne, bir “Etkinleştir” animasyonuna kadar gri ve soluk kalır. Slayt açıldığı anda devre dışı görünmesi için nesnede “Devre dışı olarak göster” seçeneğini seçin.",
+      "enableHint": "Nesne olağan görünümüne döner ve öyle kalır. Bu animasyona kadar devre dışı görünmesi için nesnede “Devre dışı olarak göster” seçeneğini seçin."
     },
     "group": {
       "leadIn": "Slayt açıldığında",
@@ -659,7 +662,9 @@
         "heartbeat": "Kalp atışı",
         "flicker": "Yanıp sönme",
         "float": "Süzülme",
-        "tilt": "Eğilme"
+        "tilt": "Eğilme",
+        "disable": "Devre dışı bırak",
+        "enable": "Etkinleştir"
       },
       "exit": {
         "disappear": "Kaybolma",
@@ -803,6 +808,8 @@
       "lock": "Kilitle",
       "unlock": "Kilidi aç",
       "hide": "Gizle",
+      "disable": "Devre dışı olarak göster",
+      "enable": "Etkin olarak göster",
       "duplicate": "Çoğalt",
       "pasteStyle": "Stili yapıştır",
       "delete": "Sil",
@@ -861,6 +868,7 @@
       "order": "Katman sırası",
       "lock": "Kilitleme",
       "visibility": "Gizleme ve gösterme",
+      "disabled": "Devre dışı veya etkin olarak gösterme",
       "rename": "Yeniden adlandırma",
       "paste": "Yapıştırma",
       "cut": "Kesme",
@@ -1046,7 +1054,10 @@
       "insert": "Çizim ekleme",
       "frame": "Çerçeve ekleme",
       "reframe": "Görseli çerçeveye yerleştirme",
-      "cards": "Kart seti ekleme"
+      "cards": "Kart seti ekleme",
+      "animation": "Animasyon ekleme",
+      "background": "Arka plan uygulama",
+      "motion": "Hareketi değiştir"
     },
     "collection": {
       "cards": "Kart setleri",
@@ -1055,7 +1066,9 @@
       "emoji": "Emoji",
       "icons": "Simgeler",
       "frames": "Çerçeveler",
-      "tables": "Tablolar"
+      "tables": "Tablolar",
+      "animations": "Animasyonlar",
+      "backgrounds": "Arka planlar"
     },
     "designs": {
       "title": "Hazır slaytlar",
@@ -1462,6 +1475,110 @@
       "ready": "Hazır boyutlar",
       "custom": "Başka bir boyut",
       "size": "{{rows}} satır, {{cols}} sütun"
+    },
+    "animations": {
+      "search": "Animasyonlarda ara",
+      "searchPlaceholder": "Animasyon ara…",
+      "hint": "Slayta eklemek için bir animasyona tıklayın. Kendi kendine hareket eder; onu her nesne gibi taşıyabilir, boyutlandırabilir ve döndürebilirsiniz.",
+      "group": {
+        "basic": "Hareketli şekiller",
+        "path": "Bir yol boyunca",
+        "spin": "Dönme",
+        "scale": "Büyüme ve atım",
+        "lines": "Çizgiler ve dalgalar",
+        "particles": "Parçacıklar ve ağlar"
+      },
+      "name": {
+        "orbit": "Yörünge",
+        "conveyor": "Yoldaki kutular",
+        "trace": "Devre yolu",
+        "atom": "Atom",
+        "shuttle": "Çizgi üzerinde nokta",
+        "hexagon": "Dönen altıgenler",
+        "rings": "Dönen halkalar",
+        "radar": "Radar",
+        "ripple": "Yayılan halkalar",
+        "breathe": "Nefes alan şekil",
+        "bars": "Yükselen çubuklar",
+        "waves": "Dalgalar",
+        "draw": "Çizilen ok",
+        "flowArrow": "Akan bağlayıcı",
+        "heartbeat": "Kalp atışı",
+        "network": "Ağ",
+        "converge": "Toplanan parçacıklar",
+        "float": "Yükselen kabarcıklar"
+      }
+    },
+    "backgrounds": {
+      "hint": "Slayta ya da seçtiğiniz tüm slaytlara uygulamak için bir arka plana tıklayın. Renkleri şablondan gelir; „Arka plan” aracı sizi şablonun arka planına geri götürür.",
+      "animated": "Hareketli arka planlar",
+      "still": "Sakin arka planlar",
+      "name": {
+        "flow": "Devre akışı",
+        "waves": "Dalgalar",
+        "converge": "Toplanma",
+        "orbit": "Yörüngeler",
+        "radar": "Radar",
+        "network": "Ağ",
+        "drift": "Süzülen ışık",
+        "particles": "Yükselen parçacıklar",
+        "dots": "Nokta ızgarası",
+        "contours": "Eş yükselti eğrileri",
+        "arcs": "Köşede yaylar"
+      }
+    },
+    "animatedShapes": {
+      "title": "Hareketli şekiller",
+      "hint": "Bir hareketi tekrarlayan sıradan şekiller. Rengi, dış çizgisi ve boyutu her şekil gibi düzenlenir; hareketi Hareket aracıyla düzenlenir.",
+      "more": "Tüm animasyonlar",
+      "name": {
+        "ring": "Dönen halka",
+        "hexagon": "Dönen altıgen",
+        "star": "Dönen yıldız",
+        "octagon": "Dönen sekizgen",
+        "square": "Dönüp duran kare",
+        "pulse": "Atan daire",
+        "heart": "Atan kalp",
+        "float": "Süzülen daire",
+        "arrow": "Sallanan ok",
+        "blink": "Yanıp sönen nokta"
+      }
+    },
+    "motion": {
+      "title": "Hareket",
+      "piece": "Animasyon hızı",
+      "loop": "Tekrarlanan hareket",
+      "kind": {
+        "none": "Yok",
+        "spin": "Dönme",
+        "pulse": "Atma",
+        "float": "Süzülme",
+        "swing": "Sallanma",
+        "blink": "Yanıp sönme"
+      },
+      "speed": "Hız",
+      "pace": {
+        "slow": "Yavaş",
+        "medium": "Orta",
+        "fast": "Hızlı"
+      },
+      "round": "Tur başına saniye",
+      "rhythm": "Ritim",
+      "rhythmKind": {
+        "steady": "Sabit",
+        "smooth": "Yumuşak",
+        "pause": "Duraklamalı"
+      },
+      "direction": "Yön",
+      "clockwise": "Saat yönünde",
+      "counterclockwise": "Saat yönünün tersine",
+      "amount": {
+        "pulse": "Atış büyüklüğü",
+        "float": "Süzülme yüksekliği",
+        "swing": "Sallanma açısı",
+        "blink": "Yanıp sönme gücü"
+      },
+      "hint": "Hareket, slayt gösterildiği sürece tekrarlanır: düzenleyicide, sunumda ve dışa aktarılan dosyada."
     }
   },
   "export": {
@@ -2322,6 +2439,11 @@
       "blur": "Bulanıklık",
       "dim": "Karartma",
       "applyAll": "Tüm slaytlara uygula",
+      "noDrawing": "Arka plan çizimini kaldır",
+      "drawingColours": "Çizimin renkleri",
+      "drawingColour": "Çizimin {{n}}. rengi",
+      "speed": "Hareket hızı",
+      "drawingOpacity": "Çizimin opaklığı",
       "reset": "Tema arka planına dön"
     },
     "groups": {
@@ -2540,6 +2662,7 @@
       "installTitle": "{{name}} yüklensin mi?",
       "installDescription": "Uygulama, {{name}} programını Windows App Installer ile indirip yükleyecek. Ardından bağlantıyı denetleyecek ve gerekirse oturum açmanızı isteyeceğiz.",
       "installDescriptionNpm": "Uygulama, {{name}} programını npm ile yükleyecek. Node.js yoksa önce Windows App Installer ile onu yükleyecek. Ardından bağlantıyı denetleyecek ve gerekirse oturum açmanızı isteyeceğiz.",
+      "installDescriptionLibrary": "Uygulama, {{name}} programını kuruluşunuzun kitaplığından indirip bu bilgisayara yükleyecek. Ardından bağlantıyı denetleyecek ve gerekirse oturum açmanızı isteyeceğiz.",
       "approveInstall": "Onayla ve yükle",
       "chooseModel": "Model seçin",
       "chooseEffort": "Çaba düzeyi seçin",

@@ -152,7 +152,14 @@ export interface SliderFieldProps {
   unit?: string;
 }
 
-/** A quantity as a slider with its number beside it: drag for feel, type for precision. */
+/** The decimal places of a step: 1 → 0, 0.5 → 1, 0.05 → 2. */
+const decimalsOf = (step: number): number => String(step).split('.')[1]?.length ?? 0;
+
+/**
+ * A quantity as a slider with its number beside it: drag for feel, type for precision. The number
+ * keeps the decimals of the step, so every value the slider reaches is shown as it is and can be
+ * typed (a step of 0.5 shows 0.5, not 1).
+ */
 export function SliderField({
   label,
   value,
@@ -185,6 +192,7 @@ export function SliderField({
           min={min}
           max={max}
           step={step}
+          precision={decimalsOf(step)}
           unit={unit}
           onValueChange={(next) => {
             onChange(next);

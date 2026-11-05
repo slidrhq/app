@@ -75,13 +75,17 @@ function phXml(role: PlaceholderRole, index: number): string | undefined {
   return el('p:ph', { type, idx: type === 'title' ? undefined : 100 + index });
 }
 
-/** A background as `p:bg`, and the shapes that draw what DrawingML's background cannot. */
+/**
+ * A background as `p:bg`, and the shapes that draw what DrawingML's background cannot: the veils
+ * of a photo and the overlay, then the background's drawing (ADR-125), which is in `shapes` too
+ * and in `drawing` alone.
+ */
 export async function backgroundXml(
   background: Background | undefined,
   ctx: ExportContext,
   part: PartWriter,
-): Promise<{ bg: string; shapes: string }> {
-  if (!background) return { bg: '', shapes: '' };
+): Promise<{ bg: string; shapes: string; drawing: string }> {
+  if (!background) return { bg: '', shapes: '', drawing: '' };
   const slide = { w: ctx.deck.size.w, h: ctx.deck.size.h };
   const fill = await fillXml(background.fill, ctx, part.rels, slide);
   const bg = el('p:bg', {}, el('p:bgPr', {}, fill, el('a:effectLst')));
@@ -127,8 +131,22 @@ export async function backgroundXml(
   if (background.overlay && background.overlay.kind !== 'none') {
     veil(await fillXml(background.overlay, ctx, part.rels, slide));
   }
-  return { bg, shapes: veils.join('') };
+  // The drawing stands in no placeholder and plays no animation of the slide.
+  const drawing = background.elements
+    ? await elementsXml(background.elements, ctx, {
+        rels: part.rels,
+        nextId: () => part.nextId(),
+        ...(part.slide ? { slide: part.slide } : {}),
+      })
+    : '';
+  return { bg, shapes: veils.join('') + drawing, drawing };
 }
+
+/**
+ * Whether the theme's background has a drawing (ADR-125). The master draws it, under every
+ * layout; a layout with a background of its own hides it (`showMasterSp`).
+ */
+const themeDrawn = (ctx: ExportContext) => Boolean(ctx.deck.theme.background.elements?.length);
 
 function idCounter(): () => number {
   let id = 1;
@@ -224,9 +242,10 @@ export async function layoutXml(
   });
   const decorations = layout ? await elementsXml(layout.decorations, ctx, part) : '';
   const type = layout ? (LAYOUT_TYPE[layout.archetype] ?? 'cust') : 'titleOnly';
+  const hideMaster = Boolean(layout?.background) && themeDrawn(ctx);
   ctx.pkg.xml(
     path,
-    `<p:sldLayout ${PML_NS} type="${type}" preserve="1">` +
+    `<p:sldLayout ${PML_NS} type="${type}" preserve="1"${hideMaster ? ' showMasterSp="0"' : ''}>` +
       el(
         'p:cSld',
         { name: layout?.name ?? 'Title Only' },
@@ -285,7 +304,7 @@ export async function masterXml(
   const part: PartWriter = { rels, nextId: idCounter() };
   const ids = layouts.map((layout) => rels.add(REL.slideLayout, layout));
   rels.add(REL.theme, themePath);
-  const { bg } = await backgroundXml(ctx.deck.theme.background, ctx, part);
+  const { bg, drawing } = await backgroundXml(ctx.deck.theme.background, ctx, part);
   const W = ctx.deck.size.w;
   const H = ctx.deck.size.h;
   const masterPh = (
@@ -346,7 +365,7 @@ export async function masterXml(
   ctx.pkg.xml(
     path,
     `<p:sldMaster ${PML_NS}>` +
-      el('p:cSld', {}, bg, spTreeXml(shapes)) +
+      el('p:cSld', {}, bg, spTreeXml(drawing + shapes)) +
       el('p:clrMap', {
         bg1: 'lt1',
         tx1: 'dk1',
@@ -504,18 +523,25 @@ export async function slideXml(
   if (slide.css?.trim()) ctx.warn('slide-css');
   const { bg, shapes: veils } = await backgroundXml(slide.background, ctx, part);
   // A slide that has a footer of its own hides the layout's drawings, and draws the rest itself.
-  const hideLayout = ownsFooter(slide, layout);
+  // So does a slide with a background of its own when the one it would show has a drawing
+  // (ADR-125): PowerPoint draws the shapes of a layout and of the master on each of its slides.
+  const footer = ownsFooter(slide, layout);
+  const inherited = layout?.background ?? ctx.deck.theme.background;
+  const hideLayout = footer || Boolean(slide.background && inherited.elements?.length);
   const ownDecorations =
     hideLayout && layout
       ? await elementsXml(
-          layout.decorations.filter((d) => d.role !== 'footer'),
+          layout.decorations.filter((d) => !footer || d.role !== 'footer'),
           ctx,
           part,
         )
       : '';
+  // What the hidden layout or master would have drawn of the background the slide shows.
   const layoutBackground =
-    hideLayout && !slide.background && layout?.background
-      ? await backgroundXml(layout.background, ctx, part)
+    hideLayout && !slide.background
+      ? layout?.background
+        ? await backgroundXml(layout.background, ctx, part)
+        : { bg: '', shapes: (await backgroundXml(inherited, ctx, part)).drawing }
       : undefined;
   const shapes = await elementsXml(slide.elements, ctx, part);
   const timing = ctx.options.animations === false ? '' : timingXml(slide, ctx, shapeIds);

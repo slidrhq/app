@@ -290,6 +290,7 @@ async function htmlToElements(
     if (element.link) out.link = element.link;
     if (element.locked) out.locked = true;
     if (element.hidden) out.hidden = true;
+    if (element.disabled) out.disabled = true;
     return out;
   });
   if (elements.length === 1 && element.name && !elements[0]!.name) elements[0]!.name = element.name;
@@ -322,8 +323,21 @@ async function elementToHtml(
       `A ${element.type} draws itself while it plays or loads; it cannot be written out as html.`,
     );
   }
-  const { frame, rotation, opacity, flipH, flipV, effects, css, link, locked, hidden, name, role } =
-    element;
+  const {
+    frame,
+    rotation,
+    opacity,
+    flipH,
+    flipV,
+    effects,
+    css,
+    link,
+    locked,
+    hidden,
+    disabled,
+    name,
+    role,
+  } = element;
   // Drawn alone, unrotated and opaque: those stay on the element, not in its markup.
   const bare = {
     ...element,
@@ -336,6 +350,8 @@ async function elementToHtml(
   delete bare.effects;
   delete bare.css;
   delete bare.hidden;
+  // The grey of an element out of use is on its box, which the markup leaves out: it stays a field.
+  delete bare.disabled;
   const offscreen = await renderSlideOffscreen({
     deck,
     slide: createSlide({ id: newId('s'), elements: [bare] }),
@@ -386,6 +402,7 @@ async function elementToHtml(
     ...(link ? { link } : {}),
     ...(locked ? { locked } : {}),
     ...(hidden ? { hidden } : {}),
+    ...(disabled ? { disabled } : {}),
     ...(name ? { name } : {}),
     ...(role ? { role } : {}),
   });

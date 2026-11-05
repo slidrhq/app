@@ -67,6 +67,7 @@
       "signingIn": "Hãy hoàn tất đăng nhập trong cửa sổ vừa mở. Sau đó chúng ta sẽ tiếp tục tại đây.",
       "installDescription": "{{name}} chưa được cài đặt trên máy tính này. Nếu bạn đồng ý, chúng tôi sẽ tải xuống và cài đặt bằng Windows App Installer, rồi tiếp tục tại đây.",
       "installDescriptionNpm": "{{name}} chưa được cài đặt trên máy tính này. Nếu bạn đồng ý, chúng tôi sẽ cài đặt bằng npm (nếu thiếu Node.js, chúng tôi sẽ cài nó trước bằng Windows App Installer), rồi tiếp tục tại đây.",
+      "installDescriptionLibrary": "{{name}} chưa được cài đặt trên máy tính này. Nếu bạn đồng ý, chúng tôi sẽ tải xuống từ thư viện của tổ chức bạn và cài đặt, rồi tiếp tục tại đây.",
       "install": "Đồng ý và cài đặt",
       "signInDescription": "Hãy đăng nhập tài khoản để tải các mô hình khả dụng.",
       "signIn": "Đăng nhập",
@@ -611,7 +612,9 @@
       "paragraph": "Đoạn {{n}}/{{total}}",
       "row": "{{effect}} cho {{name}}",
       "original": "Chuyển động gốc",
-      "originalHint": "Chuyển động có sẵn trong tệp đã nhập, đúng như được viết trong tệp. Chọn hiệu ứng khác sẽ thay thế chuyển động này."
+      "originalHint": "Chuyển động có sẵn trong tệp đã nhập, đúng như được viết trong tệp. Chọn hiệu ứng khác sẽ thay thế chuyển động này.",
+      "disableHint": "Đối tượng vẫn xám và mờ cho đến hiệu ứng động “Kích hoạt”. Để đối tượng trông như bị vô hiệu hóa ngay khi trang chiếu mở ra, hãy chọn “Hiển thị như bị vô hiệu hóa” cho đối tượng đó.",
+      "enableHint": "Đối tượng trở lại diện mạo thường ngày và giữ nguyên như vậy. Để đối tượng trông như bị vô hiệu hóa cho đến hiệu ứng động này, hãy chọn “Hiển thị như bị vô hiệu hóa” cho đối tượng đó."
     },
     "group": {
       "leadIn": "Khi mở trang chiếu",
@@ -658,7 +661,9 @@
         "heartbeat": "Nhịp tim",
         "flicker": "Nhấp nháy",
         "float": "Lơ lửng",
-        "tilt": "Nghiêng"
+        "tilt": "Nghiêng",
+        "disable": "Vô hiệu hóa",
+        "enable": "Kích hoạt"
       },
       "exit": {
         "disappear": "Biến mất",
@@ -802,6 +807,8 @@
       "lock": "Khóa",
       "unlock": "Mở khóa",
       "hide": "Ẩn",
+      "disable": "Hiển thị như bị vô hiệu hóa",
+      "enable": "Hiển thị như đang hoạt động",
       "duplicate": "Nhân bản",
       "pasteStyle": "Dán kiểu",
       "delete": "Xóa",
@@ -860,6 +867,7 @@
       "order": "Thứ tự lớp",
       "lock": "Khóa",
       "visibility": "Ẩn và hiện",
+      "disabled": "Hiển thị như bị vô hiệu hóa hoặc đang hoạt động",
       "rename": "Đổi tên",
       "paste": "Dán",
       "cut": "Cắt",
@@ -1042,7 +1050,10 @@
       "insert": "Chèn đồ họa",
       "frame": "Chèn khung",
       "reframe": "Đặt ảnh vào khung",
-      "cards": "Chèn bộ thẻ"
+      "cards": "Chèn bộ thẻ",
+      "animation": "Chèn hoạt ảnh",
+      "background": "Áp dụng nền",
+      "motion": "Thay đổi chuyển động"
     },
     "collection": {
       "cards": "Bộ thẻ",
@@ -1051,7 +1062,9 @@
       "emoji": "Emoji",
       "icons": "Biểu tượng",
       "frames": "Khung",
-      "tables": "Bảng"
+      "tables": "Bảng",
+      "animations": "Hoạt ảnh",
+      "backgrounds": "Nền"
     },
     "designs": {
       "title": "Trang chiếu có sẵn",
@@ -1458,6 +1471,110 @@
       "ready": "Kích thước có sẵn",
       "custom": "Kích thước khác",
       "size": "{{rows}} hàng × {{cols}} cột"
+    },
+    "animations": {
+      "search": "Tìm hoạt ảnh",
+      "searchPlaceholder": "Tìm hoạt ảnh…",
+      "hint": "Bấm vào một hoạt ảnh để thêm vào trang chiếu. Hoạt ảnh tự chuyển động, và bạn có thể di chuyển, đổi kích thước và xoay nó như mọi đối tượng.",
+      "group": {
+        "basic": "Hình động",
+        "path": "Theo đường đi",
+        "spin": "Xoay",
+        "scale": "Phóng to và nhịp đập",
+        "lines": "Đường và sóng",
+        "particles": "Hạt và mạng lưới"
+      },
+      "name": {
+        "orbit": "Quỹ đạo",
+        "conveyor": "Hộp trên đường đi",
+        "trace": "Đường mạch",
+        "atom": "Nguyên tử",
+        "shuttle": "Chấm trên đường thẳng",
+        "hexagon": "Lục giác xoay",
+        "rings": "Vòng xoay",
+        "radar": "Ra-đa",
+        "ripple": "Gợn sóng",
+        "breathe": "Hình đang thở",
+        "bars": "Cột đi lên",
+        "waves": "Sóng",
+        "draw": "Mũi tên được vẽ",
+        "flowArrow": "Đường nối chảy",
+        "heartbeat": "Nhịp tim",
+        "network": "Mạng lưới",
+        "converge": "Hạt hội tụ",
+        "float": "Bong bóng bay lên"
+      }
+    },
+    "backgrounds": {
+      "hint": "Bấm vào một nền để áp dụng cho trang chiếu, hoặc cho mọi trang chiếu bạn đã chọn. Màu sắc lấy từ mẫu, và công cụ “Nền” đưa bạn về nền của mẫu.",
+      "animated": "Nền chuyển động",
+      "still": "Nền tĩnh",
+      "name": {
+        "flow": "Dòng chảy mạch",
+        "waves": "Sóng",
+        "converge": "Hội tụ",
+        "orbit": "Quỹ đạo",
+        "radar": "Ra-đa",
+        "network": "Mạng lưới",
+        "drift": "Ánh sáng trôi",
+        "particles": "Hạt bay lên",
+        "dots": "Lưới chấm",
+        "contours": "Đường đồng mức",
+        "arcs": "Vòng cung ở góc"
+      }
+    },
+    "animatedShapes": {
+      "title": "Hình động",
+      "hint": "Các hình thông thường lặp lại một chuyển động. Màu, đường viền và kích thước được chỉnh như mọi hình khác, còn chuyển động thì chỉnh bằng công cụ Chuyển động.",
+      "more": "Tất cả hoạt ảnh",
+      "name": {
+        "ring": "Vòng xoay",
+        "hexagon": "Lục giác xoay",
+        "star": "Ngôi sao xoay",
+        "octagon": "Bát giác xoay",
+        "square": "Hình vuông xoay rồi nghỉ",
+        "pulse": "Hình tròn đập nhịp",
+        "heart": "Trái tim đập",
+        "float": "Hình tròn trôi nổi",
+        "arrow": "Mũi tên lắc lư",
+        "blink": "Chấm nhấp nháy"
+      }
+    },
+    "motion": {
+      "title": "Chuyển động",
+      "piece": "Tốc độ hoạt ảnh",
+      "loop": "Chuyển động lặp lại",
+      "kind": {
+        "none": "Không",
+        "spin": "Xoay",
+        "pulse": "Đập nhịp",
+        "float": "Trôi nổi",
+        "swing": "Lắc lư",
+        "blink": "Nhấp nháy"
+      },
+      "speed": "Tốc độ",
+      "pace": {
+        "slow": "Chậm",
+        "medium": "Vừa",
+        "fast": "Nhanh"
+      },
+      "round": "Số giây mỗi vòng",
+      "rhythm": "Nhịp",
+      "rhythmKind": {
+        "steady": "Đều",
+        "smooth": "Mượt",
+        "pause": "Có quãng nghỉ"
+      },
+      "direction": "Hướng",
+      "clockwise": "Theo chiều kim đồng hồ",
+      "counterclockwise": "Ngược chiều kim đồng hồ",
+      "amount": {
+        "pulse": "Độ lớn nhịp đập",
+        "float": "Độ cao trôi nổi",
+        "swing": "Góc lắc lư",
+        "blink": "Độ mạnh nhấp nháy"
+      },
+      "hint": "Chuyển động lặp lại khi trang chiếu đang hiển thị: trong trình soạn thảo, khi trình chiếu và trong tệp đã xuất."
     }
   },
   "export": {
@@ -2316,6 +2433,11 @@
       "blur": "Làm mờ",
       "dim": "Làm tối",
       "applyAll": "Áp dụng cho tất cả trang chiếu",
+      "noDrawing": "Xóa hình vẽ trên nền",
+      "drawingColours": "Màu của hình vẽ",
+      "drawingColour": "Màu {{n}} của hình vẽ",
+      "speed": "Tốc độ chuyển động",
+      "drawingOpacity": "Độ mờ đục của hình vẽ",
       "reset": "Trở về nền chủ đề"
     },
     "groups": {
@@ -2534,6 +2656,7 @@
       "installTitle": "Cài đặt {{name}}?",
       "installDescription": "Ứng dụng sẽ tải xuống và cài đặt {{name}} bằng Windows App Installer. Sau đó chúng tôi sẽ kiểm tra kết nối và yêu cầu bạn đăng nhập nếu cần.",
       "installDescriptionNpm": "Ứng dụng sẽ cài đặt {{name}} bằng npm. Nếu thiếu Node.js, ứng dụng sẽ cài nó trước bằng Windows App Installer. Sau đó chúng tôi sẽ kiểm tra kết nối và yêu cầu bạn đăng nhập nếu cần.",
+      "installDescriptionLibrary": "Ứng dụng sẽ tải {{name}} xuống từ thư viện của tổ chức bạn và cài đặt trên máy tính này. Sau đó chúng tôi sẽ kiểm tra kết nối và yêu cầu bạn đăng nhập nếu cần.",
       "approveInstall": "Đồng ý và cài đặt",
       "chooseModel": "Chọn mô hình",
       "chooseEffort": "Chọn mức nỗ lực",

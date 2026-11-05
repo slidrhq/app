@@ -39,6 +39,9 @@ export const emphasisNames = [
   'flicker',
   'float',
   'tilt',
+  // These two leave the element as they made it: out of use, or in use again (`disabled.ts`).
+  'disable',
+  'enable',
 ] as const;
 
 export const exitNames = [

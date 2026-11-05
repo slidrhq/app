@@ -14,14 +14,22 @@ import {
   ArrowDownToLine,
   ArrowUp,
   ArrowUpToLine,
+  Ban,
   CopyPlus,
   Layers2,
   Lock,
   LockOpen,
   Trash2,
 } from '@slidr/ui/icons';
-import { abilities } from '../arrange/abilities';
-import { duplicate, remove, reorder, toggleLock } from '../arrange/actions';
+import { abilities, selectedElements } from '../arrange/abilities';
+import {
+  allDisabled,
+  duplicate,
+  remove,
+  reorder,
+  toggleDisabled,
+  toggleLock,
+} from '../arrange/actions';
 import { focusStage, useDeck, useEditor, useSelection } from '../shell';
 
 /** The four moves of the layer order, front first, with the keys of SPEC Appendix A. */
@@ -78,9 +86,10 @@ function moveAlong(event: KeyboardEvent<HTMLDivElement>) {
 }
 
 /**
- * The floating toolbar beside the selection (STG-05): duplicate, delete, lock and layer order.
- * The Stage places it and puts it away during a gesture; this is what is in it. A selection
- * that is all locked gets only the way out of the lock, which is the one thing it can do.
+ * The floating toolbar beside the selection (STG-05): duplicate, delete, lock, the look of an
+ * element out of use, and layer order. The Stage places it and puts it away during a gesture; this
+ * is what is in it. A selection that is all locked gets only the way out of the lock, which is the
+ * one thing it can do.
  */
 export function SelectionToolbar() {
   const { t } = useTranslation();
@@ -90,6 +99,7 @@ export function SelectionToolbar() {
   const ids = useSelection((s) => s.selectedElementIds);
   const slide = slideId ? findSlide(deck, slideId) : undefined;
   const can = useMemo(() => abilities(slide, ids), [slide, ids]);
+  const disabled = useMemo(() => allDisabled(selectedElements(slide, ids)), [slide, ids]);
   if (can.count === 0) return null;
 
   return (
@@ -136,6 +146,17 @@ export function SelectionToolbar() {
         label={can.allLocked ? t('arrange:menu.unlock') : t('arrange:menu.lock')}
         onClick={() => toggleLock(editor)}
       />
+      {!can.allLocked && (
+        // Pressed while every selected element is shown out of use: a press shows them in use.
+        <IconButton
+          icon={Ban}
+          size="sm"
+          tooltipSide="top"
+          label={t('arrange:menu.disable')}
+          aria-pressed={disabled}
+          onClick={() => toggleDisabled(editor)}
+        />
+      )}
       {!can.allLocked && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

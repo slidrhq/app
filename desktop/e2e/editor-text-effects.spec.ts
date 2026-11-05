@@ -140,8 +140,22 @@ test('an outline and a shadow, beside the fill', async ({ page }) => {
     '-webkit-text-stroke': '2px var(--color-text)',
     'paint-order': 'stroke fill',
   });
+  // The end of the slider is half a pixel, and the number beside it says so, not "1".
+  const width = page.getByRole('textbox', { name: 'עובי' });
+  const thinnest = await oneStep(page, async () => {
+    await page.getByRole('slider', { name: 'עובי' }).press('Home');
+  });
+  expect(thinnest?.['-webkit-text-stroke']).toBe('0.5px var(--color-text)');
+  await expect(width).toHaveValue('0.5');
+  // One up from there is 1, and half a pixel can be typed back.
+  await width.press('ArrowUp');
+  await expect(width).toHaveValue('1');
+  await width.fill('0.5');
+  await width.press('Enter');
+  await expect(width).toHaveValue('0.5');
+  expect((await css(page))?.['-webkit-text-stroke']).toBe('0.5px var(--color-text)');
+
   const wider = await oneStep(page, async () => {
-    const width = page.getByRole('textbox', { name: 'עובי' });
     await width.fill('6');
     await width.press('Enter');
   });

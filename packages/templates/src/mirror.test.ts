@@ -1,7 +1,13 @@
 import { createElement, Layout, richText, type Background, type Element } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
 import { nightTemplate, paperTemplate } from './fixtures';
-import { mirrorBackground, mirrorElement, mirrorFrame, mirrorLayout } from './mirror';
+import {
+  mirrorBackground,
+  mirrorBackgroundDrawing,
+  mirrorElement,
+  mirrorFrame,
+  mirrorLayout,
+} from './mirror';
 
 const box = (x: number, y: number, w: number, h: number) => ({ x, y, w, h });
 
@@ -132,6 +138,24 @@ describe('mirrorBackground', () => {
     }
     expect(mirrorBackground(photo)).toEqual(photo);
     expect(mirrorBackground(free)).toEqual(free);
+  });
+
+  it('moves its drawing to the other side, and its drawing alone when asked (ADR-125)', () => {
+    const stops = [
+      { color: { token: 'bg' as const }, at: 0 },
+      { color: { token: 'primary' as const }, at: 1 },
+    ];
+    const bar = createElement.shape({ id: 'e_bar', frame: box(40, 100, 300, 12) });
+    const drawn: Background = { fill: { kind: 'linear', angle: 90, stops }, elements: [bar] };
+    const there = mirrorBackground(drawn);
+    expect(there.fill).toEqual({ kind: 'linear', angle: -90, stops });
+    expect(there.elements).toEqual([mirrorElement(bar)]);
+    expect(there.elements![0]!.frame).toEqual(box(1580, 100, 300, 12));
+    expect(mirrorBackground(there)).toEqual(drawn);
+
+    expect(mirrorBackgroundDrawing(drawn)).toEqual({ ...drawn, elements: [mirrorElement(bar)] });
+    const bare: Background = { fill: drawn.fill };
+    expect(mirrorBackgroundDrawing(bare)).toBe(bare);
   });
 });
 

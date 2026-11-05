@@ -21,7 +21,7 @@ use crate::{storage::Storage, system_settings::SystemSettings};
 type Manager<'a> = State<'a, Arc<HarnessManager>>;
 
 /// `agent_harnesses()`: the registered harnesses with their capabilities (AGT-02), as the
-/// organization's settings offer them once this start has read them (ADR-117).
+/// organization's settings that this start goes by offer them (ADR-117, ADR-124).
 #[tauri::command]
 pub async fn agent_harnesses(
     manager: Manager<'_>,

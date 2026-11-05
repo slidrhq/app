@@ -1,6 +1,11 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { harnessLook, installedByOrganization, installsWithNpm } from '../agent/harnessLook';
+import {
+  harnessLook,
+  installDescription,
+  installedByOrganization,
+  installsWithNpm,
+} from '../agent/harnessLook';
 import { currentLanguage, i18n, languages, offerLanguages, offeredLanguages } from '../i18n';
 import {
   customAgent,
@@ -53,6 +58,11 @@ describe("the organization's settings (ADR-117)", () => {
           { id: 'acme', name: 'Acme Agent', glyph: 'A', tone: 'teal', install: { winget: 'A.B' } },
           { id: 'webui', name: 'Open WebUI', install: { npm: '@acme/webui' } },
           { id: 'inhouse', name: 'In-house', tone: 'no-such-tint' },
+          {
+            id: 'packed',
+            name: 'Packed',
+            install: { package: 'system/agents/packed.zip', sha256: 'ab'.repeat(32), size: 2048 },
+          },
         ],
       }),
     );
@@ -70,6 +80,16 @@ describe("the organization's settings (ADR-117)", () => {
     expect([installsWithNpm('webui'), installedByOrganization('webui')]).toEqual([true, false]);
     expect(installedByOrganization('inhouse')).toBe(true);
     expect(installedByOrganization('acme')).toBe(false);
+    // A package of the library is the app's to install, from the library alone (ADR-125).
+    expect(harnessLook('packed')?.installer).toBe('library');
+    expect(installedByOrganization('packed')).toBe(false);
+    expect(['packed', 'webui', 'acme', 'claude-code', undefined].map(installDescription)).toEqual([
+      'installDescriptionLibrary',
+      'installDescriptionNpm',
+      'installDescription',
+      'installDescription',
+      'installDescription',
+    ]);
     // The app's own agents keep their looks.
     expect(harnessLook('claude-code')?.name).toBe('Claude');
     expect(installedByOrganization('claude-code')).toBe(false);

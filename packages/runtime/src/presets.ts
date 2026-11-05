@@ -1,4 +1,5 @@
 import type { Vec } from './direction';
+import { disabledFilter, joinFilters } from './disabled';
 import {
   keyframesOf,
   type Category,
@@ -6,7 +7,7 @@ import {
   type entranceNames,
   type exitNames,
 } from './names';
-import type { FlowDirection, Size } from './types';
+import type { FlowDirection, Size, TextBy } from './types';
 
 export { animationPresets, KEYFRAMES_PREFIX, keyframesOf, type Category } from './names';
 
@@ -31,6 +32,8 @@ export interface Frame {
   clip?: readonly [number, number, number, number];
   /** Slide pixels. */
   blur?: number;
+  /** How far the part is toward the look of one out of use: 0 in use, 1 out of use. */
+  disabled?: number;
   hidden?: boolean;
   /** Easing from this frame to the next. */
   easing?: string;
@@ -57,6 +60,12 @@ export interface Preset {
   direction: FlowDirection;
   /** The preset to use for inline text, which cannot be scaled, rotated or clipped. */
   inline?: string;
+  /**
+   * For a preset that changes how the part stands: true leaves it out of use, false in use again,
+   * and it stays so until another step changes it. The timeline plays it from where the part
+   * stands, so a part that is out of use already does not flash back.
+   */
+  disables?: boolean;
 }
 
 /** Clear of the slide's edge, so a shadow is out of sight too. */
@@ -495,6 +504,23 @@ const emphasis: Record<(typeof emphasisNames)[number], Preset> = {
       { offset: 1, rotate: 0 },
     ],
   },
+  // Unlike the others, these two leave the part as they made it (`disables`).
+  disable: {
+    direction: 'up',
+    disables: true,
+    frames: () => [
+      { offset: 0, disabled: 0 },
+      { offset: 1, disabled: 1 },
+    ],
+  },
+  enable: {
+    direction: 'up',
+    disables: false,
+    frames: () => [
+      { offset: 0, disabled: 1 },
+      { offset: 1, disabled: 0 },
+    ],
+  },
 };
 
 // Looked up by the free text of a step, so by any string.
@@ -536,7 +562,18 @@ export interface PresetInfo {
   directional: boolean;
   /** The direction a step gets when it names none. */
   direction: FlowDirection;
+  /**
+   * How the preset may take a text (`textBy`). A part taken out of use stays so, and only a whole
+   * element or a paragraph is there to stay: the words and letters of a text are put back together
+   * once their step has played.
+   */
+  textBy: readonly TextBy[];
+  /** For a preset that leaves the part out of use (true) or in use again (false). */
+  disables?: boolean;
 }
+
+const EVERY_WAY: readonly TextBy[] = ['all', 'paragraph', 'word', 'char'];
+const AS_BLOCKS: readonly TextBy[] = ['all', 'paragraph'];
 
 /** Whether a preset's frames depend on the way it travels: asked of the frames themselves. */
 function turns(preset: Preset): boolean {
@@ -550,9 +587,20 @@ function turns(preset: Preset): boolean {
 
 export function describePreset(category: Category, name: string): PresetInfo {
   // The slide's own keyframes say how the element moves; there is no direction to choose.
-  if (keyframesOf(name)) return { known: true, directional: false, direction: 'up' };
+  if (keyframesOf(name)) {
+    return { known: true, directional: false, direction: 'up', textBy: EVERY_WAY };
+  }
   const { preset, known } = findPreset(category, name);
-  return { known, directional: turns(preset), direction: preset.direction };
+  if (preset.disables === undefined) {
+    return { known, directional: turns(preset), direction: preset.direction, textBy: EVERY_WAY };
+  }
+  return {
+    known,
+    directional: false,
+    direction: preset.direction,
+    textBy: AS_BLOCKS,
+    disables: preset.disables,
+  };
 }
 
 export interface PartStyle {
@@ -599,8 +647,13 @@ export function toKeyframes(frames: readonly Frame[], part: PartStyle): Keyframe
     if (frame.scale !== undefined) k.scale = String(frame.scale);
     if (frame.rotate !== undefined) k.rotate = `${frame.rotate}deg`;
     if (frame.clip) k.clipPath = inset(frame.clip);
-    if (frame.blur !== undefined) {
-      k.filter = `${part.filter ? `${part.filter} ` : ''}blur(${round(frame.blur * part.unit)}px)`;
+    if (frame.blur !== undefined || frame.disabled !== undefined) {
+      k.filter =
+        joinFilters(
+          part.filter,
+          frame.disabled !== undefined ? disabledFilter(frame.disabled) : '',
+          frame.blur !== undefined ? `blur(${round(frame.blur * part.unit)}px)` : '',
+        ) || 'none';
     }
     return k;
   });
