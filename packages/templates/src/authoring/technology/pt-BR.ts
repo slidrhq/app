@@ -10,6 +10,7 @@ export const ptBR: TechnologyCopies = {
     ],
     section: ['Uma única região', 'Uma falha ali parava todos os pagamentos.'],
     agenda: {
+      kicker: 'Pauta',
       title: 'O que vamos ver hoje',
       lead: [
         'Por que uma região deixou de atender ao nosso núcleo de pagamentos.',
@@ -114,6 +115,7 @@ export const ptBR: TechnologyCopies = {
     hero: ['Dez anos,', 'uma bateria', 'O hidrômetro inteligente WM-10, do protótipo à produção.'],
     section: ['O orçamento de energia', 'Cada microampere conta durante dez anos.'],
     agenda: {
+      kicker: 'Pauta',
       title: 'As perguntas desta revisão',
       lead: [
         'Quatro respostas mensuráveis decidem a passagem para DVT em abril.',
@@ -235,6 +237,7 @@ export const ptBR: TechnologyCopies = {
     ],
     section: ['As novidades', 'Três pedidos de vocês e uma surpresa.'],
     agenda: {
+      kicker: 'O roteiro',
       title: 'A programação de hoje',
       lead: [
         'Trinta minutos sobre o que mudou no Zrima 2.0 e nossas escolhas.',

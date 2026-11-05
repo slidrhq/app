@@ -10,6 +10,7 @@ export const vi: TechnologyCopies = {
     ],
     section: ['Chỉ một vùng', 'Một sự cố tại đó từng làm dừng mọi khoản thanh toán.'],
     agenda: {
+      kicker: 'Chương trình',
       title: 'Nội dung hôm nay',
       lead: [
         'Vì sao một vùng không còn đủ cho lõi thanh toán của chúng ta.',
@@ -115,6 +116,7 @@ export const vi: TechnologyCopies = {
     ],
     section: ['Ngân sách điện năng', 'Mỗi microampe đều quan trọng suốt mười năm.'],
     agenda: {
+      kicker: 'Chương trình',
       title: 'Các câu hỏi cần giải đáp',
       lead: [
         'Bốn đáp án đo được quyết định bước DVT vào tháng 4.',
@@ -215,6 +217,7 @@ export const vi: TechnologyCopies = {
     hero: ['Vận hành ở chế độ', 'tự động', 'Zrima 2.0 kết nối công cụ và xử lý công việc lặp lại.'],
     section: ['Điểm mới', 'Ba điều bạn yêu cầu và một bất ngờ.'],
     agenda: {
+      kicker: 'Lịch trình',
       title: 'Chương trình tối nay',
       lead: [
         'Ba mươi phút về những điểm mới của Zrima 2.0 và lý do thiết kế.',

@@ -737,12 +737,12 @@ const WIDTH = 1920 - START - END;
 const AFTER = START + 42;
 
 /** The kicker on its node, and the title. */
-function head(name: string, width = 1240, lines = 2) {
+function head(name: string, width = 1240, lines = 2, titleHeight = 74 * lines) {
   return {
     placeholders: [
       place('p_kicker', 'caption', at(AFTER, 84, Math.min(900, width - 42), 34), 'caption'),
       // Room for two lines: a title another deck brings may run to a second.
-      place('p_title', 'title', at(START, 122, width, 74 * lines), 'title'),
+      place('p_title', 'title', at(START, 122, width, titleHeight), 'title'),
     ],
     decorations: [node(`d_anan_${name}_node`, START, 88)],
   };
@@ -1801,11 +1801,14 @@ function layouts(): Layout[] {
       id: 'l_anan_text',
       name: 'Text',
       archetype: 'text',
+      // The kicker over the title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        place('p_title', 'title', at(START, 112, 1300, 92), 'title'),
+        ...head('text', 1300, 1, 92).placeholders,
         place('p_body', 'body', at(START + 56, textCard.y + 56, WIDTH - 112, 560), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
+        ...head('text', 1300, 1, 92).decorations,
         card('d_anan_text_card', textCard),
         drawing(
           'd_anan_text_region',
@@ -1813,7 +1816,7 @@ function layouts(): Layout[] {
           regionScene().fit(textArt.w, textArt.h, 6, 4, 0.5, 1),
           PAINT,
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -2276,6 +2279,7 @@ const sampleHe: SampleSlide[] = [
     layout: 'l_anan_text',
     name: 'על מה נדבר',
     content: {
+      caption: text('סדר היום'),
       title: text('על מה נדבר היום'),
       body: {
         paragraphs: [
@@ -2294,6 +2298,7 @@ const sampleHe: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_HE,
     },
   },
   {
@@ -2544,6 +2549,7 @@ const sampleEn: SampleSlide[] = [
     layout: 'l_anan_text',
     name: 'Today',
     content: {
+      caption: text('Agenda'),
       title: text('What we will cover today'),
       body: {
         paragraphs: [
@@ -2562,6 +2568,7 @@ const sampleEn: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_EN,
     },
   },
   {

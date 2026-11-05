@@ -17,6 +17,7 @@ export const vi: TaaruchaCopy = {
   },
   agenda: {
     name: 'Sáng nay',
+    kicker: 'Dành cho báo chí và nhà bảo trợ',
     title: 'Chương trình sáng nay',
     intro:
       'Bốn mươi phút về cách chúng tôi treo lại bộ sưu tập sau hai năm thi công, và những gì thay đổi với khách tham quan từ ngày mở cửa. Sau đó là một vòng dạo qua các phòng đầu tiên.',

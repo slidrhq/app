@@ -1,4 +1,5 @@
 import { findElement, findSlide } from '@slidr/model';
+import { adjustHandles } from '@slidr/renderer';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import { layerSnippet } from '../arrange/layers';
@@ -6,14 +7,14 @@ import { elementDisplayKind, useDeck, useSelection } from '../shell';
 import { stageKeys } from './keyboardSession';
 
 /**
- * Where the keyboard is beyond the selection, in words (UI-06): the point of a line or the crop
- * handle the arrows move, and the element of the slide or the slide of the Filmstrip that the
+ * Where the keyboard is beyond the selection, in words (UI-06): the point of a line, the
+ * adjustment handle of a shape or the crop handle the arrows move, and the element of the slide or the slide of the Filmstrip that the
  * selection walk stands on. The Stage and the Filmstrip draw a ring there; this says it to a
  * screen reader, as the host says what is selected. It is a live region with nothing to see.
  */
 export function KeyboardStatus() {
   const { t } = useTranslation();
-  const { handle, point, cursor, slide: walkedSlide } = useStore(stageKeys);
+  const { handle, point, adjust, cursor, slide: walkedSlide } = useStore(stageKeys);
   const slideId = useSelection((s) => s.currentSlideId);
   const ids = useSelection((s) => s.selectedElementIds);
   const slideIds = useSelection((s) => s.selectedSlideIds);
@@ -36,6 +37,10 @@ export function KeyboardStatus() {
   } else if (one?.type === 'line' && point !== null) {
     const total = one.points.length;
     said = t('stage:at.point', { n: Math.min(point, total - 1) + 1, total });
+  } else if (one?.type === 'shape' && one.geometry.kind === 'preset' && adjust !== null) {
+    const { geometry, frame } = one;
+    const total = adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust).length;
+    if (total > 0) said = t('stage:at.adjust', { n: Math.min(adjust, total - 1) + 1, total });
   } else if (one?.type === 'image' && editingId === one.id) {
     said = handle
       ? t('stage:at.handle', { where: t(`stage:at.handles.${handle}`) })

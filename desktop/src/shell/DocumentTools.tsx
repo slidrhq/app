@@ -168,7 +168,7 @@ function FileMenu() {
   // Find and replace is another area's: the menu offers what its shortcut does, when it is there.
   const find = useShortcut('find.replace');
   const focusTaken = useRef(false);
-  // So are the imports, of HTML and of PowerPoint (ADR-108): "Open…" offers their files with the
+  // So are the imports, of HTML and of PowerPoint (ADR-132): "Open…" offers their files with the
   // app's own (ADR-123), and the area of the one chosen asks about the open document if it has
   // work. In a plain browser they are all that opens.
   const importers = useImporters();

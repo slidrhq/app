@@ -8,7 +8,7 @@ export type { PptxImportOptions, StoreAsset } from './slides';
 
 /*
  * A PowerPoint file as a deck: every slide, with its layout, background, objects, notes,
- * transition and animations, the objects editable as Slidr's own. See docs/adr/ADR-108-powerpoint-files.md.
+ * transition and animations, the objects editable as Slidr's own. See docs/adr/ADR-132-powerpoint-files.md.
  */
 
 export interface PptxImportResult {

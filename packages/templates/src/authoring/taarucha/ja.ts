@@ -17,6 +17,7 @@ export const ja: TaaruchaCopy = {
   },
   agenda: {
     name: '本日の内覧',
+    kicker: '報道・賛助会員向け',
     title: '本日の内覧会',
     intro: [
       'この40分では、2年間の工事を経てコレクションをどのように展示し直したか、',

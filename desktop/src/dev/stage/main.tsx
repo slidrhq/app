@@ -341,8 +341,42 @@ function stageDeck(): Deck {
     ],
   });
 
+  // Shapes with adjustment handles (ADR-133): a ring, an arrow, and a ring turned and mirrored.
+  const preset = (name: string) => ({ kind: 'preset' as const, preset: name });
+  const shapes = createSlide({
+    id: 's_shapes',
+    name: 'Shapes',
+    elements: [
+      createElement.shape({
+        id: 'e_ring',
+        frame: { x: 200, y: 200, w: 360, h: 360 },
+        geometry: preset('donut'),
+        fill: solid('primary'),
+      }),
+      createElement.shape({
+        id: 'e_arrow',
+        frame: { x: 800, y: 260, w: 480, h: 240 },
+        geometry: preset('arrowRight'),
+        fill: solid('accent'),
+      }),
+      createElement.shape({
+        id: 'e_ring_turned',
+        frame: { x: 1400, y: 600, w: 360, h: 360 },
+        rotation: 90,
+        flipH: true,
+        geometry: preset('donut'),
+        fill: solid('secondary'),
+      }),
+      createElement.shape({
+        id: 'e_plain',
+        frame: { x: 200, y: 700, w: 480, h: 240 },
+        fill: solid('surface'),
+      }),
+    ],
+  });
+
   return {
-    ...createDeck({ lang: 'en', title: 'Stage', slides: [crop, groups, lines, cards] }),
+    ...createDeck({ lang: 'en', title: 'Stage', slides: [crop, groups, lines, cards, shapes] }),
     assets: referenceDeck().assets,
   };
 }

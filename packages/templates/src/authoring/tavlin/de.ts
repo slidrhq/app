@@ -17,6 +17,7 @@ export const de: TavlinCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Für unsere Partner',
     title: 'Heute auf der Karte',
     intro:
       'Vierzig Minuten darüber, wie Sieben Gewürze vom Wochenendmarkt zu einem Festival mit einundvierzigtausend Gästen wurde, und was wir für Mai von jedem Partner brauchen. Danach Ihre Fragen, bei einem Tee.',

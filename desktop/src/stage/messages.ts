@@ -21,6 +21,7 @@ export const he = {
     editData: 'עריכת הנתונים',
     editCells: 'עריכת התאים',
     editPoints: 'עריכת הנקודות',
+    adjust: 'התאמת הצורה',
     order: 'סדר שכבות',
   },
   toolbar: {
@@ -33,7 +34,7 @@ export const he = {
     walk: 'מעבר לאובייקט הבא או הקודם, וב-Filmstrip לשקף, בלי לבחור בו',
     toggle: 'הוספה לבחירה או הסרה ממנה',
     points: 'כניסה לנקודות של קו, ויציאה מהן',
-    part: 'הנקודה הבאה או הקודמת של קו; ידית החיתוך הבאה או הקודמת',
+    part: 'הנקודה הבאה או הקודמת של קו; ידית ההתאמה הבאה או הקודמת של צורה; ידית החיתוך הבאה או הקודמת',
     addPoint: 'הוספת נקודה לקו',
     removePoint: 'הסרת נקודה מקו',
     lock: 'נעילה וביטול נעילה',
@@ -42,6 +43,7 @@ export const he = {
   // Where the keyboard is on the slide beyond the selection, said to a screen reader.
   at: {
     point: 'נקודה {{n}} מתוך {{total}}. החיצים מזיזים אותה.',
+    adjust: 'ידית התאמה {{n}} מתוך {{total}}. החיצים מזיזים אותה.',
     picture:
       'חיתוך: החיצים מזיזים את התמונה. Ctrl עם חץ למעלה או למטה משנה את גודלה. Tab עובר לידיות.',
     handle: 'ידית החיתוך: {{where}}. החיצים מזיזים אותה.',
@@ -92,6 +94,7 @@ export const en = {
     editData: 'Edit data',
     editCells: 'Edit cells',
     editPoints: 'Edit points',
+    adjust: 'Adjust shape',
     order: 'Layer order',
   },
   toolbar: {
@@ -103,7 +106,7 @@ export const en = {
     walk: 'Go to the next or the previous object, or slide in the Filmstrip, without selecting it',
     toggle: 'Add to the selection, or take out of it',
     points: 'Into the points of a line, and out of them',
-    part: 'The next or the previous point of a line; the next or the previous crop handle',
+    part: 'The next or the previous point of a line, adjustment handle of a shape or crop handle',
     addPoint: 'Add a point to the line',
     removePoint: 'Remove a point from the line',
     lock: 'Lock and unlock',
@@ -111,6 +114,7 @@ export const en = {
   },
   at: {
     point: 'Point {{n}} of {{total}}. The arrows move it.',
+    adjust: 'Adjustment handle {{n}} of {{total}}. The arrows move it.',
     picture:
       'Crop: the arrows move the picture. Ctrl+Up or Down scales it. Tab goes to the handles.',
     handle: 'Crop handle: {{where}}. The arrows move it.',

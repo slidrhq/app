@@ -18,6 +18,7 @@ export const ko: TavlinCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '파트너 여러분께',
     title: '오늘의 메뉴',
     intro: [
       '40분 동안 일곱 향신료가 주말 장터에서 4만 1천 명이 찾는 축제로 자라 온 과정과,',

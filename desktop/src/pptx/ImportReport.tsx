@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ltr } from '../export/exportDeck';
 import { WarningList } from './WarningList';
 
-/** What a PowerPoint import brought (ADR-108): how many slides, and what came in otherwise. */
+/** What a PowerPoint import brought (ADR-132): how many slides, and what came in otherwise. */
 export function ImportReport({
   name,
   slides,

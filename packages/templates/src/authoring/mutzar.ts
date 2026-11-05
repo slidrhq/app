@@ -547,11 +547,11 @@ const WIDTH = 1920 - START - END;
  * The kicker with a live dot before it, and the title under it, with room for two lines: the
  * content of every layout starts below the second line.
  */
-function head(name: string, width = 1180) {
+function head(name: string, width = 1180, titleHeight = 136) {
   return {
     placeholders: [
       place('p_kicker', 'caption', at(START + 30, 80, Math.min(900, width - 30), 34), 'caption'),
-      place('p_title', 'title', at(START, 116, width, 136), 'title'),
+      place('p_title', 'title', at(START, 116, width, titleHeight), 'title'),
     ],
     decorations: liveDot(name, 80),
   };
@@ -1058,13 +1058,17 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is the page of a document, in its window from margin to margin and down to over
-      // the foot, from the top of the page; the people on the page stand beside the title.
+      // the foot, from the top of the page; the people on the page stand beside the title. The
+      // kicker over a title of one line and the footer, as on the text-and-image slide
+      // (ADR-135).
       placeholders: [
-        place('p_title', 'title', at(START, 112, WIDTH - 300, 92), 'title'),
+        ...head('text', WIDTH - 300, 92).placeholders,
         place('p_body', 'body', at(START + 64, PAGE.y + 132, WIDTH - 128, 512), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
         board('text'),
+        ...head('text', WIDTH - 300, 92).decorations,
         ...browser('text', PAGE, 'zrima.app/docs/launch-night'),
         // The page's cover, a band of the theme's colours under the bar of the window.
         rect(
@@ -1780,6 +1784,7 @@ const sampleHe: SampleSlide[] = [
     layout: 'l_mutzar_text',
     name: 'סדר הערב',
     content: {
+      caption: text('התוכנית'),
       title: text('על מה נדבר הערב'),
       body: {
         paragraphs: [
@@ -1798,6 +1803,7 @@ const sampleHe: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_HE,
     },
   },
   {
@@ -2042,6 +2048,7 @@ const sampleEn: SampleSlide[] = [
     layout: 'l_mutzar_text',
     name: 'Agenda',
     content: {
+      caption: text('The programme'),
       title: text("Tonight's agenda"),
       body: {
         paragraphs: [
@@ -2060,6 +2067,7 @@ const sampleEn: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_EN,
     },
   },
   {

@@ -24,7 +24,13 @@ export interface TechnologyCopy {
   footer: string;
   hero: Three;
   section: [title: string, subtitle: string];
-  agenda: { title: string; lead: [string, string]; points: [string, string][] };
+  agenda: {
+    /** The kicker over the title, as the text-and-image slide has one (ADR-135). */
+    kicker: string;
+    title: string;
+    lead: [string, string];
+    points: [string, string][];
+  };
   figures: { title: string; subtitle: string; labels: Three; body: string };
   features: { title: string; heads: Three; bodies: Three };
   timeline: { title: string; heads: Four; bodies: Four };

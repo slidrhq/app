@@ -11,6 +11,7 @@ export const tr: HonCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'Olağan Genel Kurul',
     title: 'Bu akşamın gündemi',
     intro:
       'Kırk dakika boyunca sahibi olduğunuz bankanın 2026 yılını konuşacağız: ne kadar kredi verdik, ne kadarını sermaye olarak tuttuk ve üyeler olarak size ne geri döndü. Ardından oylamalar ve sorularınız.',

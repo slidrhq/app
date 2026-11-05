@@ -17,6 +17,7 @@ export const ja: RakiaCopy = {
   },
   agenda: {
     name: '今夜',
+    kicker: 'ブリーフィング',
     title: '今夜の4つのテーマ',
     intro: [
       'この40分では、今週ファーストライトを迎える望遠鏡と、最初のシーズンに観測するもの、',

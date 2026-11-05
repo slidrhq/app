@@ -17,6 +17,7 @@ export const tr: AtlasCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'Açılış',
     title: 'Bugünün gündemi',
     intro:
       'On dört liman kentinin bu yıl suyun yeniden kullanımı ve tuzdan arındırılması üzerine öğrendiklerine ve sırada her ortaktan ne isteyeceğimize ayrılmış yirmi beş dakika. Ardından sorularınız.',

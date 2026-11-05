@@ -36,7 +36,7 @@ pub fn builtin() -> Vec<Arc<dyn AgentHarness>> {
 /// The harnesses the organization's settings offer: the built-in ones and its own agents, after
 /// them, those it offers alone, its default first. Without settings, the built-in ones. The mock
 /// is offered whatever they say, as it is for the tests alone. An agent of its own that comes as a
-/// package of its library is installed into the folders of `packages` (ADR-125).
+/// package of its library is installed into the folders of `packages` (ADR-130).
 pub fn offered(
     policy: Option<&Policy>,
     packages: &Arc<CustomAgents>,

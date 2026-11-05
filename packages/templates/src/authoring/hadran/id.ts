@@ -17,6 +17,7 @@ export const id: HadranCopy = {
   },
   setlist: {
     name: 'Setlist',
+    kicker: 'Peluncuran musim',
     title: 'Setlist malam ini',
     intro:
       'Empat puluh menit tentang musim mendatang: pelajaran dari musim lalu, dua belas album yang akan kami rilis, delapan belas kota dalam tur, dan sekolah kami. Setelah itu bar dibuka dan band mulai bermain.',

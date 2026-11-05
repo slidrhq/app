@@ -17,6 +17,7 @@ export const ko: RakiaCopy = {
   },
   agenda: {
     name: '오늘 밤',
+    kicker: '브리핑',
     title: '오늘 밤, 네 가지 이야기',
     intro: [
       '40분 동안 이번 주 첫 별빛을 받는 망원경이 첫 시즌에 무엇을 관측하는지,',

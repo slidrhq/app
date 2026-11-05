@@ -17,6 +17,7 @@ export const vi: TeferCopy = {
   },
   agenda: {
     name: 'Chương trình',
+    kicker: 'Dành cho nhà mua hàng',
     title: 'Trên bàn sáng nay',
     intro:
       'Bốn mươi phút về bộ sưu tập hai mươi bốn chiếc áo khoác: vải đến từ đâu, chúng tôi cắt thế nào để gần như không còn gì trên sàn, và cách đặt hàng cho mùa thu. Sau đó là chính những chiếc áo, trên giá treo.',

@@ -17,6 +17,7 @@ export const id: TaaruchaCopy = {
   },
   agenda: {
     name: 'Pagi ini',
+    kicker: 'Untuk pers dan donatur',
     title: 'Pratinjau pagi ini',
     intro:
       'Empat puluh menit tentang cara kami menata ulang koleksi setelah dua tahun pembangunan, dan apa yang berubah bagi pengunjung sejak hari pintu dibuka. Lalu berjalan-jalan di ruang-ruang pertama.',

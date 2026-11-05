@@ -17,6 +17,7 @@ export const ko: TeferCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '바이어 설명회',
     title: '오늘 아침 테이블 위에 놓인 것',
     intro: [
       '40분 동안 코트 24벌로 이루어진 컬렉션을 소개합니다. 원단의 출처, 바닥에 거의 아무것도 남기지 않는 재단법,',

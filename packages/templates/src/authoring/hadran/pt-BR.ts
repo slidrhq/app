@@ -17,6 +17,7 @@ export const ptBR: HadranCopy = {
   },
   setlist: {
     name: 'Repertório',
+    kicker: 'Lançamento da temporada',
     title: 'O repertório desta noite',
     intro:
       'Quarenta minutos sobre a temporada que vem: o que a última nos ensinou, os doze discos que vamos lançar, as dezoito cidades da turnê e a nossa escola. Depois o bar abre e a banda toca.',

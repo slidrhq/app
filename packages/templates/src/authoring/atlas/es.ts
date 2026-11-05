@@ -17,6 +17,7 @@ export const es: AtlasCopy = {
   },
   agenda: {
     name: 'Orden del día',
+    kicker: 'Apertura',
     title: 'Lo que veremos hoy',
     intro:
       'Veinticinco minutos sobre lo que catorce ciudades portuarias aprendieron este año sobre reutilizar y desalar el agua, y sobre lo que pediremos a cada socio a continuación. Después, sus preguntas.',

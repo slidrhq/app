@@ -17,6 +17,7 @@ export const de: SadeCopy = {
   },
   agenda: {
     name: 'Tagesordnung',
+    kicker: 'Mitgliederversammlung',
     title: 'Was wir heute Vormittag besprechen',
     intro:
       'Vierzig Minuten zur Ernte 2026: was wir angebaut haben, wie viel Wasser es brauchte und was uns der Boden gezeigt hat. Danach der Plan für die Saison 2027 und Zeit für Ihre Fragen.',

@@ -11,6 +11,7 @@ export const zhCN: HonCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '年度会员大会',
     title: '今晚的议程',
     intro: [
       '在接下来的四十分钟里，我们将报告您拥有的这家银行的 2026 年：我们放出了多少贷款、留存了多少资本，',

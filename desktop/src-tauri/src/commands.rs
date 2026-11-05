@@ -170,7 +170,7 @@ fn header(request: &Request<'_>, name: &str) -> Result<Option<String>> {
 }
 
 /// `export_write_file`: writes an exported presentation to the place the user chose in the save
-/// dialog (WG9-T12, ADR-108). The body is the file's bytes, as in [`asset_import_bytes`]; the
+/// dialog (WG9-T12, ADR-132). The body is the file's bytes, as in [`asset_import_bytes`]; the
 /// path travels percent-encoded in the header `x-file-path`.
 #[tauri::command]
 pub async fn export_write_file(request: Request<'_>) -> Result<()> {
@@ -228,7 +228,7 @@ fn write_export(path: &std::path::Path, bytes: &[u8]) -> Result<()> {
 /// presentation larger than this is one of hours of video.
 const PPTX_LIMIT: u64 = 2 << 30;
 
-/// `pptx_read({ path })`: the bytes of a PowerPoint file the user chose to import (ADR-108). The
+/// `pptx_read({ path })`: the bytes of a PowerPoint file the user chose to import (ADR-132). The
 /// answer is the raw bytes, not JSON. The path comes from the webview, so it is held to what an
 /// import is: an absolute path to a `.pptx` file.
 #[tauri::command]

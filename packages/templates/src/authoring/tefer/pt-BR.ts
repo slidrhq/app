@@ -17,6 +17,7 @@ export const ptBR: TeferCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Apresentação para compradores',
     title: 'Na mesa nesta manhã',
     intro:
       'Quarenta minutos sobre uma coleção de vinte e quatro casacos: de onde veio o tecido, como o cortamos para que quase nada fique no chão e como encomendá-la para o outono. Depois, os próprios casacos, na arara.',

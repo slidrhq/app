@@ -17,6 +17,7 @@ export const de: HadranCopy = {
   },
   setlist: {
     name: 'Setlist',
+    kicker: 'Saisonauftakt',
     title: 'Die Setlist des Abends',
     intro:
       'Vierzig Minuten über die neue Saison: was uns die letzte gelehrt hat, die zwölf Platten, die wir herausbringen, die achtzehn Städte der Tournee und unsere Schule. Dann öffnet die Bar, und die Band spielt.',

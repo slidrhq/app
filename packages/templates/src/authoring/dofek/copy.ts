@@ -32,7 +32,14 @@ export interface DofekCopy {
    * The text slide: a lead of two lines, given in its lines where the language may break
    * anywhere, and four points, each one line that opens with a few words in bold.
    */
-  agenda: { name: string; title: Title; intro: Title; items: [opening: string, rest: string][] };
+  agenda: {
+    name: string;
+    /** The kicker over the title, as the text-and-image slide has one (ADR-135). */
+    kicker: string;
+    title: Title;
+    intro: Title;
+    items: [opening: string, rest: string][];
+  };
   section: { name: string; part: string; title: string[]; subtitle: string };
   /** The year in figures, on the monitor: the main channel and three beside it. */
   figures: {

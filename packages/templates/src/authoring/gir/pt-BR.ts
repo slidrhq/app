@@ -17,6 +17,7 @@ export const ptBR: GirCopy = {
   },
   agenda: {
     name: 'Hoje à noite',
+    kicker: 'Boas-vindas',
     title: 'Hoje à noite, em quarenta minutos',
     intro:
       'Quarenta minutos sobre como o 7º ano vai aprender este ano, o que muda na sala de aula e como vocês podem ajudar em casa. Depois, vocês conhecem o professor conselheiro do seu filho na sala nova.',

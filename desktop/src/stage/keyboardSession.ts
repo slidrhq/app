@@ -4,9 +4,9 @@ import type { HANDLES } from './geometry';
 
 /*
  * Where the keyboard is on the Stage and in the Filmstrip, beyond the selection (UI-06): the
- * crop handle or the point of a line the arrows move, and the element or the slide the selection
- * walk stands on. It is kept here and not in the components' own state, so the host can say it
- * in words to a screen reader, as it says the selection. And the way a registered shortcut
+ * crop handle, the point of a line or the adjustment handle of a shape the arrows move, and the
+ * element or the slide the selection walk stands on. It is kept here and not in the components'
+ * own state, so the host can say it in words to a screen reader, as it says the selection. And the way a registered shortcut
  * reaches the Stage or the Filmstrip, whichever has the keyboard.
  */
 
@@ -20,19 +20,27 @@ export interface StageKeys {
   handle: HandleName | null;
   /** The point of the selected line the arrows move; null: they move the line itself. */
   point: number | null;
+  /** The adjustment handle of the selected shape the arrows move (ADR-133); null: none. */
+  adjust: number | null;
   /** The element the selection walk stands on, which may or may not be selected. */
   cursor: string | null;
   /** The slide the walk stands on in the Filmstrip, which may or may not be selected. */
   slide: string | null;
 }
 
-const NOWHERE: StageKeys = { handle: null, point: null, cursor: null, slide: null };
+const NOWHERE: StageKeys = {
+  handle: null,
+  point: null,
+  adjust: null,
+  cursor: null,
+  slide: null,
+};
 
 export const stageKeys = createStore<StageKeys>(() => NOWHERE);
 
 export function resetStageKeys(): void {
-  const { handle, point, cursor, slide } = stageKeys.getState();
-  if (handle !== null || point !== null || cursor !== null || slide !== null) {
+  const { handle, point, adjust, cursor, slide } = stageKeys.getState();
+  if (handle !== null || point !== null || adjust !== null || cursor !== null || slide !== null) {
     stageKeys.setState(NOWHERE);
   }
 }
@@ -50,7 +58,9 @@ export type StageCommand =
    * Stage's only while it has the keyboard; the menu asks whatever has it.
    */
   | { type: 'points'; fromMenu?: boolean }
-  /** The next or the previous crop handle, or point of the line. */
+  /** Goes into the adjustment handles of the one selected shape, from the menu (ADR-133). */
+  | { type: 'adjust' }
+  /** The next or the previous crop handle, point of the line, or adjustment handle. */
   | { type: 'part'; step: 1 | -1 }
   /** A new point after the one the keyboard is on, or that point removed. */
   | { type: 'point.add' }

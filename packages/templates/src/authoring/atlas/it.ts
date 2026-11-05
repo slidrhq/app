@@ -19,6 +19,7 @@ export const it: AtlasCopy = {
   },
   agenda: {
     name: 'Ordine del giorno',
+    kicker: 'Apertura',
     title: 'Di cosa parliamo oggi',
     intro:
       'Venticinque minuti su ciò che quattordici città portuali hanno imparato quest’anno sul riuso e sulla dissalazione dell’acqua, e su ciò che chiederemo poi a ogni partner. Poi le vostre domande.',

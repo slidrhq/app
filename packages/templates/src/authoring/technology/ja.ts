@@ -10,6 +10,7 @@ export const ja: TechnologyCopies = {
     ],
     section: ['1つのリージョン', '一度の障害が、すべての決済を止めていました。'],
     agenda: {
+      kicker: 'アジェンダ',
       title: '本日の内容',
       lead: [
         '決済基盤に、なぜ1つのリージョンでは足りなくなったのか。',
@@ -107,6 +108,7 @@ export const ja: TechnologyCopies = {
     hero: ['10年間、', '電池1本で', 'スマート水道メーターWM-10。試作から量産まで。'],
     section: ['消費電力の設計', '10年間を支える、1マイクロアンペアの積み重ね。'],
     agenda: {
+      kicker: 'アジェンダ',
       title: '今回のレビューの論点',
       lead: [
         '4月のDVT移行を、4つの測定可能な答えで判断します。',
@@ -207,6 +209,7 @@ export const ja: TechnologyCopies = {
     hero: ['日々の業務を', '自動運転に', 'Zrima 2.0がツールをつなぎ、繰り返し作業を引き受けます。'],
     section: ['新しくなったこと', 'ご要望の3機能と、もう1つのサプライズ。'],
     agenda: {
+      kicker: 'タイムテーブル',
       title: '今夜のプログラム',
       lead: [
         '30分で紹介する、Zrima 2.0の新機能と開発の理由。',

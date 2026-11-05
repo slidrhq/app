@@ -1,4 +1,4 @@
-// PowerPoint files: a deck to .pptx and back (ADR-108).
+// PowerPoint files: a deck to .pptx and back (ADR-132).
 export {
   exportPptx,
   type ElementPicture,

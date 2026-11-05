@@ -11,6 +11,7 @@ export const vi: DofekCopy = {
   },
   agenda: {
     name: 'Chương trình',
+    kicker: 'Trước khi bắt đầu',
     title: 'Nội dung hôm nay',
     intro:
       'Hai mươi phút về những gì chương trình đã thay đổi, điều gì diễn ra trên phố khi một trái tim ngừng đập, và những đề xuất của chúng tôi với hội đồng cho năm 2027. Sau đó là phần hỏi đáp.',

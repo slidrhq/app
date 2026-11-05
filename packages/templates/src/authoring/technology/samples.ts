@@ -43,6 +43,7 @@ function translated(
   const oldBody = find('text').content.body;
   const leadStyle = rich(oldBody) ? oldBody.paragraphs[0]! : para('');
   put('text', copy.agenda.title, {
+    caption: text(copy.agenda.kicker),
     title: text(copy.agenda.title),
     body: {
       paragraphs: [

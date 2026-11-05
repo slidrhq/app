@@ -17,6 +17,7 @@ export const tr: TaaruchaCopy = {
   },
   agenda: {
     name: 'Bu sabah',
+    kicker: 'Basın ve müze dostlarına',
     title: 'Bu sabahki önizleme',
     intro:
       'Kırk dakika boyunca, iki yıllık inşaatın ardından koleksiyonu nasıl yeniden astığımızı ve açılıştan itibaren ziyaretçiler için nelerin değiştiğini anlatacağız. Ardından ilk salonları gezeceğiz.',

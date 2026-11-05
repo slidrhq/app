@@ -17,6 +17,7 @@ export const de: TaaruchaCopy = {
   },
   agenda: {
     name: 'Heute Vormittag',
+    kicker: 'Für Presse und Förderer',
     title: 'Unser Rundgang heute Vormittag',
     intro:
       'Vierzig Minuten darüber, wie wir die Sammlung nach zwei Jahren Bauzeit neu gehängt haben und was sich für Besucher ab dem ersten Öffnungstag ändert. Danach ein Gang durch die ersten Säle.',

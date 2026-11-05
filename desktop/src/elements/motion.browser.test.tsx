@@ -5,7 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 import { backgroundCommands, motionElement } from './motion';
 import { motionBackgrounds } from './motionBackgrounds';
-import { motionPieces } from './motionPieces';
+import { motionPictures, motionPieces, type LinePiece } from './motionPieces';
 
 /*
  * The animations and the backgrounds of Elements (ADR-127) as the renderer draws them, in Edge:
@@ -62,7 +62,7 @@ function at(picture: ShadowRoot, seconds: number): string {
 const SMIL = 'animate, animateMotion, animateTransform';
 
 describe('an animation drawn on a slide', () => {
-  it.each(motionPieces().map((piece) => [piece.id, piece] as const))(
+  it.each(motionPictures().map((piece) => [piece.id, piece] as const))(
     '%s keeps its motion through the cleaning, and moves',
     (_id, piece) => {
       const deck = createDeck({ lang: 'en' });
@@ -84,7 +84,7 @@ describe('an animation drawn on a slide', () => {
     const deck = createDeck({ lang: 'en' });
     deck.theme.colors.text = '#123456';
     deck.theme.colors.accent = '#e11d48';
-    const orbit = motionPieces().find((piece) => piece.id === 'orbit')!;
+    const orbit = motionPictures().find((piece) => piece.id === 'orbit')!;
     const picture = draw(deck, createSlide({ elements: [motionElement(orbit, deck)] }));
     // The dots that travel are hidden until SMIL shows them, and it does.
     at(picture, 1);
@@ -102,7 +102,7 @@ describe('an animation drawn on a slide', () => {
 
   it('fills a frame far wider than its drawing with waves, from side to side', () => {
     const deck = createDeck({ lang: 'en' });
-    const waves = motionPieces().find((piece) => piece.id === 'waves')!;
+    const waves = motionPictures().find((piece) => piece.id === 'waves')!;
     // As wide as the slide and 60 high: 32 times as wide as high, the widest they are made for.
     const element = { ...motionElement(waves, deck), frame: { x: 0, y: 500, w: 1920, h: 60 } };
     const picture = draw(deck, createSlide({ elements: [element] }));
@@ -123,6 +123,44 @@ describe('an animation drawn on a slide', () => {
     const fade = getComputedStyle(picture.querySelector('svg')!).maskImage;
     expect(fade).toContain('min(16%, 26.88px)');
   });
+});
+
+describe('an animation that is a line (ADR-131)', () => {
+  const lines = motionPieces().filter((piece): piece is LinePiece => piece.kind === 'line');
+
+  it('is the boxes on a path and the flowing connector', () => {
+    expect(lines.map((piece) => piece.id)).toEqual(['conveyor', 'flowArrow']);
+  });
+
+  it.each(lines.map((piece) => [piece.id, piece] as const))(
+    '%s is drawn as a line whose dashes flow, with its riders on it',
+    (_id, piece) => {
+      const deck = createDeck({ lang: 'en' });
+      deck.theme.colors.secondary = '#123456';
+      const element = motionElement(piece, deck);
+      host = document.createElement('div');
+      document.body.append(host);
+      root = createRoot(host);
+      flushSync(() =>
+        root!.render(
+          <SlideRenderer deck={deck} slide={createSlide({ elements: [element] })} mode="present" />,
+        ),
+      );
+      const box = host.querySelector(`[data-element-id="${element.id}"]`)!;
+      // A line, not a picture: nothing of it is in a shadow root.
+      expect(box.querySelector('[data-slidr-svg]')).toBeNull();
+      const stroke = box.querySelector<SVGPathElement>('svg > path')!;
+      expect(getComputedStyle(stroke).stroke).toBe('rgb(18, 52, 86)');
+      const flows = stroke.getAnimations() as CSSAnimation[];
+      expect(flows.map((animation) => animation.animationName)).toEqual(['slidr-flow']);
+      const riders = Array.from(box.querySelectorAll('[data-slidr-riders] > g'));
+      const { flow } = piece.line;
+      expect(riders).toHaveLength(flow.rider && flow.rider !== 'none' ? (flow.count ?? 3) : 0);
+      for (const rider of riders) {
+        expect((rider.getAnimations()[0] as CSSAnimation).animationName).toBe('slidr-ride');
+      }
+    },
+  );
 });
 
 describe('a background drawn behind a slide', () => {

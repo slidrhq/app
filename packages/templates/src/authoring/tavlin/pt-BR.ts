@@ -17,6 +17,7 @@ export const ptBR: TavlinCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Para nossos parceiros',
     title: 'No cardápio de hoje',
     intro:
       'Quarenta minutos sobre como o Sete Especiarias passou de feira de fim de semana a festival de quarenta e um mil visitantes, e sobre o que pedimos a cada parceiro para maio. Depois, suas perguntas, com um chá.',

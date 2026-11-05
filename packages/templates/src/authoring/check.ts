@@ -57,9 +57,10 @@ function coversTheSlide(d: Element): boolean {
 /**
  * The text slide (ADR-094): the body from margin to margin, about 1600px wide, set from the top
  * of its card or panel, which runs down to over the foot; the title across the slide, or beside
- * no more than a small accent. Its sample, in every language, is a lead and four points that
- * each open with a few words in bold. Whether the lead takes two lines and a point one, only
- * the renders show.
+ * no more than a small accent; the kicker over the title and the footer in the foot, as on the
+ * text-and-image slide (ADR-135). Its sample, in every language, fills the kicker and the
+ * footer, and is a lead and four points that each open with a few words in bold. Whether the
+ * lead takes two lines and a point one, only the renders show.
  */
 export function textSlideGaps(template: Template, samples: Authored['samples']): string[] {
   const layout = template.layouts.find((l) => l.archetype === 'text');
@@ -80,8 +81,21 @@ export function textSlideGaps(template: Template, samples: Authored['samples']):
     );
   if (title && title.frame.w < 1300)
     problems.push(`${layout.id}: the title is ${title.frame.w}px wide; it runs across the slide`);
+  const kicker = layout.placeholders.find((p) => p.role === 'caption');
+  const meet = (a: Layout['placeholders'][number], b: Layout['placeholders'][number]) =>
+    a.frame.x < b.frame.x + b.frame.w &&
+    b.frame.x < a.frame.x + a.frame.w &&
+    a.frame.y < b.frame.y + b.frame.h &&
+    b.frame.y < a.frame.y + a.frame.h;
+  for (const other of [title, body])
+    if (kicker && other && meet(kicker, other))
+      problems.push(`${layout.id}: the kicker runs into the ${other.role}`);
   for (const lang of languagesOf(samples)) {
     const slide = samples[lang]!.find((s) => s.layout === layout.id);
+    if (slide && (!slide.content.caption || !slide.content.footer))
+      problems.push(
+        `${lang} sample of ${layout.id}: fill its kicker and its footer, as the text-and-image slide's`,
+      );
     const fill = slide?.content.body;
     const paragraphs = fill && !Array.isArray(fill) && 'paragraphs' in fill ? fill.paragraphs : [];
     const lead = paragraphs.filter((p) => !p.list);

@@ -1417,21 +1417,23 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a card of paper from margin to margin, down to over the foot, from its
-      // top; a seedling grows out of the card's corner, beside the title.
+      // top; a seedling grows out of the card's corner, beside the title. The kicker over the
+      // title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 260, 1, false).placeholders,
-        place('p_body', 'body', at(START + 72, 284, WIDTH - 144, 600), 'body'),
+        ...head('text', WIDTH - 260, 1).placeholders,
+        place('p_body', 'body', at(START + 72, 300, WIDTH - 144, 584), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', WIDTH - 260, 1, false).decorations,
-        card('d_sade_text_card', at(START, 222, WIDTH, 700)),
-        art('d_sade_text_bed', at(START, 222, WIDTH, 14), bed(WIDTH, 14, 91)),
+        ...head('text', WIDTH - 260, 1).decorations,
+        card('d_sade_text_card', at(START, 238, WIDTH, 684)),
+        art('d_sade_text_bed', at(START, 238, WIDTH, 14), bed(WIDTH, 14, 91)),
         art(
           'd_sade_text_seedling',
-          atEnd(END + 50, 70, 150, 156),
+          atEnd(END + 50, 86, 150, 156),
           `<path d="M18 156Q75 136 132 156Z" fill="${LOAM}"/>` + sprout(75, 148, 100),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1868,6 +1870,7 @@ function drawSample(copy: SadeCopy): SampleSlide[] {
       layout: 'l_sade_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1878,6 +1881,7 @@ function drawSample(copy: SadeCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

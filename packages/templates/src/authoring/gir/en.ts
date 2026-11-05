@@ -17,6 +17,7 @@ export const en: GirCopy = {
   },
   agenda: {
     name: 'Tonight',
+    kicker: 'Welcome',
     title: 'Tonight, in forty minutes',
     intro:
       'Forty minutes on how Grade 7 will learn this year, what changes in the classroom and how you can help at home. Then you will meet your child’s homeroom teacher in the new classroom.',

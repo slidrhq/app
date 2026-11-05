@@ -11,6 +11,7 @@ export const zhCN: DofekCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '开始之前',
     title: '今天我们要谈的内容',
     intro: [
       '这二十分钟里，我们将介绍项目带来了哪些改变、如今街头有人心脏骤停时会发生什么，',

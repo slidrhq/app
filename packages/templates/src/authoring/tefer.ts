@@ -1074,13 +1074,15 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a sheet of pattern paper from margin to margin, down to over the foot,
-      // from its top; two pins hold its corner, beside the title.
+      // from its top; two pins hold its corner, beside the title. The kicker over the title and
+      // the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 220, 1, false).placeholders,
+        ...head('text', WIDTH - 220, 1).placeholders,
         place('p_body', 'body', at(START + 56, 232 + 54, WIDTH - 112, 600), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', WIDTH - 220, 1, false).decorations,
+        ...head('text', WIDTH - 220, 1).decorations,
         lifted(
           art(
             'd_tefer_text_sheet',
@@ -1106,7 +1108,7 @@ function layouts(): Layout[] {
           atEnd(END - 56, 166, 180, 112),
           pin(40, 22, 32, 96) + pin(150, 30, 148, 92, IVORY),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1565,6 +1567,7 @@ function drawSample(copy: TeferCopy): SampleSlide[] {
       layout: 'l_tefer_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1575,6 +1578,7 @@ function drawSample(copy: TeferCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

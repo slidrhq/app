@@ -17,6 +17,7 @@ export const de: GirCopy = {
   },
   agenda: {
     name: 'Heute Abend',
+    kicker: 'Herzlich willkommen',
     title: 'Heute Abend, in vierzig Minuten',
     intro:
       'Vierzig Minuten darüber, wie Klasse 7 in diesem Jahr lernt, was sich im Unterricht ändert und wie Sie zu Hause helfen können. Danach lernen Sie die Klassenleitung Ihres Kindes im neuen Klassenzimmer kennen.',

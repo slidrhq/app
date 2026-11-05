@@ -20,6 +20,7 @@ export const fr: HadranCopy = {
   },
   setlist: {
     name: 'Setlist',
+    kicker: 'Lancement de saison',
     title: 'La setlist de ce soir',
     intro: `Quarante minutes sur la saison à venir${N}: ce que la dernière nous a appris, les douze disques que nous sortirons, les dix-huit villes de la tournée et notre école. Ensuite, le bar ouvre et le groupe joue.`,
     items: [

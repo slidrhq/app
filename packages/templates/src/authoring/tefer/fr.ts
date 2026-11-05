@@ -17,6 +17,7 @@ export const fr: TeferCopy = {
   },
   agenda: {
     name: 'Ordre du jour',
+    kicker: 'Présentation aux acheteurs',
     title: 'Sur la table ce matin',
     intro:
       'Quarante minutes sur une collection de vingt-quatre manteaux\u00a0: d’où vient son étoffe, comment nous la coupons pour qu’il ne reste presque rien au sol, et comment la commander pour l’automne. Puis les manteaux eux-mêmes, sur le portant.',

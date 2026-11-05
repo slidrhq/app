@@ -15,7 +15,7 @@ import { en, he } from './messages';
 import { backgroundCommands, backgroundWith, motionElement, shownMotionBackground } from './motion';
 import { motionBackgrounds } from './motionBackgrounds';
 import { GLINT, INK, inkOverrides } from './motionKit';
-import { MOTION_GROUPS, motionPieces } from './motionPieces';
+import { MOTION_GROUPS, motionPictures, motionPieces, type LinePiece } from './motionPieces';
 
 /*
  * The animations and the backgrounds of Elements (ADR-127): pictures that move by themselves,
@@ -24,9 +24,12 @@ import { MOTION_GROUPS, motionPieces } from './motionPieces';
  */
 
 const pieces = motionPieces();
+/** The animations that are pictures; the others are lines (ADR-131). */
+const pictures = motionPictures();
+const lines = pieces.filter((p): p is LinePiece => p.kind === 'line');
 const backgrounds = motionBackgrounds();
 const all = [
-  ...pieces.map((p) => ({ kind: 'animation', id: p.id, markup: p.markup, moves: true })),
+  ...pictures.map((p) => ({ kind: 'animation', id: p.id, markup: p.markup, moves: true })),
   ...backgrounds.map((b) => ({
     kind: 'background',
     id: b.id,
@@ -108,7 +111,7 @@ describe('the catalog', () => {
 describe('an animation on a slide', () => {
   it('is an svg element in the middle of the slide, in the theme colours it uses', () => {
     const deck = createDeck({ lang: 'en' });
-    for (const piece of pieces) {
+    for (const piece of pictures) {
       const element = motionElement(piece, deck);
       expect(elementSchemas.svg.safeParse(element).success).toBe(true);
       expect(element.frame).toEqual({
@@ -130,17 +133,71 @@ describe('an animation on a slide', () => {
   it('runs from side to side in the reading direction of the deck', () => {
     const rtl = createDeck({ lang: 'he' });
     expect(rtl.meta.dir).toBe('rtl');
-    const arrow = pieces.find((p) => p.id === 'flowArrow')!;
-    const orbit = pieces.find((p) => p.id === 'orbit')!;
-    expect(motionElement(arrow, rtl).flipH).toBe(true);
+    const drawn = pictures.find((p) => p.id === 'draw')!;
+    const orbit = pictures.find((p) => p.id === 'orbit')!;
+    expect(motionElement(drawn, rtl).flipH).toBe(true);
     expect(motionElement(orbit, rtl).flipH).toBeUndefined();
+    // A line is not mirrored: it is drawn from its other end, as a new line is.
+    const arrow = lines.find((p) => p.id === 'flowArrow')!;
+    const line = motionElement(arrow, rtl);
+    expect(line.flipH).toBeUndefined();
+    expect(line.points).toEqual(arrow.line.points.map((p) => ({ x: arrow.size.w - p.x, y: p.y })));
   });
 
   it('steps aside from what stands in the middle already', () => {
     const deck = createDeck({ lang: 'en' });
-    const piece = pieces[0]!;
-    const first = motionElement(piece, deck);
-    expect(motionElement(piece, deck, [first.frame]).frame).not.toEqual(first.frame);
+    for (const piece of [pictures[0]!, lines[0]!]) {
+      const first = motionElement(piece, deck);
+      expect(motionElement(piece, deck, [first.frame]).frame).not.toEqual(first.frame);
+    }
+  });
+});
+
+describe('an animation that is a line (ADR-131)', () => {
+  it('is the boxes on a path and the flowing connector', () => {
+    expect(lines.map((p) => p.id)).toEqual(['conveyor', 'flowArrow']);
+  });
+
+  it.each(lines.map((piece) => [piece.id, piece] as const))(
+    '%s lands as a line from end to end of its frame, in the theme colours, flowing',
+    (_id, piece) => {
+      const deck = createDeck({ lang: 'en' });
+      const element = motionElement(piece, deck);
+      expect(elementSchemas.line.safeParse(element).success).toBe(true);
+      expect(element.name).toBe(`animation-${piece.id}`);
+      expect(element.frame).toEqual({
+        x: Math.round((1920 - piece.size.w) / 2),
+        y: Math.round((1080 - piece.size.h) / 2),
+        ...piece.size,
+      });
+      // Its points span its frame, which has no room of its own around them: the line is
+      // what is selected, by its ends.
+      const xs = element.points.map((p) => p.x);
+      const ys = element.points.map((p) => p.y);
+      expect([Math.min(...xs), Math.max(...xs)]).toEqual([0, piece.size.w]);
+      expect([Math.min(...ys), Math.max(...ys)]).toEqual([0, piece.size.h]);
+      expect(element.curve).toBe('curved');
+      // The theme's colours, and dashes that something runs along.
+      expect(element.stroke.color).toHaveProperty('token');
+      if (element.flow?.color) expect(element.flow.color).toHaveProperty('token');
+      expect(element.stroke.dash).toBe('dashed');
+      expect(element.flow?.speed).toBeGreaterThan(0);
+      // A copy of its own: changing it does not change the catalogue.
+      element.points[0]!.x = 999;
+      element.flow!.speed = 1;
+      expect(piece.line.points[0]!.x).not.toBe(999);
+      expect(piece.line.flow.speed).not.toBe(1);
+    },
+  );
+
+  it('carries boxes on the path, and only dashes on the connector', () => {
+    const conveyor = lines.find((p) => p.id === 'conveyor')!;
+    expect(conveyor.line.flow).toMatchObject({ rider: 'box', count: 4 });
+    expect(conveyor.line.startHead).toBe('none');
+    expect(conveyor.line.endHead).toBe('none');
+    const arrow = lines.find((p) => p.id === 'flowArrow')!;
+    expect(arrow.line.flow.rider ?? 'none').toBe('none');
+    expect(arrow.line.endHead).toBe('triangle');
   });
 });
 
@@ -166,7 +223,7 @@ describe('a background on a slide', () => {
     elements: [createElement.svg({ frame: { x: 0, y: 0, w: 10, h: 10 }, markup: '<svg/>' })],
   };
   const drawing = (dir: 'rtl' | 'ltr') =>
-    motionElement(pieces[0]!, createDeck({ lang: dir === 'rtl' ? 'he' : 'en' }));
+    motionElement(pictures[0]!, createDeck({ lang: dir === 'rtl' ? 'he' : 'en' }));
 
   it('keeps the ground of the slide and takes the place of its drawing', () => {
     const mine = drawing('ltr');

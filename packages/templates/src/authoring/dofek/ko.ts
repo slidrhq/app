@@ -11,6 +11,7 @@ export const ko: DofekCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '시작하기 전에',
     title: '오늘 말씀드릴 내용',
     intro: [
       '20분 동안 프로그램이 무엇을 바꾸었는지, 길에서 심장이 멈추면 지금 어떤 일이 일어나는지,',

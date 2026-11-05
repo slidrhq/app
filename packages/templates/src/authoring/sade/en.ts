@@ -17,6 +17,7 @@ export const en: SadeCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Members’ assembly',
     title: 'What we will cover this morning',
     intro:
       'Forty minutes on the 2026 harvest: what we grew, how much water it took and what the soil told us. Then the plan for the 2027 season, and time for your questions.',

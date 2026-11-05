@@ -22,6 +22,7 @@ export const fr: MaslulCopy = {
   },
   agenda: {
     name: 'Ce soir',
+    kicker: 'Pour nos adhérents',
     title: 'Au programme ce soir',
     intro: `Quarante minutes pour les athlètes, les parents et les entraîneurs${N}: le déroulé de la saison 2027, ce qui change en mars sur notre propre piste et le programme de chaque groupe. Questions à la fin.`,
     items: [

@@ -17,6 +17,7 @@ export const es: SadeCopy = {
   },
   agenda: {
     name: 'Orden del día',
+    kicker: 'Asamblea de socios',
     title: 'Lo que veremos esta mañana',
     intro:
       'Cuarenta minutos sobre la cosecha de 2026: qué cultivamos, cuánta agua hizo falta y qué nos contó el suelo. Después, el plan para la temporada 2027 y tiempo para sus preguntas.',

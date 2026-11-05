@@ -17,6 +17,7 @@ export const de: TeferCopy = {
   },
   agenda: {
     name: 'Tagesordnung',
+    kicker: 'Präsentation für Einkäufer',
     title: 'Was heute Morgen auf dem Tisch liegt',
     intro:
       'Vierzig Minuten über eine Kollektion von vierundzwanzig Mänteln: woher ihr Stoff kommt, wie wir ihn so zuschneiden, dass fast nichts auf dem Boden bleibt, und wie Sie sie für den Herbst bestellen. Danach die Mäntel selbst, am Ständer.',

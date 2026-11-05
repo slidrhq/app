@@ -17,6 +17,7 @@ export const ko: AtlasCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '시작하며',
     title: '오늘의 안건',
     intro: [
       '25분 동안 14개 항구 도시가 올해 물 재이용과 해수 담수화에 대해 배운 것,',

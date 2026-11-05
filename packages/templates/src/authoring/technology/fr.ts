@@ -10,6 +10,7 @@ export const fr: TechnologyCopies = {
     ],
     section: ['Une seule région', 'Une panne suffisait à bloquer tous les paiements.'],
     agenda: {
+      kicker: 'Ordre du jour',
       title: 'Au programme aujourd’hui',
       lead: [
         'Pourquoi une région ne suffisait plus à notre cœur de paiements.',
@@ -118,6 +119,7 @@ export const fr: TechnologyCopies = {
     ],
     section: ['Le budget énergétique', 'Chaque microampère compte pendant dix ans.'],
     agenda: {
+      kicker: 'Ordre du jour',
       title: 'Les questions de cette revue',
       lead: [
         'Quatre réponses mesurables décident du passage en DVT en avril.',
@@ -238,6 +240,7 @@ export const fr: TechnologyCopies = {
     ],
     section: ['Les nouveautés', 'Trois demandes de votre part, et une surprise.'],
     agenda: {
+      kicker: 'Le déroulé',
       title: 'Le programme de ce soir',
       lead: [
         'Trente minutes sur les nouveautés de Zrima 2.0 et nos choix.',

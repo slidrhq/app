@@ -810,23 +810,25 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a chart sheet from margin to margin, down to over the foot, from its top;
-      // a small monitor tab with a beat stands on the sheet's corner, beside the title.
+      // a small monitor tab with a beat stands on the sheet's corner, beside the title. The
+      // kicker over the title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 220, 1, false).placeholders,
-        place('p_body', 'body', at(START + 64, 278, WIDTH - 120, 600), 'body'),
+        ...head('text', WIDTH - 220, 1).placeholders,
+        place('p_body', 'body', at(START + 64, 294, WIDTH - 120, 584), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', WIDTH - 220, 1, false).decorations,
-        card('d_dofek_text_sheet', at(START, 216, WIDTH, 708)),
+        ...head('text', WIDTH - 220, 1).decorations,
+        card('d_dofek_text_sheet', at(START, 232, WIDTH, 692)),
         art(
           'd_dofek_text_band',
-          at(START, 216, WIDTH, 14),
+          at(START, 232, WIDTH, 14),
           `<path d="M0 18A18 18 0 0 1 18 0H${WIDTH - 18}A18 18 0 0 1 ${WIDTH} 18V14H0Z" fill="${TEAL}"/>`,
         ),
-        rect('d_dofek_text_margin', at(START + 32, 262, 2.5, 620), solid(token('secondary', 0.5))),
+        rect('d_dofek_text_margin', at(START + 32, 278, 2.5, 604), solid(token('secondary', 0.5))),
         art(
           'd_dofek_text_tab',
-          atEnd(END + 32, 180, 210, 70),
+          atEnd(END + 32, 196, 210, 70),
           `<rect x="0" y="0" width="210" height="70" rx="16" fill="${INK}"/>` +
             `<rect x="6" y="6" width="198" height="58" rx="11" stroke="${WHITE}" stroke-opacity=".1" stroke-width="1.5"/>` +
             fromStart(
@@ -842,7 +844,7 @@ function layouts(): Layout[] {
               ),
             ),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1439,6 +1441,7 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       layout: 'l_dofek_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1449,6 +1452,7 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

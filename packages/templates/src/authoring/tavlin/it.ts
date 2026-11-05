@@ -17,6 +17,7 @@ export const it: TavlinCopy = {
   },
   agenda: {
     name: 'Ordine del giorno',
+    kicker: 'Per i nostri partner',
     title: 'Oggi nel menù',
     intro:
       'Quaranta minuti su come Sette Spezie è passato da mercato del fine settimana a festival da quarantunomila ospiti, e su ciò che chiediamo a ogni partner per maggio. Poi le vostre domande, davanti a un tè.',

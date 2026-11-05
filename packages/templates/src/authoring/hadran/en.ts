@@ -17,6 +17,7 @@ export const en: HadranCopy = {
   },
   setlist: {
     name: 'Setlist',
+    kicker: 'Season launch',
     title: 'Tonight’s setlist',
     intro:
       'Forty minutes on the season ahead: what the last one taught us, the twelve records we will release, the eighteen cities of the tour and our school. Then the bar opens and the band plays.',

@@ -10,7 +10,7 @@ import { newDocumentFrom } from '../shell/fileActions';
 import { openImportReport } from './open';
 
 /*
- * Importing a PowerPoint file (ADR-108): the file is read whole, turned into a deck, and opened
+ * Importing a PowerPoint file (ADR-132): the file is read whole, turned into a deck, and opened
  * as a new document, its pictures and media stored with it. Nothing of the open document goes
  * until the new one is ready, and the question about unsaved changes is asked first, as for any
  * document that takes the place of the open one. A report says what came in otherwise than it

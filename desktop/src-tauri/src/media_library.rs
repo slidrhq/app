@@ -393,7 +393,7 @@ impl MediaLibrary {
 
     /// A large file of the library as it is published now, as [`Self::read_fresh`] reads one,
     /// unless it is the very file `have` names by its SHA-256. It is not kept in the cache:
-    /// whoever asks for it keeps what it makes of it (an agent's package, ADR-125).
+    /// whoever asks for it keeps what it makes of it (an agent's package, ADR-130).
     pub async fn fetch_fresh(&self, path: &str, have: Option<&str>) -> Fetched {
         let Some(current) = self.fresh_manifest().await else {
             return Fetched::Unavailable;

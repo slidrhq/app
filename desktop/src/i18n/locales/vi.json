@@ -1574,6 +1574,21 @@
         "swing": "Góc lắc lư",
         "blink": "Độ mạnh nhấp nháy"
       },
+      "flow": {
+        "title": "Dọc theo đường",
+        "kind": {
+          "none": "Không",
+          "dashes": "Nét đứt",
+          "box": "Hộp",
+          "dot": "Chấm"
+        },
+        "speed": "Pixel mỗi giây",
+        "forward": "Về cuối",
+        "back": "Về đầu",
+        "count": "Số lượng",
+        "size": "Kích thước",
+        "color": "Màu"
+      },
       "hint": "Chuyển động lặp lại khi trang chiếu đang hiển thị: trong trình soạn thảo, khi trình chiếu và trong tệp đã xuất."
     }
   },
@@ -3001,6 +3016,7 @@
       "editData": "Chỉnh sửa dữ liệu",
       "editCells": "Chỉnh sửa ô",
       "editPoints": "Chỉnh sửa điểm",
+      "adjust": "Điều chỉnh hình",
       "order": "Thứ tự lớp"
     },
     "toolbar": {
@@ -3012,7 +3028,7 @@
       "walk": "Chuyển đến đối tượng tiếp theo hoặc trước đó (hoặc trang chiếu, trong dải trang chiếu) mà không chọn",
       "toggle": "Thêm vào vùng chọn hoặc bỏ khỏi vùng chọn",
       "points": "Vào chế độ chỉnh điểm của đường kẻ, và thoát ra",
-      "part": "Điểm tiếp theo hoặc trước đó của đường kẻ; tay cắt xén tiếp theo hoặc trước đó",
+      "part": "Điểm tiếp theo hoặc trước đó của đường kẻ; tay điều chỉnh tiếp theo hoặc trước đó của hình; tay cắt xén tiếp theo hoặc trước đó",
       "addPoint": "Thêm điểm vào đường kẻ",
       "removePoint": "Xóa điểm khỏi đường kẻ",
       "lock": "Khóa và mở khóa",
@@ -3020,6 +3036,7 @@
     },
     "at": {
       "point": "Điểm {{n}}/{{total}}. Dùng phím mũi tên để di chuyển.",
+      "adjust": "Tay điều chỉnh {{n}}/{{total}}. Dùng phím mũi tên để di chuyển.",
       "picture": "Cắt xén: phím mũi tên di chuyển ảnh. Ctrl+mũi tên lên hoặc xuống thay đổi kích thước ảnh. Tab chuyển đến các tay cắt xén.",
       "handle": "Tay cắt xén: {{where}}. Dùng phím mũi tên để di chuyển.",
       "walkSelected": "{{what}}: nằm trong vùng chọn",

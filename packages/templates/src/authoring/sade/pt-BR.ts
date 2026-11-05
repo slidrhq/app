@@ -17,6 +17,7 @@ export const ptBR: SadeCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Assembleia dos cooperados',
     title: 'O que vamos ver nesta manhã',
     intro:
       'Quarenta minutos sobre a safra de 2026: o que plantamos, quanta água foi preciso e o que o solo nos contou. Depois, o plano para a safra 2027 e tempo para as suas perguntas.',

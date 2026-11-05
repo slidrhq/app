@@ -17,6 +17,7 @@ export const ko: GirCopy = {
   },
   agenda: {
     name: '오늘 저녁',
+    kicker: '환영합니다',
     title: '오늘 저녁, 40분 동안',
     intro: [
       '40분 동안 올해 1학년이 어떻게 배우는지, 교실에서 무엇이 달라지는지,',

@@ -17,6 +17,7 @@ export const zhCN: AtlasCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '开场',
     title: '今天的议程',
     intro: [
       '这二十五分钟里，我们将介绍十四座港口城市今年在水的再利用与海水淡化方面学到了什么，',

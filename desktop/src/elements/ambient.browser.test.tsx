@@ -4,7 +4,7 @@ import { flushSync } from 'react-dom';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 import { motionElement, pieceMarkup } from './motion';
-import { motionPieces } from './motionPieces';
+import { motionPictures } from './motionPieces';
 import { MOTION_SHAPES, motionShapeElement } from './motionShapes';
 
 /*
@@ -74,7 +74,7 @@ describe('an animated shape drawn on a slide', () => {
 describe('an animation of Elements at another speed', () => {
   it('runs every part of its stylesheet in half the time at twice the speed', () => {
     const deck = createDeck({ lang: 'en' });
-    const orbit = motionPieces().find((piece) => piece.id === 'orbit')!;
+    const orbit = motionPictures().find((piece) => piece.id === 'orbit')!;
     const durations = (element: SvgElement) => {
       const slide = draw(deck, [element]);
       const picture = slide.querySelector('[data-slidr-svg]')!.shadowRoot!;

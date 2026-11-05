@@ -34,7 +34,8 @@ const FOOT_ZONE = 24;
  * The simple text layout every template offers, including older personal templates. A template
  * that draws its own keeps them; for one that does not they are made from its content slides:
  * the title on one line where their title stands, the body right under it, and the ground, the
- * frame and the foot (rule, mark, slide number) those slides have.
+ * frame and the foot (rule, mark, slide number) those slides have, with the kicker over their
+ * title and their footer, as the text-and-image slide seats them.
  */
 export function withStandardLayouts(template: Template): Template {
   template = withoutTitleLayout(template);
@@ -67,6 +68,17 @@ export function withStandardLayouts(template: Template): Template {
 
   // The foot: what the source draws from its footer, or from its mark and number, downwards.
   const foot = source ? footTop(source) : undefined;
+  // The head and the foot the text-and-image slide seats too (ROLE_CONTRACT): the kicker that
+  // stands over the source's title, the nearest above it, and the footer of its foot.
+  const kicker = source?.placeholders
+    .filter(
+      (place) =>
+        place.role === 'caption' && box !== undefined && place.frame.y + place.frame.h <= box.y + 4,
+    )
+    .sort((a, b) => b.frame.y - a.frame.y)[0];
+  const footer = source?.placeholders.find((place) => place.role === 'footer');
+  const seated = (place: Placeholder | undefined, id: string): Placeholder[] =>
+    place ? [{ ...(JSON.parse(JSON.stringify(place)) as Placeholder), id }] : [];
   const bodyTop = top + line + Math.round(line * 0.6);
   const bodyBottom = Math.max((foot ?? SLIDE_HEIGHT - 140) - FOOT_GAP, bodyTop + line);
 
@@ -115,6 +127,7 @@ export function withStandardLayouts(template: Template): Template {
       name: 'Text',
       archetype: 'text',
       placeholders: [
+        ...seated(kicker, 'p_kicker'),
         title(),
         {
           id: 'p_body',
@@ -124,6 +137,7 @@ export function withStandardLayouts(template: Template): Template {
           align: 'start',
           vAlign: 'top',
         },
+        ...seated(footer, 'p_footer'),
       ],
       ...drawn('text'),
     });

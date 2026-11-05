@@ -13,7 +13,7 @@ export type { ElementPicture, PptxExportOptions, PptxExportResult } from './cont
 /*
  * A deck as a PowerPoint file (ECMA-376, the transitional schemas PowerPoint writes): one master
  * on the deck's theme, a layout for each of the deck's layouts the slides use, and the slides,
- * every object an object of PowerPoint's where it has one. See docs/adr/ADR-108-powerpoint-files.md.
+ * every object an object of PowerPoint's where it has one. See docs/adr/ADR-132-powerpoint-files.md.
  */
 
 const BLANK = '';

@@ -6,6 +6,7 @@ export const zhCN: TechnologyCopies = {
     hero: ['支付服务', '跨越三个区域', '将支付核心迁至三个活跃区域，全程不中断服务。'],
     section: ['只有一个区域', '一次故障，就会让所有支付停止。'],
     agenda: {
+      kicker: '议程',
       title: '今天我们讨论什么',
       lead: [
         '为什么单一区域已无法满足支付核心的需求。',
@@ -95,6 +96,7 @@ export const zhCN: TechnologyCopies = {
     hero: ['十年运行，', '一节电池', 'WM-10智能水表：从原型走向生产。'],
     section: ['功耗预算', '十年里，每一微安都重要。'],
     agenda: {
+      kicker: '议程',
       title: '本次评审的四个问题',
       lead: [
         '四个可测量的答案，决定四月能否进入DVT阶段。',
@@ -191,6 +193,7 @@ export const zhCN: TechnologyCopies = {
     hero: ['日常运营，', '自动运行', 'Zrima 2.0连接工作工具，替您处理重复事务。'],
     section: ['有哪些新功能', '三个您期待的功能，再加一个惊喜。'],
     agenda: {
+      kicker: '活动流程',
       title: '今晚的安排',
       lead: [
         '三十分钟，介绍Zrima 2.0的新功能与背后的设计选择。',

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import type { SvgElement } from '@slidr/model';
+import type { LineElement, SvgElement } from '@slidr/model';
 import {
   currentSlide,
   deck,
@@ -74,11 +74,15 @@ test('an animation lands in the middle of the slide, selected, and moves there',
   expect(motion.smil).toBeGreaterThan(0);
   expect(motion.paused).toBe(false);
 
-  // An arrow runs in the reading direction of the deck: mirrored in one that reads from the right.
+  // A connector is a line (ADR-131), and runs in the reading direction of the deck: from its
+  // right end in one that reads from the right, as a new line is.
   await view.locator('[data-animation="flowArrow"]').click();
-  const arrow = await selected<SvgElement>(page);
+  const arrow = await selected<LineElement>(page);
+  expect(arrow.type).toBe('line');
   expect(arrow.name).toBe('animation-flowArrow');
-  expect(arrow.flipH).toBe((await deck(page)).meta.dir === 'rtl' ? true : undefined);
+  const rtl = (await deck(page)).meta.dir === 'rtl';
+  const [from, to] = [arrow.points[0]!, arrow.points.at(-1)!];
+  expect(rtl ? from.x > to.x : from.x < to.x).toBe(true);
   // Beside the first one, not on it.
   expect(arrow.frame).not.toEqual(element.frame);
 
@@ -87,6 +91,73 @@ test('an animation lands in the middle of the slide, selected, and moves there',
   expect((await currentSlide(page)).elements.some((e) => e.name?.startsWith('animation-'))).toBe(
     false,
   );
+});
+
+test('boxes on a path are a line: its ends are dragged, and the boxes ride it', async ({
+  page,
+}) => {
+  const panel = await openCollection(page, 'animations', 'en');
+  const view = panel.locator('[data-collection-view="animations"]');
+  const before = await undoDepth(page);
+  await view.locator('[data-animation="conveyor"]').click();
+  const conveyor = await selected<LineElement>(page);
+  expect(conveyor).toMatchObject({
+    type: 'line',
+    name: 'animation-conveyor',
+    curve: 'curved',
+    flow: { rider: 'box', count: 4 },
+  });
+  expect(await undoDepth(page)).toBe(before + 1);
+
+  // Selected as a line is: a handle on each end, and no box with handles to resize it by,
+  // only the handle that turns it, as any line has.
+  const surface = page.getByTestId('stage-surface');
+  await expect(surface.locator('[data-line-point]')).toHaveCount(2);
+  await expect(surface.locator('[data-handle]:not([data-handle="rotate"])')).toHaveCount(0);
+
+  // Its dashes flow and four boxes ride it, on the stage.
+  const running = await onStage(page, conveyor.id).evaluate((box) => ({
+    dashes: box
+      .querySelector('svg > path')!
+      .getAnimations()
+      .map((a) => (a as CSSAnimation).animationName),
+    riders: Array.from(box.querySelectorAll('[data-slidr-riders] > g'), (rider) =>
+      rider.getAnimations().map((a) => a.playState),
+    ),
+  }));
+  expect(running.dashes).toEqual(['slidr-flow']);
+  expect(running.riders).toEqual([['running'], ['running'], ['running'], ['running']]);
+  await page.screenshot({ path: 'test-results/elements/conveyor-line-en.png' });
+
+  // Its end, dragged out, makes the line longer; the boxes go the longer way.
+  const end = surface.locator('[data-line-point="1"]');
+  const at = (await end.boundingBox())!;
+  await page.mouse.move(at.x + at.width / 2, at.y + at.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(at.x + at.width / 2 + 120, at.y + at.height / 2 - 60, { steps: 6 });
+  await page.mouse.up();
+  const longer = await selected<LineElement>(page);
+  expect(longer.id).toBe(conveyor.id);
+  expect(longer.frame.w).toBeGreaterThan(conveyor.frame.w + 100);
+  expect(longer.frame.h).toBeGreaterThan(conveyor.frame.h + 40);
+  expect(longer.points).toHaveLength(2);
+  expect(longer.flow).toEqual(conveyor.flow);
+  await expect(surface.locator('[data-line-point]')).toHaveCount(2);
+
+  // Row B's Motion tool changes what rides it: dots, then nothing but the dashes.
+  await page.getByRole('button', { name: 'Motion', exact: true }).click();
+  const tool = page.getByTestId('motion-tool');
+  await expect(tool.locator('[data-flow="box"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: 'test-results/elements/conveyor-motion-tool-en.png' });
+  await tool.locator('[data-flow="dot"]').click();
+  expect((await selected<LineElement>(page)).flow?.rider).toBe('dot');
+  await tool.locator('[data-flow="dashes"]').click();
+  expect((await selected<LineElement>(page)).flow?.rider).toBeUndefined();
+  await expect(onStage(page, conveyor.id).locator('[data-slidr-riders]')).toHaveCount(0);
+  await tool.locator('[data-flow="none"]').click();
+  expect((await selected<LineElement>(page)).flow).toBeUndefined();
+  await undo(page);
+  expect((await selected<LineElement>(page)).flow).toMatchObject({ speed: conveyor.flow!.speed });
 });
 
 test('an animation tile is still, and moves while the pointer is on it', async ({ page }) => {

@@ -1,6 +1,6 @@
-# ADR-125 — An agent of the organization's own, as a package of its library
+# ADR-130 — An agent of the organization's own, as a package of its library
 
-Status: Implemented on 2026-11-05 in the working trees of the app and of Slidr Library; not committed at the time of this record, and the library not deployed. It adds to [ADR-117](ADR-117-system-settings-from-the-library.md) a third way to install an agent of the organization's own, beside WinGet and npm.
+Status: Implemented on 2026-11-05 in the working trees of the app and of Slidr Library; not committed at the time of this record, and the library not deployed. It adds to [ADR-117](ADR-117-system-settings-from-the-library.md) a third way to install an agent of the organization's own, beside WinGet and npm. Written as ADR-125 by a session that worked at the same time as the one that wrote [ADR-125](ADR-125-a-drawing-in-the-background.md), and numbered 130 on 2026-11-05; code built before that, such as a build of Slidr Library, may still call it ADR-125.
 
 ## Request
 

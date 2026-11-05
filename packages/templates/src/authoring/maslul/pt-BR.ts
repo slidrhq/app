@@ -19,6 +19,7 @@ export const ptBR: MaslulCopy = {
   },
   agenda: {
     name: 'Hoje à noite',
+    kicker: 'Para nossos sócios',
     title: 'A reunião de hoje',
     intro:
       'Quarenta minutos para atletas, pais e técnicos: como vai ser a temporada 2027, o que muda quando passarmos para a nossa própria pista em março e como cada grupo vai treinar. No final, perguntas.',

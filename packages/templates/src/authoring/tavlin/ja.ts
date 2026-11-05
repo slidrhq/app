@@ -18,6 +18,7 @@ export const ja: TavlinCopy = {
   },
   agenda: {
     name: 'アジェンダ',
+    kicker: 'パートナーの皆さまへ',
     title: '本日のメニュー',
     intro: [
       '40分間で、七つのスパイスが週末の市場から来場者4万1000人のフェスティバルへと育った道のりと、',

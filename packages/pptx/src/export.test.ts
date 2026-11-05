@@ -15,7 +15,7 @@ import { child, children, descendants, parseXml, path, type XmlElement } from '.
 import { readZip } from './zip';
 
 /*
- * The export (ADR-108): what a deck becomes in a PowerPoint file, read back as XML.
+ * The export (ADR-132): what a deck becomes in a PowerPoint file, read back as XML.
  */
 
 const decoder = new TextDecoder();

@@ -17,6 +17,7 @@ export const it: TaaruchaCopy = {
   },
   agenda: {
     name: 'Stamattina',
+    kicker: 'Per stampa e mecenati',
     title: 'L’anteprima di stamattina',
     intro:
       'Quaranta minuti su come abbiamo riallestito la collezione dopo due anni di lavori, e su cosa cambia per i visitatori dal giorno dell’apertura. Poi una passeggiata nelle prime sale.',

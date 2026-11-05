@@ -1331,21 +1331,24 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text on a patch of the board, ruled by hand from margin to margin down to over the
-      // foot, and set from its top; an hourglass beside the title.
+      // foot, and set from its top; an hourglass beside the title. The kicker over the title
+      // and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', 1480, 1, false).placeholders,
-        place('p_body', 'body', at(START + 64, 270, WIDTH - 128, 610), 'body'),
+        ...head('text', 1480, 1).placeholders,
+        // The body's start on the footer's, by the same edge.
+        place('p_body', 'body', at(START + 62, 286, WIDTH - 126, 594), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
         board('d_gir_text_board'),
-        ...head('text', 1480, 1, false).decorations,
-        rect('d_gir_text_patch', at(START, 216, WIDTH, 712), solid(token('surface', 0.5)), {
+        ...head('text', 1480, 1).decorations,
+        rect('d_gir_text_patch', at(START, 232, WIDTH, 696), solid(token('surface', 0.5)), {
           effects: { radius: 4 },
         }),
         chalk(
           'd_gir_text_rule',
-          at(START - 12, 204, WIDTH + 24, 736),
-          twice((k) => ruled(12, 12, WIDTH, 712, k, 9), 61, CHALK, 3.2),
+          at(START - 12, 220, WIDTH + 24, 720),
+          twice((k) => ruled(12, 12, WIDTH, 696, k, 9), 61, CHALK, 3.2),
         ),
         chalk(
           'd_gir_text_hourglass',
@@ -1378,7 +1381,7 @@ function layouts(): Layout[] {
             pen(hand([30, 34], [62, 34], 3, 0, 0.3) + hand([28, 108], [64, 108], 4, 0, 0.3), YELLOW, 7, 0.85) +
             pen(hand([46, 66], [46, 100], 5, 0, 0.2), YELLOW, 3, 0.85),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1843,6 +1846,7 @@ function drawSample(copy: GirCopy, books?: number): SampleSlide[] {
       layout: 'l_gir_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1853,6 +1857,7 @@ function drawSample(copy: GirCopy, books?: number): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

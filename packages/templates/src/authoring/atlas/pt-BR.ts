@@ -17,6 +17,7 @@ export const ptBR: AtlasCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Abertura',
     title: 'O que vamos ver hoje',
     intro:
       'Vinte e cinco minutos sobre o que catorze cidades portuárias aprenderam este ano sobre reúso e dessalinização da água, e sobre o que vamos pedir a cada parceiro daqui em diante. Depois, suas perguntas.',

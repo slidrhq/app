@@ -10,6 +10,7 @@ export const ko: TechnologyCopies = {
     ],
     section: ['단 하나의 리전', '한 번의 장애가 모든 결제를 멈추게 했습니다.'],
     agenda: {
+      kicker: '목차',
       title: '오늘 다룰 내용',
       lead: [
         '결제 핵심 시스템에 하나의 리전으로는 부족했던 이유를 살펴봅니다.',
@@ -111,6 +112,7 @@ export const ko: TechnologyCopies = {
     hero: ['10년 동안,', '배터리 하나로', '스마트 수도 계량기 WM-10, 시제품에서 생산까지.'],
     section: ['전력 예산', '10년 동안 모든 마이크로암페어가 중요합니다.'],
     agenda: {
+      kicker: '안건',
       title: '이번 검토의 질문',
       lead: [
         '측정 가능한 네 가지 답으로 4월 DVT 진입을 결정합니다.',
@@ -211,6 +213,7 @@ export const ko: TechnologyCopies = {
     hero: ['운영 업무를', '자동으로', 'Zrima 2.0이 도구를 연결하고 반복 업무를 처리합니다.'],
     section: ['새로운 기능', '요청하신 세 가지와 하나의 깜짝 소식.'],
     agenda: {
+      kicker: '진행 순서',
       title: '오늘 저녁 프로그램',
       lead: [
         '30분 동안 Zrima 2.0의 새 기능과 개발 이유를 소개합니다.',

@@ -233,7 +233,7 @@ export async function newDocument(editor: Editor, start?: Deck): Promise<boolean
 }
 
 /**
- * A new document made from a file the app imports (a PowerPoint file, ADR-108). `build` makes
+ * A new document made from a file the app imports (a PowerPoint file, ADR-132). `build` makes
  * the deck and stores the file's pictures and media with the new document, through the store
  * it is given; the open document stays until the deck is ready, and stays when `build` throws,
  * which the caller reports. False when the user kept the document that was open.

@@ -17,7 +17,7 @@ export interface HarnessLook {
    * `winget`: Windows App Installer installs the CLI. `npm`: npm installs it, and Windows App
    * Installer first installs Node.js when npm is missing (Gemini CLI is published on npm only).
    * `library`: the app downloads its package from the organization's library, and from nowhere
-   * else (ADR-125). `organization`: the organization installs it; the app does not.
+   * else (ADR-130). `organization`: the organization installs it; the app does not.
    */
   installer: 'winget' | 'npm' | 'library' | 'organization';
 }

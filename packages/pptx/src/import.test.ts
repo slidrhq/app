@@ -17,7 +17,7 @@ import { markedPicture, memoryStore } from './testing';
 import { readZip, writeZip } from './zip';
 
 /*
- * The import (ADR-108): a file another tool wrote, read into a deck; and a deck sent out to
+ * The import (ADR-132): a file another tool wrote, read into a deck; and a deck sent out to
  * PowerPoint and read back, which comes back as it went.
  */
 

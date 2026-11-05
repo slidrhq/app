@@ -17,6 +17,7 @@ export const it: SadeCopy = {
   },
   agenda: {
     name: 'Ordine del giorno',
+    kicker: 'Assemblea dei soci',
     title: 'Di cosa parleremo stamattina',
     intro:
       'Quaranta minuti sul raccolto 2026: che cosa abbiamo coltivato, quanta acqua è servita e che cosa ci ha detto il suolo. Poi il piano per la stagione 2027 e spazio alle vostre domande.',

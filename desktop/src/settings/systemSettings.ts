@@ -32,7 +32,7 @@ export interface CustomAgent {
   tone?: string;
   /**
    * How the app installs its CLI; without it, the organization does. `package`: from the
-   * organization's library, a .zip unpacked into a folder of the agent's own (ADR-125).
+   * organization's library, a .zip unpacked into a folder of the agent's own (ADR-130).
    */
   install?:
     | { winget: string; source?: string }

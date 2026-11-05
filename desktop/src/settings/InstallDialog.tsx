@@ -6,7 +6,7 @@ import type { InstallDescription } from '../agent/harnessLook';
  * The approval a CLI's installation needs before `HarnessSetup.run(id, 'install')`: asked for the
  * agent's harness, and for the CLI an image provider runs on. `description` says how the CLI is
  * installed (`installDescription` of `harnessLook.ts`): by Windows App Installer; with npm, after
- * Node.js when it is missing; or from the organization's library (ADR-125).
+ * Node.js when it is missing; or from the organization's library (ADR-130).
  */
 export function InstallDialog({
   name,

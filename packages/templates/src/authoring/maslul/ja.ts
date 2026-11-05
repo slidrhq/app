@@ -17,6 +17,7 @@ export const ja: MaslulCopy = {
   },
   agenda: {
     name: '今夜の説明会',
+    kicker: '会員の皆さまへ',
     title: '今夜の説明会',
     intro: [
       '選手・保護者・コーチのための40分間です。2027年シーズンの流れ、3月に自前のトラックへ移ると何が変わるか、',

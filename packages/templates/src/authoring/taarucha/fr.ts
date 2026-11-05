@@ -20,6 +20,7 @@ export const fr: TaaruchaCopy = {
   },
   agenda: {
     name: 'Ce matin',
+    kicker: 'Presse et mécènes',
     title: 'La visite de ce matin',
     intro:
       'Quarante minutes sur la façon dont nous avons réaccroché les collections après deux ans de travaux, et sur ce qui change pour les visiteurs dès l’ouverture. Puis une promenade dans les premières salles.',

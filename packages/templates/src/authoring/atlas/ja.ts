@@ -17,6 +17,7 @@ export const ja: AtlasCopy = {
   },
   agenda: {
     name: 'アジェンダ',
+    kicker: 'はじめに',
     title: '本日のアジェンダ',
     intro: [
       'この25分では、14の港湾都市が今年、水の再利用と海水淡水化について学んだことと、',

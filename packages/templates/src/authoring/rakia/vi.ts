@@ -17,6 +17,7 @@ export const vi: RakiaCopy = {
   },
   agenda: {
     name: 'Tối nay',
+    kicker: 'Buổi giới thiệu',
     title: 'Tối nay, bốn phần',
     intro:
       'Bốn mươi phút về chiếc kính thiên văn đón ánh sao đầu tiên trong tuần này, những gì nó sẽ quan sát trong mùa đầu tiên, và cách mỗi trường đại học đối tác chia sẻ các đêm quan sát. Sau đó chúng ta mở mái vòm.',

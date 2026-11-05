@@ -5,7 +5,7 @@ import { ltr } from '../export/exportDeck';
 import { warningLines } from './exportPptx';
 
 /**
- * What a conversion could not carry over as it was (ADR-108), one line for each kind of warning
+ * What a conversion could not carry over as it was (ADR-132), one line for each kind of warning
  * and what it is about, with the slides it is on.
  */
 export function WarningList({

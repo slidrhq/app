@@ -11,6 +11,7 @@ export const ko: HonCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '정기 총회',
     title: '오늘 밤의 안건',
     intro: [
       '40분 동안 여러분이 주인인 은행의 2026년을 보고드립니다. 얼마를 빌려드렸고, 얼마를 자본으로 쌓았으며,',

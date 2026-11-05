@@ -17,6 +17,7 @@ export const zhCN: MaslulCopy = {
   },
   agenda: {
     name: '今晚',
+    kicker: '致俱乐部会员',
     title: '今晚的说明会',
     intro: [
       '这四十分钟面向运动员、家长和教练：2027 赛季如何安排，三月搬到我们自己的跑道后有哪些变化，',

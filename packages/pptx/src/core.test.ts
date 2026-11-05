@@ -6,7 +6,7 @@ import { el, esc, parseXml, child, children, textOf } from './xml';
 import { crc32, isCompoundFile, readZip, writeZip } from './zip';
 
 /*
- * The parts under the conversions (ADR-108): the ZIP container, the XML of the parts, the paths
+ * The parts under the conversions (ADR-132): the ZIP container, the XML of the parts, the paths
  * between relationships, outlines between SVG and DrawingML, and colours.
  */
 

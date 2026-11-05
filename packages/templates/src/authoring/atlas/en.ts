@@ -17,6 +17,7 @@ export const en: AtlasCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Opening',
     title: 'On today’s agenda',
     intro:
       'Twenty-five minutes on what fourteen port cities learned this year about reusing and desalinating water, and on what we will ask of every partner next. Then your questions.',

@@ -48,14 +48,28 @@ describe('the standard text layout', () => {
       };
       const complete = withStandardLayouts(older);
       const table = tzuk.layouts.find((layout) => layout.archetype === 'table')!;
+      const seat = (layout: typeof table, role: string) =>
+        layout.placeholders.find((place) => place.role === role)!;
       for (const archetype of ['text'] as const) {
         const layout = complete.layouts.find((l) => l.archetype === archetype)!;
-        expect(layout.placeholders[0]!.frame.y).toBe(
-          table.placeholders.find((place) => place.role === 'title')!.frame.y,
-        );
+        expect(seat(layout, 'title').frame.y).toBe(seat(table, 'title').frame.y);
+        // The kicker over the title and the footer, where the table seats them, as the text and
+        // image slide seats them too.
+        expect(layout.placeholders.map((place) => place.role)).toEqual([
+          'caption',
+          'title',
+          'body',
+          'footer',
+        ]);
+        const kicker = table.placeholders.find(
+          (place) =>
+            place.role === 'caption' &&
+            place.frame.y + place.frame.h <= seat(table, 'title').frame.y + 4,
+        )!;
+        expect(seat(layout, 'caption').frame).toEqual(kicker.frame);
+        expect(seat(layout, 'footer').frame).toEqual(seat(table, 'footer').frame);
         // The brass rule over the title, and the rule, the mark and the number of the foot, under
-        // ids of their own; nothing of the table itself, and no footer: the layouts seat only what
-        // they are asked for.
+        // ids of their own; nothing of the table itself.
         expect(layout.decorations.map((d) => d.id)).toEqual([
           `d_tzuk_table_tick_${archetype}`,
           `d_tzuk_table_rule_${archetype}`,

@@ -11,6 +11,7 @@ export const id: HonCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Rapat Anggota Tahunan',
     title: 'Agenda malam ini',
     intro:
       'Empat puluh menit tentang tahun 2026 bank milik Anda: berapa yang kami pinjamkan, berapa yang kami simpan sebagai modal, dan apa yang kembali kepada Anda sebagai anggota. Lalu pemungutan suara dan pertanyaan Anda.',

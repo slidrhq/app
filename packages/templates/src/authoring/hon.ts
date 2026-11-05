@@ -926,27 +926,30 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a ledger sheet from margin to margin, down to over the foot, from its
-      // top; a small seal is pressed on the sheet's corner, beside the title.
+      // top; a small seal is pressed on the sheet's corner, beside the title. The kicker over
+      // the title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 280, 1, false).placeholders,
-        place('p_body', 'body', at(START + 60, 290, WIDTH - 100, 590), 'body'),
+        ...head('text', WIDTH - 280, 1).placeholders,
+        // The body's start on the footer's, by the same edge.
+        place('p_body', 'body', at(START + 62, 300, WIDTH - 102, 580), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', WIDTH - 280, 1, false).decorations,
-        card('d_hon_text_sheet', at(START, 232, WIDTH, 696)),
-        headBand('d_hon_text_band', at(START, 232, WIDTH, 22)),
-        ledgerRule('d_hon_text_ledger', at(START + 24, 254, 8, 674)),
+        ...head('text', WIDTH - 280, 1).decorations,
+        card('d_hon_text_sheet', at(START, 242, WIDTH, 686)),
+        headBand('d_hon_text_band', at(START, 242, WIDTH, 22)),
+        ledgerRule('d_hon_text_ledger', at(START + 24, 264, 8, 664)),
         lifted(
           art(
             'd_hon_text_seal',
-            atEnd(END + 40, 150, 124, 124),
+            atEnd(END + 40, 160, 124, 124),
             `<circle cx="62" cy="62" r="61" fill="${WHITE}"/>` + rosetteSmall(62, 62, 58),
           ),
           6,
           14,
           0.16,
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1445,6 +1448,7 @@ function drawSample(copy: HonCopy): SampleSlide[] {
       layout: 'l_hon_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1455,6 +1459,7 @@ function drawSample(copy: HonCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

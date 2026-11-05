@@ -19,6 +19,7 @@ export const de: MaslulCopy = {
   },
   agenda: {
     name: 'Heute Abend',
+    kicker: 'Für unsere Mitglieder',
     title: 'Die Themen des Abends',
     intro:
       'Vierzig Minuten für Athleten, Eltern und Trainer: wie die Saison 2027 läuft, was sich im März mit dem Umzug auf unsere eigene Bahn ändert und wie jede Gruppe trainiert. Am Ende Ihre Fragen.',

@@ -1,6 +1,6 @@
-# ADR-108 — PowerPoint files in and out
+# ADR-132 — PowerPoint files in and out
 
-Status: Implemented on 2026-10-20. It takes back one line of the README, "Out of scope: PowerPoint (`.pptx`) compatibility". Its File menu items were merged with HTML's by [ADR-119](ADR-119-one-import-one-export.md) on 2026-10-28: one "Import…" for both kinds of file, and one "Export…" whose dialog chooses the format first.
+Status: Implemented on 2026-10-20. It takes back one line of the README, "Out of scope: PowerPoint (`.pptx`) compatibility". Its File menu items were merged with HTML's by [ADR-119](ADR-119-one-import-one-export.md) on 2026-10-28: one "Import…" for both kinds of file, and one "Export…" whose dialog chooses the format first. Written as ADR-108 on the same day as [ADR-108](ADR-108-search-tags.md), which was committed first, and numbered 132 on 2026-11-05; its commit (`c8d1583`, "Import and export PowerPoint presentations (ADR-108)") keeps the old number.
 
 ## Request
 

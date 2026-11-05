@@ -11,6 +11,7 @@ export const id: DofekCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Sebelum kita mulai',
     title: 'Yang akan kita bahas hari ini',
     intro:
       'Dua puluh menit tentang apa yang telah diubah program ini, apa yang kini terjadi di jalan saat jantung seseorang berhenti, dan apa yang kami minta dari dewan untuk 2027. Setelah itu, sesi tanya jawab.',

@@ -15,10 +15,19 @@ import {
   type LineElement,
   type Point,
   type SelectionStore,
+  type ShapeElement,
   type Slide,
   type TextElement,
 } from '@slidr/model';
-import { SlideRenderer, type AssetResolver, type HtmlSlot, type TextSlot } from '@slidr/renderer';
+import {
+  adjustDefaults,
+  adjustHandles,
+  adjustTo,
+  SlideRenderer,
+  type AssetResolver,
+  type HtmlSlot,
+  type TextSlot,
+} from '@slidr/renderer';
 import { keyboardInUse, useKeyboardInUse } from '@slidr/ui';
 import { freshFrame, freshTextBackground } from '../elements/frames';
 import { cardGround } from '../objects/card';
@@ -103,6 +112,7 @@ import {
   removeLinePoint,
 } from './line';
 import {
+  AdjustHandles,
   AgentMark,
   Beside,
   CropOverlay,
@@ -295,6 +305,17 @@ type Gesture =
       snapBoxes: Frame[];
     }
   | {
+      kind: 'adjust';
+      txId: string;
+      /** The shape as the drag found it: a drag changes its values and nothing else. */
+      located: Located & { element: ShapeElement };
+      /** From the slide to the shape's own pixels, mirrored as it is drawn. */
+      inverse: Matrix;
+      index: number;
+      /** From the press to where the handle really is, which may be drawn a little aside. */
+      grab: Point;
+    }
+  | {
       kind: 'crop-resize' | 'crop-pan' | 'crop-scale';
       txId: string;
       start: Point;
@@ -387,6 +408,47 @@ function sharedPath(items: readonly { path: GroupElement[] }[]): GroupElement[] 
 
 const isLine = (located: Located): located is Located & { element: LineElement } =>
   located.element.type === 'line';
+
+/** How many adjustment handles a shape has: one for each value its preset has (ADR-133). */
+function adjustCount(shape: ShapeElement): number {
+  const { geometry, frame } = shape;
+  return geometry.kind === 'preset'
+    ? adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust).length
+    : 0;
+}
+
+/** A shape with values to set by its handles. */
+const isAdjustable = (located: Located): located is Located & { element: ShapeElement } =>
+  located.element.type === 'shape' && adjustCount(located.element) > 0;
+
+/** Where adjustment handle `index` of a shape is, in its own pixels. */
+function adjustPoint(shape: ShapeElement, index: number): Point | undefined {
+  const { geometry, frame } = shape;
+  return geometry.kind === 'preset'
+    ? adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust)[index]?.at
+    : undefined;
+}
+
+/**
+ * The shape with the values of handle `index` set so that the handle comes to `at`, in the
+ * shape's own pixels; undefined when the values stay what they were.
+ */
+function adjustPatch(shape: ShapeElement, index: number, at: Point): Patch | undefined {
+  const geometry = shape.geometry;
+  if (geometry.kind !== 'preset') return undefined;
+  const adjust = adjustTo(
+    geometry.preset,
+    index,
+    shape.frame.w,
+    shape.frame.h,
+    geometry.adjust ?? [],
+    at,
+  );
+  // What it has now, its defaults filled in as the renderer draws it.
+  const now = adjustDefaults(geometry.preset)?.map((d, i) => geometry.adjust?.[i] ?? d);
+  if (!adjust || adjust.every((v, i) => v === now?.[i])) return undefined;
+  return { geometry: { ...geometry, adjust } };
+}
 
 /**
  * The box crop mode works in: the image's own, or, in a drawn frame (`smartFrame`), the opening
@@ -671,6 +733,11 @@ export function Stage({
     single && isLine(single) && !single.locked && !editingId && keys.point !== null
       ? Math.min(keys.point, single.element.points.length - 1)
       : null;
+  // The adjustment handle of the selected shape that the arrows move (ADR-133).
+  const adjustAt =
+    single && isAdjustable(single) && !single.locked && !editingId && keys.adjust !== null
+      ? Math.min(keys.adjust, adjustCount(single.element) - 1)
+      : null;
   // The crop handle that the arrows move; without one they move the picture under the frame.
   // The opening of a drawn frame has no handles: its picture is all there is to move.
   const handleAt = crop && !crop.view.outer ? keys.handle : null;
@@ -684,10 +751,11 @@ export function Stage({
   useEffect(() => {
     const own = toggling.current;
     toggling.current = false;
-    const { point, cursor } = stageKeys.getState();
-    // A point belongs to the line that was selected, and the walk to the selection it started from.
-    if (point !== null || (cursor !== null && !own)) {
-      stageKeys.setState({ point: null, cursor: own ? cursor : null });
+    const { point, adjust, cursor } = stageKeys.getState();
+    // A point belongs to the line that was selected, a handle to the shape, and the walk to the
+    // selection it started from.
+    if (point !== null || adjust !== null || (cursor !== null && !own)) {
+      stageKeys.setState({ point: null, adjust: null, cursor: own ? cursor : null });
     }
   }, [selectedKey, currentSlideId]);
   useEffect(() => resetStageKeys, []);
@@ -1105,6 +1173,29 @@ export function Stage({
       return;
     }
 
+    // An adjustment handle of the selected shape sets one of its values (ADR-133).
+    const adjustIndex = dataOf(e.target, 'adjust-handle');
+    if (adjustIndex !== undefined && single && isAdjustable(single) && !single.locked) {
+      const index = Number(adjustIndex);
+      const own = elementMatrix(single, true);
+      const at = adjustPoint(single.element, index);
+      if (at) {
+        const real = apply(own, at);
+        begin(
+          {
+            kind: 'adjust',
+            txId: newId('tx'),
+            located: single,
+            inverse: invert(own),
+            index,
+            grab: { x: real.x - p.x, y: real.y - p.y },
+          },
+          { handle: `adjust-${index}` },
+        );
+        return;
+      }
+    }
+
     const pointIndex = dataOf(e.target, 'line-point');
     if (pointIndex !== undefined && single && isLine(single) && !single.locked) {
       begin({
@@ -1519,6 +1610,24 @@ export function Stage({
         commit(g.txId, 'Rotate', g.path, rotateTogether(elements, g.center, angle));
         return;
       }
+      if (g.kind === 'adjust') {
+        const shape = g.located.element;
+        const to = apply(g.inverse, { x: p.x + g.grab.x, y: p.y + g.grab.y });
+        // Against the shape as the drag found it: the values of its other handles are kept.
+        const patch = adjustPatch(shape, g.index, to);
+        // Back where it began, the shape has its own values again, if the drag had changed them.
+        const live = liveIndex().get(shape.id)?.element;
+        const changed = live?.type === 'shape' && live.geometry !== shape.geometry;
+        if (patch || changed) {
+          commit(
+            g.txId,
+            'Adjust shape',
+            g.located.path,
+            new Map([[shape.id, patch ?? { geometry: shape.geometry }]]),
+          );
+        }
+        return;
+      }
       if (g.kind === 'line-point') {
         const line = g.located.element;
         const space = g.located.space;
@@ -1923,6 +2032,12 @@ export function Stage({
         selection.getState().stopEditing();
         return;
       }
+      // Out of the adjustment handles of a shape, as out of the points of a line.
+      if (adjustAt !== null) {
+        e.preventDefault();
+        stageKeys.setState({ adjust: null });
+        return;
+      }
       const target = single && !single.locked ? single.element : undefined;
       if (target?.type === 'text' || target?.type === 'shape') {
         e.preventDefault();
@@ -1963,6 +2078,7 @@ export function Stage({
       else if (crop || htmlId) selection.getState().stopEditing();
       // Out of the points of a line, or off the selection walk: the selection itself stays.
       else if (pointAt !== null) stageKeys.setState({ point: null });
+      else if (adjustAt !== null) stageKeys.setState({ adjust: null });
       else if (walkAt) stageKeys.setState({ cursor: null });
       else if (scope.length) {
         // Out of the group, one level: the group itself is selected.
@@ -1977,7 +2093,7 @@ export function Stage({
     // Among the crop handles and among the points of a line Tab goes from one to the next, and
     // Delete takes a point out: those are shortcuts of the registry (`register.tsx`), which hears
     // the key after this handler has let it pass.
-    const inParts = Boolean(crop) || pointAt !== null;
+    const inParts = Boolean(crop) || pointAt !== null || adjustAt !== null;
     if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey && !e.altKey && !inParts && !htmlId) {
       // Tab walks the elements of the group being worked in, bottom to top, and Shift+Tab walks
       // back (UI-06). Past either end the key is the browser's again: the selection is cleared
@@ -2056,6 +2172,27 @@ export function Stage({
       commit(burstTx(nudge), 'Edit line', located.path, new Map([[line.id, next]]));
       return;
     }
+    if (adjustAt !== null && plain && single) {
+      // Among the adjustment handles of a shape the arrows move the one the keyboard is on, along
+      // its own way only: an arrow across it leaves the shape as it is (ADR-133).
+      const located = liveIndex().get(single.element.id);
+      if (!located || !isAdjustable(located)) return;
+      const own = elementMatrix(located, true);
+      const at = adjustPoint(located.element, adjustAt);
+      if (!at) return;
+      const real = apply(own, at);
+      const to = apply(invert(own), { x: real.x + by.x, y: real.y + by.y });
+      const patch = adjustPatch(located.element, adjustAt, to);
+      if (patch) {
+        commit(
+          burstTx(nudge),
+          'Adjust shape',
+          located.path,
+          new Map([[located.element.id, patch]]),
+        );
+      }
+      return;
+    }
     if (!crop && !plain) {
       // With Alt the side arrows turn the selection, with Ctrl the arrows size it (UI-06).
       keyTransform(moving, dir, e.altKey ? 'rotate' : 'resize', e.shiftKey);
@@ -2124,6 +2261,13 @@ export function Stage({
       surface.focus({ preventScroll: true });
       return true;
     }
+    if (command.type === 'adjust') {
+      // From the menu, which had the keyboard itself: the Stage takes it, on the first handle.
+      if (!single || !isAdjustable(single) || single.locked || editingId) return false;
+      stageKeys.setState({ adjust: 0, point: null, cursor: null });
+      surface.focus({ preventScroll: true });
+      return true;
+    }
     if (document.activeElement !== surface) return false;
     switch (command.type) {
       case 'pan': {
@@ -2147,7 +2291,7 @@ export function Stage({
               ? 0
               : walk.length - 1
             : (at + command.step + walk.length) % walk.length;
-        stageKeys.setState({ cursor: walk[to]?.element.id ?? null, point: null });
+        stageKeys.setState({ cursor: walk[to]?.element.id ?? null, point: null, adjust: null });
         return true;
       }
       case 'toggle': {
@@ -2157,6 +2301,17 @@ export function Stage({
         return true;
       }
       case 'part': {
+        if (adjustAt !== null && single && isAdjustable(single)) {
+          // Past the last handle, or back from the first, the keyboard leaves the handles and the
+          // Stage, as it leaves the points of a line.
+          const next = adjustAt + command.step;
+          if (next < 0 || next >= adjustCount(single.element)) {
+            stageKeys.setState({ adjust: null });
+            return false;
+          }
+          stageKeys.setState({ adjust: next });
+          return true;
+        }
         if (crop) {
           // The picture itself, then the eight handles, clockwise from the top left corner. The
           // opening of a drawn frame has none.
@@ -2431,6 +2586,14 @@ export function Stage({
               held={held?.handle}
               typing={single === typing}
             />
+            {isAdjustable(single) ? (
+              <AdjustHandles
+                located={single}
+                view={stageView}
+                held={held?.handle}
+                active={adjustAt}
+              />
+            ) : null}
           </>
         ) : null}
         {sized && label ? (

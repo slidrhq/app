@@ -17,6 +17,7 @@ export const fr: TavlinCopy = {
   },
   agenda: {
     name: 'Ordre du jour',
+    kicker: 'Pour nos partenaires',
     title: 'Au menu aujourd’hui',
     intro:
       'Quarante minutes sur Sept Épices, d’un marché du week-end à un festival de quarante et un mille visiteurs, et sur ce que nous demandons à chaque partenaire pour mai. Puis vos questions, autour d’un thé.',

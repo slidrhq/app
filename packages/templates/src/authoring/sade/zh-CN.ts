@@ -17,6 +17,7 @@ export const zhCN: SadeCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '成员大会',
     title: '今天上午的内容',
     intro: [
       '用四十分钟回顾2026年的收成：我们种了什么、用了多少水、土壤告诉了我们什么。',

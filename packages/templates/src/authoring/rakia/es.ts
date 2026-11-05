@@ -17,6 +17,7 @@ export const es: RakiaCopy = {
   },
   agenda: {
     name: 'Esta noche',
+    kicker: 'La sesión informativa',
     title: 'Esta noche, en cuatro partes',
     intro:
       'Cuarenta minutos sobre el telescopio que recibe esta semana su primera luz de estrellas, lo que observará en su primera temporada y cómo cada universidad socia compartirá sus noches. Después abrimos la cúpula.',

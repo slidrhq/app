@@ -51,3 +51,53 @@ describe('an element that repeats a motion, in an exported file', () => {
     }
   });
 });
+
+describe('a line that something runs along, in an exported file', () => {
+  it('flows there, its riders on its path (ADR-131)', async () => {
+    const deck = createDeck({ lang: 'en' });
+    const line = createElement.line({
+      id: 'e_conveyor',
+      frame: { x: 400, y: 400, w: 600, h: 260 },
+      points: [
+        { x: 0, y: 260 },
+        { x: 600, y: 0 },
+      ],
+      stroke: { color: { token: 'secondary' }, width: 4, dash: 'dashed', cap: 'round' },
+      curve: 'curved',
+      flow: { speed: 120, rider: 'box', count: 3, color: { token: 'text' } },
+    });
+    deck.slides = [createSlide({ elements: [line] })];
+
+    const { html } = await exportHtml(deck, { loadAsset: () => Promise.resolve(undefined) });
+    expect(html.match(/@keyframes slidr-flow\{/g)).toHaveLength(1);
+    expect(html.match(/@keyframes slidr-ride\{/g)).toHaveLength(1);
+
+    const frame = document.createElement('iframe');
+    frame.style.cssText = 'position:absolute;left:0;top:0;width:960px;height:540px';
+    const loaded = new Promise((resolve) =>
+      frame.addEventListener('load', resolve, { once: true }),
+    );
+    frame.srcdoc = html;
+    document.body.append(frame);
+    await loaded;
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const page = frame.contentDocument!;
+      const box = page.querySelector<HTMLElement>('[data-element-id="e_conveyor"]')!;
+      const stroke = box.querySelector('svg > path')!;
+      const [flow] = stroke.getAnimations() as CSSAnimation[];
+      expect(flow?.animationName).toBe('slidr-flow');
+      expect(flow?.playState).toBe('running');
+      const riders = Array.from(box.querySelectorAll('[data-slidr-riders] > g'));
+      expect(riders).toHaveLength(3);
+      for (const rider of riders) {
+        const [ride] = rider.getAnimations() as CSSAnimation[];
+        expect(ride?.animationName).toBe('slidr-ride');
+        expect(ride?.playState).toBe('running');
+        expect(getComputedStyle(rider).offsetPath).toContain('path(');
+      }
+    } finally {
+      frame.remove();
+    }
+  });
+});

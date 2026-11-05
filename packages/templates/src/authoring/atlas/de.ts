@@ -17,6 +17,7 @@ export const de: AtlasCopy = {
   },
   agenda: {
     name: 'Tagesordnung',
+    kicker: 'Zum Auftakt',
     title: 'Unsere Themen heute',
     intro:
       'Fünfundzwanzig Minuten darüber, was vierzehn Hafenstädte dieses Jahr über Wiederverwendung und Entsalzung von Wasser gelernt haben und worum wir jeden Partner als Nächstes bitten. Danach Ihre Fragen.',

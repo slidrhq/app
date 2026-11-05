@@ -11,6 +11,7 @@ export const de: DofekCopy = {
   },
   agenda: {
     name: 'Tagesordnung',
+    kicker: 'Bevor wir beginnen',
     title: 'Was wir heute besprechen',
     intro:
       'Zwanzig Minuten dazu, was das Programm verändert hat, was heute auf der Straße geschieht, wenn ein Herz stillsteht, und worum wir den Kreistag für 2027 bitten. Danach beantworten wir gern Ihre Fragen.',

@@ -17,6 +17,7 @@ export const es: GirCopy = {
   },
   agenda: {
     name: 'Esta noche',
+    kicker: 'Bienvenida',
     title: 'Esta noche, en cuarenta minutos',
     intro:
       'Cuarenta minutos sobre cómo aprenderá primero de secundaria este año, qué cambia en el aula y cómo pueden ayudar en casa. Después conocerán al tutor de su hijo o hija en su nueva aula.',

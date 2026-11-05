@@ -79,7 +79,7 @@ pub fn run() {
             app.manage(tool_bridge::ToolBridge::new());
             let (images, stock) = manage_media(app, &root);
             // The organization's agents that come as packages of its library, each installed into
-            // a folder of its own on this machine (ADR-125).
+            // a folder of its own on this machine (ADR-130).
             let packages = custom_agents::CustomAgents::new(
                 app.path().app_local_data_dir()?.join(custom_agents::FOLDER),
                 library.clone(),

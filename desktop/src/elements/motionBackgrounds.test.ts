@@ -32,8 +32,11 @@ function inside(polygon: readonly [number, number][], x: number, y: number): boo
 
 describe('a background that is a field', () => {
   it('runs its traces in from beyond one edge and out beyond the other (flow)', () => {
-    const traces = [...markupOf('flow').matchAll(/<path id="p\d+" d="([^"]+)"/g)].map((m) => m[1]!);
-    expect(traces.length).toBeGreaterThan(10);
+    // Each trace as its lights run along it (`runningLights`), a copy of it for each layer.
+    const traces = [...markupOf('flow').matchAll(/<path class="run" d="([^"]+)"/g)].map(
+      (m) => m[1]!,
+    );
+    expect(traces.length).toBeGreaterThan(20);
     for (const d of traces) {
       const xs = [...d.matchAll(/[ML](-?[\d.]+) /g)].map((m) => Number(m[1]));
       expect(Math.min(...xs)).toBeLessThan(0);
@@ -78,5 +81,28 @@ describe('a background that is a field', () => {
       Number(m[1]),
     );
     expect(Math.min(...opacities)).toBeGreaterThan(0.3);
+  });
+});
+
+describe('lights that run along a trace (flow, ADR-134)', () => {
+  const lights = [...markupOf('flow').matchAll(/<path class="run" ([^>]*)\/>/g)].map((m) => m[1]!);
+
+  it('run by CSS, not by SMIL, each on a path of its own', () => {
+    const markup = markupOf('flow');
+    // SMIL on 64 copies of the traces (`<use>`) took 8 milliseconds of every frame in Edge.
+    expect(markup).not.toMatch(/<animate|<use\b/);
+    expect(markup).toContain('@keyframes run');
+    expect(lights).toHaveLength(32);
+  });
+
+  it('come round to where they started: a round moves them a whole number of dashes', () => {
+    for (const light of lights) {
+      const [dash, gap] = /stroke-dasharray="([\d.]+) ([\d.]+)"/.exec(light)!.slice(1).map(Number);
+      const [from, to] = /--from:(-?[\d.]+)px;--to:(-?[\d.]+)px/.exec(light)!.slice(1).map(Number);
+      // Two lights on a trace: the round is two periods of the dashes.
+      expect((from! - to!) / (dash! + gap!)).toBeCloseTo(2, 3);
+      // At rest, where CSS does not run, the first light has not set out.
+      expect(light).toContain(`stroke-dashoffset="${from}"`);
+    }
   });
 });

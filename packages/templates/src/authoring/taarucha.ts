@@ -438,7 +438,7 @@ const floor = (id: string, top: number) =>
   );
 
 /** The kicker on its tag, and the title, from the top of the wall under the rail. */
-function head(name: string, width = 1200, kicker = true) {
+function head(name: string, width = 1200, kicker = true, titleHeight = 156) {
   if (!kicker) {
     return {
       placeholders: [place('p_title', 'title', at(START + 34, 112, width - 34, 92), 'title')],
@@ -450,7 +450,7 @@ function head(name: string, width = 1200, kicker = true) {
       place('p_kicker', 'caption', at(START + 30, 92, Math.min(900, width - 30), 34), 'caption', {
         color: token('primary'),
       }),
-      place('p_title', 'title', at(START, 130, width, 156), 'title'),
+      place('p_title', 'title', at(START, 130, width, titleHeight), 'title'),
     ],
     decorations: [tag(`d_taarucha_${name}_tag`, at(START, 102, 14, 14))],
   };
@@ -1059,15 +1059,17 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on the panel that opens an exhibition, from margin to margin and down to
-      // over the foot, from its top; two small works hang on nails beside the title.
+      // over the foot, from its top; two small works hang on nails beside the title. The kicker
+      // over a title of one line and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', 1380, false).placeholders,
-        place('p_body', 'body', at(START + 84, 238 + 58, WIDTH - 148, 560), 'body'),
+        ...head('text', 1380, true, 92).placeholders,
+        place('p_body', 'body', at(START + 84, 250 + 58, WIDTH - 148, 548), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', 1380, false).decorations,
-        card('d_taarucha_text_panel', at(START, 238, WIDTH, 676)),
-        rect('d_taarucha_text_band', at(START, 238, 14, 676), solid(token('primary'))),
+        ...head('text', 1380, true, 92).decorations,
+        card('d_taarucha_text_panel', at(START, 250, WIDTH, 664)),
+        rect('d_taarucha_text_band', at(START, 250, 14, 664), solid(token('primary'))),
         rail('d_taarucha_text_rail'),
         art('d_taarucha_text_nail1', atEnd(END + 10, 74, 96, 40), wire(96, 40, 30)),
         framed(
@@ -1093,7 +1095,7 @@ function layouts(): Layout[] {
               .map((c, i) => `<rect x="${100 + i * 26}" y="1" width="20" height="20" fill="${c}"/>`)
               .join(''),
         ),
-        ...foot('text', { footer: false }).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1530,6 +1532,7 @@ function drawSample(copy: TaaruchaCopy): SampleSlide[] {
       layout: 'l_taarucha_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1540,6 +1543,7 @@ function drawSample(copy: TaaruchaCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

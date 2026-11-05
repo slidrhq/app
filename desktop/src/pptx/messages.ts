@@ -1,7 +1,7 @@
 import type { Messages } from '../i18n/he';
 
 /**
- * The strings of PowerPoint export and import (ADR-108). English has the same keys
+ * The strings of PowerPoint export and import (ADR-132). English has the same keys
  * (`registerMessages` checks). What the export card says of every format (its title, the
  * slides, the animations, the buttons) is read from its namespace, `export`. A warning names the
  * slides it is on with `slides`; `{{detail}}` is the font, the file or the kind of object it is

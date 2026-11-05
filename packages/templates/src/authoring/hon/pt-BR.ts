@@ -11,6 +11,7 @@ export const ptBR: HonCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Assembleia geral anual',
     title: 'A pauta desta noite',
     intro:
       'Quarenta minutos sobre o ano de 2026 do banco que é de vocês: quanto emprestamos, quanto guardamos como capital e o que voltou para vocês, associados. Depois, as votações e as suas perguntas.',

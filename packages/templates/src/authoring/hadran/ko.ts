@@ -17,6 +17,7 @@ export const ko: HadranCopy = {
   },
   setlist: {
     name: '세트리스트',
+    kicker: '시즌 개막',
     title: '오늘 밤의 세트리스트',
     intro: [
       '40분 동안 다가올 시즌을 이야기합니다. 지난 시즌에서 배운 것, 발매할 음반 12장,',

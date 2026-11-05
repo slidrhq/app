@@ -17,6 +17,7 @@ export const ja: GirCopy = {
   },
   agenda: {
     name: '今夜の内容',
+    kicker: 'ようこそ',
     title: '今夜の40分',
     intro: [
       'この40分では、1年生が今年どのように学ぶのか、教室で何が変わるのか、',

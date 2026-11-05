@@ -17,6 +17,7 @@ export const it: RakiaCopy = {
   },
   agenda: {
     name: 'Stasera',
+    kicker: 'Il briefing',
     title: 'Stasera, in quattro parti',
     intro:
       'Quaranta minuti sul telescopio che questa settimana riceve la sua prima luce stellare, su ciò che osserverà nella prima stagione e su come ogni università partner ne condividerà le notti. Poi apriamo la cupola.',

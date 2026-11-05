@@ -6,7 +6,7 @@ import { isTauri } from '@tauri-apps/api/core';
 import { captureSlide } from '../capture/client';
 
 /*
- * Pictures of what PowerPoint has no object for (ADR-108): an HTML object, a drawing that lays
+ * Pictures of what PowerPoint has no object for (ADR-132): an HTML object, a drawing that lays
  * itself out, a picture with a look of its own. The element is drawn alone on a slide of its own,
  * at its size, without its rotation, shadow and opacity, which the file says for itself.
  *

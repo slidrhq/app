@@ -5,7 +5,7 @@
 //! protocol's events come on standard output, one JSON object a line, and the app's tools are
 //! reached over MCP. Stopping a turn ends its process; the next turn resumes the conversation.
 //!
-//! An agent may come as a package of the organization's library (ADR-125), installed into a folder
+//! An agent may come as a package of the organization's library (ADR-130), installed into a folder
 //! of its own (`custom_agents.rs`): its program is then looked for in that folder first, and
 //! `%SLIDR_AGENT_DIR%` in its program, arguments and environment is the folder.
 
@@ -269,7 +269,7 @@ impl Default for Caps {
 /// An agent of the organization's own.
 pub struct CustomCliHarness {
     agent: CustomAgent,
-    /// The agents' folders, where an agent that comes as a package is installed (ADR-125).
+    /// The agents' folders, where an agent that comes as a package is installed (ADR-130).
     packages: Arc<CustomAgents>,
     /// What its CLI said of itself when it was last probed.
     described: Mutex<Option<Caps>>,
@@ -648,7 +648,7 @@ impl AgentHarness for CustomCliHarness {
 
     async fn install(&self) -> Option<Result<()>> {
         Some(match &self.agent.install {
-            // From the organization's library, and from nowhere else (ADR-125).
+            // From the organization's library, and from nowhere else (ADR-130).
             Some(Install::Package { package, .. }) => {
                 self.packages
                     .install(&self.agent.id, &self.agent.name, package)

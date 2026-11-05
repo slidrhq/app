@@ -17,6 +17,7 @@ export const zhCN: RakiaCopy = {
   },
   agenda: {
     name: '今晚',
+    kicker: '简报',
     title: '今晚的四个部分',
     intro: [
       '在这四十分钟里，我们将介绍本周迎来首光的望远镜、它在第一个观测季要观测什么，',

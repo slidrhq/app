@@ -1578,6 +1578,21 @@
         "swing": "Schwingwinkel",
         "blink": "Blinkstärke"
       },
+      "flow": {
+        "title": "Entlang der Linie",
+        "kind": {
+          "none": "Keine",
+          "dashes": "Striche",
+          "box": "Kästchen",
+          "dot": "Punkte"
+        },
+        "speed": "Pixel pro Sekunde",
+        "forward": "Zum Ende",
+        "back": "Zum Anfang",
+        "count": "Anzahl",
+        "size": "Größe",
+        "color": "Farbe"
+      },
       "hint": "Die Bewegung wiederholt sich, solange die Folie gezeigt wird: im Editor, in der Präsentation und in einer exportierten Datei."
     }
   },
@@ -3007,6 +3022,7 @@
       "editData": "Daten bearbeiten",
       "editCells": "Zellen bearbeiten",
       "editPoints": "Punkte bearbeiten",
+      "adjust": "Form anpassen",
       "order": "Ebenenreihenfolge"
     },
     "toolbar": {
@@ -3018,7 +3034,7 @@
       "walk": "Zum nächsten oder vorherigen Objekt wechseln (in der Folienleiste: zur Folie), ohne es auszuwählen",
       "toggle": "Zur Auswahl hinzufügen oder daraus entfernen",
       "points": "Punkte einer Linie bearbeiten und wieder verlassen",
-      "part": "Nächster oder vorheriger Punkt einer Linie; nächster oder vorheriger Zuschneidegriff",
+      "part": "Nächster oder vorheriger Punkt einer Linie; nächster oder vorheriger Anpassungsgriff einer Form; nächster oder vorheriger Zuschneidegriff",
       "addPoint": "Punkt zur Linie hinzufügen",
       "removePoint": "Punkt aus der Linie entfernen",
       "lock": "Sperren und entsperren",
@@ -3026,6 +3042,7 @@
     },
     "at": {
       "point": "Punkt {{n}} von {{total}}. Mit den Pfeiltasten verschieben.",
+      "adjust": "Anpassungsgriff {{n}} von {{total}}. Mit den Pfeiltasten verschieben.",
       "picture": "Zuschneiden: Die Pfeiltasten verschieben das Bild. Ctrl+Pfeil nach oben oder unten ändert die Größe. Tab wechselt zu den Griffen.",
       "handle": "Zuschneidegriff: {{where}}. Mit den Pfeiltasten verschieben.",
       "walkSelected": "{{what}}: ausgewählt",

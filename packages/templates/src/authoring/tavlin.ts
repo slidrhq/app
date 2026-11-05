@@ -1411,24 +1411,27 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a recipe card from margin to margin, down to over the foot, from its
-      // top; a star anise lies on the card's far corner, beside the title.
+      // top; a star anise lies on the card's far corner, beside the title. The kicker over the
+      // title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        place('p_title', 'title', at(START, 100, WIDTH - 260, 84), 'title'),
-        place('p_body', 'body', at(START + 72, 300, WIDTH - 144, 590), 'body'),
+        ...head('text', WIDTH - 260).placeholders,
+        place('p_body', 'body', at(START + 72, 310, WIDTH - 144, 580), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        card('d_tavlin_text_card', at(START, 222, WIDTH, 706)),
+        ...head('text', WIDTH - 260).decorations,
+        card('d_tavlin_text_card', at(START, 232, WIDTH, 696)),
         art(
           'd_tavlin_text_rules',
-          at(START + 40, 250, WIDTH - 80, 10),
+          at(START + 40, 260, WIDTH - 80, 10),
           `<path d="M0 2H${WIDTH - 80}M0 8H${WIDTH - 80}" stroke="${PAPRIKA}" stroke-width="1.6"/>`,
         ),
         art(
           'd_tavlin_text_anise',
-          atEnd(END - 34, 152, 140, 132),
+          atEnd(END - 34, 162, 140, 132),
           `<g transform="rotate(-8 70 66)">${starAnise(62, 70, 56, { rot: 10 })}</g>` + peppercorn(124, 32, 6.5) + peppercorn(132, 50, 5.5),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1861,6 +1864,7 @@ function drawSample(copy: TavlinCopy): SampleSlide[] {
       layout: 'l_tavlin_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1871,6 +1875,7 @@ function drawSample(copy: TavlinCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

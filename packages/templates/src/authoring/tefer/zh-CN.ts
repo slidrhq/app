@@ -17,6 +17,7 @@ export const zhCN: TeferCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '买手专场',
     title: '今早摆上桌的内容',
     intro: [
       '四十分钟，介绍一个由二十四件大衣组成的系列：布料从哪里来，我们如何裁剪，让地上几乎什么也不剩，',

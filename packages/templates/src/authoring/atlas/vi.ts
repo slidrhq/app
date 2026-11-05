@@ -17,6 +17,7 @@ export const vi: AtlasCopy = {
   },
   agenda: {
     name: 'Chương trình',
+    kicker: 'Mở đầu',
     title: 'Nội dung hôm nay',
     intro:
       'Hai mươi lăm phút về những gì mười bốn thành phố cảng đã học được trong năm nay về tái sử dụng và khử mặn nước, và về những điều chúng tôi sẽ đề nghị mỗi đối tác thời gian tới. Sau đó là phần hỏi đáp.',

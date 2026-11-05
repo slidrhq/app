@@ -17,6 +17,7 @@ export const ko: SadeCopy = {
   },
   agenda: {
     name: '안건',
+    kicker: '조합원 총회',
     title: '오늘 아침 다룰 내용',
     intro: [
       '40분 동안 2026년 수확을 돌아봅니다. 무엇을 길렀고, 물은 얼마나 썼으며, 흙에서 무엇을 배웠는지.',

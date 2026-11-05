@@ -17,6 +17,7 @@ export const vi: TavlinCopy = {
   },
   agenda: {
     name: 'Nội dung',
+    kicker: 'Dành cho đối tác',
     title: 'Thực đơn hôm nay',
     intro:
       'Bốn mươi phút kể về hành trình của Bảy Gia Vị, từ một phiên chợ cuối tuần thành lễ hội đón bốn mươi mốt nghìn khách, và những gì chúng tôi cần ở mỗi đối tác cho tháng Năm. Sau đó là phần hỏi đáp, bên chén trà.',

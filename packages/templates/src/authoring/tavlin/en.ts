@@ -17,6 +17,7 @@ export const en: TavlinCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'For our partners',
     title: 'On today’s menu',
     intro:
       'Forty minutes on how Seven Spices grew from a weekend market into a festival of forty-one thousand guests, and on what we ask of every partner for May. Then your questions, over tea.',

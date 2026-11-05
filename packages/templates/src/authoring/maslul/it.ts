@@ -19,6 +19,7 @@ export const it: MaslulCopy = {
   },
   agenda: {
     name: 'Stasera',
+    kicker: 'Per i nostri soci',
     title: 'Il programma di stasera',
     intro:
       'Quaranta minuti per atleti, genitori e allenatori: come si svolgerà la stagione 2027, cosa cambia quando a marzo passeremo alla nostra pista e come si allenerà ogni gruppo. Alla fine, le vostre domande.',

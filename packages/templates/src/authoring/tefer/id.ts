@@ -17,6 +17,7 @@ export const id: TeferCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Presentasi untuk pembeli',
     title: 'Di atas meja pagi ini',
     intro:
       'Empat puluh menit tentang koleksi dua puluh empat mantel: dari mana kainnya, bagaimana kami memotongnya hingga hampir tak ada yang tersisa di lantai, dan cara memesannya untuk musim gugur. Lalu mantelnya sendiri, di rak.',

@@ -17,6 +17,7 @@ export const ptBR: RakiaCopy = {
   },
   agenda: {
     name: 'Hoje à noite',
+    kicker: 'O briefing',
     title: 'Hoje à noite, em quatro partes',
     intro:
       'Quarenta minutos sobre o telescópio que recebe nesta semana sua primeira luz das estrelas, o que ele vai observar na primeira temporada e como cada universidade parceira vai dividir suas noites. Depois, abrimos a cúpula.',

@@ -1574,6 +1574,21 @@
         "swing": "Sudut ayunan",
         "blink": "Kekuatan kedipan"
       },
+      "flow": {
+        "title": "Di sepanjang garis",
+        "kind": {
+          "none": "Tidak ada",
+          "dashes": "Garis putus",
+          "box": "Kotak",
+          "dot": "Titik"
+        },
+        "speed": "Piksel per detik",
+        "forward": "Ke ujung",
+        "back": "Ke awal",
+        "count": "Jumlah",
+        "size": "Ukuran",
+        "color": "Warna"
+      },
       "hint": "Gerakan berulang selama slide ditampilkan: di editor, saat presentasi, dan dalam file yang diekspor."
     }
   },
@@ -3001,6 +3016,7 @@
       "editData": "Edit data bagan",
       "editCells": "Edit sel",
       "editPoints": "Edit titik",
+      "adjust": "Sesuaikan bentuk",
       "order": "Urutan lapisan"
     },
     "toolbar": {
@@ -3012,7 +3028,7 @@
       "walk": "Pindah ke objek berikutnya atau sebelumnya, atau ke slide di strip slide, tanpa memilihnya",
       "toggle": "Tambahkan ke pilihan, atau keluarkan dari pilihan",
       "points": "Masuk ke titik-titik garis, dan keluar darinya",
-      "part": "Titik garis berikutnya atau sebelumnya; gagang pangkas berikutnya atau sebelumnya",
+      "part": "Titik garis berikutnya atau sebelumnya; gagang penyesuaian bentuk berikutnya atau sebelumnya; gagang pangkas berikutnya atau sebelumnya",
       "addPoint": "Tambahkan titik ke garis",
       "removePoint": "Hapus titik dari garis",
       "lock": "Kunci dan buka kunci",
@@ -3020,6 +3036,7 @@
     },
     "at": {
       "point": "Titik {{n}} dari {{total}}. Tombol panah memindahkannya.",
+      "adjust": "Gagang penyesuaian {{n}} dari {{total}}. Tombol panah memindahkannya.",
       "picture": "Pangkas: tombol panah memindahkan gambar. Ctrl+Up atau Down mengubah skalanya. Tab berpindah ke gagang.",
       "handle": "Gagang pangkas: {{where}}. Tombol panah memindahkannya.",
       "walkSelected": "{{what}}: dalam pilihan",

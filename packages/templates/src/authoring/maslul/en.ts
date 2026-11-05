@@ -17,6 +17,7 @@ export const en: MaslulCopy = {
   },
   agenda: {
     name: 'Tonight',
+    kicker: 'For our members',
     title: 'Tonight’s briefing',
     intro:
       'Forty minutes for athletes, parents and coaches: how the 2027 season will run, what changes when we move to our own track in March, and how each group will train. Questions at the end.',

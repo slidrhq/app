@@ -406,7 +406,7 @@ test('the dialogs: the shortcut map and its editor, export, a question', async (
   await page.keyboard.press('Escape');
   await expect(card).toBeHidden();
 
-  // PowerPoint (ADR-108): the export's choices and its report, and the report of an import.
+  // PowerPoint (ADR-132): the export's choices and its report, and the report of an import.
   await page.getByTestId('file-menu-trigger').click();
   await page.getByTestId('file-export').click();
   const pptx = page.getByTestId('export-card');

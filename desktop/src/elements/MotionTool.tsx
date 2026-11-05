@@ -1,32 +1,41 @@
 import {
   AMBIENT_DEFAULTS,
+  LINE_FLOW_DEFAULTS,
   type AmbientKind,
   type AmbientMotion,
   type AmbientRhythm,
+  type ElementPatch,
+  type LineElement,
+  type LineFlow,
   type SvgElement,
 } from '@slidr/model';
+import { riderSize } from '@slidr/renderer';
 import { cx, Field, Icon, SegmentedControl, type LucideIcon } from '@slidr/ui';
 import {
   BellRing,
+  Circle,
   CircleOff,
+  Ellipsis,
   HeartPulse,
   MoveVertical,
   Orbit,
   RotateCcw,
   RotateCw,
   Sparkle,
+  Square,
 } from '@slidr/ui/icons';
 import { useTranslation } from 'react-i18next';
 import { useGestureTx } from '../controls';
-import { PopoverTool, SliderField } from '../objects/parts';
+import { ColorRow, PopoverTool, SliderField } from '../objects/parts';
 import { isTarget, useTarget, type Target } from '../objects/target';
 import { pieceMarkup, pieceOf, pieceSpeed, PIECE_SPEEDS } from './motion';
-import type { MotionPiece } from './motionPieces';
+import type { PicturePiece } from './motionPieces';
 
 /*
  * Row B's Motion tool (ADR-128): the motion an element repeats while it is shown, any element,
  * and how fast an animation of Elements (ADR-127) moves. A turning hexagon is a hexagon with a
- * turn; a picture of Elements moves by itself, and can take a motion besides.
+ * turn; a picture of Elements moves by itself, and can take a motion besides. For a line, what
+ * runs along it (ADR-131): its dashes, and boxes or dots that ride it.
  */
 
 const KINDS: readonly (AmbientKind | 'none')[] = [
@@ -217,7 +226,7 @@ function AmbientControls({ target, motion }: { target: Target; motion: AmbientMo
 }
 
 /** How fast an animation of Elements moves: its picture drawn again at that speed. */
-function PieceSpeed({ target, piece }: { target: Target<SvgElement>; piece: MotionPiece }) {
+function PieceSpeed({ target, piece }: { target: Target<SvgElement>; piece: PicturePiece }) {
   const { t } = useTranslation('elements');
   const tx = useGestureTx();
   return (
@@ -236,6 +245,190 @@ function PieceSpeed({ target, piece }: { target: Target<SvgElement>; piece: Moti
       }
       onCommit={tx.end}
     />
+  );
+}
+
+/** What runs along a line (ADR-131): nothing, its dashes alone, or boxes or dots besides. */
+const FLOWS = ['none', 'dashes', 'box', 'dot'] as const;
+type FlowChoice = (typeof FLOWS)[number];
+
+const FLOW_ICONS: Record<FlowChoice, LucideIcon> = {
+  none: CircleOff,
+  dashes: Ellipsis,
+  box: Square,
+  dot: Circle,
+};
+
+/** The pace a slider offers, in slide pixels a second. */
+const FLOW_SPEED = { min: 10, max: 600, step: 5 } as const;
+/** A rider's longest side a slider offers, in slide pixels. */
+const RIDER_SIZE = { min: 4, max: 120, step: 1 } as const;
+/** How many riders a slider offers. */
+const RIDERS = { min: 1, max: 12 } as const;
+
+function flowChoice(flow: LineFlow | undefined): FlowChoice {
+  if (!flow) return 'none';
+  return flow.rider && flow.rider !== 'none' ? flow.rider : 'dashes';
+}
+
+/** The ready pace a flow goes at, if it is one: twice, once or half the time of the default. */
+function flowPaceOf(flow: LineFlow): Pace | 'custom' {
+  const found = (Object.keys(PACES) as Pace[]).find(
+    (pace) => Math.abs(LINE_FLOW_DEFAULTS.speed / PACES[pace] - flow.speed) < 0.5,
+  );
+  return found ?? 'custom';
+}
+
+/** The ways a flow chooser offers, each with its picture. */
+function FlowPicker({
+  value,
+  onChange,
+}: {
+  value: FlowChoice;
+  onChange: (choice: FlowChoice) => void;
+}) {
+  const { t } = useTranslation('elements');
+  return (
+    <div role="group" aria-label={t('motion.flow.title')} className="grid grid-cols-4 gap-1">
+      {FLOWS.map((choice) => (
+        <button
+          key={choice}
+          type="button"
+          aria-pressed={value === choice}
+          data-flow={choice}
+          onClick={() => onChange(choice)}
+          className={cx(
+            'flex cursor-default flex-col items-center gap-1 rounded-control px-1 py-1.5 text-xs text-ui-fg-muted transition-colors hover:bg-ui-hover hover:text-ui-fg',
+            'aria-pressed:bg-ui-thumb aria-pressed:text-ui-fg aria-pressed:shadow-raised',
+          )}
+        >
+          <Icon icon={FLOW_ICONS[choice]} />
+          <span className="truncate">{t(`motion.flow.kind.${choice}`)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * What runs along a line (ADR-131): the choice of it, and how it goes. A flow of dashes on a
+ * line drawn solid makes the line dashed too, in the same step, or nothing would be seen to move.
+ */
+function FlowControls({ target }: { target: Target<LineElement> }) {
+  const { t } = useTranslation('elements');
+  const tx = useGestureTx();
+  const { flow, stroke } = target.element;
+  /** Every step of a drag; `tx.end` closes the undo step. */
+  const set = (patch: ElementPatch) =>
+    target.update(patch, { txId: tx.id(), label: t('history.motion') });
+  /** A whole change at once: its own undo step. */
+  const once = (patch: ElementPatch) => {
+    set(patch);
+    tx.end();
+  };
+  const choice = flowChoice(flow);
+  const choose = (next: FlowChoice) => {
+    if (next === choice) return;
+    if (next === 'none') return once({ flow: null });
+    const { rider: _was, ...rest } = flow ?? { speed: LINE_FLOW_DEFAULTS.speed };
+    const shown: LineFlow = next === 'dashes' ? rest : { ...rest, rider: next };
+    const solid = !stroke.dash || stroke.dash === 'solid';
+    once(
+      next === 'dashes' && solid
+        ? { flow: shown, stroke: { ...stroke, dash: 'dashed', cap: stroke.cap ?? 'round' } }
+        : { flow: shown },
+    );
+  };
+  const rides = flow?.rider !== undefined && flow.rider !== 'none';
+  return (
+    <>
+      <Field label={t('motion.flow.title')}>
+        <FlowPicker value={choice} onChange={choose} />
+      </Field>
+      {flow && (
+        <>
+          <Field label={t('motion.speed')}>
+            <SegmentedControl<Pace | 'custom'>
+              aria-label={t('motion.speed')}
+              size="sm"
+              fill
+              options={(Object.keys(PACES) as Pace[]).map((pace) => ({
+                value: pace,
+                label: t(`motion.pace.${pace}`),
+              }))}
+              value={flowPaceOf(flow)}
+              onValueChange={(pace) => {
+                if (pace === 'custom') return;
+                once({ flow: { ...flow, speed: LINE_FLOW_DEFAULTS.speed / PACES[pace] } });
+              }}
+            />
+          </Field>
+          <SliderField
+            label={t('motion.flow.speed')}
+            value={Math.round(flow.speed)}
+            min={FLOW_SPEED.min}
+            max={FLOW_SPEED.max}
+            step={FLOW_SPEED.step}
+            onChange={(speed) => set({ flow: { ...flow, speed: Math.max(FLOW_SPEED.min, speed) } })}
+            onCommit={tx.end}
+          />
+          <Field label={t('motion.direction')}>
+            <SegmentedControl<'forward' | 'back'>
+              aria-label={t('motion.direction')}
+              size="sm"
+              fill
+              options={[
+                { value: 'forward', label: t('motion.flow.forward') },
+                { value: 'back', label: t('motion.flow.back') },
+              ]}
+              value={flow.reverse ? 'back' : 'forward'}
+              onValueChange={(way) => {
+                const { reverse: _was, ...rest } = flow;
+                once({ flow: way === 'back' ? { ...rest, reverse: true } : rest });
+              }}
+            />
+          </Field>
+          {rides && (
+            <>
+              <SliderField
+                label={t('motion.flow.count')}
+                value={flow.count ?? LINE_FLOW_DEFAULTS.count}
+                min={RIDERS.min}
+                max={RIDERS.max}
+                step={1}
+                onChange={(count) =>
+                  set({
+                    flow: {
+                      ...flow,
+                      count: Math.min(RIDERS.max, Math.max(RIDERS.min, Math.round(count))),
+                    },
+                  })
+                }
+                onCommit={tx.end}
+              />
+              <SliderField
+                label={t('motion.flow.size')}
+                value={Math.round(riderSize(flow, stroke))}
+                min={RIDER_SIZE.min}
+                max={RIDER_SIZE.max}
+                step={RIDER_SIZE.step}
+                unit="px"
+                onChange={(size) =>
+                  set({ flow: { ...flow, size: Math.max(RIDER_SIZE.min, size) } })
+                }
+                onCommit={tx.end}
+              />
+              <ColorRow
+                label={t('motion.flow.color')}
+                value={flow.color ?? stroke.color}
+                onChange={(color) => set({ flow: { ...flow, color } })}
+                onGestureEnd={tx.end}
+              />
+            </>
+          )}
+        </>
+      )}
+    </>
   );
 }
 
@@ -263,6 +456,12 @@ function MotionPopover({ target }: { target: Target }) {
         {piece && isTarget(target, 'svg') && (
           <>
             <PieceSpeed target={target} piece={piece} />
+            <hr className="border-ui-line" />
+          </>
+        )}
+        {isTarget(target, 'line') && (
+          <>
+            <FlowControls target={target} />
             <hr className="border-ui-line" />
           </>
         )}

@@ -1578,6 +1578,21 @@
         "swing": "Sallanma açısı",
         "blink": "Yanıp sönme gücü"
       },
+      "flow": {
+        "title": "Çizgi boyunca",
+        "kind": {
+          "none": "Yok",
+          "dashes": "Kesik çizgiler",
+          "box": "Kutular",
+          "dot": "Noktalar"
+        },
+        "speed": "Saniyede piksel",
+        "forward": "Sona doğru",
+        "back": "Başa doğru",
+        "count": "Sayı",
+        "size": "Boyut",
+        "color": "Renk"
+      },
       "hint": "Hareket, slayt gösterildiği sürece tekrarlanır: düzenleyicide, sunumda ve dışa aktarılan dosyada."
     }
   },
@@ -3007,6 +3022,7 @@
       "editData": "Verileri düzenle",
       "editCells": "Hücreleri düzenle",
       "editPoints": "Noktaları düzenle",
+      "adjust": "Şekli ayarla",
       "order": "Katman sırası"
     },
     "toolbar": {
@@ -3018,7 +3034,7 @@
       "walk": "Seçmeden sonraki veya önceki nesneye ya da slayt şeridinde sonraki veya önceki slayta git",
       "toggle": "Seçime ekle ya da seçimden çıkar",
       "points": "Çizginin noktalarına gir ve çık",
-      "part": "Çizginin sonraki veya önceki noktası; sonraki veya önceki kırpma tutamacı",
+      "part": "Çizginin sonraki veya önceki noktası; şeklin sonraki veya önceki ayar tutamacı; sonraki veya önceki kırpma tutamacı",
       "addPoint": "Çizgiye nokta ekle",
       "removePoint": "Çizgiden nokta kaldır",
       "lock": "Kilitle ve kilidi aç",
@@ -3026,6 +3042,7 @@
     },
     "at": {
       "point": "Nokta {{n}} / {{total}}. Ok tuşları noktayı taşır.",
+      "adjust": "Ayar tutamacı {{n}} / {{total}}. Ok tuşları tutamacı taşır.",
       "picture": "Kırpma: ok tuşları görseli taşır. Ctrl+Yukarı ok veya Ctrl+Aşağı ok görseli ölçeklendirir. Tab tutamaçlara geçer.",
       "handle": "Kırpma tutamacı: {{where}}. Ok tuşları tutamacı taşır.",
       "walkSelected": "{{what}}: seçimde",

@@ -42,7 +42,7 @@ import { warningText } from './warnings';
 /*
  * The export card (ADR-123; WG9-T12, SPEC 12): "Export…" of the File menu asks its questions in
  * the AI chat, a step at a time as the chat's own setup asks for the agent, and sends nothing to
- * the agent. First the format, an HTML page or a PowerPoint presentation (ADR-108); then which
+ * the agent. First the format, an HTML page or a PowerPoint presentation (ADR-132); then which
  * slides, with or without animations, and for HTML where its video and audio go; then where to
  * save, and what went into the file: its size, its assets and fonts, and what could not be
  * exported as it is in the deck. The card is not modal: it counts the deck as it is, and the

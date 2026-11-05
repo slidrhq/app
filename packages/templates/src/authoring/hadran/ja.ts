@@ -17,6 +17,7 @@ export const ja: HadranCopy = {
   },
   setlist: {
     name: 'セットリスト',
+    kicker: 'シーズン開幕',
     title: '今夜のセットリスト',
     intro: [
       'この40分では来シーズンについてお話しします。昨シーズンから学んだこと、リリース予定の12枚、',

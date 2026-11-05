@@ -1,5 +1,5 @@
-import type { Frame, LineElement, Point } from '@slidr/model';
-import { linePath } from '@slidr/renderer';
+import type { Frame, LineElement, Point, ShapeElement } from '@slidr/model';
+import { adjustHandles, linePath } from '@slidr/renderer';
 import {
   useEffect,
   useLayoutEffect,
@@ -154,7 +154,11 @@ const ROTATE_CURSOR = `url("data:image/svg+xml,${encodeURIComponent(
 
 /** The resize cursor of a handle, by where the handle points on the screen. */
 function handleCursor(handle: Handle, m: Matrix): string {
-  const v = applyVector(m, { x: handle.x, y: handle.y });
+  return cursorAlong(applyVector(m, { x: handle.x, y: handle.y }));
+}
+
+/** The resize cursor whose arrows run along `v`, a direction on the screen. */
+function cursorAlong(v: Point): string {
   const angle = (Math.atan2(v.y, v.x) * 180) / Math.PI + 90;
   const index = Math.round((((angle % 180) + 180) % 180) / 45) % 4;
   return CURSORS[index] ?? 'move';
@@ -436,6 +440,119 @@ export function Handles({
         )}
       </div>
     </>
+  );
+}
+
+/** The side of an adjustment handle's diamond, and how near a resize handle it may be drawn. */
+const ADJUST_PX = 10;
+const ADJUST_CLEAR_PX = 18;
+/**
+ * Yellow, as adjustment handles are in other editors, and so that they are not taken for the
+ * white resize handles or a line's points in the accent colour.
+ */
+const ADJUST_FILL = '#ffcd29';
+
+/**
+ * Where the adjustment handles of a shape are drawn, in screen pixels: on the points of
+ * `adjustHandles`, except that one that would lie on a resize handle stands a little in from it,
+ * towards the middle of the shape, so that both can be taken. The Stage counts a drag from where
+ * the handle really is, so the step aside does not make it jump.
+ */
+export function adjustHandleSpots(
+  located: Located & { element: ShapeElement },
+  view: StageView,
+): { at: Point; along?: Point }[] {
+  const shape = located.element;
+  if (shape.geometry.kind !== 'preset') return [];
+  const { w, h } = shape.frame;
+  const handles = adjustHandles(shape.geometry.preset, w, h, shape.geometry.adjust);
+  if (!handles.length) return [];
+  const own = elementMatrix(located, true);
+  const box = elementMatrix(located);
+  const screen = (p: Point): Point => ({
+    x: view.origin.x + p.x * view.scale,
+    y: view.origin.y + p.y * view.scale,
+  });
+  const resize = Object.values(HANDLES).map((hd) =>
+    screen(apply(box, { x: ((hd.x + 1) / 2) * w, y: ((hd.y + 1) / 2) * h })),
+  );
+  const middle = screen(apply(box, { x: w / 2, y: h / 2 }));
+  return handles.map(({ at, along }) => {
+    let spot = screen(apply(own, at));
+    const near = resize.find((r) => Math.hypot(r.x - spot.x, r.y - spot.y) < ADJUST_CLEAR_PX);
+    if (near) {
+      const dx = middle.x - near.x;
+      const dy = middle.y - near.y;
+      const length = Math.hypot(dx, dy) || 1;
+      spot = {
+        x: near.x + (dx / length) * ADJUST_CLEAR_PX,
+        y: near.y + (dy / length) * ADJUST_CLEAR_PX,
+      };
+    }
+    return along ? { at: spot, along: applyVector(own, along) } : { at: spot };
+  });
+}
+
+/**
+ * The adjustment handles of a shape (ADR-133): a yellow diamond on each value its preset has, such
+ * as the thickness of a ring or the head of an arrow, which a drag or the arrows change.
+ */
+export function AdjustHandles({
+  located,
+  view,
+  held,
+  active,
+}: {
+  located: Located & { element: ShapeElement };
+  view: StageView;
+  /** The handle that is being dragged, as `adjust-<index>`: it stays lit. */
+  held?: string | null;
+  /** The handle the keyboard is on, which the arrows move (UI-06). */
+  active?: number | null;
+}) {
+  const [over, setOver] = useState<number | null>(null);
+  const spots = adjustHandleSpots(located, view);
+  if (!spots.length) return null;
+  const grip = ADJUST_PX + 2 * GRIP_PX;
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 3 }}>
+      {spots.map(({ at, along }, i) => {
+        const lit = held ? held === `adjust-${i}` : over === i;
+        return (
+          <div
+            key={i}
+            data-adjust-handle={i}
+            data-lit={lit || undefined}
+            data-active={i === active || undefined}
+            onPointerEnter={() => setOver(i)}
+            onPointerLeave={() => setOver((at) => (at === i ? null : at))}
+            style={{
+              position: 'absolute',
+              left: at.x - grip / 2,
+              top: at.y - grip / 2,
+              width: grip,
+              height: grip,
+              pointerEvents: 'auto',
+              cursor: along ? cursorAlong(along) : 'move',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                left: GRIP_PX,
+                top: GRIP_PX,
+                width: ADJUST_PX,
+                height: ADJUST_PX,
+                transform: 'rotate(45deg)',
+                borderRadius: 2,
+                background: lit ? ACCENT : ADJUST_FILL,
+                boxShadow: i === active ? `${HANDLE_EDGE}, ${FOCUS_RING}` : HANDLE_EDGE,
+              }}
+            />
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

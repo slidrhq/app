@@ -11,6 +11,7 @@ export const ptBR: DofekCopy = {
   },
   agenda: {
     name: 'Pauta',
+    kicker: 'Antes de começar',
     title: 'O que vamos ver hoje',
     intro:
       'Vinte minutos sobre o que o programa mudou, o que acontece hoje na rua quando um coração para e o que pedimos ao conselho para 2027. Depois, abrimos espaço para as perguntas de vocês.',

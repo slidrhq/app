@@ -11,6 +11,7 @@ export const de: HonCopy = {
   },
   agenda: {
     name: 'Tagesordnung',
+    kicker: 'Generalversammlung',
     title: 'Heute Abend auf der Tagesordnung',
     intro:
       'Vierzig Minuten darüber, wie das Jahr 2026 für die Bank lief, die Ihnen gehört: was wir verliehen, was wir als Kapital behalten haben und was an Sie als Mitglieder zurückgeflossen ist. Danach die Abstimmungen und Ihre Fragen.',

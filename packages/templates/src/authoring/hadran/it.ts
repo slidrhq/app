@@ -17,6 +17,7 @@ export const it: HadranCopy = {
   },
   setlist: {
     name: 'Scaletta',
+    kicker: 'Lancio della stagione',
     title: 'La scaletta di stasera',
     intro:
       'Quaranta minuti sulla stagione che arriva: cosa ci ha insegnato l’ultima, i dodici dischi che pubblicheremo, le diciotto città del tour e la nostra scuola. Poi apre il bar e suona la band.',

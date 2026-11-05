@@ -17,6 +17,7 @@ export const id: SadeCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Rapat anggota',
     title: 'Yang akan kita bahas pagi ini',
     intro:
       'Empat puluh menit tentang panen 2026: apa yang kita tanam, berapa banyak air yang terpakai, dan apa yang diceritakan tanah. Lalu rencana musim 2027, dan waktu untuk pertanyaan Anda.',

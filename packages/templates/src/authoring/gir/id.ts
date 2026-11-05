@@ -17,6 +17,7 @@ export const id: GirCopy = {
   },
   agenda: {
     name: 'Malam ini',
+    kicker: 'Selamat datang',
     title: 'Malam ini, dalam empat puluh menit',
     intro:
       'Empat puluh menit tentang cara kelas 7 belajar tahun ini, apa yang berubah di kelas, dan bagaimana Bapak/Ibu bisa membantu di rumah. Setelah itu, Bapak/Ibu akan bertemu wali kelas anak di ruang kelas yang baru.',

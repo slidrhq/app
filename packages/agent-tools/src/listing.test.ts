@@ -133,8 +133,9 @@ describe('tool definitions for a transport adapter', () => {
     const add = listing.find((t) => t.name === 'element_add')!;
     // Raised from 30 KB for the card of a magnet and the window of its photograph (ADR-095), and
     // from 31 KB for the look of an element out of use (`disabled`), which every element type has,
-    // and from 31.5 KB for the motion an element repeats (`ambient`, ADR-128), written once.
-    expect(JSON.stringify(add.inputSchema).length).toBeLessThan(32_000);
+    // and from 31.5 KB for the motion an element repeats (`ambient`, ADR-128), written once, and
+    // from 32 KB for what runs along a line (`flow`, ADR-131).
+    expect(JSON.stringify(add.inputSchema).length).toBeLessThan(32_500);
   });
 
   it('stay within a size the agent can afford', () => {

@@ -11,6 +11,7 @@ export const it: HonCopy = {
   },
   agenda: {
     name: 'Ordine del giorno',
+    kicker: 'Assemblea annuale dei soci',
     title: 'Stasera all’ordine del giorno',
     intro:
       'Quaranta minuti sul 2026 della banca che vi appartiene: quanto abbiamo prestato, quanto abbiamo tenuto come capitale e che cosa è tornato a voi soci. Poi le votazioni e le vostre domande.',

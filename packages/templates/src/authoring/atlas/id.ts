@@ -19,6 +19,7 @@ export const id: AtlasCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Pembukaan',
     title: 'Agenda hari ini',
     intro:
       'Dua puluh lima menit tentang apa yang dipelajari empat belas kota pelabuhan tahun ini soal penggunaan ulang dan desalinasi air, serta apa yang akan kami minta dari setiap mitra berikutnya. Lalu sesi tanya jawab.',

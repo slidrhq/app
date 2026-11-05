@@ -1,4 +1,4 @@
-//! The organization's agents that come as packages of its library (ADR-125): a .zip of the
+//! The organization's agents that come as packages of its library (ADR-130): a .zip of the
 //! agent's CLI and every file it needs, which Slidr Library publishes at `system/agents/<id>.zip`
 //! as its system settings name it (`install.package`). Once the user approves the agent's
 //! installation, the app downloads the package from the library alone, never from the internet,

@@ -15,6 +15,7 @@ import { cssString, scopeSlideCss } from './css';
 import { ElementView } from './elements';
 import { BackgroundLayers } from './fill';
 import { frameScriptNonce, resolveAssetUrls } from './markup';
+import { STILL_ATTRIBUTE, STILL_CSS } from './still';
 import { opensAddress } from './text';
 import { colorCss, deckFontFaces, themeVariables } from './theme';
 
@@ -210,6 +211,9 @@ function SlideRendererView({
     hasAmbient(slide.elements) ||
     hasAmbient(layout?.decorations) ||
     hasAmbient(background.elements);
+  // A thumbnail holds still what moves by itself (ADR-134): its pictures (`holdPicture`), and the
+  // CSS animations of its own elements, by a rule its root opts into.
+  const still = mode === 'thumbnail';
   // The slide's own stylesheet can name an asset of the deck too (`url("slidr-asset:<id>")`):
   // a face of a font the deck keeps, which has no record of its own on the asset.
   const scopedCss = useMemo(
@@ -233,6 +237,7 @@ function SlideRendererView({
       <div
         className={className ? `slidr-slide ${className}` : 'slidr-slide'}
         data-slide-id={slide.id}
+        {...(still ? { [STILL_ATTRIBUTE]: '' } : {})}
         lang={meta.lang}
         dir={meta.dir}
         style={{
@@ -269,6 +274,7 @@ function SlideRendererView({
         {fontFaces ? <style data-slidr-fonts="">{fontFaces}</style> : null}
         {scopedCss ? <style>{scopedCss}</style> : null}
         {moves ? <style data-slidr-ambient="">{AMBIENT_KEYFRAMES}</style> : null}
+        {still && (moves || scopedCss) ? <style data-slidr-still="">{STILL_CSS}</style> : null}
         <BackgroundLayers background={background} ctx={ctx} />
         {/* The background's drawing (ADR-125): the background's, as the decorations are the
             layout's, so nothing selects it; it goes when the slide takes another background. */}

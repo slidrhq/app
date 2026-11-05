@@ -80,7 +80,7 @@ describe("the organization's settings (ADR-117)", () => {
     expect([installsWithNpm('webui'), installedByOrganization('webui')]).toEqual([true, false]);
     expect(installedByOrganization('inhouse')).toBe(true);
     expect(installedByOrganization('acme')).toBe(false);
-    // A package of the library is the app's to install, from the library alone (ADR-125).
+    // A package of the library is the app's to install, from the library alone (ADR-130).
     expect(harnessLook('packed')?.installer).toBe('library');
     expect(installedByOrganization('packed')).toBe(false);
     expect(['packed', 'webui', 'acme', 'claude-code', undefined].map(installDescription)).toEqual([

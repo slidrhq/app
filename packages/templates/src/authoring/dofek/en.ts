@@ -11,6 +11,7 @@ export const en: DofekCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Before we begin',
     title: 'What we will cover today',
     intro:
       'Twenty minutes on what the programme has changed, what now happens on the street when a heart stops, and what we ask of the council for 2027. Then we will take your questions.',

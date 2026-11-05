@@ -1582,6 +1582,21 @@
         "swing": "Angle du balancement",
         "blink": "Intensité du clignotement"
       },
+      "flow": {
+        "title": "Le long de la ligne",
+        "kind": {
+          "none": "Aucun",
+          "dashes": "Tirets",
+          "box": "Boîtes",
+          "dot": "Points"
+        },
+        "speed": "Pixels par seconde",
+        "forward": "Vers la fin",
+        "back": "Vers le début",
+        "count": "Nombre",
+        "size": "Taille",
+        "color": "Couleur"
+      },
       "hint": "Le mouvement se répète tant que la diapositive est affichée : dans l’éditeur, en présentation et dans un fichier exporté."
     }
   },
@@ -3013,6 +3028,7 @@
       "editData": "Modifier les données",
       "editCells": "Modifier les cellules",
       "editPoints": "Modifier les points",
+      "adjust": "Ajuster la forme",
       "order": "Ordre des calques"
     },
     "toolbar": {
@@ -3024,7 +3040,7 @@
       "walk": "Passer à l’objet suivant ou précédent, ou à la diapositive suivante ou précédente dans le volet des diapositives, sans modifier la sélection",
       "toggle": "Ajouter à la sélection, ou en retirer",
       "points": "Entrer dans les points d’une ligne, et en sortir",
-      "part": "Point suivant ou précédent d’une ligne ; poignée de rognage suivante ou précédente",
+      "part": "Point suivant ou précédent d’une ligne ; poignée d’ajustement suivante ou précédente d’une forme ; poignée de rognage suivante ou précédente",
       "addPoint": "Ajouter un point à la ligne",
       "removePoint": "Supprimer un point de la ligne",
       "lock": "Verrouiller et déverrouiller",
@@ -3032,6 +3048,7 @@
     },
     "at": {
       "point": "Point {{n}} sur {{total}}. Les flèches le déplacent.",
+      "adjust": "Poignée d’ajustement {{n}} sur {{total}}. Les flèches la déplacent.",
       "picture": "Rognage : les flèches déplacent l’image. Ctrl+Flèche haut ou bas la redimensionne. Tab passe aux poignées.",
       "handle": "Poignée de rognage : {{where}}. Les flèches la déplacent.",
       "walkSelected": "{{what}} : dans la sélection",

@@ -17,6 +17,7 @@ export const tr: TavlinCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'İş ortaklarımız için',
     title: 'Bugünün menüsünde',
     intro:
       'Kırk dakika boyunca Yedi Baharat’ın bir hafta sonu pazarından kırk bir bin misafirli bir festivale nasıl dönüştüğünü ve mayıs için her ortaktan ne istediğimizi anlatacağız. Ardından çay eşliğinde sorularınız.',

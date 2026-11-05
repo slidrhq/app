@@ -1582,6 +1582,21 @@
         "swing": "Ângulo do balanço",
         "blink": "Intensidade da piscada"
       },
+      "flow": {
+        "title": "Ao longo da linha",
+        "kind": {
+          "none": "Nenhum",
+          "dashes": "Traços",
+          "box": "Caixas",
+          "dot": "Pontos"
+        },
+        "speed": "Pixels por segundo",
+        "forward": "Para o fim",
+        "back": "Para o início",
+        "count": "Quantidade",
+        "size": "Tamanho",
+        "color": "Cor"
+      },
       "hint": "O movimento se repete enquanto o slide é exibido: no editor, na apresentação e em um arquivo exportado."
     }
   },
@@ -3013,6 +3028,7 @@
       "editData": "Editar dados",
       "editCells": "Editar células",
       "editPoints": "Editar pontos",
+      "adjust": "Ajustar forma",
       "order": "Ordem das camadas"
     },
     "toolbar": {
@@ -3024,7 +3040,7 @@
       "walk": "Ir para o objeto seguinte ou anterior (ou para o slide, na faixa de slides) sem selecioná-lo",
       "toggle": "Adicionar à seleção ou remover dela",
       "points": "Entrar nos pontos de uma linha e sair deles",
-      "part": "Ponto seguinte ou anterior de uma linha; alça de corte seguinte ou anterior",
+      "part": "Ponto seguinte ou anterior de uma linha; alça de ajuste seguinte ou anterior de uma forma; alça de corte seguinte ou anterior",
       "addPoint": "Adicionar um ponto à linha",
       "removePoint": "Remover um ponto da linha",
       "lock": "Bloquear e desbloquear",
@@ -3032,6 +3048,7 @@
     },
     "at": {
       "point": "Ponto {{n}} de {{total}}. As setas o movem.",
+      "adjust": "Alça de ajuste {{n}} de {{total}}. As setas a movem.",
       "picture": "Corte: as setas movem a imagem. Ctrl+Seta para cima ou para baixo altera a escala. Tab vai para as alças.",
       "handle": "Alça de corte: {{where}}. As setas a movem.",
       "walkSelected": "{{what}}: na seleção",

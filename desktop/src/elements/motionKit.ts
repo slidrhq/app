@@ -193,6 +193,55 @@ export function runningLight(options: {
 }
 
 /**
+ * The stylesheet `runningLights` needs, once in a picture. Each light says in its `style` how far
+ * it runs (`--from`, `--to`), how long a round takes and how far into it the picture starts.
+ */
+export const RUNNING_LIGHTS_CSS =
+  '.run{animation:run linear infinite}' +
+  '@keyframes run{from{stroke-dashoffset:var(--from)}to{stroke-dashoffset:var(--to)}}';
+
+/**
+ * `count` lights that follow one another along a path of length `length`, each leaving a trail
+ * behind it, as `runningLight` draws one, but moved by CSS (`RUNNING_LIGHTS_CSS`) and not by
+ * SMIL: Chrome restyles a picture for every value SMIL sets, and the 64 lights of the `flow`
+ * background took 8 milliseconds of every frame that way, ten times what CSS takes (ADR-134).
+ *
+ * One copy of the path per layer draws every light: its dashes are the lights, `count` to a
+ * round, and a round moves them by a whole number of their period, so it starts again where it
+ * ended. A light runs from the start of the path until its trail has left the end. Without CSS
+ * animations the lights rest where the round starts.
+ */
+export function runningLights(options: {
+  path: string;
+  length: number;
+  stroke: string;
+  layers: readonly (readonly [dash: number, width: number, opacity: number])[];
+  dur: number;
+  /** Seconds the first light is into its run when the picture starts. */
+  into: number;
+  count: number;
+}): string {
+  const { path, length, stroke, layers, dur, into, count } = options;
+  const longest = Math.max(...layers.map(([dash]) => dash));
+  const way = length + longest;
+  const period = way / count;
+  const begin = num(-(((into % dur) + dur) % dur), 2);
+  return layers
+    .map(([dash, width, opacity]) => {
+      const paint =
+        ` fill="none" stroke="${stroke}" stroke-width="${num(width)}"` +
+        (opacity < 1 ? ` stroke-opacity="${num(opacity, 2)}"` : '') +
+        ` stroke-linecap="round" stroke-dasharray="${num(dash)} ${num(Math.max(1, period - dash), 2)}"` +
+        ` stroke-dashoffset="${num(dash)}"`;
+      const run =
+        `--from:${num(dash)}px;--to:${num(dash - way, 2)}px;` +
+        `animation-duration:${num(dur, 2)}s;animation-delay:${begin}s`;
+      return `<path class="run" d="${path}"${paint} style="${run}"/>`;
+    })
+    .join('');
+}
+
+/**
  * A dot that travels along a path: `dur` seconds a round, `into` seconds into it when the
  * picture starts, backwards when `back`.
  *

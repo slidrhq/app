@@ -17,6 +17,7 @@ export const tr: GirCopy = {
   },
   agenda: {
     name: 'Bu akşam',
+    kicker: 'Hoş geldiniz',
     title: 'Bu akşam, kırk dakikada',
     intro:
       'Kırk dakika boyunca 7. sınıfların bu yıl nasıl öğreneceğini, sınıfta neyin değiştiğini ve evde nasıl destek olabileceğinizi anlatacağız. Ardından çocuğunuzun sınıf öğretmeniyle yeni sınıfında tanışacaksınız.',

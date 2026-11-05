@@ -1582,6 +1582,21 @@
         "swing": "Ángulo de balanceo",
         "blink": "Intensidad del parpadeo"
       },
+      "flow": {
+        "title": "A lo largo de la línea",
+        "kind": {
+          "none": "Nada",
+          "dashes": "Guiones",
+          "box": "Cajas",
+          "dot": "Puntos"
+        },
+        "speed": "Píxeles por segundo",
+        "forward": "Hacia el final",
+        "back": "Hacia el inicio",
+        "count": "Cantidad",
+        "size": "Tamaño",
+        "color": "Color"
+      },
       "hint": "El movimiento se repite mientras se muestra la diapositiva: en el editor, en la presentación y en un archivo exportado."
     }
   },
@@ -3013,6 +3028,7 @@
       "editData": "Editar datos",
       "editCells": "Editar celdas",
       "editPoints": "Editar puntos",
+      "adjust": "Ajustar forma",
       "order": "Orden de las capas"
     },
     "toolbar": {
@@ -3024,7 +3040,7 @@
       "walk": "Ir al objeto siguiente o anterior (o a la diapositiva, en la tira de diapositivas) sin seleccionarlo",
       "toggle": "Agregar a la selección o quitar de ella",
       "points": "Entrar en los puntos de una línea y salir de ellos",
-      "part": "El punto siguiente o anterior de una línea; el controlador de recorte siguiente o anterior",
+      "part": "El punto siguiente o anterior de una línea; el controlador de ajuste siguiente o anterior de una forma; el controlador de recorte siguiente o anterior",
       "addPoint": "Agregar un punto a la línea",
       "removePoint": "Quitar un punto de la línea",
       "lock": "Bloquear y desbloquear",
@@ -3032,6 +3048,7 @@
     },
     "at": {
       "point": "Punto {{n}} de {{total}}. Las flechas lo mueven.",
+      "adjust": "Controlador de ajuste {{n}} de {{total}}. Las flechas lo mueven.",
       "picture": "Recorte: las flechas mueven la imagen. Ctrl+Flecha arriba o abajo cambia su tamaño. Tab va a los controladores.",
       "handle": "Controlador de recorte: {{where}}. Las flechas lo mueven.",
       "walkSelected": "{{what}}: en la selección",

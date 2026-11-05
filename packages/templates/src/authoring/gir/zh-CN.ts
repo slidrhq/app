@@ -17,6 +17,7 @@ export const zhCN: GirCopy = {
   },
   agenda: {
     name: '今晚',
+    kicker: '欢迎各位家长',
     title: '今晚的四十分钟',
     intro: [
       '用四十分钟介绍七年级今年怎样学习、课堂上会有哪些变化，以及您在家里可以怎样帮助孩子。',

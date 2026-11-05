@@ -11,6 +11,7 @@ export const tr: DofekCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'Başlamadan önce',
     title: 'Bugün neleri konuşacağız',
     intro:
       'Yirmi dakika boyunca programın neleri değiştirdiğini, bugün sokakta bir kalp durduğunda neler olduğunu ve 2027 için meclisten ne istediğimizi anlatacağız. Ardından sorularınızı yanıtlayacağız.',

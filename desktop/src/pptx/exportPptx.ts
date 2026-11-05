@@ -12,7 +12,7 @@ import type { Editor } from '../shell';
 import { elementPictures, toPng, videoFrame } from './pictures';
 
 /*
- * The deck as a PowerPoint file (ADR-108): the choices of the dialog, the export with what only
+ * The deck as a PowerPoint file (ADR-132): the choices of the dialog, the export with what only
  * the app can do for it (the assets' bytes, the pictures of objects PowerPoint has no object
  * for, the counterparts of the fonts), and the file written where the user chose.
  */

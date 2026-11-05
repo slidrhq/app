@@ -8,7 +8,8 @@ import {
   polylineLength,
   polylinePath,
   random,
-  runningLight,
+  RUNNING_LIGHTS_CSS,
+  runningLights,
   smoothPath,
   travelling,
   type Pt,
@@ -82,26 +83,22 @@ function flow(): string {
     // half as long: so a light keeps the reference's pace across the slide.
     paths.push({ points, off: rng(), speed: (0.0015 + rng() * 0.003) * 0.5 });
   }
-  const defs = paths.map((p, i) => `<path id="p${i}" d="${polylinePath(p.points)}"/>`).join('');
   const layers = [
     [62, 3, 0.32],
     [0.5, 7.2, 0.85],
   ] as const;
+  // Two lights on each trace, half a round apart, as the reference has them.
   const lights = paths
-    .map(({ points, off, speed }, i) => {
+    .map(({ points, off, speed }) => {
       const length = polylineLength(points);
       // A round of the reference's: the whole path in `1 / (speed * 60)` seconds.
       const round = 1 / (speed * 60);
       const dur = (round * (length + layers[0][0])) / length;
-      return [0, 0.5]
-        .map((k) =>
-          runningLight({ path: `#p${i}`, length, stroke: P, layers, dur, into: (off + k) * round }),
-        )
-        .join('');
+      const path = polylinePath(points);
+      return runningLights({ path, length, stroke: P, layers, dur, into: off * round, count: 2 });
     })
     .join('');
   const body =
-    `<defs>${defs}</defs>` +
     `<path d="${paths.map((p) => polylinePath(p.points)).join('')}" fill="none" stroke="${P}" stroke-opacity=".16" stroke-width="2"/>` +
     dotsAt(
       paths.flatMap((p) => p.points),
@@ -110,7 +107,7 @@ function flow(): string {
       0.35,
     ) +
     lights;
-  return picture(W, H, body);
+  return picture(W, H, body, RUNNING_LIGHTS_CSS);
 }
 
 /**

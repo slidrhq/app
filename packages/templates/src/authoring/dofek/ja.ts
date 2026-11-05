@@ -11,6 +11,7 @@ export const ja: DofekCopy = {
   },
   agenda: {
     name: 'アジェンダ',
+    kicker: '始める前に',
     title: '本日お話しすること',
     intro: [
       'この20分では、プログラムが何を変えたのか、街で心臓が止まったときにいま何が起きるのか、',

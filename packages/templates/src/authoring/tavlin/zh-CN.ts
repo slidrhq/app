@@ -17,6 +17,7 @@ export const zhCN: TavlinCopy = {
   },
   agenda: {
     name: '议程',
+    kicker: '致合作伙伴',
     title: '今日菜单',
     intro: [
       '这四十分钟里，我们将讲述七种香料如何从一个周末市集，成长为接待四万一千位来宾的美食节，',

@@ -104,7 +104,7 @@ const UNSAFE = /[<>:"/\\|?*\x00-\x1f]/g;
 
 /**
  * The name an export is offered under: the document's, else the deck's title, else `fallback`,
- * with the extension of the file it is (`html`, or `pptx` for PowerPoint, ADR-108).
+ * with the extension of the file it is (`html`, or `pptx` for PowerPoint, ADR-132).
  */
 export function exportFileName(
   path: string | null,

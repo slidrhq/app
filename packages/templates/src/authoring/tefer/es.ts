@@ -17,6 +17,7 @@ export const es: TeferCopy = {
   },
   agenda: {
     name: 'Orden del día',
+    kicker: 'Presentación para compradores',
     title: 'Sobre la mesa esta mañana',
     intro:
       'Cuarenta minutos sobre una colección de veinticuatro abrigos: de dónde viene su tela, cómo la cortamos para que casi nada quede en el suelo y cómo pedirla para el otoño. Después, los abrigos mismos, en el perchero.',

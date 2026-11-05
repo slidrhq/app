@@ -17,6 +17,7 @@ export const vi: HadranCopy = {
   },
   setlist: {
     name: 'Danh sách bài',
+    kicker: 'Ra mắt mùa diễn',
     title: 'Danh sách bài tối nay',
     intro:
       'Bốn mươi phút về mùa diễn sắp tới: những gì mùa trước dạy chúng tôi, mười hai đĩa nhạc sẽ phát hành, mười tám thành phố của tour và trường nhạc của chúng tôi. Sau đó quầy bar mở cửa và ban nhạc lên sân khấu.',

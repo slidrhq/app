@@ -1582,6 +1582,21 @@
         "swing": "Angolo di oscillazione",
         "blink": "Intensità del lampeggio"
       },
+      "flow": {
+        "title": "Lungo la linea",
+        "kind": {
+          "none": "Nessuno",
+          "dashes": "Trattini",
+          "box": "Scatole",
+          "dot": "Punti"
+        },
+        "speed": "Pixel al secondo",
+        "forward": "Verso la fine",
+        "back": "Verso l'inizio",
+        "count": "Quantità",
+        "size": "Dimensione",
+        "color": "Colore"
+      },
       "hint": "Il movimento si ripete finché la diapositiva è visibile: nell’editor, nella presentazione e in un file esportato."
     }
   },
@@ -3013,6 +3028,7 @@
       "editData": "Modifica dati",
       "editCells": "Modifica celle",
       "editPoints": "Modifica punti",
+      "adjust": "Regola forma",
       "order": "Ordine dei livelli"
     },
     "toolbar": {
@@ -3024,7 +3040,7 @@
       "walk": "Passa all'oggetto successivo o precedente (o alla diapositiva, nel riquadro delle diapositive) senza selezionarlo",
       "toggle": "Aggiungi alla selezione o rimuovi da essa",
       "points": "Entra nei punti di una linea ed esci",
-      "part": "Punto successivo o precedente di una linea; quadratino di ritaglio successivo o precedente",
+      "part": "Punto successivo o precedente di una linea; quadratino di regolazione successivo o precedente di una forma; quadratino di ritaglio successivo o precedente",
       "addPoint": "Aggiungi un punto alla linea",
       "removePoint": "Rimuovi un punto dalla linea",
       "lock": "Blocca e sblocca",
@@ -3032,6 +3048,7 @@
     },
     "at": {
       "point": "Punto {{n}} di {{total}}. Spostalo con le frecce.",
+      "adjust": "Quadratino di regolazione {{n}} di {{total}}. Spostalo con le frecce.",
       "picture": "Ritaglio: sposta l'immagine con le frecce. Ctrl+freccia su o giù la ridimensiona. Tab passa ai quadratini.",
       "handle": "Quadratino di ritaglio: {{where}}. Spostalo con le frecce.",
       "walkSelected": "{{what}}: nella selezione",

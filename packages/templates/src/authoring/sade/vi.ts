@@ -17,6 +17,7 @@ export const vi: SadeCopy = {
   },
   agenda: {
     name: 'Chương trình',
+    kicker: 'Đại hội thành viên',
     title: 'Sáng nay chúng ta sẽ bàn những gì',
     intro:
       'Bốn mươi phút về vụ thu hoạch 2026: chúng ta đã trồng gì, tốn bao nhiêu nước và đất cho thấy điều gì. Sau đó là kế hoạch mùa vụ 2027 và thời gian để quý vị đặt câu hỏi.',

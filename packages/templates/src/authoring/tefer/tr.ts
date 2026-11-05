@@ -17,6 +17,7 @@ export const tr: TeferCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'Alıcı sunumu',
     title: 'Bu sabah masada neler var',
     intro:
       'Yirmi dört paltoluk bir koleksiyon üzerine kırk dakika: kumaşı nereden geldi, yerde neredeyse hiçbir şey kalmayacak şekilde onu nasıl kesiyoruz ve sonbahar için nasıl sipariş verilir. Ardından askıdaki paltoların kendisi.',

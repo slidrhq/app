@@ -17,6 +17,7 @@ export const es: TaaruchaCopy = {
   },
   agenda: {
     name: 'Esta mañana',
+    kicker: 'Para prensa y mecenas',
     title: 'La visita de esta mañana',
     intro:
       'Cuarenta minutos sobre cómo hemos vuelto a montar la colección tras dos años de obras, y sobre lo que cambia para el público desde el día de la apertura. Después, un paseo por las primeras salas.',

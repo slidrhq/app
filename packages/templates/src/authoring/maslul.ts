@@ -1018,16 +1018,19 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a white sheet from margin to margin, down to over the foot, from its top;
-      // a hurdle stands on the sheet's corner, beside the title.
+      // a hurdle stands on the sheet's corner, beside the title. The kicker over the title and
+      // the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 230, 1, false).placeholders,
-        place('p_body', 'body', at(START + 72, 290, WIDTH - 144, 590), 'body'),
+        ...head('text', WIDTH - 230, 1).placeholders,
+        // The body's start on the footer's, by the same edge.
+        place('p_body', 'body', at(START + 74, 298, WIDTH - 146, 582), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        ...head('text', WIDTH - 230, 1, false).decorations,
-        ...sheet('d_maslul_text_sheet', at(START, 236, WIDTH, 684)),
-        art('d_maslul_text_hurdle', atEnd(END + 44, 120, 170, 118), hurdle(170, 118, RED)),
-        ...foot('text', false).decorations,
+        ...head('text', WIDTH - 230, 1).decorations,
+        ...sheet('d_maslul_text_sheet', at(START, 244, WIDTH, 676)),
+        art('d_maslul_text_hurdle', atEnd(END + 44, 128, 170, 118), hurdle(170, 118, RED)),
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1496,6 +1499,7 @@ function drawSample(copy: MaslulCopy): SampleSlide[] {
       layout: 'l_maslul_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1506,6 +1510,7 @@ function drawSample(copy: MaslulCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

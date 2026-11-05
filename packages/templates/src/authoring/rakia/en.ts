@@ -17,6 +17,7 @@ export const en: RakiaCopy = {
   },
   agenda: {
     name: 'Tonight',
+    kicker: 'The briefing',
     title: 'Tonight, in four parts',
     intro:
       'Forty minutes on the telescope that sees its first starlight this week, what it will observe in its first season, and how every partner university will share its nights. Then we open the dome.',

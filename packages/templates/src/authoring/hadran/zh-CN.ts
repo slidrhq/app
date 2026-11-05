@@ -17,6 +17,7 @@ export const zhCN: HadranCopy = {
   },
   setlist: {
     name: '曲目单',
+    kicker: '演出季启动',
     title: '今晚的曲目单',
     intro: [
       '用四十分钟谈谈新的演出季：上个演出季教会了我们什么，我们将发行的十二张唱片，',

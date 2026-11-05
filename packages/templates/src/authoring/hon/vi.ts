@@ -11,6 +11,7 @@ export const vi: HonCopy = {
   },
   agenda: {
     name: 'Chương trình',
+    kicker: 'Đại hội thường niên',
     title: 'Chương trình tối nay',
     intro:
       'Bốn mươi phút về năm 2026 của ngân hàng do chính quý vị sở hữu: chúng tôi đã cho vay bao nhiêu, giữ lại bao nhiêu làm vốn và những gì đã trở về với quý vị, các thành viên. Sau đó là phần biểu quyết và câu hỏi của quý vị.',

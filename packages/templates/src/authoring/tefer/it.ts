@@ -17,6 +17,7 @@ export const it: TeferCopy = {
   },
   agenda: {
     name: 'Programma',
+    kicker: 'Presentazione ai buyer',
     title: 'Sul tavolo stamattina',
     intro:
       'Quaranta minuti su una collezione di ventiquattro cappotti: da dove viene il suo tessuto, come lo tagliamo perché a terra non resti quasi nulla e come ordinarla per l’autunno. Poi i cappotti stessi, sullo stender.',

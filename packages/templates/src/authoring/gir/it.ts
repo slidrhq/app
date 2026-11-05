@@ -17,6 +17,7 @@ export const it: GirCopy = {
   },
   agenda: {
     name: 'Stasera',
+    kicker: 'Benvenuti',
     title: 'Stasera, in quaranta minuti',
     intro:
       'Quaranta minuti su come impareranno le prime quest’anno, su cosa cambia in classe e su come potete aiutare a casa. Poi conoscerete il coordinatore di classe di vostro figlio, nella sua nuova aula.',

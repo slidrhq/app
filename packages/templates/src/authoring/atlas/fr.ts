@@ -22,6 +22,7 @@ export const fr: AtlasCopy = {
   },
   agenda: {
     name: 'Ordre du jour',
+    kicker: 'Ouverture',
     title: 'Au programme aujourd’hui',
     intro:
       'Vingt-cinq minutes sur ce que quatorze villes portuaires ont appris cette année sur la réutilisation et le dessalement de l’eau, et sur ce que nous demanderons ensuite à chaque partenaire. Puis vos questions.',

@@ -57,7 +57,7 @@ const RESERVED: [&str; 7] = [
     "mock",
 ];
 
-/// The folder an agent's package is unpacked into (ADR-125): `%SLIDR_AGENT_DIR%` in its program,
+/// The folder an agent's package is unpacked into (ADR-130): `%SLIDR_AGENT_DIR%` in its program,
 /// arguments and environment, and a variable of its environment.
 pub const AGENT_DIR: &str = "SLIDR_AGENT_DIR";
 
@@ -145,7 +145,7 @@ pub enum Install {
     },
     /// npm's package, after Node.js when npm is missing.
     Npm { npm: String },
-    /// A package of the organization's library (ADR-125): a .zip of the CLI and every file it
+    /// A package of the organization's library (ADR-130): a .zip of the CLI and every file it
     /// needs, downloaded from the library alone and unpacked into a folder of the agent's own.
     /// `sha256` and `size` are of the package as the settings were published; the app installs it
     /// as the library has it at the start that installs it.
@@ -239,7 +239,7 @@ fn is_hash(value: &str) -> bool {
 }
 
 impl CustomAgent {
-    /// The path of its package in the library, when it comes as one (ADR-125).
+    /// The path of its package in the library, when it comes as one (ADR-130).
     pub fn package(&self) -> Option<&str> {
         match &self.install {
             Some(Install::Package { package, .. }) => Some(package),

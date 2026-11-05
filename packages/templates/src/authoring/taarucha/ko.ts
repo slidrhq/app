@@ -17,6 +17,7 @@ export const ko: TaaruchaCopy = {
   },
   agenda: {
     name: '오늘 오전',
+    kicker: '언론과 후원자 여러분께',
     title: '오늘 오전의 사전 공개',
     intro: [
       '40분 동안 2년간의 공사를 마친 뒤 소장품을 어떻게 다시 걸었는지,',

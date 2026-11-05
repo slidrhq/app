@@ -17,6 +17,7 @@ export const ptBR: TaaruchaCopy = {
   },
   agenda: {
     name: 'Esta manhã',
+    kicker: 'Para imprensa e patronos',
     title: 'A visita desta manhã',
     intro:
       'Quarenta minutos sobre como remontamos o acervo depois de dois anos de obras, e sobre o que muda para o público a partir do dia da abertura. Depois, um passeio pelas primeiras salas.',

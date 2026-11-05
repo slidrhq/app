@@ -1146,16 +1146,18 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a panel of dark glass from margin to margin, down to over the horizon,
-      // from its top; a small constellation stands in the margin beside the title.
+      // from its top; a small constellation stands in the margin beside the title. The kicker
+      // over the title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        place('p_title', 'title', at(START + 48, 118, WIDTH - 330, 84), 'title'),
-        place('p_body', 'body', at(START + 72, 292, WIDTH - 144, 584), 'body'),
+        ...head('text', WIDTH - 330, 1).placeholders,
+        place('p_body', 'body', at(START + 72, 300, WIDTH - 144, 576), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        kickerStar('d_rakia_text_star', 142),
+        ...head('text', WIDTH - 330, 1).decorations,
         art(
           'd_rakia_text_constellation',
-          atEnd(END, 104, 250, 116),
+          atEnd(END, 112, 250, 116),
           constellation(
             [
               [212, 30, 2.6],
@@ -1174,12 +1176,12 @@ function layouts(): Layout[] {
             ],
           ),
         ),
-        card('d_rakia_text_panel', at(START, 236, WIDTH, 676), 10),
+        card('d_rakia_text_panel', at(START, 244, WIDTH, 668), 10),
         // The corner marks of a camera's frame, each a part of its own.
         ...(
           [
-            ['top_start', at(START + 18, 254, 32, 32), 'M0 1H31V32'],
-            ['top_end', atEnd(END + 18, 254, 32, 32), 'M32 1H1V32'],
+            ['top_start', at(START + 18, 262, 32, 32), 'M0 1H31V32'],
+            ['top_end', atEnd(END + 18, 262, 32, 32), 'M32 1H1V32'],
             ['bottom_start', at(START + 18, 862, 32, 32), 'M0 31H31V0'],
             ['bottom_end', atEnd(END + 18, 862, 32, 32), 'M32 31H1V0'],
           ] as const
@@ -1190,7 +1192,7 @@ function layouts(): Layout[] {
             `<path d="${d}" stroke="${VEGA}" stroke-opacity=".75" stroke-width="2"/>`,
           ),
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1593,6 +1595,7 @@ function drawSample(copy: RakiaCopy): SampleSlide[] {
       layout: 'l_rakia_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1603,6 +1606,7 @@ function drawSample(copy: RakiaCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

@@ -10,6 +10,7 @@ export const es: TechnologyCopies = {
     ],
     section: ['Una sola región', 'Un fallo allí detenía todos los pagos.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Lo que veremos hoy',
       lead: [
         'Por qué una región dejó de bastar para nuestro núcleo de pagos.',
@@ -118,6 +119,7 @@ export const es: TechnologyCopies = {
     ],
     section: ['Presupuesto de consumo', 'Cada microamperio cuenta durante diez años.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Las preguntas de esta revisión',
       lead: [
         'Cuatro respuestas medibles deciden el paso a DVT en abril.',
@@ -238,6 +240,7 @@ export const es: TechnologyCopies = {
     ],
     section: ['Las novedades', 'Tres cosas que pidieron y una sorpresa.'],
     agenda: {
+      kicker: 'La agenda',
       title: 'El programa de esta noche',
       lead: [
         'Treinta minutos sobre las novedades de Zrima 2.0 y sus motivos.',

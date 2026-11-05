@@ -10,6 +10,7 @@ export const id: TechnologyCopies = {
     ],
     section: ['Satu wilayah', 'Satu gangguan di sana menghentikan semua pembayaran.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Yang kita bahas hari ini',
       lead: [
         'Mengapa satu wilayah tidak lagi cukup untuk inti pembayaran kami.',
@@ -114,6 +115,7 @@ export const id: TechnologyCopies = {
     hero: ['Sepuluh tahun,', 'satu baterai', 'Meter air pintar WM-10, dari prototipe ke produksi.'],
     section: ['Anggaran daya', 'Setiap mikroampere berarti selama sepuluh tahun.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Pertanyaan dalam tinjauan ini',
       lead: [
         'Empat jawaban terukur menentukan tahap DVT pada April.',
@@ -226,6 +228,7 @@ export const id: TechnologyCopies = {
     ],
     section: ['Yang baru', 'Tiga permintaan Anda dan satu kejutan.'],
     agenda: {
+      kicker: 'Susunan acara',
       title: 'Acara malam ini',
       lead: [
         'Tiga puluh menit tentang pembaruan Zrima 2.0 dan alasan di baliknya.',

@@ -17,6 +17,7 @@ export const en: TeferCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Buyers’ presentation',
     title: 'On the table this morning',
     intro:
       'Forty minutes on a collection of twenty-four coats: where its cloth came from, how we cut it so that almost nothing is left on the floor, and how to order it for the autumn. Then the coats themselves, on the rail.',

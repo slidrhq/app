@@ -932,7 +932,7 @@ const ICONS = {
 
 function layouts(): Layout[] {
   const kit = drumKit();
-  const sheet = at(START, 236, WIDTH, 680);
+  const sheet = at(START, 244, WIDTH, 672);
   const tableCase = at(START, 252, WIDTH, 608);
   const ticket = at(176, 190, 1568, 640);
   const stub = 440;
@@ -1093,17 +1093,19 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The setlist: a sheet taped to the stage from margin to margin, down to over the foot,
-      // the text from its top; a pick dropped on its corner.
+      // the text from its top; a pick dropped on its corner. The kicker over the title and the
+      // footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        place('p_title', 'title', at(KICK, 114, WIDTH - 220, 90), 'title'),
+        ...head('text', WIDTH - 220).placeholders,
         place('p_body', 'body', at(START + 72, sheet.y + 66, WIDTH - 144, 500), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        play('d_hadran_text_play', 136),
+        ...head('text', WIDTH - 220).decorations,
         card('d_hadran_text_sheet', sheet, 6),
         // Gaffer tape over the two top corners of the sheet.
-        art('d_hadran_text_tape1', at(START - 44, 206, 200, 76), gaffer(9)),
-        art('d_hadran_text_tape2', atEnd(END - 44, 206, 200, 76), gaffer(-7)),
+        art('d_hadran_text_tape1', at(START - 44, 214, 200, 76), gaffer(9)),
+        art('d_hadran_text_tape2', atEnd(END - 44, 214, 200, 76), gaffer(-7)),
         // A pick left on the sheet's last corner, clear of the text.
         lifted(
           art(
@@ -1115,7 +1117,7 @@ function layouts(): Layout[] {
           12,
           0.22,
         ),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1649,6 +1651,7 @@ function drawSample(copy: HadranCopy): SampleSlide[] {
       layout: 'l_hadran_text',
       name: copy.setlist.name,
       content: {
+        caption: text(copy.setlist.kicker),
         title: lines(copy.setlist.title),
         body: {
           paragraphs: [
@@ -1659,6 +1662,7 @@ function drawSample(copy: HadranCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

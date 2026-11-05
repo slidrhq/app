@@ -17,6 +17,7 @@ export const en: TaaruchaCopy = {
   },
   agenda: {
     name: 'This morning',
+    kicker: 'For press and patrons',
     title: 'This morning’s preview',
     intro:
       'Forty minutes on how we rehung the collection after two years of building work, and on what changes for visitors from the day the doors open. Then a walk through the first rooms.',

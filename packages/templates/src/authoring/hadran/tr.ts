@@ -17,6 +17,7 @@ export const tr: HadranCopy = {
   },
   setlist: {
     name: 'Set listesi',
+    kicker: 'Sezon açılışı',
     title: 'Bu gecenin set listesi',
     intro:
       'Önümüzdeki sezon üzerine kırk dakika: geçen sezonun bize öğrettikleri, çıkaracağımız on iki plak, turnenin on sekiz şehri ve okulumuz. Ardından bar açılıyor ve grup sahneye çıkıyor.',

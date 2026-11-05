@@ -17,6 +17,7 @@ export const tr: SadeCopy = {
   },
   agenda: {
     name: 'Gündem',
+    kicker: 'Ortaklar genel kurulu',
     title: 'Bu sabah neleri konuşacağız',
     intro:
       '2026 hasadı üzerine kırk dakika: neler yetiştirdik, ne kadar su harcadık ve toprak bize neler anlattı. Ardından 2027 sezonunun planı ve sorularınız için ayrılan zaman.',

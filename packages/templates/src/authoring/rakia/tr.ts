@@ -17,6 +17,7 @@ export const tr: RakiaCopy = {
   },
   agenda: {
     name: 'Bu akşam',
+    kicker: 'Bilgilendirme',
     title: 'Bu akşam, dört bölümde',
     intro:
       'Bu hafta ilk yıldız ışığını alan teleskop üzerine kırk dakika: ilk sezonunda neleri gözlemleyeceği ve her ortak üniversitenin gecelerini nasıl paylaşacağı. Ardından kubbeyi açıyoruz.',

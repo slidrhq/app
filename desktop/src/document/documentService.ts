@@ -130,7 +130,7 @@ export class DocumentService {
   }
 
   /**
-   * Starts a new, unsaved document from a file of another kind (a PowerPoint file, ADR-108).
+   * Starts a new, unsaved document from a file of another kind (a PowerPoint file, ADR-132).
    * `build` gets a store for the new document's files, puts the file's pictures and media in it
    * and returns the deck; the open document stays until then, and stays when `build` fails or
    * `mayReplace` keeps it. The deck counts as unsaved: it is in no `.slidr` file yet.

@@ -20,7 +20,7 @@ Status: Implemented in the 2026-10-26 working tree; **not committed** at the tim
     - or a renderer of our own, whose fidelity for Hebrew, lists and tables would be poor.
 
     A PDF would help Claude Code alone, and Claude reads every page of a PDF as a picture as well as text, so each read costs thousands of tokens a page.
-  - **Reading the file in the app, into Markdown and the pictures in it.** This needs no new dependency: `@slidr/pptx` already has a ZIP reader and an XML parser ([ADR-108](ADR-108-powerpoint-files.md)). Every harness reads the result, and the text is exact, Hebrew included.
+  - **Reading the file in the app, into Markdown and the pictures in it.** This needs no new dependency: `@slidr/pptx` already has a ZIP reader and an XML parser ([ADR-132](ADR-132-powerpoint-files.md)). Every harness reads the result, and the text is exact, Hebrew included.
 
 ## Decision
 

@@ -5,7 +5,7 @@ import type { AssetMeta, Deck } from '@slidr/model';
 import { importPptx } from '@slidr/pptx';
 import { FHD, openApp } from './runtime-app-helpers';
 
-// PowerPoint in the app (ADR-108): "Export…" in PowerPoint's format writes a .pptx that reads back
+// PowerPoint in the app (ADR-132): "Export…" in PowerPoint's format writes a .pptx that reads back
 // as the deck, "Import…" opens one made elsewhere as a new document, and a file that is not
 // one is refused. In a plain browser the file is a download and the chosen file is read whole;
 // in the app they go through the save and open dialogs and the Rust commands.

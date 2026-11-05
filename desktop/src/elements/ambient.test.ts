@@ -18,7 +18,7 @@ import {
   PIECE_SPEEDS,
 } from './motion';
 import { atSpeed } from './motionKit';
-import { motionPieces } from './motionPieces';
+import { motionPictures } from './motionPieces';
 import { MOTION_SHAPES, motionShapeElement } from './motionShapes';
 import { newAmbient } from './MotionTool';
 
@@ -29,7 +29,8 @@ import { newAmbient } from './MotionTool';
  * browser, `motion.browser.test.tsx`.
  */
 
-const pieces = motionPieces();
+/** The animations that are pictures: a line's pace is its flow's (ADR-131). */
+const pieces = motionPictures();
 
 /** Every time written in a picture, in seconds, in order. */
 function times(markup: string): number[] {

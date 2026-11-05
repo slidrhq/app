@@ -48,5 +48,5 @@ Two pictures came with it, cut from the reference deck: a dashed orbit with dots
 
 - Whether a background from Elements should also be offered as a template's background variant, and whether the agent should be able to choose one.
 - Whether the speed of an animation should be adjustable (it would be a field on the element, read by the renderer as a playback rate), or whether its motion should follow the show (start with an entrance, hold on a black screen). The speed was answered by [ADR-128](ADR-128-motion-that-repeats-and-animated-shapes.md): row B's Motion tool draws the picture again at another speed.
-- The filmstrip's thumbnail of a slide with a moving background moves too, as the renderer draws it. Whether a thumbnail should be still (`mode="thumbnail"` in the renderer) is open; it was not measured on a long deck.
+- The filmstrip's thumbnail of a slide with a moving background moves too, as the renderer draws it. Whether a thumbnail should be still (`mode="thumbnail"` in the renderer) is open; it was not measured on a long deck. Answered by [ADR-134](ADR-134-motion-that-costs-less.md): measured, it was the costliest motion of the app, and a thumbnail now holds still.
 - The pieces were reviewed in the app's mocked browser setup and in Edge, not in the packaged app's window, and not in an exported PowerPoint file opened in PowerPoint.

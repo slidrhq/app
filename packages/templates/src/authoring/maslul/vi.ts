@@ -19,6 +19,7 @@ export const vi: MaslulCopy = {
   },
   agenda: {
     name: 'Tối nay',
+    kicker: 'Dành cho hội viên',
     title: 'Nội dung tối nay',
     intro:
       'Bốn mươi phút cho vận động viên, phụ huynh và huấn luyện viên: mùa giải 2027 diễn ra thế nào, điều gì đổi khác khi tháng Ba ta chuyển sang đường chạy riêng, và mỗi nhóm tập ra sao. Cuối buổi là hỏi đáp.',

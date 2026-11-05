@@ -248,7 +248,7 @@ export function useActionPopover(id: ToolAction): ComponentType<ActionPopoverPro
 
 /**
  * A kind of file the app takes in by importing it rather than opening it, such as a page of HTML
- * (ADR-036) or a PowerPoint presentation (ADR-108). "Open…" of the File menu and "Load from file"
+ * (ADR-036) or a PowerPoint presentation (ADR-132). "Open…" of the File menu and "Load from file"
  * of the welcome screen offer the files of every importer in the same dialog as the app's own,
  * and hand the one chosen to the importer of its extension (ADR-123).
  */

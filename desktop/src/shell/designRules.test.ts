@@ -38,7 +38,7 @@ const exempt: Record<string, string> = {
   'desktop/src/templates/acceptance.ts':
     'the contact sheet a template is accepted on: a picture on a canvas (ADR-063)',
   'desktop/src/pptx/pictures.ts':
-    'the pictures of objects for a PowerPoint file, drawn on black and on white (ADR-108)',
+    'the pictures of objects for a PowerPoint file, drawn on black and on white (ADR-132)',
 
   // The stand-ins of a plain browser page, which paint the pictures that a provider or a photo
   // library would return.

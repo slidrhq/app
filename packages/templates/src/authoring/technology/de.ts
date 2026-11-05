@@ -10,6 +10,7 @@ export const de: TechnologyCopies = {
     ],
     section: ['Eine Region', 'Ein Ausfall dort stoppte jede Zahlung.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Darüber sprechen wir heute',
       lead: [
         'Warum eine Region für unseren Zahlungskern nicht mehr reichte.',
@@ -118,6 +119,7 @@ export const de: TechnologyCopies = {
     ],
     section: ['Das Strombudget', 'Jedes Mikroampere zählt, zehn Jahre lang.'],
     agenda: {
+      kicker: 'Agenda',
       title: 'Die Fragen dieser Prüfung',
       lead: [
         'Vier messbare Antworten entscheiden über die DVT im April.',
@@ -226,6 +228,7 @@ export const de: TechnologyCopies = {
     ],
     section: ['Was ist neu?', 'Drei Wünsche von Ihnen, dazu eine Überraschung.'],
     agenda: {
+      kicker: 'Der Ablauf',
       title: 'Das Programm heute Abend',
       lead: [
         'In 30 Minuten: Was Zrima 2.0 neu kann und warum wir es gebaut haben.',

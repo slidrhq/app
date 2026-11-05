@@ -17,6 +17,7 @@ export const es: TavlinCopy = {
   },
   agenda: {
     name: 'Orden del día',
+    kicker: 'Para nuestros colaboradores',
     title: 'Hoy en el menú',
     intro:
       'Cuarenta minutos sobre cómo Siete Especias pasó de ser un mercado de fin de semana a un festival de cuarenta y un mil visitantes, y sobre lo que pediremos a cada socio para mayo. Después, sus preguntas, con un té.',

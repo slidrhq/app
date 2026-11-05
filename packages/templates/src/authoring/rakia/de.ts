@@ -17,6 +17,7 @@ export const de: RakiaCopy = {
   },
   agenda: {
     name: 'Heute Abend',
+    kicker: 'Das Briefing',
     title: 'Heute Abend, in vier Teilen',
     intro:
       'Vierzig Minuten über das Teleskop, das diese Woche sein erstes Sternenlicht empfängt, über seine erste Beobachtungssaison und darüber, wie die Partneruniversitäten seine Nächte teilen. Danach öffnen wir die Kuppel.',

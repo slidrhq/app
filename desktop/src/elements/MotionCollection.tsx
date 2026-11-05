@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createSlide, type Background, type Deck, type Slide } from '@slidr/model';
-import { FittedSlide } from '@slidr/renderer';
+import {
+  createSlide,
+  type Background,
+  type Deck,
+  type LineElement,
+  type Slide,
+} from '@slidr/model';
+import { FittedSlide, STILL_AT } from '@slidr/renderer';
 import { cx, Input, Tooltip } from '@slidr/ui';
 import { Play, Search } from '@slidr/ui/icons';
 import { searchIcons, withTags, wordsOf, type SearchWords } from '../media/icons/search';
@@ -19,9 +25,6 @@ import { MOTION_SHAPES, motionShapeElement, type MotionShape } from './motionSha
  * ground under the background's drawing, as a click would leave it. A tile is still, at a moment
  * that shows what it is, and moves while the pointer or the keyboard is on it.
  */
-
-/** How far into its motion a still tile shows a drawing, in seconds. */
-const STILL_AT = 4;
 
 /** The longest side of an animation on its tile's slide, as a share of the slide's height. */
 const PIECE_HEIGHT = 0.84;
@@ -194,20 +197,42 @@ function TileGrid({ label, children }: { label: string; children: ReactNode }) {
 
 /* ---------------------------------------------------------------- animations */
 
+/**
+ * A line of an animation (ADR-131) drawn `scale` times as large: its points, its width and the
+ * pace of what runs along it, so that it looks and moves on its tile as on a slide of its size.
+ */
+function scaledLine(line: LineElement, scale: number): LineElement {
+  const { flow } = line;
+  return {
+    ...line,
+    points: line.points.map((p) => ({ x: p.x * scale, y: p.y * scale })),
+    stroke: { ...line.stroke, width: line.stroke.width * scale },
+    ...(flow
+      ? {
+          flow: {
+            ...flow,
+            speed: flow.speed * scale,
+            ...(flow.size === undefined ? {} : { size: flow.size * scale }),
+          },
+        }
+      : {}),
+  };
+}
+
 /** The slide an animation's tile draws: the piece, large, in the middle of the theme's ground. */
 function pieceSlide(piece: MotionPiece, deck: Deck): Slide {
   const element = motionElement(piece, deck);
   const scale = (deck.size.h * PIECE_HEIGHT) / Math.max(piece.size.h, piece.size.w * 0.56);
   const [w, h] = [piece.size.w * scale, piece.size.h * scale];
+  const frame = { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h };
+  const id = `motion_${piece.id}`;
   return createSlide({
     id: `s_motion_${piece.id}`,
     background: { fill: { kind: 'solid', color: { token: 'bg' } } },
     elements: [
-      {
-        ...element,
-        id: `motion_${piece.id}`,
-        frame: { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h },
-      },
+      element.type === 'line'
+        ? { ...scaledLine(element, scale), id, frame }
+        : { ...element, id, frame },
     ],
   });
 }

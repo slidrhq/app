@@ -20,6 +20,7 @@ export const fr: RakiaCopy = {
   },
   agenda: {
     name: 'Ce soir',
+    kicker: 'Le briefing',
     title: 'Ce soir, en quatre temps',
     intro:
       'Quarante minutes sur le télescope qui capte cette semaine sa première lumière, sur ce qu’il observera lors de sa première saison et sur le partage de ses nuits entre les universités partenaires. Puis nous ouvrons la coupole.',

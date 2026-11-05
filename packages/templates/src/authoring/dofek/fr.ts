@@ -11,6 +11,7 @@ export const fr: DofekCopy = {
   },
   agenda: {
     name: 'Ordre du jour',
+    kicker: 'Avant de commencer',
     title: 'Ce que nous verrons aujourd’hui',
     intro:
       'Vingt minutes sur ce que le programme a changé, sur ce qui se passe aujourd’hui dans la rue quand un cœur s’arrête, et sur ce que nous demandons au conseil pour 2027. Puis place à vos questions.',

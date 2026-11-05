@@ -40,6 +40,8 @@ export interface TeferCopy {
    */
   agenda: {
     name: string;
+    /** The kicker over the title, as the text-and-image slide has one (ADR-135). */
+    kicker: string;
     title: Title;
     intro: Title;
     items: [opening: string, rest: string][];

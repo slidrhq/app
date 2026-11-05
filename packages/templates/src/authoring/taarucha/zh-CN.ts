@@ -17,6 +17,7 @@ export const zhCN: TaaruchaCopy = {
   },
   agenda: {
     name: '今天上午',
+    kicker: '致媒体与赞助人',
     title: '今天上午的预览',
     intro: [
       '在接下来的四十分钟里，我们将介绍历经两年施工后如何重新陈列馆藏，',

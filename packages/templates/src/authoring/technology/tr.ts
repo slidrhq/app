@@ -10,6 +10,7 @@ export const tr: TechnologyCopies = {
     ],
     section: ['Tek bir bölge', 'Oradaki bir arıza tüm ödemeleri durduruyordu.'],
     agenda: {
+      kicker: 'Gündem',
       title: 'Bugün neleri ele alacağız?',
       lead: [
         'Ödeme çekirdeğimiz için tek bölgenin neden yetersiz kaldığını konuşacağız.',
@@ -114,6 +115,7 @@ export const tr: TechnologyCopies = {
     hero: ['On yıl,', 'tek pil', 'WM-10 akıllı su sayacı: prototipten üretime.'],
     section: ['Güç bütçesi', 'Her mikroamper, on yıl boyunca önemli.'],
     agenda: {
+      kicker: 'Gündem',
       title: 'Bu incelemenin soruları',
       lead: [
         'Nisanda DVT’ye geçişi dört ölçülebilir yanıt belirleyecek.',
@@ -218,6 +220,7 @@ export const tr: TechnologyCopies = {
     ],
     section: ['Neler yeni?', 'İstediğiniz üç özellik ve bir sürpriz.'],
     agenda: {
+      kicker: 'Etkinlik akışı',
       title: 'Bu akşamın programı',
       lead: [
         'Zrima 2.0’ın yeniliklerini ve kararlarımızı otuz dakikada anlatacağız.',

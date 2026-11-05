@@ -975,14 +975,16 @@ function layouts(): Layout[] {
       name: 'Text',
       archetype: 'text',
       // The text is on a sheet of paper from margin to margin, down to over the foot, from its
-      // top; a stamp and its postmark stand on the sheet's corner, beside the title.
+      // top; a stamp and its postmark stand on the sheet's corner, beside the title. The kicker
+      // over the title and the footer, as on the text-and-image slide (ADR-135).
       placeholders: [
-        ...head('text', WIDTH - 300, 1, false).placeholders,
+        ...head('text', WIDTH - 300, 1).placeholders,
         place('p_body', 'body', at(START + 64, SHEET.y + 56, WIDTH - 128, 560), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
         neatline('d_atlas_text_frame', false),
-        ...head('text', WIDTH - 300, 1, false).decorations,
+        ...head('text', WIDTH - 300, 1).decorations,
         card('d_atlas_text_sheet', SHEET),
         lifted(
           art(
@@ -998,7 +1000,7 @@ function layouts(): Layout[] {
           0.18,
         ),
         art('d_atlas_text_postmark', atEnd(END + 128, 196, 220, 92), postmark(46, 46, 38, 4, 150)),
-        ...foot('text', false).decorations,
+        ...foot('text').decorations,
       ],
     },
     {
@@ -1563,6 +1565,7 @@ function drawSample(copy: AtlasCopy): SampleSlide[] {
       layout: 'l_atlas_text',
       name: copy.agenda.name,
       content: {
+        caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
         body: {
           paragraphs: [
@@ -1573,6 +1576,7 @@ function drawSample(copy: AtlasCopy): SampleSlide[] {
               .paragraphs,
           ],
         },
+        footer,
       },
     },
     {

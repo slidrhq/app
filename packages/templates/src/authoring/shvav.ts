@@ -493,7 +493,7 @@ const kickerPad = (id: string, top: number) =>
  * The head of a content slide: the kicker on its test point, and the title. `lines` is the room
  * the title has.
  */
-function head(name: string, width = 1400, lines = 2, net = true) {
+function head(name: string, width = 1400, lines = 2, net = true, titleHeight = 72 * lines) {
   return {
     placeholders: [
       place(
@@ -502,7 +502,7 @@ function head(name: string, width = 1400, lines = 2, net = true) {
         at(START + 44, KICKER, Math.min(900, width - 44), 34),
         'caption',
       ),
-      place('p_title', 'title', at(START, KICKER + 38, width, 72 * lines), 'title'),
+      place('p_title', 'title', at(START, KICKER + 38, width, titleHeight), 'title'),
     ],
     decorations: [
       net
@@ -1918,18 +1918,17 @@ function layouts(): Layout[] {
       archetype: 'text',
       // The text is on a module from margin to margin, down to over the foot, from its top; its
       // castellations run down both sides and its parts stand at the end corner of its foot.
+      // The kicker on its pad over the title and the footer, as on the text-and-image slide
+      // (ADR-135).
       background: ground(0.5, 0.42),
       placeholders: [
-        place('p_title', 'title', at(START, 116, WIDTH, 92), 'title'),
-        place('p_body', 'body', at(START + 64, MODULE.y + 56, WIDTH - 128, 536), 'body'),
+        ...head('text', WIDTH, 1, true, 92).placeholders,
+        // The body's start on the footer's, by the same edge.
+        place('p_body', 'body', at(START + 60, MODULE.y + 56, WIDTH - 124, 536), 'body'),
+        ...foot('text').placeholders,
       ],
       decorations: [
-        drawing(
-          'd_shvav_text_title_pad',
-          at(START - 54, 151, 22, 22),
-          svg(22, 22, DEFS + testPoint(11, 11, 10)),
-          PAINT,
-        ),
+        ...head('text', WIDTH, 1, true, 92).decorations,
         rect('d_shvav_text_module', MODULE, solid(token('surface')), {
           stroke: { color: token('text', 0.14), width: 1.5 },
           effects: {
@@ -2355,6 +2354,7 @@ const sampleHe: SampleSlide[] = [
     layout: 'l_shvav_text',
     name: 'מה בסקירה',
     content: {
+      caption: text('סדר היום'),
       title: text('מה בסקירה'),
       body: {
         paragraphs: [
@@ -2373,6 +2373,7 @@ const sampleHe: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_HE,
     },
   },
   {
@@ -2611,6 +2612,7 @@ const sampleEn: SampleSlide[] = [
     layout: 'l_shvav_text',
     name: 'This review',
     content: {
+      caption: text('Agenda'),
       title: text('What this review covers'),
       body: {
         paragraphs: [
@@ -2629,6 +2631,7 @@ const sampleEn: SampleSlide[] = [
           ).paragraphs,
         ],
       },
+      footer: FOOTER_EN,
     },
   },
   {

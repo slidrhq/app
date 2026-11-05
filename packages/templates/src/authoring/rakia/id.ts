@@ -17,6 +17,7 @@ export const id: RakiaCopy = {
   },
   agenda: {
     name: 'Malam ini',
+    kicker: 'Paparan',
     title: 'Malam ini, dalam empat bagian',
     intro:
       'Empat puluh menit tentang teleskop yang menangkap cahaya bintang pertamanya minggu ini, apa yang diamatinya di musim pertama, dan cara universitas mitra berbagi malam-malamnya. Lalu kita buka kubah.',

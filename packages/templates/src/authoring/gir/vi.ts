@@ -17,6 +17,7 @@ export const vi: GirCopy = {
   },
   agenda: {
     name: 'Tối nay',
+    kicker: 'Chào mừng quý phụ huynh',
     title: 'Tối nay, trong bốn mươi phút',
     intro:
       'Bốn mươi phút về cách khối 7 sẽ học trong năm nay, những gì thay đổi trong lớp và cách quý phụ huynh có thể hỗ trợ ở nhà. Sau đó, quý vị sẽ gặp giáo viên chủ nhiệm của con tại lớp học mới.',

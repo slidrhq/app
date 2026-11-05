@@ -17,6 +17,7 @@ export const tr: MaslulCopy = {
   },
   agenda: {
     name: 'Bu akşam',
+    kicker: 'Üyelerimiz için',
     title: 'Bu akşamın gündemi',
     intro:
       'Sporcular, veliler ve antrenörler için kırk dakika: 2027 sezonu nasıl geçecek, mart ayında kendi pistimize taşındığımızda neler değişecek ve her grup nasıl çalışacak. Sonunda sorularınızı alacağız.',

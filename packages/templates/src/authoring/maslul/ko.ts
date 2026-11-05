@@ -17,6 +17,7 @@ export const ko: MaslulCopy = {
   },
   agenda: {
     name: '오늘 밤',
+    kicker: '회원 여러분께',
     title: '오늘 밤의 설명회',
     intro: [
       '선수, 학부모, 코치를 위한 40분입니다. 2027 시즌의 진행 방식과 3월에 우리 트랙으로 옮기면 달라지는 점,',

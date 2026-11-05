@@ -17,6 +17,7 @@ export const id: TavlinCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Untuk para mitra',
     title: 'Menu hari ini',
     intro:
       'Empat puluh menit tentang perjalanan Tujuh Rempah dari pasar akhir pekan menjadi festival dengan empat puluh satu ribu pengunjung, dan apa yang kami minta dari setiap mitra untuk bulan Mei. Lalu pertanyaan Anda, sambil minum teh.',

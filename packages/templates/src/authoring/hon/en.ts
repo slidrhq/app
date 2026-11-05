@@ -11,6 +11,7 @@ export const en: HonCopy = {
   },
   agenda: {
     name: 'Agenda',
+    kicker: 'Annual General Meeting',
     title: 'On the agenda tonight',
     intro:
       'Forty minutes on how the bank you own did in 2026: what we lent, what we kept as capital and what came back to you as members. Then the votes, and your questions.',

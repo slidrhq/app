@@ -5,13 +5,19 @@ import {
   type Command,
   type Deck,
   type Frame,
+  type LineElement,
   type Slide,
   type SvgElement,
 } from '@slidr/model';
 import { centredFrame } from '../objects/shapes';
 import type { MotionBackground } from './motionBackgrounds';
 import { atSpeed, inkOverrides, withRootAttribute } from './motionKit';
-import { motionPieces, type MotionPiece } from './motionPieces';
+import {
+  motionPictures,
+  type LinePiece,
+  type MotionPiece,
+  type PicturePiece,
+} from './motionPieces';
 
 /*
  * What the animations and the backgrounds of Elements put on a slide (ADR-127). Pure, so it is
@@ -19,21 +25,47 @@ import { motionPieces, type MotionPiece } from './motionPieces';
  */
 
 /**
- * An animation as a new element: an `svg` element whose picture moves by itself, in the theme's
- * colours, in the middle of the slide (beside whatever already stands there). One that runs from
- * side to side runs in the deck's reading direction.
+ * An animation as a new element, in the theme's colours, in the middle of the slide (beside
+ * whatever already stands there): an `svg` element whose picture moves by itself, or a line that
+ * something runs along (ADR-131). One that runs from side to side runs in the deck's reading
+ * direction: a picture mirrored, a line drawn from its right end, as a new line is.
  */
+export function motionElement(
+  piece: PicturePiece,
+  deck: Deck,
+  taken?: readonly Frame[],
+): SvgElement;
+export function motionElement(piece: LinePiece, deck: Deck, taken?: readonly Frame[]): LineElement;
+export function motionElement(
+  piece: MotionPiece,
+  deck: Deck,
+  taken?: readonly Frame[],
+): SvgElement | LineElement;
 export function motionElement(
   piece: MotionPiece,
   deck: Deck,
   taken: readonly Frame[] = [],
-): SvgElement {
+): SvgElement | LineElement {
+  const frame = centredFrame(piece.size, deck.size, taken);
+  const rtl = piece.reads && deck.meta.dir === 'rtl';
+  const name = `animation-${piece.id}`;
+  if (piece.kind === 'line') {
+    const { points, stroke, flow, ...line } = piece.line;
+    return createElement.line({
+      frame,
+      name,
+      ...line,
+      points: points.map((p) => ({ x: rtl ? piece.size.w - p.x : p.x, y: p.y })),
+      stroke: { ...stroke },
+      flow: { ...flow },
+    });
+  }
   return createElement.svg({
-    frame: centredFrame(piece.size, deck.size, taken),
+    frame,
     markup: piece.markup,
-    name: `animation-${piece.id}`,
+    name,
     colorOverrides: inkOverrides(piece.markup),
-    ...(piece.reads && deck.meta.dir === 'rtl' ? { flipH: true } : {}),
+    ...(rtl ? { flipH: true } : {}),
   });
 }
 
@@ -52,11 +84,12 @@ export const PIECE_SPEEDS = { min: 0.25, max: 4 } as const;
  * itself, or else by the element's name, which an element put on a slide before its picture
  * named itself has (ADR-127).
  */
-export function pieceOf(element: SvgElement): MotionPiece | undefined {
+export function pieceOf(element: SvgElement): PicturePiece | undefined {
   if (!element.markup) return undefined;
   const named = PIECE_NAME.exec(element.markup)?.[1];
   const id = named ?? (element.name?.startsWith('animation-') ? element.name.slice(10) : undefined);
-  return id ? motionPieces().find((piece) => piece.id === id) : undefined;
+  // A picture of an animation that is now a line (ADR-131) still draws, at its own pace.
+  return id ? motionPictures().find((piece) => piece.id === id) : undefined;
 }
 
 /** How fast the picture of an animation of Elements moves, as a share of its own pace. */
@@ -71,7 +104,7 @@ export function pieceSpeed(markup: string): number {
  * divided by the speed (`atSpeed`), and saying its speed. Its colours are where they were, so
  * the element's replacements of them still hold.
  */
-export function pieceMarkup(piece: MotionPiece, speed: number): string {
+export function pieceMarkup(piece: PicturePiece, speed: number): string {
   return markupAtSpeed(piece.markup, speed);
 }
 

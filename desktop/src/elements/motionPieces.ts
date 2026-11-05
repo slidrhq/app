@@ -1,3 +1,4 @@
+import type { LineElement, LineFlow } from '@slidr/model';
 import {
   circlePath,
   ellipsePath,
@@ -20,12 +21,16 @@ import {
  * (a dot on a path, a line, a polygon, a circle), some are not one shape (waves, particles, a
  * network). The pieces in the reference deck's slides (`tests/import/מצגת רפרנס.html`) are among
  * them: the orbit around a hub, and the boxes that ride a dashed path.
+ *
+ * Most are pictures. Those that are a line with something running along it (ADR-131), the boxes
+ * on a path and the flowing connector, are lines of the deck: their ends and bends are dragged
+ * as any line's, with no box around them, and the flow follows the line wherever it goes.
  */
 
 export const MOTION_GROUPS = ['path', 'spin', 'scale', 'lines', 'particles'] as const;
 export type MotionGroup = (typeof MOTION_GROUPS)[number];
 
-export interface MotionPiece {
+interface PieceBase {
   id: string;
   group: MotionGroup;
   /** The units of the drawing, and the size it lands on a slide at, in slide pixels. */
@@ -35,8 +40,28 @@ export interface MotionPiece {
    * mirrored in a deck that reads from the right, as a new line is.
    */
   reads: boolean;
+}
+
+/** A picture that moves by itself: an `svg` element (ADR-127). */
+export interface PicturePiece extends PieceBase {
+  kind: 'picture';
   markup: string;
 }
+
+/** What a line of the deck is drawn with, and what runs along it (ADR-131). */
+export type LineShape = Pick<
+  LineElement,
+  'points' | 'stroke' | 'startHead' | 'endHead' | 'curve'
+> & { flow: LineFlow };
+
+/** A line that something runs along: a `line` element with a flow (ADR-131). */
+export interface LinePiece extends PieceBase {
+  kind: 'line';
+  /** Its points in the units of `size`, from left to right. */
+  line: LineShape;
+}
+
+export type MotionPiece = PicturePiece | LinePiece;
 
 const { primary: P, secondary: S, accent: A, text: T, surface: U, bg: B } = INK;
 
@@ -87,24 +112,21 @@ function orbit(): string {
 
 /**
  * Boxes that ride a dashed path: the reference deck's "floor to AI", the line alone, without the
- * nodes at its ends, so it can join whatever the slide puts there.
+ * nodes at its ends, so it can join whatever the slide puts there. A curved line from the bottom
+ * on one side to the top on the other, its dashes and its boxes moving up it together.
  */
-function conveyor(): string {
-  const path = 'M24 186C160 186 200 24 402 24';
-  const css = '.f{animation:flow 1.1s linear infinite}@keyframes flow{to{stroke-dashoffset:-16}}';
-  const box = (into: number) =>
-    travelling({
-      shape: `<rect x="-13" y="-9" width="26" height="18" rx="4" fill="${T}" stroke="${B}" stroke-width="2.5"/>`,
-      path,
-      dur: 4,
-      into,
-      turn: true,
-      extra: `<animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.1;.88;1" dur="4s" begin="${num(-into, 2)}s" repeatCount="indefinite"/>`,
-    });
-  const body =
-    `<path class="f" d="${path}" fill="none" stroke="${S}" stroke-width="3.5" stroke-dasharray="8 8" stroke-linecap="round"/>` +
-    [0.4, 1.4, 2.4, 3.4].map(box).join('');
-  return picture(426, 210, body, css);
+function conveyor(): LineShape {
+  return {
+    points: [
+      { x: 0, y: 160 },
+      { x: 380, y: 0 },
+    ],
+    stroke: { color: { token: 'secondary' }, width: 3.5, dash: 'dashed', cap: 'round' },
+    startHead: 'none',
+    endHead: 'none',
+    curve: 'curved',
+    flow: { speed: 90, rider: 'box', count: 4, color: { token: 'text' } },
+  };
 }
 
 /** A circuit trace: lights with a trail run from a node to a chip. */
@@ -465,17 +487,20 @@ function draw(): string {
   return picture(560, 230, body, css);
 }
 
-/** A connector whose dashes flow toward its arrow. */
-function flowArrow(): string {
-  const path = 'M44 124C170 26 360 26 478 96';
-  const css = '.f{animation:flow .9s linear infinite}@keyframes flow{to{stroke-dashoffset:-28}}';
-  const angle = num((Math.atan2(96 - 26, 478 - 360) * 180) / Math.PI);
-  const body =
-    `<path class="f" d="${path}" fill="none" stroke="${S}" stroke-width="6" stroke-dasharray="14 14" stroke-linecap="round"/>` +
-    `<circle cx="44" cy="124" r="15" fill="${S}"/>` +
-    `<circle cx="44" cy="124" r="6" fill="${U}"/>` +
-    `<path transform="translate(484 100) rotate(${angle})" d="M10 0L-20 -17L-20 17Z" fill="${S}" stroke="${S}" stroke-width="4" stroke-linejoin="round"/>`;
-  return picture(540, 170, body, css);
+/** A connector whose dashes flow toward its arrow: an arc from a dot to a head. */
+function flowArrow(): LineShape {
+  return {
+    points: [
+      { x: 0, y: 80 },
+      { x: 220, y: 0 },
+      { x: 430, y: 50 },
+    ],
+    stroke: { color: { token: 'secondary' }, width: 6, dash: 'dashed', cap: 'round' },
+    startHead: 'circle',
+    endHead: 'triangle',
+    curve: 'curved',
+    flow: { speed: 40 },
+  };
 }
 
 /** A pulse line: a beat runs along it, bright at its head. */
@@ -640,10 +665,10 @@ const BUILDERS: readonly [
   w: number,
   h: number,
   reads: boolean,
-  build: () => string,
+  build: () => string | LineShape,
 ][] = [
   ['orbit', 'path', 400, 400, false, orbit],
-  ['conveyor', 'path', 426, 210, true, conveyor],
+  ['conveyor', 'path', 380, 160, true, conveyor],
   ['trace', 'path', 580, 220, true, trace],
   ['atom', 'path', 400, 400, false, atom],
   ['shuttle', 'path', 560, 140, true, shuttle],
@@ -655,7 +680,7 @@ const BUILDERS: readonly [
   ['bars', 'scale', 430, 300, true, bars],
   ['waves', 'lines', 560, 200, false, waves],
   ['draw', 'lines', 560, 230, true, draw],
-  ['flowArrow', 'lines', 540, 170, true, flowArrow],
+  ['flowArrow', 'lines', 430, 80, true, flowArrow],
   ['heartbeat', 'lines', 560, 220, true, heartbeat],
   ['network', 'particles', 480, 300, false, network],
   ['converge', 'particles', 400, 400, false, converge],
@@ -672,14 +697,19 @@ let pieces: readonly MotionPiece[] | undefined;
 
 /** Every animation, in the order the collection shows them. Drawn the first time it is asked. */
 export function motionPieces(): readonly MotionPiece[] {
-  pieces ??= BUILDERS.map(([id, group, w, h, reads, build]) => ({
-    id,
-    group,
-    size: { w, h },
-    reads,
-    markup: withRootAttribute(build(), PIECE_ATTRIBUTE, id),
-  }));
+  pieces ??= BUILDERS.map(([id, group, w, h, reads, build]): MotionPiece => {
+    const built = build();
+    const base = { id, group, size: { w, h }, reads };
+    return typeof built === 'string'
+      ? { ...base, kind: 'picture', markup: withRootAttribute(built, PIECE_ATTRIBUTE, id) }
+      : { ...base, kind: 'line', line: built };
+  });
   return pieces;
+}
+
+/** The animations that are pictures (ADR-127), without the lines (ADR-131). */
+export function motionPictures(): readonly PicturePiece[] {
+  return motionPieces().filter((piece): piece is PicturePiece => piece.kind === 'picture');
 }
 
 export { radarBody };

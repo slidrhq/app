@@ -17,6 +17,7 @@ export const id: MaslulCopy = {
   },
   agenda: {
     name: 'Malam ini',
+    kicker: 'Untuk para anggota',
     title: 'Agenda malam ini',
     intro:
       'Empat puluh menit untuk atlet, orang tua, dan pelatih: bagaimana musim 2027 berjalan, apa yang berubah saat kita pindah ke lintasan sendiri pada bulan Maret, dan bagaimana setiap kelompok berlatih. Lalu tanya jawab.',
