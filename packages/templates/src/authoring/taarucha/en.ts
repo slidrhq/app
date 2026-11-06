@@ -19,13 +19,10 @@ export const en: TaaruchaCopy = {
     name: 'This morning',
     kicker: 'For press and patrons',
     title: 'This morning’s preview',
-    intro:
-      'Forty minutes on how we rehung the collection after two years of building work, and on what changes for visitors from the day the doors open. Then a walk through the first rooms.',
     items: [
-      ['The new wing: ', 'twenty-two rooms on three floors, and one route through them.'],
-      ['Conservation: ', '312 works cleaned, mended and reframed for the rehang.'],
-      ['The visit: ', 'free Thursday evenings, and a studio made for school groups.'],
-      ['The year ahead: ', 'four dates to keep, from the opening to the first loan show.'],
+      ['The new wing', 'Twenty-two rooms on three floors, and one route through them.'],
+      ['Conservation', '312 works cleaned, mended and reframed for the rehang.'],
+      ['The visit', 'Free Thursday evenings, and a studio made for school groups.'],
     ],
   },
   figures: {
@@ -49,7 +46,10 @@ export const en: TaaruchaCopy = {
     title: 'Every work, ready for its wall',
     items: [
       ['Cleaned by hand', 'Old varnish lifted with cotton swabs, a few centimetres at a time.'],
-      ['Mended, never repainted', 'Tears and losses filled with materials that can always be removed.'],
+      [
+        'Mended, never repainted',
+        'Tears and losses filled with materials that can always be removed.',
+      ],
       ['Lit to measure', 'Each work’s light set to what its paint or paper can bear.'],
     ],
   },
@@ -70,9 +70,21 @@ export const en: TaaruchaCopy = {
     kicker: 'Three new ways to visit',
     title: 'A museum open to more people',
     cards: [
-      ['Thursdays', 'Free evenings', 'Open until ten, with music in the atrium and no ticket needed.'],
-      ['Schools', 'The open studio', 'A room where classes draw from the works they have just seen.'],
-      ['Members', 'Behind the scenes', 'A monthly visit to the conservation studio and the stores.'],
+      [
+        'Thursdays',
+        'Free evenings',
+        'Open until ten, with music in the atrium and no ticket needed.',
+      ],
+      [
+        'Schools',
+        'The open studio',
+        'A room where classes draw from the works they have just seen.',
+      ],
+      [
+        'Members',
+        'Behind the scenes',
+        'A monthly visit to the conservation studio and the stores.',
+      ],
     ],
     note: 'Every programme starts in the week the doors open.',
   },
@@ -83,7 +95,11 @@ export const en: TaaruchaCopy = {
     stops: [
       ['14 April', 'The doors open', 'All twenty-two rooms, free on the opening weekend.'],
       ['1 July', 'Summer evenings', 'Thursdays until ten, with music in the atrium.'],
-      ['20 October', 'The first loan show', 'Fifty works lent by museums in Lisbon, Seoul and Dakar.'],
+      [
+        '20 October',
+        'The first loan show',
+        'Fifty works lent by museums in Lisbon, Seoul and Dakar.',
+      ],
       ['3 February', 'The collection online', 'Every work on view, photographed and published.'],
     ],
     note: 'Dates in 2027 and early 2028. Every exhibition is included in the ticket.',

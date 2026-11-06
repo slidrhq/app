@@ -19,13 +19,10 @@ export const id: TavlinCopy = {
     name: 'Agenda',
     kicker: 'Untuk para mitra',
     title: 'Menu hari ini',
-    intro:
-      'Empat puluh menit tentang perjalanan Tujuh Rempah dari pasar akhir pekan menjadi festival dengan empat puluh satu ribu pengunjung, dan apa yang kami minta dari setiap mitra untuk bulan Mei. Lalu pertanyaan Anda, sambil minum teh.',
     items: [
-      ['Pasar: ', 'enam puluh empat lapak, dan cara kami membaginya tahun ini.'],
-      ['Dapur kelas memasak: ', 'dua belas meja tempat tamu memasak di samping para koki.'],
-      ['Meja panjang: ', 'enam ratus kursi setiap malam, dan siapa yang memasak untuk mereka.'],
-      ['Menuju Mei: ', 'apa yang kami butuhkan dari setiap mitra, dan kapan tenggatnya.'],
+      ['Pasar', 'Enam puluh empat lapak, dan cara kami membaginya tahun ini.'],
+      ['Dapur kelas memasak', 'Dua belas meja tempat tamu memasak di samping para koki.'],
+      ['Meja panjang', 'Enam ratus kursi setiap malam, dan siapa yang memasak untuk mereka.'],
     ],
   },
   figures: {
@@ -56,10 +53,7 @@ export const id: TavlinCopy = {
         'Sembilan puluh menit per kelas',
         'Dari biji utuh hingga hidangan jadi: disangrai, digiling, diracik, dan dicicipi.',
       ],
-      [
-        'Dalam empat bahasa',
-        'Portugis, Inggris, Prancis, dan Arab, dengan koki di setiap meja.',
-      ],
+      ['Dalam empat bahasa', 'Portugis, Inggris, Prancis, dan Arab, dengan koki di setiap meja.'],
     ],
   },
   market: {
@@ -79,11 +73,7 @@ export const id: TavlinCopy = {
     kicker: 'Tiga cara untuk ikut',
     title: 'Satu festival, tiga dapur',
     cards: [
-      [
-        'Program 01',
-        'Pasar',
-        'Enam puluh empat lapak rempah utuh dan bubuk, dijual per takar.',
-      ],
+      ['Program 01', 'Pasar', 'Enam puluh empat lapak rempah utuh dan bubuk, dijual per takar.'],
       [
         'Program 02',
         'Kelas memasak',
@@ -113,7 +103,11 @@ export const id: TavlinCopy = {
         'Kursi kelas memasak dibuka lebih dulu, meja panjang seminggu kemudian.',
       ],
       ['Apr 2027', 'Pembagian lapak', 'Setiap mitra menerima denah aula dan jadwal bongkar muat.'],
-      ['14 Mei', 'Pintu dibuka', 'Pasar buka siang hari, meja panjang pertama pukul delapan malam.'],
+      [
+        '14 Mei',
+        'Pintu dibuka',
+        'Pasar buka siang hari, meja panjang pertama pukul delapan malam.',
+      ],
     ],
     note: 'Semua tanggal berlaku untuk ketiga program; mitra yang terlambat masuk daftar tunggu.',
   },

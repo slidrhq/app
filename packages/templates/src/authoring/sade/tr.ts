@@ -19,13 +19,10 @@ export const tr: SadeCopy = {
     name: 'Gündem',
     kicker: 'Ortaklar genel kurulu',
     title: 'Bu sabah neleri konuşacağız',
-    intro:
-      '2026 hasadı üzerine kırk dakika: neler yetiştirdik, ne kadar su harcadık ve toprak bize neler anlattı. Ardından 2027 sezonunun planı ve sorularınız için ayrılan zaman.',
     items: [
-      ['Hasat: ', '212 çiftlikten 18.400 ton tahıl ve bu tahılın nereye gittiği.'],
-      ['Su: ', 'damla sulama ve örtü bitkileri bir ton tahılın suyunu nasıl azalttı.'],
-      ['Toprak: ', 'üç yıllık analizler tarlalarımızın altında neler gösteriyor.'],
-      ['2027 sezonu: ', 'tohum bankası, ortak makineler ve takvim.'],
+      ['Hasat', '212 çiftlikten 18.400 ton tahıl ve bu tahılın nereye gittiği.'],
+      ['Su', 'Damla sulama ve örtü bitkileri bir ton tahılın suyunu nasıl azalttı.'],
+      ['Toprak', 'Üç yıllık analizler tarlalarımızın altında neler gösteriyor.'],
     ],
   },
   figures: {
@@ -167,8 +164,16 @@ export const tr: SadeCopy = {
     kicker: 'Kooperatifin ekibi',
     title: 'Hasadın arkasındaki insanlar',
     people: [
-      ['Yönetim kurulu başkanı', 'Nadia Haddad', '64 hektarlık arazisinde buğday ve nohut yetiştiriyor'],
-      ['Baş ziraat mühendisi', 'Tomás Ferreira', 'Toprak laboratuvarını ve dron taramasını yönetiyor'],
+      [
+        'Yönetim kurulu başkanı',
+        'Nadia Haddad',
+        '64 hektarlık arazisinde buğday ve nohut yetiştiriyor',
+      ],
+      [
+        'Baş ziraat mühendisi',
+        'Tomás Ferreira',
+        'Toprak laboratuvarını ve dron taramasını yönetiyor',
+      ],
       ['Su mühendisi', 'Kwame Asante', 'Ortak damla sulama ağını baştan sona tasarladı'],
       ['Tohum bankası sorumlusu', 'Mei Lin', 'Deneme parsellerinde kırk yerel çeşidi sınıyor'],
     ],

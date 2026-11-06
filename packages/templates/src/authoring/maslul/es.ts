@@ -21,13 +21,16 @@ export const es: MaslulCopy = {
     name: 'Esta noche',
     kicker: 'Para nuestros socios',
     title: 'La reunión de esta noche',
-    intro:
-      'Cuarenta minutos para atletas, familias y entrenadores: cómo será la temporada 2027, qué cambia cuando pasemos a nuestra propia pista en marzo y cómo entrenará cada grupo. Al final, sus preguntas.',
     items: [
-      ['La nueva pista: ', 'ocho calles iluminadas, abiertas seis tardes por semana desde el 13 de marzo.'],
-      ['Grupos de entrenamiento: ', 'quién entrena cuándo y dónde, y con qué entrenador.'],
-      ['La temporada: ', 'cuatro competiciones, del mitin inaugural de marzo al campeonato nacional de julio.'],
-      ['Cómo unirse: ', 'cómo pasa un atleta nuevo de una sesión de prueba a su primera carrera.'],
+      [
+        'La nueva pista',
+        'Ocho calles iluminadas, abiertas seis tardes por semana desde el 13 de marzo.',
+      ],
+      ['Grupos de entrenamiento', 'Quién entrena cuándo y dónde, y con qué entrenador.'],
+      [
+        'La temporada',
+        'Cuatro competiciones, del mitin inaugural de marzo al campeonato nacional de julio.',
+      ],
     ],
   },
   figures: {
@@ -109,9 +112,17 @@ export const es: MaslulCopy = {
         'Mitin inaugural',
         'Las primeras carreras en nuestra nueva pista, abiertas a todos los socios.',
       ],
-      ['Mayo', 'Campeonato del club', 'Todos los socios compiten y cada resultado suma para el club.'],
+      [
+        'Mayo',
+        'Campeonato del club',
+        'Todos los socios compiten y cada resultado suma para el club.',
+      ],
       ['Junio', 'Liga regional', 'Tres jornadas en cuatro semanas contra otros once clubes.'],
-      ['Julio', 'Campeonato nacional', 'Nuestros clasificados luchan por medallas, tras las nueve de 2026.'],
+      [
+        'Julio',
+        'Campeonato nacional',
+        'Nuestros clasificados luchan por medallas, tras las nueve de 2026.',
+      ],
     ],
     note: 'Como en un relevo, cada cita pasa el testigo a la siguiente: sus resultados deciden quién corre después.',
   },
@@ -147,7 +158,8 @@ export const es: MaslulCopy = {
     name: 'Marcas personales',
     kicker: 'Marcas personales',
     title: 'Más rápidos cada temporada',
-    source: 'Marcas personales logradas en competición por atletas del club, por temporada, 2023–2026.',
+    source:
+      'Marcas personales logradas en competición por atletas del club, por temporada, 2023–2026.',
     series: ['Sub-18', 'Absolutos y máster'],
     figures: [
       ['212', 'marcas personales en 2026, récord del club.'],
@@ -174,8 +186,16 @@ export const es: MaslulCopy = {
     title: 'Las personas junto a la pista',
     people: [
       ['Velocidad y vallas', 'Amara Okafor', 'Entrenadora jefa y exvallista de 400 m'],
-      ['Medio fondo y fondo', 'Mateo Ruiz', 'Entrenador de fondo; corrió su primer maratón a los 19'],
-      ['Saltos y lanzamientos', 'Yael Ben-Ami', 'Entrenadora de saltos y lanzamientos, fisioterapeuta deportiva'],
+      [
+        'Medio fondo y fondo',
+        'Mateo Ruiz',
+        'Entrenador de fondo; corrió su primer maratón a los 19',
+      ],
+      [
+        'Saltos y lanzamientos',
+        'Yael Ben-Ami',
+        'Entrenadora de saltos y lanzamientos, fisioterapeuta deportiva',
+      ],
       ['Atletismo infantil', 'Kenji Sato', 'Entrenador juvenil; dirige las mañanas de sábado'],
     ],
   },

@@ -12,15 +12,10 @@ export const fr: TechnologyCopies = {
     agenda: {
       kicker: 'Ordre du jour',
       title: 'Au programme aujourd’hui',
-      lead: [
-        'Pourquoi une région ne suffisait plus à notre cœur de paiements.',
-        'Comment nous sommes passés à trois régions actives sans interruption.',
-      ],
       points: [
-        ['Le besoin : ', 'Une seule panne bloquait tous les paiements.'],
-        ['L’architecture : ', 'Chaque région peut absorber toute la charge.'],
-        ['La migration : ', 'Quatre étapes en décembre, toutes réversibles.'],
-        ['Les résultats : ', 'Disponibilité, latence p95 et facture mensuelle.'],
+        ['Le besoin', 'Une seule panne bloquait tous les paiements.'],
+        ['L’architecture', 'Chaque région peut absorber toute la charge.'],
+        ['La migration', 'Quatre étapes en décembre, toutes réversibles.'],
       ],
     },
     figures: {
@@ -121,15 +116,10 @@ export const fr: TechnologyCopies = {
     agenda: {
       kicker: 'Ordre du jour',
       title: 'Les questions de cette revue',
-      lead: [
-        'Quatre réponses mesurables décident du passage en DVT en avril.',
-        'Chaque question a une personne responsable au sein de l’équipe.',
-      ],
       points: [
-        ['Énergie : ', 'Une pile tient-elle dix ans, même en hiver ?'],
-        ['Coût : ', 'Le prix d’une carte pour un lot de 10 000 unités.'],
-        ['Terrain : ', 'Les leçons des 60 compteurs installés en janvier.'],
-        ['Production : ', 'Ce qui manque avant de commander le premier lot.'],
+        ['Énergie', 'Une pile tient-elle dix ans, même en hiver ?'],
+        ['Coût', 'Le prix d’une carte pour un lot de 10 000 unités.'],
+        ['Terrain', 'Les leçons des 60 compteurs installés en janvier.'],
       ],
     },
     figures: {
@@ -242,15 +232,10 @@ export const fr: TechnologyCopies = {
     agenda: {
       kicker: 'Le déroulé',
       title: 'Le programme de ce soir',
-      lead: [
-        'Trente minutes sur les nouveautés de Zrima 2.0 et nos choix.',
-        'Puis une démo en direct : d’une page vide à un flux autonome.',
-      ],
       points: [
-        ['L’éditeur : ', 'Tout le flux sur une toile, avec l’aide de l’IA.'],
-        ['La bêta : ', 'Les créations et les demandes de 4 200 équipes.'],
-        ['Les offres : ', 'Trois formules, du gratuit à Business.'],
-        ['La suite : ', 'Validations mobiles en février, flux partagés en 2027.'],
+        ['L’éditeur', 'Tout le flux sur une toile, avec l’aide de l’IA.'],
+        ['La bêta', 'Les créations et les demandes de 4 200 équipes.'],
+        ['Les offres', 'Trois formules, du gratuit à Business.'],
       ],
     },
     figures: {

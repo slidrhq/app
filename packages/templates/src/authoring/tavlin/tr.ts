@@ -19,13 +19,10 @@ export const tr: TavlinCopy = {
     name: 'Gündem',
     kicker: 'İş ortaklarımız için',
     title: 'Bugünün menüsünde',
-    intro:
-      'Kırk dakika boyunca Yedi Baharat’ın bir hafta sonu pazarından kırk bir bin misafirli bir festivale nasıl dönüştüğünü ve mayıs için her ortaktan ne istediğimizi anlatacağız. Ardından çay eşliğinde sorularınız.',
     items: [
-      ['Pazar: ', 'altmış dört tezgâh ve bu yıl onları nasıl dağıtacağımız.'],
-      ['Atölye mutfağı: ', 'misafirlerin şeflerle yan yana pişirdiği on iki istasyon.'],
-      ['Uzun sofra: ', 'her akşam altı yüz kişilik yer ve onlar için kimin pişirdiği.'],
-      ['Mayısa giden yol: ', 'her ortaktan neye ve ne zamana kadar ihtiyacımız var.'],
+      ['Pazar', 'Altmış dört tezgâh ve bu yıl onları nasıl dağıtacağımız.'],
+      ['Atölye mutfağı', 'Misafirlerin şeflerle yan yana pişirdiği on iki istasyon.'],
+      ['Uzun sofra', 'Her akşam altı yüz kişilik yer ve onlar için kimin pişirdiği.'],
     ],
   },
   figures: {
@@ -95,11 +92,7 @@ export const tr: TavlinCopy = {
     kicker: 'Mayısa giden yol',
     title: 'Bugünden açılış gecesine',
     stops: [
-      [
-        'Şub. 2027',
-        'Ortak kaydı',
-        'Tezgâh sahipleri ve şefler yerlerini 15 Mart’a kadar onaylar.',
-      ],
+      ['Şub. 2027', 'Ortak kaydı', 'Tezgâh sahipleri ve şefler yerlerini 15 Mart’a kadar onaylar.'],
       ['Mart 2027', 'Biletler satışta', 'Önce atölye yerleri, bir hafta sonra uzun sofra.'],
       ['Nis. 2027', 'Tezgâh dağıtımı', 'Her ortak bir salon planı ve bir teslimat saati alır.'],
       ['14 Mayıs', 'Kapılar açılıyor', 'Pazar öğlen açılır, ilk uzun sofra akşam sekizde kurulur.'],

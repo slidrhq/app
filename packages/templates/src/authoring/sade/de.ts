@@ -19,13 +19,10 @@ export const de: SadeCopy = {
     name: 'Tagesordnung',
     kicker: 'Mitgliederversammlung',
     title: 'Was wir heute Vormittag besprechen',
-    intro:
-      'Vierzig Minuten zur Ernte 2026: was wir angebaut haben, wie viel Wasser es brauchte und was uns der Boden gezeigt hat. Danach der Plan für die Saison 2027 und Zeit für Ihre Fragen.',
     items: [
-      ['Die Ernte: ', '18.400 Tonnen Getreide von 212 Höfen, und wohin sie gingen.'],
-      ['Wasser: ', 'wie Tropfleitungen und Zwischenfrüchte den Bedarf je Tonne senkten.'],
-      ['Der Boden: ', 'was drei Jahre Bodenproben unter unseren Feldern zeigen.'],
-      ['Die Saison 2027: ', 'die Saatgutbank, die gemeinsamen Maschinen und der Kalender.'],
+      ['Die Ernte', '18.400 Tonnen Getreide von 212 Höfen, und wohin sie gingen.'],
+      ['Wasser', 'Wie Tropfleitungen und Zwischenfrüchte den Bedarf je Tonne senkten.'],
+      ['Der Boden', 'Was drei Jahre Bodenproben unter unseren Feldern zeigen.'],
     ],
   },
   figures: {
@@ -170,7 +167,11 @@ export const de: SadeCopy = {
       ['Vorstandsvorsitzende', 'Nadia Haddad', 'Baut auf 64 Hektar Weizen und Kichererbsen an'],
       ['Leitender Agronom', 'Tomás Ferreira', 'Leitet das Bodenlabor und die Drohnenflüge'],
       ['Wasseringenieur', 'Kwame Asante', 'Hat das gemeinsame Tropfnetz entworfen'],
-      ['Hüterin der Saatgutbank', 'Mei Lin', 'Erprobt vierzig regionale Sorten auf den Versuchsparzellen'],
+      [
+        'Hüterin der Saatgutbank',
+        'Mei Lin',
+        'Erprobt vierzig regionale Sorten auf den Versuchsparzellen',
+      ],
     ],
   },
   closing: {

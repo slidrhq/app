@@ -13,13 +13,10 @@ export const tr: DofekCopy = {
     name: 'Gündem',
     kicker: 'Başlamadan önce',
     title: 'Bugün neleri konuşacağız',
-    intro:
-      'Yirmi dakika boyunca programın neleri değiştirdiğini, bugün sokakta bir kalp durduğunda neler olduğunu ve 2027 için meclisten ne istediğimizi anlatacağız. Ardından sorularınızı yanıtlayacağız.',
     items: [
-      ['Rakamlar: ', 'hastane dışında kalbi duran kişiler için neler değişti.'],
-      ['Sokakta: ', 'komşular, gönüllüler ve defibrilatörler artık nasıl birlikte çalışıyor.'],
-      ['İnsanlar: ', 'programı yürüten ekip ve yanındaki gönüllüler.'],
-      ['Gelecek yıl: ', 'meclisten ne istiyoruz, hangi tarihe kadar.'],
+      ['Rakamlar', 'Hastane dışında kalbi duran kişiler için neler değişti.'],
+      ['Sokakta', 'Komşular, gönüllüler ve defibrilatörler artık nasıl birlikte çalışıyor.'],
+      ['İnsanlar', 'Programı yürüten ekip ve yanındaki gönüllüler.'],
     ],
   },
   section: {
@@ -76,7 +73,10 @@ export const tr: DofekCopy = {
     kicker: 'Nöbetteki gönüllüler',
     title: 'Yardım bir sokak ötede',
     items: [
-      ['Saniyeler içinde uyarı', 'Bir uygulama, çağrı yerine 500 metreden yakın olan eğitimli gönüllüleri anında uyarır.'],
+      [
+        'Saniyeler içinde uyarı',
+        'Bir uygulama, çağrı yerine 500 metreden yakın olan eğitimli gönüllüleri anında uyarır.',
+      ],
       ['Defibrilatör yolda', 'İkinci bir gönüllü en yakın halka açık defibrilatörü getirir.'],
       ['Sirenden önce orada', 'On vakanın altısında hastaya ilk ulaşan bir gönüllü oldu.'],
     ],

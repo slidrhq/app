@@ -53,14 +53,34 @@ describe('the standard text layout', () => {
       for (const archetype of ['text'] as const) {
         const layout = complete.layouts.find((l) => l.archetype === archetype)!;
         expect(seat(layout, 'title').frame.y).toBe(seat(table, 'title').frame.y);
-        // The kicker over the title and the footer, where the table seats them, as the text and
-        // image slide seats them too.
+        // The kicker over the title and the footer, where the table seats them, and between them
+        // the points of the text-and-image slide across the width (ADR-136).
         expect(layout.placeholders.map((place) => place.role)).toEqual([
           'caption',
           'title',
+          'subtitle',
+          'body',
+          'subtitle',
+          'body',
+          'subtitle',
           'body',
           'footer',
         ]);
+        const beside = tzuk.layouts.find((l) => l.archetype === 'textImage')!;
+        const points = (l: typeof table) =>
+          l.placeholders.filter((place) => place.role === 'subtitle' || place.role === 'body');
+        points(layout).forEach((place, i) => {
+          const them = points(beside)[i]!;
+          expect(place.styleRef).toBe(them.styleRef);
+          expect(place.frame.h).toBe(them.frame.h);
+          expect(place.frame.x).toBe(96);
+          expect(place.frame.w).toBeGreaterThan(them.frame.w + 600);
+          expect(place.frame.y).toBeGreaterThan(seat(layout, 'title').frame.y);
+        });
+        // Their numbers and the rules between them come too, and nothing of the picture.
+        const drawn = [...layout.decorations, ...(layout.objects ?? [])].map((o) => o.id);
+        expect(drawn.filter((id) => /_n\d/.test(id))).toHaveLength(3);
+        expect(drawn.filter((id) => /_rule\d/.test(id))).toHaveLength(3);
         const kicker = table.placeholders.find(
           (place) =>
             place.role === 'caption' &&
@@ -69,8 +89,8 @@ describe('the standard text layout', () => {
         expect(seat(layout, 'caption').frame).toEqual(kicker.frame);
         expect(seat(layout, 'footer').frame).toEqual(seat(table, 'footer').frame);
         // The brass rule over the title, and the rule, the mark and the number of the foot, under
-        // ids of their own; nothing of the table itself.
-        expect(layout.decorations.map((d) => d.id)).toEqual([
+        // ids of their own; nothing of the table itself. Then what the points are drawn with.
+        expect(layout.decorations.map((d) => d.id).slice(0, 4)).toEqual([
           `d_tzuk_table_tick_${archetype}`,
           `d_tzuk_table_rule_${archetype}`,
           `d_tzuk_table_mark_${archetype}`,
@@ -78,8 +98,8 @@ describe('the standard text layout', () => {
         ]);
         expect(layout.decorations.map((d) => d.role)).toContain('slideNumber');
         expect(layout.decorations.map((d) => d.role)).toContain('logo');
-        const body = layout.placeholders.find((place) => place.role === 'body');
-        if (body) expect(body.frame.y + body.frame.h).toBeLessThanOrEqual(940);
+        for (const body of layout.placeholders.filter((place) => place.role === 'body'))
+          expect(body.frame.y + body.frame.h).toBeLessThanOrEqual(940);
       }
     },
   );

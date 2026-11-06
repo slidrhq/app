@@ -21,13 +21,13 @@ export const it: MaslulCopy = {
     name: 'Stasera',
     kicker: 'Per i nostri soci',
     title: 'Il programma di stasera',
-    intro:
-      'Quaranta minuti per atleti, genitori e allenatori: come si svolgerà la stagione 2027, cosa cambia quando a marzo passeremo alla nostra pista e come si allenerà ogni gruppo. Alla fine, le vostre domande.',
     items: [
-      ['La nuova pista: ', 'otto corsie illuminate, aperte sei sere a settimana dal 13 marzo.'],
-      ['I gruppi: ', 'chi si allena quando e dove, e con quale allenatore.'],
-      ['La stagione: ', 'quattro gare, dal meeting d’apertura di marzo ai campionati nazionali di luglio.'],
-      ['Come iniziare: ', 'come un nuovo atleta passa da una prova gratuita alla prima gara.'],
+      ['La nuova pista', 'Otto corsie illuminate, aperte sei sere a settimana dal 13 marzo.'],
+      ['I gruppi', 'Chi si allena quando e dove, e con quale allenatore.'],
+      [
+        'La stagione',
+        'Quattro gare, dal meeting d’apertura di marzo ai campionati nazionali di luglio.',
+      ],
     ],
   },
   figures: {
@@ -104,9 +104,21 @@ export const it: MaslulCopy = {
     kicker: 'La stagione 2027',
     title: 'Quattro gare, una stagione',
     stops: [
-      ['Marzo', 'Meeting d’apertura', 'Le prime gare sulla nostra nuova pista, aperte a tutti i soci.'],
-      ['Maggio', 'Campionati sociali', 'Gareggiano tutti i soci, e ogni risultato porta punti al club.'],
-      ['Giugno', 'Campionato regionale', 'Tre prove in quattro settimane contro altri undici club.'],
+      [
+        'Marzo',
+        'Meeting d’apertura',
+        'Le prime gare sulla nostra nuova pista, aperte a tutti i soci.',
+      ],
+      [
+        'Maggio',
+        'Campionati sociali',
+        'Gareggiano tutti i soci, e ogni risultato porta punti al club.',
+      ],
+      [
+        'Giugno',
+        'Campionato regionale',
+        'Tre prove in quattro settimane contro altri undici club.',
+      ],
       [
         'Luglio',
         'Campionati nazionali',

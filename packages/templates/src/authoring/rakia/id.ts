@@ -18,14 +18,14 @@ export const id: RakiaCopy = {
   agenda: {
     name: 'Malam ini',
     kicker: 'Paparan',
-    title: 'Malam ini, dalam empat bagian',
-    intro:
-      'Empat puluh menit tentang teleskop yang menangkap cahaya bintang pertamanya minggu ini, apa yang diamatinya di musim pertama, dan cara universitas mitra berbagi malam-malamnya. Lalu kita buka kubah.',
+    title: 'Malam ini, dalam tiga bagian',
     items: [
-      ['Teleskop: ', 'dua belas tahun dari sketsa pertama hingga cermin 2,4 meter yang dipoles.'],
-      ['Lokasi: ', 'mengapa Meridian Peak lebih gelap dan stabil daripada tempat lain yang kami ukur.'],
-      ['Musim pertama: ', 'tiga program riset dan objek yang pertama mereka amati.'],
-      ['Berbagi malam: ', 'cara mitra meminta waktu, dan cara publik ikut serta.'],
+      ['Teleskop', 'Dua belas tahun dari sketsa pertama hingga cermin 2,4 meter yang dipoles.'],
+      [
+        'Lokasi',
+        'Mengapa Meridian Peak lebih gelap dan stabil daripada tempat lain yang kami ukur.',
+      ],
+      ['Musim pertama', 'Tiga program riset dan objek yang pertama mereka amati.'],
     ],
   },
   figures: {

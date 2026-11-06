@@ -6,27 +6,37 @@ export const fr: DofekCopy = {
     name: 'Ouverture',
     org: 'Santé du District côtier · Point de santé publique',
     title: ['Quatre minutes', 'pour un cœur'],
-    subtitle: ['Comment un district de 640\u00a0000 habitants', 'a appris à agir avant l’ambulance'],
+    subtitle: [
+      'Comment un district de 640\u00a0000 habitants',
+      'a appris à agir avant l’ambulance',
+    ],
     meta: 'Point devant le conseil de district · 15 avril 2027',
   },
   agenda: {
     name: 'Ordre du jour',
     kicker: 'Avant de commencer',
     title: 'Ce que nous verrons aujourd’hui',
-    intro:
-      'Vingt minutes sur ce que le programme a changé, sur ce qui se passe aujourd’hui dans la rue quand un cœur s’arrête, et sur ce que nous demandons au conseil pour 2027. Puis place à vos questions.',
     items: [
-      ['Les chiffres\u00a0: ', 'ce qui a changé pour les victimes d’un arrêt cardiaque hors de l’hôpital.'],
-      ['Dans la rue\u00a0: ', 'comment voisins, bénévoles et défibrillateurs agissent désormais ensemble.'],
-      ['L’équipe\u00a0: ', 'celles et ceux qui font vivre le programme, et les bénévoles à leurs côtés.'],
-      ['L’an prochain\u00a0: ', 'ce que nous demandons au conseil, et pour quand.'],
+      [
+        'Les chiffresu00a0',
+        'Ce qui a changé pour les victimes d’un arrêt cardiaque hors de l’hôpital.',
+      ],
+      [
+        'Dans la rueu00a0',
+        'Comment voisins, bénévoles et défibrillateurs agissent désormais ensemble.',
+      ],
+      [
+        'L’équipeu00a0',
+        'Celles et ceux qui font vivre le programme, et les bénévoles à leurs côtés.',
+      ],
     ],
   },
   section: {
     name: 'Les premières minutes',
     part: 'Première partie',
     title: ['Les premières', 'minutes'],
-    subtitle: 'Pourquoi les minutes avant l’arrivée de l’ambulance décident de qui rentre chez soi.',
+    subtitle:
+      'Pourquoi les minutes avant l’arrivée de l’ambulance décident de qui rentre chez soi.',
   },
   figures: {
     name: 'L’année en chiffres',
@@ -76,9 +86,18 @@ export const fr: DofekCopy = {
     kicker: 'Citoyens sauveteurs',
     title: 'L’aide au coin de la rue',
     items: [
-      ['Alertés en quelques secondes', 'Une application alerte aussitôt les bénévoles formés qui se trouvent à moins de 500\u00a0mètres.'],
-      ['Un défibrillateur en route', 'Un second bénévole part chercher le défibrillateur public le plus proche de la victime.'],
-      ['Là avant la sirène', 'Dans six cas sur dix, un bénévole est arrivé auprès de la victime avant l’ambulance.'],
+      [
+        'Alertés en quelques secondes',
+        'Une application alerte aussitôt les bénévoles formés qui se trouvent à moins de 500\u00a0mètres.',
+      ],
+      [
+        'Un défibrillateur en route',
+        'Un second bénévole part chercher le défibrillateur public le plus proche de la victime.',
+      ],
+      [
+        'Là avant la sirène',
+        'Dans six cas sur dix, un bénévole est arrivé auprès de la victime avant l’ambulance.',
+      ],
     ],
   },
   park: {

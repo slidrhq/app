@@ -19,13 +19,10 @@ export const ptBR: SadeCopy = {
     name: 'Pauta',
     kicker: 'Assembleia dos cooperados',
     title: 'O que vamos ver nesta manhã',
-    intro:
-      'Quarenta minutos sobre a safra de 2026: o que plantamos, quanta água foi preciso e o que o solo nos contou. Depois, o plano para a safra 2027 e tempo para as suas perguntas.',
     items: [
-      ['A colheita: ', '18.400 toneladas de grãos de 212 propriedades, e para onde foram.'],
-      ['A água: ', 'como o gotejamento e as plantas de cobertura cortaram a água por tonelada.'],
-      ['O solo: ', 'o que três anos de análises mostram sob os nossos campos.'],
-      ['A safra 2027: ', 'o banco de sementes, as máquinas compartilhadas e o calendário.'],
+      ['A colheita', '18.400 toneladas de grãos de 212 propriedades, e para onde foram.'],
+      ['A água', 'Como o gotejamento e as plantas de cobertura cortaram a água por tonelada.'],
+      ['O solo', 'O que três anos de análises mostram sob os nossos campos.'],
     ],
   },
   figures: {
@@ -170,7 +167,11 @@ export const ptBR: SadeCopy = {
       ['Presidente do conselho', 'Nadia Haddad', 'Planta trigo e grão-de-bico em 64 hectares'],
       ['Agrônomo-chefe', 'Tomás Ferreira', 'Dirige o laboratório de solos e os voos do drone'],
       ['Engenheiro hídrico', 'Kwame Asante', 'Projetou a rede de gotejamento compartilhada'],
-      ['Guardiã das sementes', 'Mei Lin', 'Testa quarenta variedades locais nas parcelas de ensaio'],
+      [
+        'Guardiã das sementes',
+        'Mei Lin',
+        'Testa quarenta variedades locais nas parcelas de ensaio',
+      ],
     ],
   },
   closing: {

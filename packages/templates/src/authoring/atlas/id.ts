@@ -21,13 +21,10 @@ export const id: AtlasCopy = {
     name: 'Agenda',
     kicker: 'Pembukaan',
     title: 'Agenda hari ini',
-    intro:
-      'Dua puluh lima menit tentang apa yang dipelajari empat belas kota pelabuhan tahun ini soal penggunaan ulang dan desalinasi air, serta apa yang akan kami minta dari setiap mitra berikutnya. Lalu sesi tanya jawab.',
     items: [
-      ['Jaringan: ', 'posisi empat belas kota setelah tiga tahun bekerja bersama.'],
-      ['Proyek tahun ini: ', 'pelabuhan di Limassol yang kini membuat airnya sendiri.'],
-      ['Bergabung: ', 'cara kota baru bergabung dengan jaringan, dalam lima langkah.'],
-      ['Tahun depan: ', 'apa yang kami minta dari setiap mitra, dan kapan tenggatnya.'],
+      ['Jaringan', 'Posisi empat belas kota setelah tiga tahun bekerja bersama.'],
+      ['Proyek tahun ini', 'Pelabuhan di Limassol yang kini membuat airnya sendiri.'],
+      ['Bergabung', 'Cara kota baru bergabung dengan jaringan, dalam lima langkah.'],
     ],
   },
   figures: {

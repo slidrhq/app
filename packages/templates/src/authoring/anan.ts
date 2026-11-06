@@ -9,9 +9,7 @@ import {
   bullets,
   drawing,
   pageNumber,
-  para,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -1019,33 +1017,6 @@ function stackScene() {
   return s;
 }
 
-/**
- * The corner of the text slide's card: a region on its plate, a server and a database on it, and
- * its cloud over it on a dashed line.
- */
-function regionScene() {
-  const s = new Scene(0, 0, 1);
-  s.plate(0, 0, 0, 200, 200, 16);
-  s.shadow(30, 30, 16, 60, 60, 64, 0.1);
-  s.shadow(112, 30, 16, 60, 60, 46, 0.1);
-  s.server(30, 30, 16, 60, 60, 104);
-  s.server(112, 30, 16, 60, 60, 76, LOOK.sky);
-  s.cylinderShadow(70, 150, 16, 28, 28, 0.1);
-  s.cylinder(70, 150, 16, 28, 58, TEAL, 2);
-  s.cylinderShadow(150, 150, 16, 28, 28, 0.1);
-  s.cylinder(150, 150, 16, 28, 44, TEAL, 2);
-  s.link(
-    [
-      [100, 100, 236],
-      [100, 100, 150],
-    ],
-    BLUE,
-    { head: true, width: 2, dash: '3 7', opacity: 0.6 },
-  );
-  s.cloud([100, 100, 262], 190);
-  return s;
-}
-
 /** The icon of a card: the gateway, the ledger, the risk engine. */
 function serviceIcon(kind: 'gateway' | 'ledger' | 'risk') {
   const s = new Scene(0, 0, 1);
@@ -1576,6 +1547,46 @@ const tiles3 = [284, 492, 700];
 const lines3 = [520, 630, 740];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...rows3.flatMap((top, i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 90, top, width, 53), 'heading'),
+          place(`p_point${i + 1}_body`, 'body', at(START + 90, top + 56, width, 136), 'caption'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_anan_${name}_spine`,
+          at(START + 31, rows3[0]! + 70, 8, rows3[2]! - rows3[0]! - 74),
+          `<path d="M4 4V${rows3[2]! - rows3[0]! - 78}" stroke="${BLUE}" stroke-opacity=".45" stroke-width="2.2" stroke-dasharray="3 7" stroke-linecap="round"/>`,
+        ),
+        ...rows3.map((top, i) => {
+          const s = new Scene(0, 0, 1);
+          s.box(0, 0, 0, 60, 60, 10, LOOK.plate);
+          if (i === 0) {
+            s.server(14, 14, 10, 32, 32, 50, LOOK.blue, WHITE);
+          } else if (i === 1) {
+            s.cylinder(30, 30, 10, 18, 52, TEAL, 2, false);
+          } else {
+            s.box(16, 16, 10, 28, 28, 18, LOOK.orange);
+            s.cloud([30, 30, 64], 66);
+          }
+          return drawing(
+            `d_anan_${name}_icon${i + 1}`,
+            at(START, top - 8, 70, 70),
+            s.fit(70, 70, 3),
+            PAINT,
+          );
+        }),
+      ],
+    };
+  }
+
   // The opening scene, and the chips of its regions where the scene puts them.
   const heroArt = atEnd(24, 40, 890, 960);
   const hero = heroScene();
@@ -1595,10 +1606,6 @@ function layouts(): Layout[] {
   })();
   const tag = atEnd(560, 108, 280, 176);
 
-  // The text slide: the card from margin to margin, down to the foot's connector, and the body in
-  // it from its top; a small region stands on the card's corner, beside the title.
-  const textCard = at(START, 236, WIDTH, 666);
-  const textArt = atEnd(END, 54, 340, 236);
   const closingArt = atEnd(20, 60, 900, 820);
   const window = atEnd(END, 100, 780, 812);
 
@@ -1801,21 +1808,16 @@ function layouts(): Layout[] {
       id: 'l_anan_text',
       name: 'Text',
       archetype: 'text',
-      // The kicker over the title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', 1300, 1, 92).placeholders,
-        place('p_body', 'body', at(START + 56, textCard.y + 56, WIDTH - 112, 560), 'body'),
+        ...textPoints('text', WIDTH - 90).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', 1300, 1, 92).decorations,
-        card('d_anan_text_card', textCard),
-        drawing(
-          'd_anan_text_region',
-          textArt,
-          regionScene().fit(textArt.w, textArt.h, 6, 4, 0.5, 1),
-          PAINT,
-        ),
+        ...textPoints('text', WIDTH - 90).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1826,10 +1828,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 820).placeholders,
         place('p_image', 'image', atEnd(END + 14, 156, 752, 742)),
-        ...rows3.flatMap((top, i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 90, top, 740, 53), 'heading'),
-          place(`p_point${i + 1}_body`, 'body', at(START + 90, top + 56, 740, 136), 'caption'),
-        ]),
+        ...textPoints('text_image', 740).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1838,29 +1837,7 @@ function layouts(): Layout[] {
         lettered('d_anan_text_image_bar', atEnd(END, 100, 780, 56), (dir) =>
           svg(780, 56, panelBar(780, 'payments / architecture', [['3 regions', GREEN]], dir)),
         ),
-        art(
-          'd_anan_text_image_spine',
-          at(START + 31, rows3[0]! + 70, 8, rows3[2]! - rows3[0]! - 74),
-          `<path d="M4 4V${rows3[2]! - rows3[0]! - 78}" stroke="${BLUE}" stroke-opacity=".45" stroke-width="2.2" stroke-dasharray="3 7" stroke-linecap="round"/>`,
-        ),
-        ...rows3.map((top, i) => {
-          const s = new Scene(0, 0, 1);
-          s.box(0, 0, 0, 60, 60, 10, LOOK.plate);
-          if (i === 0) {
-            s.server(14, 14, 10, 32, 32, 50, LOOK.blue, WHITE);
-          } else if (i === 1) {
-            s.cylinder(30, 30, 10, 18, 52, TEAL, 2, false);
-          } else {
-            s.box(16, 16, 10, 28, 28, 18, LOOK.orange);
-            s.cloud([30, 30, 64], 66);
-          }
-          return drawing(
-            `d_anan_text_image_icon${i + 1}`,
-            at(START, top - 8, 70, 70),
-            s.fit(70, 70, 3),
-            PAINT,
-          );
-        }),
+        ...textPoints('text_image', 740).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -2281,23 +2258,12 @@ const sampleHe: SampleSlide[] = [
     content: {
       caption: text('סדר היום'),
       title: text('על מה נדבר היום'),
-      body: {
-        paragraphs: [
-          para(
-            'עשרים דקות על הסיבה שאזור אחד הפסיק להספיק לליבת התשלומים, ועל הדרך שבה העברנו אותה לשלושה אזורים פעילים בלי דקה אחת של השבתה. אחר כך נשאיר זמן לכל השאלות שלכם.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['למה עברנו: ', 'אזור אחד, ותקלה אחת בו עצרה את כל התשלומים.'],
-              ['הארכיטקטורה: ', 'שלושה אזורים פעילים, וכל אחד מהם נושא לבדו את כל העומס.'],
-              ['המעבר: ', 'ארבעה שלבים בדצמבר, וכל שלב הפיך בתוך דקות.'],
-              ['התוצאות: ', 'הזמינות, זמן התגובה ב-p95 והחשבון החודשי, לפני ואחרי.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('למה עברנו'), text('הארכיטקטורה'), text('המעבר')],
+      body: [
+        text('אזור אחד, ותקלה אחת בו עצרה את כל התשלומים.'),
+        text('שלושה אזורים פעילים, וכל אחד מהם נושא לבדו את כל העומס.'),
+        text('ארבעה שלבים בדצמבר, וכל שלב הפיך בתוך דקות.'),
+      ],
       footer: FOOTER_HE,
     },
   },
@@ -2551,23 +2517,12 @@ const sampleEn: SampleSlide[] = [
     content: {
       caption: text('Agenda'),
       title: text('What we will cover today'),
-      body: {
-        paragraphs: [
-          para(
-            'Twenty minutes on why one region stopped being enough for the payments core, and on how we moved it to three active regions without a minute of downtime. Then your questions.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['Why we moved: ', 'one region, and a single outage there stopped every payment.'],
-              ['The architecture: ', 'three active regions, each able to carry the whole load.'],
-              ['The move: ', 'four stages in December, each one reversible within minutes.'],
-              ['The results: ', 'uptime, p95 latency and the monthly bill, before and after.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('Why we moved'), text('The architecture'), text('The move')],
+      body: [
+        text('One region, and a single outage there stopped every payment.'),
+        text('Three active regions, each able to carry the whole load.'),
+        text('Four stages in December, each one reversible within minutes.'),
+      ],
       footer: FOOTER_EN,
     },
   },

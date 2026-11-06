@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -677,9 +676,6 @@ function foot(name: string, withFooter = true) {
   };
 }
 
-/** The sheet of the text slide: from margin to margin, down to over the foot. */
-const SHEET = at(START, 236, WIDTH, 684);
-
 /** A sheet of paper on the slide: a card. */
 const card = (id: string, frame: Frame, radius = 14) =>
   rect(id, frame, solid(token('surface')), {
@@ -742,6 +738,31 @@ const steps5 = [START, START + 337, START + 674, START + 1011, START + 1348];
 const team4 = [START, START + 428, START + 856, START + 1284];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 80, 314 + i * 182, width, 48), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 80, 366 + i * 182, width, 126), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_atlas_${name}_thread`,
+          at(START + 26, 364, 4, 368),
+          `<path d="M2 2V366" stroke="${VERMILION}" stroke-width="2.2" stroke-dasharray="2 8" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          numberPin(`d_atlas_${name}_pin${i + 1}`, at(START, 310 + i * 182, 54, 54), i + 1),
+        ),
+      ],
+    };
+  }
+
   // The opening's globe rises out of the end corner of the sheet, cropped by its border: the
   // Mediterranean high on its face, where the slide's eye falls.
   const heroArt = atEnd(INNER, INNER, 900, 1080 - INNER * 2);
@@ -974,32 +995,17 @@ function layouts(): Layout[] {
       id: 'l_atlas_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a sheet of paper from margin to margin, down to over the foot, from its
-      // top; a stamp and its postmark stand on the sheet's corner, beside the title. The kicker
-      // over the title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 300, 1).placeholders,
-        place('p_body', 'body', at(START + 64, SHEET.y + 56, WIDTH - 128, 560), 'body'),
+        ...textPoints('text', WIDTH - 80).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         neatline('d_atlas_text_frame', false),
         ...head('text', WIDTH - 300, 1).decorations,
-        card('d_atlas_text_sheet', SHEET),
-        lifted(
-          art(
-            'd_atlas_text_stamp',
-            atEnd(END + 40, 120, 132, 160),
-            stamp(132, 160, OCEAN, 14) +
-              `<rect x="20" y="20" width="92" height="120" fill="${OCEAN}" fill-opacity=".08"/>` +
-              contours([{ x: 66, y: 84, rx: 38, ry: 48, seed: 1.3, levels: 5 }], OCEAN, 0.5, 1.2) +
-              pinGlyph(76, 68, 8),
-          ),
-          8,
-          16,
-          0.18,
-        ),
-        art('d_atlas_text_postmark', atEnd(END + 128, 196, 220, 92), postmark(46, 46, 38, 4, 150)),
+        ...textPoints('text', WIDTH - 80).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1010,10 +1016,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 960).placeholders,
         place('p_image', 'image', atEnd(END + 16, 156, 628, 728)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 80, 314 + i * 182, 860, 48), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 80, 366 + i * 182, 860, 126), 'body'),
-        ]),
+        ...textPoints('text_image', 860).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1037,14 +1040,7 @@ function layouts(): Layout[] {
                 : `<rect x=".75" y="${r1(12.5 + i * len)}" width="11.75" height="${r1(len)}" fill="${INK}"/><rect x="647.5" y="${r1(12.5 + i * len)}" width="11.75" height="${r1(len)}" fill="${INK}"/>`;
             }).join(''),
         ),
-        art(
-          'd_atlas_text_image_thread',
-          at(START + 26, 364, 4, 368),
-          `<path d="M2 2V366" stroke="${VERMILION}" stroke-width="2.2" stroke-dasharray="2 8" stroke-linecap="round"/>`,
-        ),
-        ...[0, 1, 2].map((i) =>
-          numberPin(`d_atlas_text_image_pin${i + 1}`, at(START, 310 + i * 182, 54, 54), i + 1),
-        ),
+        ...textPoints('text_image', 860).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1567,15 +1563,8 @@ function drawSample(copy: AtlasCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 36 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

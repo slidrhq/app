@@ -19,13 +19,10 @@ export const de: TeferCopy = {
     name: 'Tagesordnung',
     kicker: 'Präsentation für Einkäufer',
     title: 'Was heute Morgen auf dem Tisch liegt',
-    intro:
-      'Vierzig Minuten über eine Kollektion von vierundzwanzig Mänteln: woher ihr Stoff kommt, wie wir ihn so zuschneiden, dass fast nichts auf dem Boden bleibt, und wie Sie sie für den Herbst bestellen. Danach die Mäntel selbst, am Ständer.',
     items: [
-      ['Der Stoff: ', '1.840 Meter aus drei Webereien, und warum 86\u00a0% davon Restbestände waren.'],
-      ['Der Zuschnitt: ', 'Schnitte, die 3\u00a0% des Stoffs auf dem Boden lassen, nicht 15\u00a0%.'],
-      ['Das Atelier: ', 'einunddreißig Stunden Handarbeit in jedem Mantel, in Porto.'],
-      ['Bestellungen: ', 'wie Sie für September bestellen, und was wir weiter nach Maß fertigen.'],
+      ['Der Stoff', '1.840 Meter aus drei Webereien, und warum 86u00a0% davon Restbestände waren.'],
+      ['Der Zuschnitt', 'Schnitte, die 3u00a0% des Stoffs auf dem Boden lassen, nicht 15u00a0%.'],
+      ['Das Atelier', 'Einunddreißig Stunden Handarbeit in jedem Mantel, in Porto.'],
     ],
   },
   cloth: {
@@ -53,7 +50,10 @@ export const de: TeferCopy = {
         'Jeder Schnitt ist so angelegt, dass seine Teile wie ein Puzzle über den Stoff passen.',
       ],
       ['Reste mit Aufgabe', 'Was übrig bleibt, wird zu Taschen, Besätzen und Unterkragen.'],
-      ['Ein Schneider, ein Mantel', 'Jeder Mantel wird von denselben Händen zugeschnitten und genäht.'],
+      [
+        'Ein Schneider, ein Mantel',
+        'Jeder Mantel wird von denselben Händen zugeschnitten und genäht.',
+      ],
     ],
   },
   workroom: {

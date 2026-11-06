@@ -6,7 +6,10 @@ export const id: SadeCopy = {
     name: 'Pembukaan',
     org: 'Commonfield · Koperasi petani',
     title: ['Akar dalam,', 'lumbung penuh'],
-    subtitle: ['Cara 212 pertanian keluarga menuai lebih', 'banyak biji-bijian dengan lebih sedikit air'],
+    subtitle: [
+      'Cara 212 pertanian keluarga menuai lebih',
+      'banyak biji-bijian dengan lebih sedikit air',
+    ],
     meta: 'Rapat anggota · 14 Januari 2027',
   },
   section: {
@@ -19,13 +22,10 @@ export const id: SadeCopy = {
     name: 'Agenda',
     kicker: 'Rapat anggota',
     title: 'Yang akan kita bahas pagi ini',
-    intro:
-      'Empat puluh menit tentang panen 2026: apa yang kita tanam, berapa banyak air yang terpakai, dan apa yang diceritakan tanah. Lalu rencana musim 2027, dan waktu untuk pertanyaan Anda.',
     items: [
-      ['Panen: ', '18.400 ton biji-bijian dari 212 pertanian, dan ke mana semuanya pergi.'],
-      ['Air: ', 'cara irigasi tetes dan tanaman penutup menekan air untuk tiap ton.'],
-      ['Tanah: ', 'apa yang ditunjukkan tiga tahun uji tanah di bawah ladang kita.'],
-      ['Musim 2027: ', 'bank benih, mesin bersama, dan kalendernya.'],
+      ['Panen', '18.400 ton biji-bijian dari 212 pertanian, dan ke mana semuanya pergi.'],
+      ['Air', 'Cara irigasi tetes dan tanaman penutup menekan air untuk tiap ton.'],
+      ['Tanah', 'Apa yang ditunjukkan tiga tahun uji tanah di bawah ladang kita.'],
     ],
   },
   figures: {

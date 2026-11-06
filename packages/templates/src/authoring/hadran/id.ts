@@ -6,7 +6,9 @@ export const id: HadranCopy = {
     name: 'Pembukaan',
     org: 'Night Tram Records · Lisbon',
     title: ['Malam ini', 'musim dimulai'],
-    subtitle: ['Dua belas album baru, tur ke delapan belas kota, dan sekolah untuk suara-suara berikutnya'],
+    subtitle: [
+      'Dua belas album baru, tur ke delapan belas kota, dan sekolah untuk suara-suara berikutnya',
+    ],
     meta: 'Peluncuran musim · Depo Trem · 21 Januari 2027',
   },
   section: {
@@ -19,13 +21,10 @@ export const id: HadranCopy = {
     name: 'Setlist',
     kicker: 'Peluncuran musim',
     title: 'Setlist malam ini',
-    intro:
-      'Empat puluh menit tentang musim mendatang: pelajaran dari musim lalu, dua belas album yang akan kami rilis, delapan belas kota dalam tur, dan sekolah kami. Setelah itu bar dibuka dan band mulai bermain.',
     items: [
-      ['Musim lalu: ', 'tiga puluh satu konser, sembilan album, hampir semua kursi terjual.'],
-      ['Cara kami merekam: ', 'satu ruangan, satu take, mesin pita reel dari 1974.'],
-      ['Musim 2027: ', 'dua belas album dan tur ke delapan belas kota.'],
-      ['Sekolah: ', 'enam puluh empat remaja belajar bermain dan merekam musik.'],
+      ['Musim lalu', 'Tiga puluh satu konser, sembilan album, hampir semua kursi terjual.'],
+      ['Cara kami merekam', 'Satu ruangan, satu take, mesin pita reel dari 1974.'],
+      ['Musim 2027', 'Dua belas album dan tur ke delapan belas kota.'],
     ],
   },
   season: {
@@ -48,18 +47,9 @@ export const id: HadranCopy = {
     kicker: 'Cara kami merekam',
     title: 'Satu ruangan, satu take',
     items: [
-      [
-        'Band bermain bersama',
-        'Tanpa overdub, tanpa klik: seperti di atas panggung.',
-      ],
-      [
-        'Langsung ke pita',
-        'Mesin pita reel 1974 memberi tiap album suara hangat.',
-      ],
-      [
-        'Seminggu untuk tiap album',
-        'Lima hari rekaman, dua hari mixing: ruangan penentunya.',
-      ],
+      ['Band bermain bersama', 'Tanpa overdub, tanpa klik: seperti di atas panggung.'],
+      ['Langsung ke pita', 'Mesin pita reel 1974 memberi tiap album suara hangat.'],
+      ['Seminggu untuk tiap album', 'Lima hari rekaman, dua hari mixing: ruangan penentunya.'],
     ],
   },
   depot: {

@@ -6,20 +6,20 @@ export const id: DofekCopy = {
     name: 'Pembuka',
     org: 'Dinas Kesehatan Distrik Pesisir · Paparan kesehatan masyarakat',
     title: ['Empat menit', 'demi jantung'],
-    subtitle: ['Bagaimana distrik berpenduduk 640.000 jiwa', 'belajar bertindak sebelum ambulans tiba'],
+    subtitle: [
+      'Bagaimana distrik berpenduduk 640.000 jiwa',
+      'belajar bertindak sebelum ambulans tiba',
+    ],
     meta: 'Paparan untuk dewan distrik · 15 April 2027',
   },
   agenda: {
     name: 'Agenda',
     kicker: 'Sebelum kita mulai',
     title: 'Yang akan kita bahas hari ini',
-    intro:
-      'Dua puluh menit tentang apa yang telah diubah program ini, apa yang kini terjadi di jalan saat jantung seseorang berhenti, dan apa yang kami minta dari dewan untuk 2027. Setelah itu, sesi tanya jawab.',
     items: [
-      ['Angka: ', 'apa yang berubah bagi mereka yang mengalami henti jantung di luar rumah sakit.'],
-      ['Di jalan: ', 'bagaimana tetangga, relawan, dan defibrilator kini bekerja bersama.'],
-      ['Orang-orangnya: ', 'tim yang menjalankan program dan para relawan di sampingnya.'],
-      ['Tahun depan: ', 'apa yang kami minta dari dewan, dan kapan.'],
+      ['Angka', 'Apa yang berubah bagi mereka yang mengalami henti jantung di luar rumah sakit.'],
+      ['Di jalan', 'Bagaimana tetangga, relawan, dan defibrilator kini bekerja bersama.'],
+      ['Orang-orangnya', 'Tim yang menjalankan program dan para relawan di sampingnya.'],
     ],
   },
   section: {
@@ -76,9 +76,15 @@ export const id: DofekCopy = {
     kicker: 'Relawan siaga',
     title: 'Bantuan dari ujung jalan',
     items: [
-      ['Dikabari dalam hitungan detik', 'Aplikasi langsung mengabari relawan terlatih yang berada dalam radius 500 meter.'],
+      [
+        'Dikabari dalam hitungan detik',
+        'Aplikasi langsung mengabari relawan terlatih yang berada dalam radius 500 meter.',
+      ],
       ['Defibrilator dalam perjalanan', 'Relawan kedua mengambil defibrilator publik terdekat.'],
-      ['Tiba sebelum sirene', 'Dalam enam dari sepuluh panggilan, relawanlah yang pertama tiba di sisi pasien.'],
+      [
+        'Tiba sebelum sirene',
+        'Dalam enam dari sepuluh panggilan, relawanlah yang pertama tiba di sisi pasien.',
+      ],
     ],
   },
   park: {

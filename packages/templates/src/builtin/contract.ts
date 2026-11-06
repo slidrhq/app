@@ -16,8 +16,8 @@ export const ROLE_CONTRACT: Record<Drawn, Seats> = {
   title: { title: 1 },
   bigNumber: { caption: 4, title: 1, number: 4, subtitle: 1, body: 1, footer: 1 },
   quote: { quote: 1, attribution: 1, caption: 1, footer: 1 },
-  // The head and the foot of the text-and-image slide: its kicker over the title, and its footer.
-  text: { caption: 1, title: 1, body: 1, footer: 1 },
+  // The text-and-image slide without its picture: its kicker, title, points and footer (ADR-136).
+  text: { caption: 1, title: 1, subtitle: 3, body: 3, footer: 1 },
   textImage: { caption: 1, title: 1, image: 1, subtitle: 3, body: 3, footer: 1 },
   fullImage: { image: 1, caption: 1, title: 1, body: 1 },
   cards: { caption: 4, title: 1, subtitle: 3, body: 4, footer: 1 },

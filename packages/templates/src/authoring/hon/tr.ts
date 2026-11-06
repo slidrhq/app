@@ -13,13 +13,10 @@ export const tr: HonCopy = {
     name: 'Gündem',
     kicker: 'Olağan Genel Kurul',
     title: 'Bu akşamın gündemi',
-    intro:
-      'Kırk dakika boyunca sahibi olduğunuz bankanın 2026 yılını konuşacağız: ne kadar kredi verdik, ne kadarını sermaye olarak tuttuk ve üyeler olarak size ne geri döndü. Ardından oylamalar ve sorularınız.',
     items: [
-      ['Rakamlarla yıl: ', 'krediler, sermaye ve üyelere geri dönenler.'],
-      ['Yeşil evler: ', 'bu yıl en hızlı büyüyen kalem olan yenileme kredileri.'],
-      ['İş başındaki birikiminiz: ', 'bir mevduat beş adımda nasıl bir komşunun kredisine dönüşür.'],
-      ['Oylamalar: ', 'yönetim kurulu, denetçiler ve üyelere dağıtılacak pay.'],
+      ['Rakamlarla yıl', 'Krediler, sermaye ve üyelere geri dönenler.'],
+      ['Yeşil evler', 'Bu yıl en hızlı büyüyen kalem olan yenileme kredileri.'],
+      ['İş başındaki birikiminiz', 'Bir mevduat beş adımda nasıl bir komşunun kredisine dönüşür.'],
     ],
   },
   section: {
@@ -50,7 +47,10 @@ export const tr: HonCopy = {
     source: 'Yıl sonu bakiyeleri, milyar €, 2023–2026.',
     series: ['Üyelerin birikimi', 'Üyelere krediler'],
     figures: [
-      ['%81', 'üye birikiminin kredi olarak üyelere dönen payı; kalanı güvenlik marjı olarak tutulur.'],
+      [
+        '%81',
+        'üye birikiminin kredi olarak üyelere dönen payı; kalanı güvenlik marjı olarak tutulur.',
+      ],
       ['+%21', '2023’ten bu yana birikimdeki artış; piyasalardan tek avro borç almadan.'],
     ],
   },
@@ -155,8 +155,16 @@ export const tr: HonCopy = {
     kicker: 'Doksan altı yıl',
     title: 'Üye üye büyüyen bir banka',
     stops: [
-      ['1931', 'Liman işçilerince kuruldu', 'İki yüz aile, birbirine borç vermek için ücretlerini bir araya getirir.'],
-      ['1974', 'İlk konut kredileri', 'Üyeler, onlarca yıldır kirada oturdukları evleri satın almaya başlar.'],
+      [
+        '1931',
+        'Liman işçilerince kuruldu',
+        'İki yüz aile, birbirine borç vermek için ücretlerini bir araya getirir.',
+      ],
+      [
+        '1974',
+        'İlk konut kredileri',
+        'Üyeler, onlarca yıldır kirada oturdukları evleri satın almaya başlar.',
+      ],
       ['2009', 'Kurtarma gerekmedi', 'Finansal krizi tek bir kuruş kamu parası almadan atlatır.'],
       ['2026', '412.000 üye', 'Son yirmi yılın en hızlı büyüme yılı.'],
     ],

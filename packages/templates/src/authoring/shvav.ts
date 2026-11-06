@@ -9,9 +9,7 @@ import {
   bullets,
   drawing,
   pageNumber,
-  para,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -1135,74 +1133,6 @@ function quoteArt(): Part[] {
 }
 
 // ---------------------------------------------------------------------------------------------
-// The text: a module from margin to margin, castellated down both sides
-
-/** The module of the text slide: from the start margin to the end one, down to over the foot. */
-const MODULE = at(START, 236, WIDTH, 690);
-
-/**
- * The castellations of the module's two sides, half holes plated in gold down each edge, and
- * the traces that run from every other one off the board; a part each side.
- */
-function moduleSides(): Part[] {
-  const [l, r] = [MODULE.x, MODULE.x + MODULE.w];
-  const rows = Array.from({ length: 12 }, (_, k) => MODULE.y + 44 + k * 55);
-  const side = (x: number, out: number) => {
-    let g = '';
-    rows.forEach((y, j) => {
-      if (j % 3 !== 1)
-        g += tr(
-          [
-            [x + out * 14, y],
-            [out > 0 ? 1930 : -10, y],
-          ],
-          j % 2 ? UNDER : { ...BARE, w: 5, op: 0.6 },
-        );
-      g += `<rect x="${f1(out > 0 ? x - 4 : x - 16)}" y="${y - 11}" width="20" height="22" rx="2" fill="url(#au)"/>`;
-      g += `<circle cx="${x}" cy="${y}" r="11" fill="url(#au)"/><path d="M${x} ${y - 6}A6 6 0 0 ${out > 0 ? 0 : 1} ${x} ${y + 6}Z" fill="${HOLE}"/>`;
-    });
-    return g;
-  };
-  const top = rows[0]! - 14;
-  const height = rows[rows.length - 1]! + 14 - top;
-  return [
-    { name: 'castellations_start', box: atEnd(r - 18, top, 1920 - r + 18, height), g: side(r, 1) },
-    { name: 'castellations_end', box: atEnd(0, top, l + 18, height), g: side(l, -1) },
-  ];
-}
-
-/**
- * The parts along the foot of the module, at its end corner and clear of the text: the crystal,
- * two passives, the microcontroller, and the LED, lit, where the slide is now.
- */
-function moduleParts(): Part {
-  const l = MODULE.x;
-  const y = MODULE.y + MODULE.h - 40;
-  const g =
-    `<path d="M${l + 36} ${y - 28}H${l + 420}" stroke="${INK}" stroke-opacity=".14" stroke-width="2" stroke-dasharray="8 8"/>` +
-    crystal(l + 84, y, 50, 22) +
-    passive(l + 150, y, 'cap', false, 30, 15) +
-    passive(l + 196, y, 'res', false, 30, 15) +
-    tr(
-      [
-        [l + 212, y],
-        [l + 246, y],
-      ],
-      { ...UNDER, w: 4 },
-    ) +
-    qfp(l + 276, y, 36, 6, { len: 6, w: 4 }) +
-    tr(
-      [
-        [l + 306, y],
-        [l + 350, y],
-      ],
-      { ...UNDER, w: 4 },
-    ) +
-    led(l + 376, y, 34);
-  return { name: 'parts', box: atEnd(l + 20, y - 38, 400, MODULE.y + MODULE.h - (y - 38)), g };
-}
-
-// ---------------------------------------------------------------------------------------------
 // The picture of the board, framed by its courtyard
 
 const PHOTO = atEnd(END + 24, 120, 680, 790);
@@ -1829,6 +1759,42 @@ const LINES = [536, 640, 744];
 
 /** The background of each layout, by its id; the mirror turns their light to the other side. */
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...ROWS.flatMap((top, i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 76, top, width, 53), 'heading'),
+          place(`p_point${i + 1}_body`, 'body', at(START + 76, top + 58, width, 132), 'body'),
+        ]),
+      ],
+      decorations: [
+        drawing(
+          `d_shvav_${name}_net`,
+          at(START, ROWS[0]!, 48, ROWS[2]! - ROWS[0]! + 48),
+          svg(
+            48,
+            ROWS[2]! - ROWS[0]! + 48,
+            tr(
+              [
+                [24, 30],
+                [24, ROWS[2]! - ROWS[0]! + 18],
+              ],
+              { ...UNDER, op: 0.34 },
+            ),
+          ),
+          PAINT,
+        ),
+        ...ROWS.map((top, i) =>
+          numberPad(`d_shvav_${name}_n${i + 1}`, at(START, top + 2, 48, 48), i + 1),
+        ),
+      ],
+    };
+  }
+
   return [
     {
       id: 'l_shvav_hero',
@@ -1916,27 +1882,17 @@ function layouts(): Layout[] {
       id: 'l_shvav_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a module from margin to margin, down to over the foot, from its top; its
-      // castellations run down both sides and its parts stand at the end corner of its foot.
-      // The kicker on its pad over the title and the footer, as on the text-and-image slide
-      // (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       background: ground(0.5, 0.42),
       placeholders: [
         ...head('text', WIDTH, 1, true, 92).placeholders,
-        // The body's start on the footer's, by the same edge.
-        place('p_body', 'body', at(START + 60, MODULE.y + 56, WIDTH - 124, 536), 'body'),
+        ...textPoints('text', WIDTH - 76).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH, 1, true, 92).decorations,
-        rect('d_shvav_text_module', MODULE, solid(token('surface')), {
-          stroke: { color: token('text', 0.14), width: 1.5 },
-          effects: {
-            radius: 12,
-            shadow: { x: 0, y: 14, blur: 30, color: { value: '#01100a', alpha: 0.45 } },
-          },
-        }),
-        ...parts('text', [...moduleSides(), moduleParts()]),
+        ...textPoints('text', WIDTH - 76).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1948,10 +1904,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 900, 2).placeholders,
         place('p_image', 'image', PHOTO),
-        ...ROWS.flatMap((top, i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 76, top, 840, 53), 'heading'),
-          place(`p_point${i + 1}_body`, 'body', at(START + 76, top + 58, 840, 132), 'body'),
-        ]),
+        ...textPoints('text_image', 840).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1961,25 +1914,7 @@ function layouts(): Layout[] {
           atEnd(END + 24 - 64, 120 - 64, 808, 890),
           photoFrameArt(),
         ),
-        drawing(
-          'd_shvav_text_image_net',
-          at(START, ROWS[0]!, 48, ROWS[2]! - ROWS[0]! + 48),
-          svg(
-            48,
-            ROWS[2]! - ROWS[0]! + 48,
-            tr(
-              [
-                [24, 30],
-                [24, ROWS[2]! - ROWS[0]! + 18],
-              ],
-              { ...UNDER, op: 0.34 },
-            ),
-          ),
-          PAINT,
-        ),
-        ...ROWS.map((top, i) =>
-          numberPad(`d_shvav_text_image_n${i + 1}`, at(START, top + 2, 48, 48), i + 1),
-        ),
+        ...textPoints('text_image', 840).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -2356,23 +2291,12 @@ const sampleHe: SampleSlide[] = [
     content: {
       caption: text('סדר היום'),
       title: text('מה בסקירה'),
-      body: {
-        paragraphs: [
-          para(
-            'ארבע שאלות יקבעו אם WM-10 עובר ל-DVT באפריל. לכל אחת מהן יש בעלים בצוות, מספר שאפשר למדוד ותאריך שבו בודקים אותו, וכולן יקבלו תשובה עד סוף הסקירה, כדי שנוכל להחליט כבר היום.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['הספק: ', 'האם התקציב מחזיק עשר שנים על סוללה אחת, גם בחורף קר?'],
-              ['עלות: ', 'כמה עולה לוח אחד בכמות של 10,000 יחידות, עם הרדיו והמארז.'],
-              ['השטח: ', 'מה למדנו מ-60 המונים שעובדים בשטח מאז ינואר.'],
-              ['ייצור: ', 'מה עוד צריך לסגור לפני שמזמינים את הסדרה הראשונה.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('הספק'), text('עלות'), text('השטח')],
+      body: [
+        text('האם התקציב מחזיק עשר שנים על סוללה אחת, גם בחורף קר?'),
+        text('כמה עולה לוח אחד בכמות של 10,000 יחידות, עם הרדיו והמארז.'),
+        text('מה למדנו מ-60 המונים שעובדים בשטח מאז ינואר.'),
+      ],
       footer: FOOTER_HE,
     },
   },
@@ -2614,23 +2538,12 @@ const sampleEn: SampleSlide[] = [
     content: {
       caption: text('Agenda'),
       title: text('What this review covers'),
-      body: {
-        paragraphs: [
-          para(
-            'Four questions decide whether WM-10 moves on to DVT in April. Each has an owner on the team and a number we can measure, and each gets its answer by the end of this review.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['Power: ', 'does the budget hold ten years on one cell, even in a cold winter?'],
-              ['Cost: ', 'what one board costs at 10,000 units, with the radio and the case.'],
-              ['The field: ', 'what the 60 meters running since January have taught us.'],
-              ['Production: ', 'what is left to close before we order the first batch.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('Power'), text('Cost'), text('The field')],
+      body: [
+        text('Does the budget hold ten years on one cell, even in a cold winter?'),
+        text('What one board costs at 10,000 units, with the radio and the case.'),
+        text('What the 60 meters running since January have taught us.'),
+      ],
       footer: FOOTER_EN,
     },
   },

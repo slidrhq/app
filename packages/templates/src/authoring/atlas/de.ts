@@ -19,13 +19,10 @@ export const de: AtlasCopy = {
     name: 'Tagesordnung',
     kicker: 'Zum Auftakt',
     title: 'Unsere Themen heute',
-    intro:
-      'Fünfundzwanzig Minuten darüber, was vierzehn Hafenstädte dieses Jahr über Wiederverwendung und Entsalzung von Wasser gelernt haben und worum wir jeden Partner als Nächstes bitten. Danach Ihre Fragen.',
     items: [
-      ['Das Netzwerk: ', 'wo die vierzehn Städte nach drei Jahren Zusammenarbeit stehen.'],
-      ['Projekt des Jahres: ', 'ein Hafen in Limassol, der jetzt sein eigenes Wasser macht.'],
-      ['Beitritt: ', 'wie eine neue Stadt in fünf Schritten dazukommt.'],
-      ['Das kommende Jahr: ', 'worum wir jeden Partner bitten, und bis wann.'],
+      ['Das Netzwerk', 'Wo die vierzehn Städte nach drei Jahren Zusammenarbeit stehen.'],
+      ['Projekt des Jahres', 'Ein Hafen in Limassol, der jetzt sein eigenes Wasser macht.'],
+      ['Beitritt', 'Wie eine neue Stadt in fünf Schritten dazukommt.'],
     ],
   },
   figures: {

@@ -19,13 +19,10 @@ export const it: SadeCopy = {
     name: 'Ordine del giorno',
     kicker: 'Assemblea dei soci',
     title: 'Di cosa parleremo stamattina',
-    intro:
-      'Quaranta minuti sul raccolto 2026: che cosa abbiamo coltivato, quanta acqua è servita e che cosa ci ha detto il suolo. Poi il piano per la stagione 2027 e spazio alle vostre domande.',
     items: [
-      ['Il raccolto: ', '18.400 tonnellate di cereali da 212 aziende, e dove sono andate.'],
-      ['L’acqua: ', 'come goccia e colture di copertura hanno tagliato l’acqua per tonnellata.'],
-      ['Il suolo: ', 'che cosa mostrano tre anni di analisi sotto i nostri campi.'],
-      ['La stagione 2027: ', 'la banca dei semi, le macchine in comune e il calendario.'],
+      ['Il raccolto', '18.400 tonnellate di cereali da 212 aziende, e dove sono andate.'],
+      ['L’acqua', 'Come goccia e colture di copertura hanno tagliato l’acqua per tonnellata.'],
+      ['Il suolo', 'Che cosa mostrano tre anni di analisi sotto i nostri campi.'],
     ],
   },
   figures: {

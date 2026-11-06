@@ -9,7 +9,9 @@ export const fr: HadranCopy = {
     name: 'Ouverture',
     org: 'Night Tram Records · Lisbonne',
     title: ['La saison', 'débute ce soir'],
-    subtitle: ['Douze disques, une tournée dans dix-huit villes et une école pour les voix de demain'],
+    subtitle: [
+      'Douze disques, une tournée dans dix-huit villes et une école pour les voix de demain',
+    ],
     meta: 'Lancement de saison · Le Dépôt des trams · 21 janvier 2027',
   },
   section: {
@@ -22,12 +24,13 @@ export const fr: HadranCopy = {
     name: 'Setlist',
     kicker: 'Lancement de saison',
     title: 'La setlist de ce soir',
-    intro: `Quarante minutes sur la saison à venir${N}: ce que la dernière nous a appris, les douze disques que nous sortirons, les dix-huit villes de la tournée et notre école. Ensuite, le bar ouvre et le groupe joue.`,
     items: [
-      [`La saison passée${N}: `, 'trente et un concerts, neuf disques, presque toutes les places vendues.'],
-      [`Notre façon d’enregistrer${N}: `, 'une salle, une prise, un magnéto à bandes de 1974.'],
-      [`La saison 2027${N}: `, 'douze albums et une tournée dans dix-huit villes.'],
-      [`L’école${N}: `, 'soixante-quatre ados apprennent à jouer et à enregistrer.'],
+      [
+        'La saison passée',
+        'Trente et un concerts, neuf disques, presque toutes les places vendues.',
+      ],
+      ['Notre façon d’enregistrer', 'Une salle, une prise, un magnéto à bandes de 1974.'],
+      ['La saison 2027', 'Douze albums et une tournée dans dix-huit villes.'],
     ],
   },
   season: {
@@ -50,10 +53,7 @@ export const fr: HadranCopy = {
     kicker: 'Comment nous enregistrons',
     title: 'Une salle, une prise',
     items: [
-      [
-        'Le groupe joue ensemble',
-        `Ni overdubs ni clic${N}: les morceaux sonnent comme sur scène.`,
-      ],
+      ['Le groupe joue ensemble', `Ni overdubs ni clic${N}: les morceaux sonnent comme sur scène.`],
       [
         'Directement sur bande',
         'Un magnétophone à bandes de 1974 donne à chaque disque sa chaleur.',

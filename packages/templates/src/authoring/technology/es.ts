@@ -12,15 +12,10 @@ export const es: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Lo que veremos hoy',
-      lead: [
-        'Por qué una región dejó de bastar para nuestro núcleo de pagos.',
-        'Cómo pasamos a tres regiones activas sin detener el servicio.',
-      ],
       points: [
-        ['El motivo: ', 'Un solo fallo detenía todos los pagos.'],
-        ['La arquitectura: ', 'Cada región puede asumir toda la carga.'],
-        ['La migración: ', 'Cuatro etapas en diciembre, todas reversibles.'],
-        ['Los resultados: ', 'Disponibilidad, latencia p95 y coste mensual.'],
+        ['El motivo', 'Un solo fallo detenía todos los pagos.'],
+        ['La arquitectura', 'Cada región puede asumir toda la carga.'],
+        ['La migración', 'Cuatro etapas en diciembre, todas reversibles.'],
       ],
     },
     figures: {
@@ -121,15 +116,10 @@ export const es: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Las preguntas de esta revisión',
-      lead: [
-        'Cuatro respuestas medibles deciden el paso a DVT en abril.',
-        'Cada pregunta tiene una persona responsable dentro del equipo.',
-      ],
       points: [
-        ['Consumo: ', '¿Una pila dura diez años incluso en invierno?'],
-        ['Coste: ', 'Cuánto cuesta una placa en una tirada de 10.000.'],
-        ['Prueba de campo: ', 'Qué enseñan los 60 contadores desde enero.'],
-        ['Producción: ', 'Qué falta antes de encargar el primer lote.'],
+        ['Consumo', '¿Una pila dura diez años incluso en invierno?'],
+        ['Coste', 'Cuánto cuesta una placa en una tirada de 10.000.'],
+        ['Prueba de campo', 'Qué enseñan los 60 contadores desde enero.'],
       ],
     },
     figures: {
@@ -242,15 +232,10 @@ export const es: TechnologyCopies = {
     agenda: {
       kicker: 'La agenda',
       title: 'El programa de esta noche',
-      lead: [
-        'Treinta minutos sobre las novedades de Zrima 2.0 y sus motivos.',
-        'Después, una demo en directo: de una página vacía a un flujo autónomo.',
-      ],
       points: [
-        ['El editor: ', 'Cada paso en un lienzo, con borradores de IA.'],
-        ['La beta: ', 'Qué crearon y pidieron 4.200 equipos.'],
-        ['Los planes: ', 'Tres opciones, del gratuito a Business.'],
-        ['La hoja de ruta: ', 'Aprobaciones móviles en febrero y flujos compartidos en 2027.'],
+        ['El editor', 'Cada paso en un lienzo, con borradores de IA.'],
+        ['La beta', 'Qué crearon y pidieron 4.200 equipos.'],
+        ['Los planes', 'Tres opciones, del gratuito a Business.'],
       ],
     },
     figures: {

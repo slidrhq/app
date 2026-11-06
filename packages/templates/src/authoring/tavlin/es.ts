@@ -6,7 +6,8 @@ export const es: TavlinCopy = {
     name: 'Apertura',
     org: 'Siete Especias · Un festival gastronómico en Lisboa',
     title: ['Siete especias,', 'una mesa larga'],
-    subtitle: 'El plan de nuestra tercera edición, de los puestos del mercado a la cocina de los talleres',
+    subtitle:
+      'El plan de nuestra tercera edición, de los puestos del mercado a la cocina de los talleres',
     meta: 'Reunión de socios · Lisboa · 2 de febrero de 2027',
   },
   section: {
@@ -19,13 +20,10 @@ export const es: TavlinCopy = {
     name: 'Orden del día',
     kicker: 'Para nuestros colaboradores',
     title: 'Hoy en el menú',
-    intro:
-      'Cuarenta minutos sobre cómo Siete Especias pasó de ser un mercado de fin de semana a un festival de cuarenta y un mil visitantes, y sobre lo que pediremos a cada socio para mayo. Después, sus preguntas, con un té.',
     items: [
-      ['El mercado: ', 'sesenta y cuatro puestos, y cómo los asignamos este año.'],
-      ['La cocina de los talleres: ', 'doce fogones donde se cocina junto a los chefs.'],
-      ['La mesa larga: ', 'seiscientos comensales cada noche, y quién cocina para ellos.'],
-      ['El camino a mayo: ', 'qué necesitamos de cada socio, y para cuándo.'],
+      ['El mercado', 'Sesenta y cuatro puestos, y cómo los asignamos este año.'],
+      ['La cocina de los talleres', 'Doce fogones donde se cocina junto a los chefs.'],
+      ['La mesa larga', 'Seiscientos comensales cada noche, y quién cocina para ellos.'],
     ],
   },
   figures: {
@@ -81,7 +79,11 @@ export const es: TavlinCopy = {
         'El mercado',
         'Sesenta y cuatro puestos de especias enteras y molidas, a\u00a0granel.',
       ],
-      ['Programa 02', 'Los talleres', 'Noventa minutos en tu propio fogón, de la semilla al plato.'],
+      [
+        'Programa 02',
+        'Los talleres',
+        'Noventa minutos en tu propio fogón, de la semilla al plato.',
+      ],
       [
         'Programa 03',
         'La mesa larga',
@@ -100,13 +102,21 @@ export const es: TavlinCopy = {
         'Inscripción de socios',
         'Comerciantes y chefs confirman su lugar antes del 15 de marzo.',
       ],
-      ['Mar. 2027', 'Venta de entradas', 'Primero los talleres; la mesa larga, una semana después.'],
+      [
+        'Mar. 2027',
+        'Venta de entradas',
+        'Primero los talleres; la mesa larga, una semana después.',
+      ],
       [
         'Abr. 2027',
         'Reparto de puestos',
         'Cada socio recibe un plano de la nave y un horario de descarga.',
       ],
-      ['14 may.', 'Se abren las puertas', 'El mercado a mediodía, la primera mesa larga a las ocho.'],
+      [
+        '14 may.',
+        'Se abren las puertas',
+        'El mercado a mediodía, la primera mesa larga a las ocho.',
+      ],
     ],
     note: 'Las fechas valen para los tres programas; quien llegue tarde pasa a la lista de espera.',
   },

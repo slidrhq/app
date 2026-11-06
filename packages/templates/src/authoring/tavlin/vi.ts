@@ -19,13 +19,10 @@ export const vi: TavlinCopy = {
     name: 'Nội dung',
     kicker: 'Dành cho đối tác',
     title: 'Thực đơn hôm nay',
-    intro:
-      'Bốn mươi phút kể về hành trình của Bảy Gia Vị, từ một phiên chợ cuối tuần thành lễ hội đón bốn mươi mốt nghìn khách, và những gì chúng tôi cần ở mỗi đối tác cho tháng Năm. Sau đó là phần hỏi đáp, bên chén trà.',
     items: [
-      ['Khu chợ: ', 'sáu mươi bốn sạp hàng và cách chúng tôi phân sạp năm nay.'],
-      ['Bếp lớp học: ', 'mười hai bàn bếp nơi khách nấu ăn bên cạnh các đầu bếp.'],
-      ['Bàn tiệc dài: ', 'sáu trăm chỗ ngồi mỗi tối, và ai sẽ nấu cho họ.'],
-      ['Đường đến tháng Năm: ', 'chúng tôi cần gì ở mỗi đối tác, và hạn chót là khi nào.'],
+      ['Khu chợ', 'Sáu mươi bốn sạp hàng và cách chúng tôi phân sạp năm nay.'],
+      ['Bếp lớp học', 'Mười hai bàn bếp nơi khách nấu ăn bên cạnh các đầu bếp.'],
+      ['Bàn tiệc dài', 'Sáu trăm chỗ ngồi mỗi tối, và ai sẽ nấu cho họ.'],
     ],
   },
   figures: {
@@ -49,10 +46,7 @@ export const vi: TavlinCopy = {
     title: 'Nấu ăn bên các đầu bếp',
     items: [
       ['Mười hai bàn bếp', 'Mỗi khách nấu ở bàn bếp riêng, gia vị đã được cân sẵn chờ họ.'],
-      [
-        'Chín mươi phút mỗi lớp',
-        'Từ hạt nguyên đến món ăn hoàn chỉnh: rang, xay, trộn và nếm.',
-      ],
+      ['Chín mươi phút mỗi lớp', 'Từ hạt nguyên đến món ăn hoàn chỉnh: rang, xay, trộn và nếm.'],
       [
         'Bằng bốn ngôn ngữ',
         'Tiếng Bồ Đào Nha, Anh, Pháp và Ả Rập, với một đầu\u00a0bếp ở mỗi bàn.',

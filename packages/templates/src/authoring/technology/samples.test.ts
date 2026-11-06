@@ -38,19 +38,14 @@ describe.each([anan, shvav, mutzar])('$id in every supported language', (entry) 
     }
   });
 
-  it('keeps a two-line lead and four numbered points with bold openings in each added language', () => {
+  it('fills the three points of the text slide in each added language (ADR-136)', () => {
     for (const lang of CONTENT_LANGUAGES.filter((l) => l !== 'he' && l !== 'en')) {
       const slide = entry.samples[lang]!.find((s) => s.layout === `l_${entry.id}_text`)!;
-      const body = slide.content.body as RichText;
-      expect(body.paragraphs).toHaveLength(5);
-      expect(body.paragraphs[0]!.runs[0]!.text.split('\n'), lang).toHaveLength(2);
-      for (const point of body.paragraphs.slice(1)) {
-        expect(point.list?.kind, lang).toBe('number');
-        expect(point.runs[0]!.marks?.weight, lang).toBe(700);
-        expect(
-          point.runs.every((r) => r.text.trim().length > 0),
-          lang,
-        ).toBe(true);
+      for (const role of ['subtitle', 'body'] as const) {
+        const fill = slide.content[role] as RichText[];
+        expect(fill, `${lang} ${role}`).toHaveLength(3);
+        for (const one of fill)
+          expect(one.paragraphs[0]!.runs[0]!.text.trim().length, lang).toBeGreaterThan(0);
       }
     }
   });

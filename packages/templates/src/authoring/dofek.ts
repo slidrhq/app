@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -209,7 +208,8 @@ function complex(x: number, y: number, a: number, w: number): string {
 /** A trace from `x0` to `x1` along `y`, beating where it is told, time running with x. */
 function ecg(x0: number, x1: number, y: number, beats: readonly Beat[], w = 120): string {
   let d = `M${r1(x0)} ${y}`;
-  for (const beat of [...beats].sort((a, b) => a.x - b.x)) d += complex(beat.x, y, beat.a, beat.w ?? w);
+  for (const beat of [...beats].sort((a, b) => a.x - b.x))
+    d += complex(beat.x, y, beat.a, beat.w ?? w);
   return `${d}L${r1(x1)} ${y}`;
 }
 
@@ -274,7 +274,8 @@ const END = 128;
 const WIDTH = 1920 - START - END;
 
 /** The red cross before a kicker. */
-const kickerCross = (id: string, top: number) => art(id, at(START, top + 6, 24, 24), cross(24, RED));
+const kickerCross = (id: string, top: number) =>
+  art(id, at(START, top + 6, 24, 24), cross(24, RED));
 
 /** The kicker on its cross, and the title; without a kicker, the title on the cross. */
 function head(name: string, width = 1100, lines = 2, kicker = true) {
@@ -469,7 +470,10 @@ function wristband(id: string, w: number, h: number, colour: string) {
   const sh = Math.round(h * 0.5);
   const sy = (h - sh) / 2;
   const holes = [0, 1, 2, 3]
-    .map((i) => `<circle cx="${w - strap + 92 + i * 52}" cy="${h / 2}" r="9" fill="${MINT}" stroke="${INK}" stroke-opacity=".18" stroke-width="1.5"/>`)
+    .map(
+      (i) =>
+        `<circle cx="${w - strap + 92 + i * 52}" cy="${h / 2}" r="9" fill="${MINT}" stroke="${INK}" stroke-opacity=".18" stroke-width="1.5"/>`,
+    )
     .join('');
   return fromStart(
     w,
@@ -513,7 +517,8 @@ const CHANNELS = [
   // Breathing.
   (w: number, h: number) => {
     let d = `M0 ${h / 2}`;
-    for (let x = 0; x < w; x += 4) d += `L${x} ${r1(h / 2 - Math.sin((x / w) * Math.PI * 3) * h * 0.32)}`;
+    for (let x = 0; x < w; x += 4)
+      d += `L${x} ${r1(h / 2 - Math.sin((x / w) * Math.PI * 3) * h * 0.32)}`;
     return traced(d, AMBER, 3, 0.18);
   },
   // A bar of a count rising to its mark.
@@ -547,6 +552,31 @@ const BANDS = [TEAL, RED, AMBER] as const;
 const BADGES = [TEAL, RED, AMBER, INK] as const;
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 84, 306 + i * 186, width, 48), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 84, 358 + i * 186, width, 120), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_dofek_${name}_thread`,
+          at(START, 362, 56, 368),
+          `<path d="M28 4V364" stroke="${TEAL}" stroke-opacity=".5" stroke-width="2.4" stroke-dasharray="2 9" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          numberDisc(`d_dofek_${name}_disc${i + 1}`, at(START, 302 + i * 186, 56, 56), i + 1),
+        ),
+      ],
+    };
+  }
+
   // The opening: the stethoscope on the end side, its chest piece low beside the words.
   const heroArt = atEnd(40, 0, 860, 960);
   const chest = { x: 610, y: 716, r: 112 };
@@ -628,7 +658,16 @@ function layouts(): Layout[] {
             `<rect x="-20" y="14" width="${560 - 12}" height="14" rx="7" fill="url(#d_dofek_section_pole-steel)" stroke="${STEEL_DARK}" stroke-width="1.5"/>` +
             `<circle cx="${560 - 22}" cy="21" r="12" fill="url(#d_dofek_section_pole-steel)" stroke="${STEEL_DARK}" stroke-width="1.5"/>`,
         ),
-        lifted(art('d_dofek_section_bag', atEnd(270, 120, 380, 600), ivBag('d_dofek_section_bag', 380, 600)), 18, 40, 0.12),
+        lifted(
+          art(
+            'd_dofek_section_bag',
+            atEnd(270, 120, 380, 600),
+            ivBag('d_dofek_section_bag', 380, 600),
+          ),
+          18,
+          40,
+          0.12,
+        ),
         // The drip chamber under the bag.
         art(
           'd_dofek_section_chamber',
@@ -678,9 +717,15 @@ function layouts(): Layout[] {
           place(`p_number${i + 2}`, 'number', atEnd(END + 44, channel(i) + 6, 400, 74), 'title', {
             color: token('surface'),
           }),
-          place(`p_label${i + 2}`, 'caption', atEnd(END + 44, channel(i) + 82, 400, 70), 'caption', {
-            color: token('bg', 0.8),
-          }),
+          place(
+            `p_label${i + 2}`,
+            'caption',
+            atEnd(END + 44, channel(i) + 82, 400, 70),
+            'caption',
+            {
+              color: token('bg', 0.8),
+            },
+          ),
         ]),
         ...foot('big_number').placeholders,
       ],
@@ -708,7 +753,12 @@ function layouts(): Layout[] {
             1000,
             `<path d="M0 22H1000M0 132H1000" stroke="${WHITE}" stroke-opacity=".07" stroke-width="1.5" stroke-dasharray="3 8"/>` +
               traced(
-                ecg(0, 836, 104, [100, 270, 440, 610, 780].map((x) => ({ x, a: 84, w: 140 }))),
+                ecg(
+                  0,
+                  836,
+                  104,
+                  [100, 270, 440, 610, 780].map((x) => ({ x, a: 84, w: 140 })),
+                ),
                 RED,
                 3.4,
                 0.22,
@@ -788,17 +838,20 @@ function layouts(): Layout[] {
           atEnd(388, 214, 330, 118),
           `<rect x="1" y="1" width="328" height="116" rx="8" fill="${WHITE}" stroke="${INK}" stroke-opacity=".16" stroke-width="1.5"/>` +
             `<rect x="1" y="1" width="16" height="116" rx="6" fill="${RED}"/>` +
-            [3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2]
-              .reduce(
-                (acc, wide, i) => {
-                  const x = acc.x;
-                  return {
-                    x: x + wide * 2.4 + 3,
-                    s: acc.s + (i % 2 ? '' : `<rect x="${r1(x)}" y="22" width="${r1(wide * 2.4)}" height="74" fill="${INK}"/>`),
-                  };
-                },
-                { x: 36, s: '' },
-              ).s +
+            [3, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 3, 1, 2, 1, 3, 1, 1, 2, 1, 3, 2].reduce(
+              (acc, wide, i) => {
+                const x = acc.x;
+                return {
+                  x: x + wide * 2.4 + 3,
+                  s:
+                    acc.s +
+                    (i % 2
+                      ? ''
+                      : `<rect x="${r1(x)}" y="22" width="${r1(wide * 2.4)}" height="74" fill="${INK}"/>`),
+                };
+              },
+              { x: 36, s: '' },
+            ).s +
             `<path d="M218 32H304M218 58H288M218 84H254" stroke="${INK}" stroke-opacity=".2" stroke-width="8" stroke-linecap="round"/>`,
         ),
         rect('d_dofek_quote_rule', at(420, 700, 120, 4), solid(token('secondary'))),
@@ -809,41 +862,16 @@ function layouts(): Layout[] {
       id: 'l_dofek_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a chart sheet from margin to margin, down to over the foot, from its top;
-      // a small monitor tab with a beat stands on the sheet's corner, beside the title. The
-      // kicker over the title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 220, 1).placeholders,
-        place('p_body', 'body', at(START + 64, 294, WIDTH - 120, 584), 'body'),
+        ...textPoints('text', WIDTH - 84).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 220, 1).decorations,
-        card('d_dofek_text_sheet', at(START, 232, WIDTH, 692)),
-        art(
-          'd_dofek_text_band',
-          at(START, 232, WIDTH, 14),
-          `<path d="M0 18A18 18 0 0 1 18 0H${WIDTH - 18}A18 18 0 0 1 ${WIDTH} 18V14H0Z" fill="${TEAL}"/>`,
-        ),
-        rect('d_dofek_text_margin', at(START + 32, 278, 2.5, 604), solid(token('secondary', 0.5))),
-        art(
-          'd_dofek_text_tab',
-          atEnd(END + 32, 196, 210, 70),
-          `<rect x="0" y="0" width="210" height="70" rx="16" fill="${INK}"/>` +
-            `<rect x="6" y="6" width="198" height="58" rx="11" stroke="${WHITE}" stroke-opacity=".1" stroke-width="1.5"/>` +
-            fromStart(
-              210,
-              traced(
-                ecg(18, 192, 42, [
-                  { x: 70, a: 26, w: 60 },
-                  { x: 140, a: 26, w: 60 },
-                ]),
-                RED,
-                2.6,
-                0.2,
-              ),
-            ),
-        ),
+        ...textPoints('text', WIDTH - 84).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -854,10 +882,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 920).placeholders,
         place('p_image', 'image', atEnd(END + 22, 142, 656, 640)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 84, 306 + i * 186, 820, 48), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 84, 358 + i * 186, 820, 120), 'body'),
-        ]),
+        ...textPoints('text_image', 820).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -875,7 +900,12 @@ function layouts(): Layout[] {
             620,
             `<path d="M0 82H620" stroke="${WHITE}" stroke-opacity=".14" stroke-width="1.5" stroke-dasharray="3 8"/>` +
               traced(
-                ecg(0, 560, 60, [120, 300, 480].map((x) => ({ x, a: 46, w: 110 }))),
+                ecg(
+                  0,
+                  560,
+                  60,
+                  [120, 300, 480].map((x) => ({ x, a: 46, w: 110 })),
+                ),
                 WHITE,
                 3,
                 0.18,
@@ -884,14 +914,7 @@ function layouts(): Layout[] {
               `<path d="${heartPath(600, 58, 30)}" fill="${RED}"/>`,
           ),
         ),
-        art(
-          'd_dofek_text_image_thread',
-          at(START, 362, 56, 368),
-          `<path d="M28 4V364" stroke="${TEAL}" stroke-opacity=".5" stroke-width="2.4" stroke-dasharray="2 9" stroke-linecap="round"/>`,
-        ),
-        ...[0, 1, 2].map((i) =>
-          numberDisc(`d_dofek_text_image_disc${i + 1}`, at(START, 302 + i * 186, 56, 56), i + 1),
-        ),
+        ...textPoints('text_image', 820).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -960,7 +983,11 @@ function layouts(): Layout[] {
           const y = 250 + i * 202;
           return [
             lifted(
-              art(`d_dofek_cards_band${i + 1}`, at(START, y, WIDTH, 188), wristband(`d_dofek_cards_band${i + 1}`, WIDTH, 188, BANDS[i]!)),
+              art(
+                `d_dofek_cards_band${i + 1}`,
+                at(START, y, WIDTH, 188),
+                wristband(`d_dofek_cards_band${i + 1}`, WIDTH, 188, BANDS[i]!),
+              ),
               10,
               24,
               0.12,
@@ -1052,7 +1079,9 @@ function layouts(): Layout[] {
             align: 'center',
           }),
         ]),
-        place('p_note', 'body', at(START + 120, 766, WIDTH - 170, 100), 'body', { vAlign: 'middle' }),
+        place('p_note', 'body', at(START + 120, 766, WIDTH - 170, 100), 'body', {
+          vAlign: 'middle',
+        }),
         ...foot('process').placeholders,
       ],
       decorations: [
@@ -1166,7 +1195,12 @@ function layouts(): Layout[] {
           fromStart(
             600,
             traced(
-              ecg(0, 600, 50, [90, 260, 430].map((x) => ({ x, a: 46, w: 110 }))),
+              ecg(
+                0,
+                600,
+                50,
+                [90, 260, 430].map((x) => ({ x, a: 46, w: 110 })),
+              ),
               WHITE,
               3,
               0.2,
@@ -1207,7 +1241,10 @@ function layouts(): Layout[] {
         card('d_dofek_chart_panel', at(START, 256, 1100, 648)),
         art('d_dofek_chart_paper', at(START + 24, 280, 1052, 600), ecgPaper(1052, 600, 12, 0.45)),
         rect('d_dofek_chart_tile1', atEnd(END, 256, 510, 306), solid(token('primary')), {
-          effects: { radius: 24, shadow: { x: 0, y: 16, blur: 40, color: { value: '#0d3b3a', alpha: 0.14 } } },
+          effects: {
+            radius: 24,
+            shadow: { x: 0, y: 16, blur: 40, color: { value: '#0d3b3a', alpha: 0.14 } },
+          },
         }),
         card('d_dofek_chart_tile2', atEnd(END, 598, 510, 306), 24),
         art(
@@ -1254,14 +1291,17 @@ function layouts(): Layout[] {
           atEnd(END, 136, 300, 84),
           `<rect x="1" y="1" width="298" height="82" rx="10" fill="${WHITE}" stroke="${INK}" stroke-opacity=".16" stroke-width="1.5"/>` +
             `<rect x="1" y="1" width="44" height="82" rx="10" fill="${AMBER}"/><rect x="30" y="1" width="15" height="82" fill="${AMBER}"/>` +
-            [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 1, 1, 3, 1, 2, 3, 1]
-              .reduce(
-                (acc, wide, i) => ({
-                  x: acc.x + wide * 2.2 + 3,
-                  s: acc.s + (i % 2 ? '' : `<rect x="${r1(acc.x)}" y="16" width="${r1(wide * 2.2)}" height="52" fill="${INK}"/>`),
-                }),
-                { x: 62, s: '' },
-              ).s +
+            [3, 1, 2, 1, 1, 3, 2, 1, 3, 1, 2, 1, 1, 3, 1, 2, 3, 1].reduce(
+              (acc, wide, i) => ({
+                x: acc.x + wide * 2.2 + 3,
+                s:
+                  acc.s +
+                  (i % 2
+                    ? ''
+                    : `<rect x="${r1(acc.x)}" y="16" width="${r1(wide * 2.2)}" height="52" fill="${INK}"/>`),
+              }),
+              { x: 62, s: '' },
+            ).s +
             `<path d="M200 26H278M200 46H262M200 64H240" stroke="${INK}" stroke-opacity=".2" stroke-width="7" stroke-linecap="round"/>`,
         ),
         kickerCross('d_dofek_table_note_cross', 888),
@@ -1443,15 +1483,8 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 44 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('secondary'), gap: 30 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },
@@ -1469,9 +1502,15 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       layout: 'l_dofek_big_number',
       name: copy.figures.name,
       content: {
-        caption: [text(copy.figures.kicker), ...copy.figures.others.map(([, label]) => text(label))],
+        caption: [
+          text(copy.figures.kicker),
+          ...copy.figures.others.map(([, label]) => text(label)),
+        ],
         title: lines(copy.figures.title),
-        number: [text(copy.figures.hero.value), ...copy.figures.others.map(([value]) => text(value))],
+        number: [
+          text(copy.figures.hero.value),
+          ...copy.figures.others.map(([value]) => text(value)),
+        ],
         subtitle: text(copy.figures.hero.label),
         body: text(copy.figures.hero.note),
         footer,
@@ -1481,7 +1520,11 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       layout: 'l_dofek_comparison',
       name: copy.change.name,
       content: {
-        caption: [text(copy.change.kicker), text(copy.change.before[0]), text(copy.change.after[0])],
+        caption: [
+          text(copy.change.kicker),
+          text(copy.change.before[0]),
+          text(copy.change.after[0]),
+        ],
         title: lines(copy.change.title),
         subtitle: [text(copy.change.before[1]), text(copy.change.after[1])],
         body: [text(copy.change.before[2]), text(copy.change.after[2])],
@@ -1492,7 +1535,10 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       layout: 'l_dofek_process',
       name: copy.chain.name,
       content: {
-        caption: [text(copy.chain.kicker), ...copy.chain.steps.map(([, , caption]) => text(caption))],
+        caption: [
+          text(copy.chain.kicker),
+          ...copy.chain.steps.map(([, , caption]) => text(caption)),
+        ],
         title: lines(copy.chain.title),
         number: copy.chain.steps.map(([time]) => text(time)),
         subtitle: copy.chain.steps.map(([, step]) => text(step)),
@@ -1536,10 +1582,16 @@ function drawSample(copy: DofekCopy): SampleSlide[] {
       layout: 'l_dofek_cards',
       name: copy.programmes.name,
       content: {
-        caption: [text(copy.programmes.kicker), ...copy.programmes.cards.map(([label]) => text(label))],
+        caption: [
+          text(copy.programmes.kicker),
+          ...copy.programmes.cards.map(([label]) => text(label)),
+        ],
         title: lines(copy.programmes.title),
         subtitle: copy.programmes.cards.map(([, title]) => text(title)),
-        body: [...copy.programmes.cards.map(([, , body]) => text(body)), text(copy.programmes.note)],
+        body: [
+          ...copy.programmes.cards.map(([, , body]) => text(body)),
+          text(copy.programmes.note),
+        ],
         footer,
       },
     },

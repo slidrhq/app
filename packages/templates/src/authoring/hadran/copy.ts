@@ -33,17 +33,15 @@ export interface HadranCopy {
   hero: { name: string; org: string; title: string[]; subtitle: string[]; meta: string };
   section: { name: string; part: string; title: string[]; subtitle: string };
   /**
-   * The text slide, the evening's setlist: a lead of two lines, given in its lines where the
-   * language may break anywhere, and four points, each one line that opens with a few words in
-   * bold.
+   * The text slide (ADR-136): three points, a title and its body each, as the text-and-image
+   * slide has them.
    */
   setlist: {
     name: string;
     /** The kicker over the title, as the text-and-image slide has one (ADR-135). */
     kicker: string;
     title: Title;
-    intro: Title;
-    items: [opening: string, rest: string][];
+    items: [title: string, body: string][];
   };
   /** The big number: last season. */
   season: {

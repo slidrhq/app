@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -315,7 +314,8 @@ function tufts(w: number, y: number, seed: number, every = 160, size = 9) {
       const lean = (b - 1) * 4 + (rand() - 0.5) * 3;
       const hgt = size * (0.6 + rand() * 0.5) * (b === 1 ? 1.2 : 1);
       // The first blade of a tuft from its place, the next two from the tip before.
-      const from = b === 0 ? `M${r1(bx)} ${y}` : `m${r1(r1(bx) - r1(bx - 4) - tip[0])} ${r1(-tip[1])}`;
+      const from =
+        b === 0 ? `M${r1(bx)} ${y}` : `m${r1(r1(bx) - r1(bx - 4) - tip[0])} ${r1(-tip[1])}`;
       d += `${from}q${r1(lean * 0.3)} ${r1(-hgt * 0.6)} ${r1(lean)} ${r1(-hgt)}`;
       tip = [r1(lean), r1(-hgt)];
     }
@@ -405,7 +405,15 @@ function earShape(n: number, length: number, scale: number) {
  * An ear of wheat from its foot along `angle` (radians), `length` long, placed from the ears of
  * its drawing: lengths in steps of `step` px, sizes in steps of a twentieth.
  */
-function ear(x: number, y: number, angle: number, length: number, scale = 1, fill = GOLD, step = 4) {
+function ear(
+  x: number,
+  y: number,
+  angle: number,
+  length: number,
+  scale = 1,
+  fill = GOLD,
+  step = 4,
+) {
   const l = Math.round(length / step) * step;
   // An ear whose size follows its length (a stalk's) keeps doing so.
   const s = scale === length / 74 ? l / 74 : Math.round(scale * 20) / 20;
@@ -668,7 +676,12 @@ function coverCrop(w: number, h: number) {
     }
     vetch += `<circle cx="${r1(x + 12)}" cy="${y0 - 128}" r="7" fill="${AMBER}" fill-opacity=".8"/><circle cx="${r1(x + 4)}" cy="${y0 - 134}" r="5" fill="${AMBER}" fill-opacity=".55"/>`;
   }
-  return body + `<path d="${stems}" stroke="${LEAF}" stroke-width="2.4" stroke-linecap="round"/>` + vetch + heads;
+  return (
+    body +
+    `<path d="${stems}" stroke="${LEAF}" stroke-width="2.4" stroke-linecap="round"/>` +
+    vetch +
+    heads
+  );
 }
 
 /** A drip line along a row of young plants: an emitter at each, and its drop. */
@@ -702,9 +715,17 @@ function seedTray(w: number, h: number) {
   const seeds = [
     (x: number, y: number) => grainUse(r1(x), r1(y), 20, Math.round(rand() * 180), GOLD),
     (x: number, y: number) =>
-      reuse('pea', () => `<circle r="7.5" fill="#e2c07a" stroke="${AMBER}" stroke-width="1.2"/>`, `x="${r1(x)}" y="${r1(y)}"`),
+      reuse(
+        'pea',
+        () => `<circle r="7.5" fill="#e2c07a" stroke="${AMBER}" stroke-width="1.2"/>`,
+        `x="${r1(x)}" y="${r1(y)}"`,
+      ),
     (x: number, y: number) =>
-      reuse('lentil', () => `<ellipse rx="7" ry="5" fill="${AMBER}" fill-opacity=".8"/>`, `x="${r1(x)}" y="${r1(y)}"`),
+      reuse(
+        'lentil',
+        () => `<ellipse rx="7" ry="5" fill="${AMBER}" fill-opacity=".8"/>`,
+        `x="${r1(x)}" y="${r1(y)}"`,
+      ),
     (x: number, y: number) =>
       reuse(
         'sunflower',
@@ -714,7 +735,11 @@ function seedTray(w: number, h: number) {
       ),
     (x: number, y: number) => grainUse(r1(x), r1(y), 22, Math.round(rand() * 180), '#e2c07a'),
     (x: number, y: number) =>
-      reuse('vetch', () => `<circle r="5" fill="${LEAF}" fill-opacity=".85"/>`, `x="${r1(x)}" y="${r1(y)}"`),
+      reuse(
+        'vetch',
+        () => `<circle r="5" fill="${LEAF}" fill-opacity=".85"/>`,
+        `x="${r1(x)}" y="${r1(y)}"`,
+      ),
   ];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
@@ -723,7 +748,10 @@ function seedTray(w: number, h: number) {
       body += `<rect x="${r1(x + 5)}" y="${r1(y + 5)}" width="${r1(cw - 10)}" height="${r1(ch - 10)}" rx="10" fill="${PAPER}" stroke="${LOAM}" stroke-opacity=".18" stroke-width="1.5"/>`;
       const kind = seeds[(c + r * 3) % seeds.length]!;
       for (let i = 0; i < 6; i++) {
-        body += kind(x + cw / 2 + (rand() - 0.5) * (cw - 34), y + ch / 2 + (rand() - 0.5) * (ch - 34));
+        body += kind(
+          x + cw / 2 + (rand() - 0.5) * (cw - 34),
+          y + ch / 2 + (rand() - 0.5) * (ch - 34),
+        );
       }
     }
   }
@@ -796,7 +824,14 @@ function seasonCrop(season: number, w: number, h: number) {
     case 2:
       for (const [i, x] of xs.entries()) {
         body += wheat(
-          { x: r1(x + (rand() - 0.5) * 8), base, h: 62 + rand() * 22, bend: (rand() - 0.5) * 22, ear: 36, leaves: 1 },
+          {
+            x: r1(x + (rand() - 0.5) * 8),
+            base,
+            h: 62 + rand() * 22,
+            bend: (rand() - 0.5) * 22,
+            ear: 36,
+            leaves: 1,
+          },
           season * 10 + i,
         );
       }
@@ -1252,6 +1287,39 @@ const team4 = [START, START + 424, START + 848, START + 1272];
 const bins3 = [END + 592, END + 296, END];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 84, 306 + i * 196, width, 50), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 84, 360 + i * 196, width, 124), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_sade_${name}_drip`,
+          at(START, 296, 56, 580),
+          `<path d="M28 0V580" stroke="${LOAM}" stroke-width="8" stroke-linecap="round"/>` +
+            `<path d="M25 4V576" stroke="${PAPER}" stroke-opacity=".3" stroke-width="2"/>` +
+            [0, 1, 2]
+              .map((i) => {
+                const y = 26 + i * 196;
+                return (
+                  `<rect x="14" y="${y - 14}" width="28" height="28" rx="6" fill="${LOAM}" stroke="${PAPER}" stroke-opacity=".5" stroke-width="2"/>` +
+                  `<circle cx="28" cy="${y}" r="5" fill="${SKY}"/>` +
+                  `<path d="M28 ${y + 22}c-6 10 -9 15 -9 19a9 9 0 0 0 18 0c0 -4 -3 -9 -9 -19z" fill="${SKY}"/>`
+                );
+              })
+              .join(''),
+        ),
+      ],
+    };
+  }
+
   // The stand of wheat of the opening, rooted in the soil that runs across the slide.
   const stand = atEnd(40, 146, 900, 620);
   const standStalks: Stalk[] = [];
@@ -1272,9 +1340,14 @@ function layouts(): Layout[] {
   const heroWheat =
     standStalks
       .filter((_, i) => i % 2)
-      .map((s, i) => wheat({ ...s, h: s.h + 40, x: s.x + 18 }, 100 + i, { stem: GOLD, ear: '#e2b75a', opacity: 0.55 }))
-      .join('') +
-    standStalks.map((s, i) => wheat(s, 200 + i)).join('');
+      .map((s, i) =>
+        wheat({ ...s, h: s.h + 40, x: s.x + 18 }, 100 + i, {
+          stem: GOLD,
+          ear: '#e2b75a',
+          opacity: 0.55,
+        }),
+      )
+      .join('') + standStalks.map((s, i) => wheat(s, 200 + i)).join('');
   const heroRoots = standStalks
     .map((s, i) => roots(s.x, 0, 120 + (i % 3) * 40, 500 + i, 1.2))
     .join('');
@@ -1328,17 +1401,26 @@ function layouts(): Layout[] {
       ],
       decorations: [
         art('d_sade_section_soil', { x: 0, y: 812, w: W, h: 268 }, soil(W, 268, 23)),
-        art('d_sade_section_seedlings', seedlings, [
-          sprout(60, seedlings.h - 4, 70),
-          sprout(170, seedlings.h - 4, 116),
-          sprout(300, seedlings.h - 4, 150),
-        ].join('')),
+        art(
+          'd_sade_section_seedlings',
+          seedlings,
+          [
+            sprout(60, seedlings.h - 4, 70),
+            sprout(170, seedlings.h - 4, 116),
+            sprout(300, seedlings.h - 4, 150),
+          ].join(''),
+        ),
         art(
           'd_sade_section_roots',
           atEnd(720, 812, 420, 204),
           `<path d="${roots(60, 4, 60, 71) + roots(170, 4, 110, 72) + roots(300, 4, 160, 73)}" stroke="${STRAW}" stroke-opacity=".32" stroke-width="1.5" stroke-linecap="round"/>`,
         ),
-        lifted(art('d_sade_section_sign', atEnd(330, 200, 340, 780), plotSign(340, 320, 460)), 18, 34, 0.2),
+        lifted(
+          art('d_sade_section_sign', atEnd(330, 200, 340, 780), plotSign(340, 320, 460)),
+          18,
+          34,
+          0.2,
+        ),
         kickerGrain('d_sade_section_grain', 338),
       ],
     },
@@ -1369,10 +1451,15 @@ function layouts(): Layout[] {
         art(
           'd_sade_big_number_ground',
           atEnd(END - 50, 872, 1000, 46),
-          `<path d="M0 18Q500 8 1000 18V40Q500 34 0 40Z" fill="${LOAM}" fill-opacity=".9"/>` + tufts(1000, 16, 12, 70, 12),
+          `<path d="M0 18Q500 8 1000 18V40Q500 34 0 40Z" fill="${LOAM}" fill-opacity=".9"/>` +
+            tufts(1000, 16, 12, 70, 12),
         ),
         ...bins3.map((end, i) =>
-          art(`d_sade_big_number_bin${i + 2}`, atEnd(end, 290, 256, 600), grainBin(256, 600, [0.42, 0.5, 0.46][i]!)),
+          art(
+            `d_sade_big_number_bin${i + 2}`,
+            atEnd(end, 290, 256, 600),
+            grainBin(256, 600, [0.42, 0.5, 0.46][i]!),
+          ),
         ),
         art(
           'd_sade_big_number_row',
@@ -1382,9 +1469,22 @@ function layouts(): Layout[] {
             let row = '';
             for (let i = 0; i < 11; i++) {
               const x = 24 + i * 55 + (rand() - 0.5) * 10;
-              row += wheat({ x, base: 174, h: 92 + rand() * 30, bend: (rand() - 0.4) * 24, ear: 40, leaves: 1 }, 620 + i);
+              row += wheat(
+                {
+                  x,
+                  base: 174,
+                  h: 92 + rand() * 30,
+                  bend: (rand() - 0.4) * 24,
+                  ear: 40,
+                  leaves: 1,
+                },
+                620 + i,
+              );
             }
-            return row + `<g transform="translate(0 172)">${soil(600, 18, 61, { ridge: 2, horizons: [] })}</g>`;
+            return (
+              row +
+              `<g transform="translate(0 172)">${soil(600, 18, 61, { ridge: 2, horizons: [] })}</g>`
+            );
           })(),
         ),
         ...foot('big_number').decorations,
@@ -1416,23 +1516,16 @@ function layouts(): Layout[] {
       id: 'l_sade_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a card of paper from margin to margin, down to over the foot, from its
-      // top; a seedling grows out of the card's corner, beside the title. The kicker over the
-      // title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 260, 1).placeholders,
-        place('p_body', 'body', at(START + 72, 300, WIDTH - 144, 584), 'body'),
+        ...textPoints('text', WIDTH - 84).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 260, 1).decorations,
-        card('d_sade_text_card', at(START, 238, WIDTH, 684)),
-        art('d_sade_text_bed', at(START, 238, WIDTH, 14), bed(WIDTH, 14, 91)),
-        art(
-          'd_sade_text_seedling',
-          atEnd(END + 50, 86, 150, 156),
-          `<path d="M18 156Q75 136 132 156Z" fill="${LOAM}"/>` + sprout(75, 148, 100),
-        ),
+        ...textPoints('text', WIDTH - 84).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1443,10 +1536,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 980).placeholders,
         place('p_image', 'image', atEnd(END + 28, 166, 620, 690)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 84, 306 + i * 196, 860, 50), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 84, 360 + i * 196, 860, 124), 'body'),
-        ]),
+        ...textPoints('text_image', 860).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1459,31 +1549,20 @@ function layouts(): Layout[] {
           atEnd(END + 28, 870, 620, 34),
           (() => {
             let ticks = '';
-            for (let i = 0; i <= 30; i++) ticks += `M${2 + i * 10} 0v${i % 10 ? (i % 5 ? 8 : 13) : 18}`;
+            for (let i = 0; i <= 30; i++)
+              ticks += `M${2 + i * 10} 0v${i % 10 ? (i % 5 ? 8 : 13) : 18}`;
             return (
               `<path d="M2 0H302" stroke="${LOAM}" stroke-width="2"/><path d="${ticks}" stroke="${LOAM}" stroke-width="1.6"/>` +
               [GOLD, AMBER, LEAF, SAGE, SKY, LOAM]
-                .map((c, i) => `<rect x="${r1(620 - 6 * 44 + i * 44)}" y="2" width="40" height="30" rx="3" fill="${c}"/>`)
+                .map(
+                  (c, i) =>
+                    `<rect x="${r1(620 - 6 * 44 + i * 44)}" y="2" width="40" height="30" rx="3" fill="${c}"/>`,
+                )
                 .join('')
             );
           })(),
         ),
-        art(
-          'd_sade_text_image_drip',
-          at(START, 296, 56, 580),
-          `<path d="M28 0V580" stroke="${LOAM}" stroke-width="8" stroke-linecap="round"/>` +
-            `<path d="M25 4V576" stroke="${PAPER}" stroke-opacity=".3" stroke-width="2"/>` +
-            [0, 1, 2]
-              .map((i) => {
-                const y = 26 + i * 196;
-                return (
-                  `<rect x="14" y="${y - 14}" width="28" height="28" rx="6" fill="${LOAM}" stroke="${PAPER}" stroke-opacity=".5" stroke-width="2"/>` +
-                  `<circle cx="28" cy="${y}" r="5" fill="${SKY}"/>` +
-                  `<path d="M28 ${y + 22}c-6 10 -9 15 -9 19a9 9 0 0 0 18 0c0 -4 -3 -9 -9 -19z" fill="${SKY}"/>`
-                );
-              })
-              .join(''),
-        ),
+        ...textPoints('text_image', 860).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1503,7 +1582,11 @@ function layouts(): Layout[] {
         }),
       ],
       decorations: [
-        art('d_sade_full_image_soil', { x: 0, y: 700, w: W, h: 380 }, soil(W, 380, 37, { ridge: 0 })),
+        art(
+          'd_sade_full_image_soil',
+          { x: 0, y: 700, w: W, h: 380 },
+          soil(W, 380, 37, { ridge: 0 }),
+        ),
         art(
           'd_sade_full_image_roots',
           atEnd(END + 654, 700, 140, 324),
@@ -1559,12 +1642,19 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('timeline', 1100).decorations,
-        art('d_sade_timeline_row', { x: 0, y: 484, w: W, h: 40 }, soil(W, 40, 51, { horizons: [0.7], grain: 1.6 })),
+        art(
+          'd_sade_timeline_row',
+          { x: 0, y: 484, w: W, h: 40 },
+          soil(W, 40, 51, { horizons: [0.7], grain: 1.6 }),
+        ),
         art(
           'd_sade_timeline_rules',
           at(START, 256, WIDTH, 234),
           [416, 832, 1248]
-            .map((x) => `<path d="M${WIDTH - x + 8} 12V226" stroke="${LOAM}" stroke-opacity=".22" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"/>`)
+            .map(
+              (x) =>
+                `<path d="M${WIDTH - x + 8} 12V226" stroke="${LOAM}" stroke-opacity=".22" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"/>`,
+            )
             .join(''),
         ),
         ...seasons4.flatMap((s, i) => [
@@ -1608,7 +1698,12 @@ function layouts(): Layout[] {
             tufts(W, 14, 21, 120, 9),
         ),
         ...steps5.map((s, i) =>
-          lifted(art(`d_sade_process_plot${i + 1}`, at(s + 24, 340, 252, 252), plot(i, 252)), 8, 18, 0.14),
+          lifted(
+            art(`d_sade_process_plot${i + 1}`, at(s + 24, 340, 252, 252), plot(i, 252)),
+            8,
+            18,
+            0.14,
+          ),
         ),
         rect('d_sade_process_rule', at(START, 822, WIDTH, 2), solid(token('text', 0.14))),
         kickerGrain('d_sade_process_note_grain', 856),
@@ -1655,7 +1750,10 @@ function layouts(): Layout[] {
               const y = r1(70 + d * cm);
               body += `<rect x="20" y="${r1(y - 26)}" width="48" height="22" rx="4" fill="${STRAW}"/><text x="44" y="${r1(y - 9)}" text-anchor="middle" font-family="Be Vietnam Pro, Assistant, sans-serif" font-size="17" font-weight="600" fill="${MUTED}">${d}</text>`;
             }
-            return body + `<path d="M34 46L44 58L54 46" stroke="${SKY}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
+            return (
+              body +
+              `<path d="M34 46L44 58L54 46" stroke="${SKY}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`
+            );
           })(),
         ),
         ...foot('comparison').decorations,
@@ -1872,15 +1970,8 @@ function drawSample(copy: SadeCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 36 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

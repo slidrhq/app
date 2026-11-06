@@ -19,13 +19,10 @@ export const de: TavlinCopy = {
     name: 'Agenda',
     kicker: 'Für unsere Partner',
     title: 'Heute auf der Karte',
-    intro:
-      'Vierzig Minuten darüber, wie Sieben Gewürze vom Wochenendmarkt zu einem Festival mit einundvierzigtausend Gästen wurde, und was wir für Mai von jedem Partner brauchen. Danach Ihre Fragen, bei einem Tee.',
     items: [
-      ['Der Markt: ', 'vierundsechzig Stände, und wie wir sie dieses Jahr vergeben.'],
-      ['Die Kochschule: ', 'zwölf Stationen, an denen Gäste neben den Köchen kochen.'],
-      ['Die lange Tafel: ', 'sechshundert Plätze pro Abend, und wer für sie kocht.'],
-      ['Der Weg zum Mai: ', 'was wir von jedem Partner brauchen, und bis wann.'],
+      ['Der Markt', 'Vierundsechzig Stände, und wie wir sie dieses Jahr vergeben.'],
+      ['Die Kochschule', 'Zwölf Stationen, an denen Gäste neben den Köchen kochen.'],
+      ['Die lange Tafel', 'Sechshundert Plätze pro Abend, und wer für sie kocht.'],
     ],
   },
   figures: {
@@ -190,7 +187,11 @@ export const de: TavlinCopy = {
     name: 'Abschluss',
     kicker: 'Danke',
     title: ['Wir sehen uns', 'an der Tafel'],
-    lines: ['Alter Zollmarkt, Lissabon', '14. bis 16. Mai 2027', 'Anmeldung für Partner bis 15. März'],
+    lines: [
+      'Alter Zollmarkt, Lissabon',
+      '14. bis 16. Mai 2027',
+      'Anmeldung für Partner bis 15. März',
+    ],
     meta: 'Sieben Gewürze · Ein Food-Festival in Lissabon',
   },
 };

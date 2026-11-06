@@ -19,13 +19,10 @@ export const tr: AtlasCopy = {
     name: 'Gündem',
     kicker: 'Açılış',
     title: 'Bugünün gündemi',
-    intro:
-      'On dört liman kentinin bu yıl suyun yeniden kullanımı ve tuzdan arındırılması üzerine öğrendiklerine ve sırada her ortaktan ne isteyeceğimize ayrılmış yirmi beş dakika. Ardından sorularınız.',
     items: [
-      ['Ağ: ', 'on dört kent, üç yıllık ortak çalışmanın sonunda nerede duruyor.'],
-      ['Yılın projesi: ', 'artık kendi suyunu üreten Limasol’daki liman.'],
-      ['Katılım: ', 'yeni bir kent ağa beş adımda nasıl katılır.'],
-      ['Önümüzdeki yıl: ', 'her ortaktan ne istiyoruz ve ne zamana kadar.'],
+      ['Ağ', 'On dört kent, üç yıllık ortak çalışmanın sonunda nerede duruyor.'],
+      ['Yılın projesi', 'Artık kendi suyunu üreten Limasol’daki liman.'],
+      ['Katılım', 'Yeni bir kent ağa beş adımda nasıl katılır.'],
     ],
   },
   figures: {

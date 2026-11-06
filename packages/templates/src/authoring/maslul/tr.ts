@@ -19,13 +19,10 @@ export const tr: MaslulCopy = {
     name: 'Bu akşam',
     kicker: 'Üyelerimiz için',
     title: 'Bu akşamın gündemi',
-    intro:
-      'Sporcular, veliler ve antrenörler için kırk dakika: 2027 sezonu nasıl geçecek, mart ayında kendi pistimize taşındığımızda neler değişecek ve her grup nasıl çalışacak. Sonunda sorularınızı alacağız.',
     items: [
-      ['Yeni pist: ', 'ışıklandırılmış sekiz kulvar, 13 Mart’tan itibaren haftada altı akşam açık.'],
-      ['Antrenman grupları: ', 'kim ne zaman, nerede ve hangi antrenörle çalışıyor.'],
-      ['Sezon: ', 'mart ayındaki açılış yarışmasından temmuzdaki ulusal şampiyonaya dört yarışma.'],
-      ['Aramıza katılın: ', 'yeni bir sporcunun deneme antrenmanından ilk yarışına uzanan yolu.'],
+      ['Yeni pist', 'Işıklandırılmış sekiz kulvar, 13 Mart’tan itibaren haftada altı akşam açık.'],
+      ['Antrenman grupları', 'Kim ne zaman, nerede ve hangi antrenörle çalışıyor.'],
+      ['Sezon', 'Mart ayındaki açılış yarışmasından temmuzdaki ulusal şampiyonaya dört yarışma.'],
     ],
   },
   figures: {
@@ -102,7 +99,11 @@ export const tr: MaslulCopy = {
       ['Mart', 'Açılış yarışması', 'Yeni pistimizdeki ilk yarışlar, tüm üyelere açık.'],
       ['Mayıs', 'Kulüp şampiyonası', 'Bütün üyeler yarışır, her sonuç kulübe puan getirir.'],
       ['Haziran', 'Bölge ligi', 'Dört haftada üç ayak, on bir kulübe karşı.'],
-      ['Temmuz', 'Ulusal şampiyona', 'Barajı geçenler madalya için koşar; 2026’da dokuz madalya kazandık.'],
+      [
+        'Temmuz',
+        'Ulusal şampiyona',
+        'Barajı geçenler madalya için koşar; 2026’da dokuz madalya kazandık.',
+      ],
     ],
     note: 'Bayrak yarışında olduğu gibi her yarışma sopayı sonrakine verir: sonuçlar sonraki turu belirler.',
   },
@@ -165,7 +166,11 @@ export const tr: MaslulCopy = {
     title: 'Pistin kenarındaki insanlar',
     people: [
       ['Sürat ve engelli', 'Amara Okafor', 'Baş antrenör, eski 400 m engelli koşucusu'],
-      ['Orta ve uzun mesafe', 'Mateo Ruiz', 'Dayanıklılık antrenörü; ilk maratonunu 19 yaşında koştu'],
+      [
+        'Orta ve uzun mesafe',
+        'Mateo Ruiz',
+        'Dayanıklılık antrenörü; ilk maratonunu 19 yaşında koştu',
+      ],
       ['Atlamalar ve atmalar', 'Yael Ben-Ami', 'Atlama ve atma antrenörü, spor fizyoterapisti'],
       ['Çocuk atletizmi', 'Kenji Sato', 'Altyapı antrenörü; cumartesi sabahlarını yönetir'],
     ],

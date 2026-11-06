@@ -6,7 +6,9 @@ export const it: TeferCopy = {
     name: 'Apertura',
     org: 'Ourela · Cappotti fatti a Porto',
     title: ['Cappotti', 'per durare'],
-    subtitle: ['Ventiquattro cappotti tagliati nei tessuti che i lanifici non sono riusciti a vendere'],
+    subtitle: [
+      'Ventiquattro cappotti tagliati nei tessuti che i lanifici non sono riusciti a vendere',
+    ],
     meta: 'Presentazione ai buyer · Parigi · 4 marzo 2027',
   },
   section: {
@@ -19,13 +21,10 @@ export const it: TeferCopy = {
     name: 'Programma',
     kicker: 'Presentazione ai buyer',
     title: 'Sul tavolo stamattina',
-    intro:
-      'Quaranta minuti su una collezione di ventiquattro cappotti: da dove viene il suo tessuto, come lo tagliamo perché a terra non resti quasi nulla e come ordinarla per l’autunno. Poi i cappotti stessi, sullo stender.',
     items: [
-      ['Il tessuto: ', '1.840 metri da tre lanifici, e perché l’86% era invenduto.'],
-      ['Il taglio: ', 'cartamodelli che lasciano a terra il 3% del tessuto, non il 15%.'],
-      ['L’atelier: ', 'trentuno ore di lavoro a mano in ogni cappotto, a Porto.'],
-      ['Gli ordini: ', 'come ordinare per settembre, e cosa facciamo ancora su misura.'],
+      ['Il tessuto', '1.840 metri da tre lanifici, e perché l’86% era invenduto.'],
+      ['Il taglio', 'Cartamodelli che lasciano a terra il 3% del tessuto, non il 15%.'],
+      ['L’atelier', 'Trentuno ore di lavoro a mano in ogni cappotto, a Porto.'],
     ],
   },
   cloth: {
@@ -161,7 +160,11 @@ export const it: TeferCopy = {
     kicker: 'L’atelier',
     title: 'Le mani dietro la collezione',
     people: [
-      ['Atelier', 'Inês Moreira', 'Responsabile dell’atelier, taglia il primo cappotto di ogni modello'],
+      [
+        'Atelier',
+        'Inês Moreira',
+        'Responsabile dell’atelier, taglia il primo cappotto di ogni modello',
+      ],
       ['Design', 'Aiko Mori', 'Designer, disegna ogni cartamodello sul suo tessuto'],
       ['Modelli', 'Kofi Asante', 'Modellista, dispone i pezzi incastrati sul tessuto'],
       ['Tessuti', 'Omar Khalil', 'Buyer dei tessuti, conosce i magazzini di ogni lanificio'],

@@ -19,13 +19,10 @@ export const en: TavlinCopy = {
     name: 'Agenda',
     kicker: 'For our partners',
     title: 'On today’s menu',
-    intro:
-      'Forty minutes on how Seven Spices grew from a weekend market into a festival of forty-one thousand guests, and on what we ask of every partner for May. Then your questions, over tea.',
     items: [
-      ['The market: ', 'sixty-four stalls, and how we assign them this year.'],
-      ['The masterclass kitchen: ', 'twelve stations where guests cook beside the chefs.'],
-      ['The long table: ', 'six hundred seats a night, and who cooks for them.'],
-      ['The road to May: ', 'what we need from each partner, and by when.'],
+      ['The market', 'Sixty-four stalls, and how we assign them this year.'],
+      ['The masterclass kitchen', 'Twelve stations where guests cook beside the chefs.'],
+      ['The long table', 'Six hundred seats a night, and who cooks for them.'],
     ],
   },
   figures: {

@@ -18,14 +18,11 @@ export const en: RakiaCopy = {
   agenda: {
     name: 'Tonight',
     kicker: 'The briefing',
-    title: 'Tonight, in four parts',
-    intro:
-      'Forty minutes on the telescope that sees its first starlight this week, what it will observe in its first season, and how every partner university will share its nights. Then we open the dome.',
+    title: 'Tonight, in three parts',
     items: [
-      ['The telescope: ', 'twelve years from the first sketch to a polished 2.4-metre mirror.'],
-      ['The site: ', 'why Meridian Peak is darker and steadier than anywhere we measured.'],
-      ['The first season: ', 'three research programmes and the objects they observe first.'],
-      ['Sharing the nights: ', 'how a partner asks for time, and how the public joins in.'],
+      ['The telescope', 'Twelve years from the first sketch to a polished 2.4-metre mirror.'],
+      ['The site', 'Why Meridian Peak is darker and steadier than anywhere we measured.'],
+      ['The first season', 'Three research programmes and the objects they observe first.'],
     ],
   },
   figures: {
@@ -48,7 +45,10 @@ export const en: RakiaCopy = {
     kicker: 'Inside the dome',
     title: 'A mirror polished for two years',
     items: [
-      ['Cast in one piece', 'The glass cooled in its mould for three months, so that it would not crack.'],
+      [
+        'Cast in one piece',
+        'The glass cooled in its mould for three months, so that it would not crack.',
+      ],
       [
         'Polished to 18 nanometres',
         'Its surface strays from the perfect curve by less than a thousandth of a hair.',
@@ -101,7 +101,11 @@ export const en: RakiaCopy = {
     stops: [
       ['2024', 'The mirror is cast', 'The glass cools for three months before polishing begins.'],
       ['2025', 'The dome rises', 'A 14-metre dome goes up on the summit in a single season.'],
-      ['2026', 'The optics arrive', 'The polished mirror climbs the mountain road at walking pace.'],
+      [
+        '2026',
+        'The optics arrive',
+        'The polished mirror climbs the mountain road at walking pace.',
+      ],
       ['2027', 'First light', 'The telescope takes its first image of the sky on 12 March.'],
     ],
     note: 'The mirror spent two of these four years on the polishing machine.',

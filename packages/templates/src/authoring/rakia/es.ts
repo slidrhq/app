@@ -18,14 +18,14 @@ export const es: RakiaCopy = {
   agenda: {
     name: 'Esta noche',
     kicker: 'La sesión informativa',
-    title: 'Esta noche, en cuatro partes',
-    intro:
-      'Cuarenta minutos sobre el telescopio que recibe esta semana su primera luz de estrellas, lo que observará en su primera temporada y cómo cada universidad socia compartirá sus noches. Después abrimos la cúpula.',
+    title: 'Esta noche, en tres partes',
     items: [
-      ['El telescopio: ', 'doce años desde el primer boceto hasta un espejo pulido de 2,4 metros.'],
-      ['El sitio: ', 'por qué Meridian Peak es más oscuro y estable que cualquier lugar medido.'],
-      ['La primera temporada: ', 'tres programas de investigación y los objetos que observan primero.'],
-      ['Compartir las noches: ', 'cómo un socio pide tiempo y cómo participa el público.'],
+      ['El telescopio', 'Doce años desde el primer boceto hasta un espejo pulido de 2,4 metros.'],
+      ['El sitio', 'Por qué Meridian Peak es más oscuro y estable que cualquier lugar medido.'],
+      [
+        'La primera temporada',
+        'Tres programas de investigación y los objetos que observan primero.',
+      ],
     ],
   },
   figures: {
@@ -48,7 +48,10 @@ export const es: RakiaCopy = {
     kicker: 'Dentro de la cúpula',
     title: 'Un espejo pulido durante dos años',
     items: [
-      ['Fundido en una sola pieza', 'El vidrio se enfrió tres meses en su molde para no agrietarse.'],
+      [
+        'Fundido en una sola pieza',
+        'El vidrio se enfrió tres meses en su molde para no agrietarse.',
+      ],
       [
         'Pulido a 18 nanómetros',
         'Su superficie se aparta de la curva perfecta menos de una milésima de cabello.',
@@ -100,8 +103,16 @@ export const es: RakiaCopy = {
     title: 'Cuatro años, cuatro hitos',
     stops: [
       ['2024', 'Se funde el espejo', 'El vidrio se enfría tres meses antes de empezar el pulido.'],
-      ['2025', 'Se alza la cúpula', 'Una cúpula de 14 metros se levanta en la cumbre en una sola temporada.'],
-      ['2026', 'Llega la óptica', 'El espejo pulido sube la carretera de montaña a paso de peatón.'],
+      [
+        '2025',
+        'Se alza la cúpula',
+        'Una cúpula de 14 metros se levanta en la cumbre en una sola temporada.',
+      ],
+      [
+        '2026',
+        'Llega la óptica',
+        'El espejo pulido sube la carretera de montaña a paso de peatón.',
+      ],
       ['2027', 'Primera luz', 'El telescopio toma su primera imagen del cielo el 12 de marzo.'],
     ],
     note: 'El espejo pasó dos de estos cuatro años en la máquina de pulir.',

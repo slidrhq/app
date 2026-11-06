@@ -1,5 +1,5 @@
 import { CONTENT_LANGUAGES, type Localized, type RichText } from '@slidr/model';
-import { para, points, text, token, type SampleSlide } from '../../builtin/kit';
+import { para, text, type SampleSlide } from '../../builtin/kit';
 import {
   TECHNOLOGY_COPY,
   type Technology,
@@ -40,19 +40,14 @@ function translated(
     title: text(copy.section[0]),
     subtitle: text(copy.section[1]),
   });
-  const oldBody = find('text').content.body;
-  const leadStyle = rich(oldBody) ? oldBody.paragraphs[0]! : para('');
+  // The text slide's three points, as on the text-and-image slide (ADR-136).
+  const { body: _old, ...rest } = find('text').content;
+  find('text').content = rest;
   put('text', copy.agenda.title, {
     caption: text(copy.agenda.kicker),
     title: text(copy.agenda.title),
-    body: {
-      paragraphs: [
-        // Two authored lines, including in scripts whose words can break at any character.
-        { ...leadStyle, runs: [{ text: copy.agenda.lead.join('\n') }] },
-        ...points(copy.agenda.points, { kind: 'number', mark: token('primary'), gap: 22 })
-          .paragraphs,
-      ],
-    },
+    subtitle: many(copy.agenda.points.map(([title]) => title)),
+    body: many(copy.agenda.points.map(([, body]) => body)),
   });
   put('big_number', copy.figures.title, {
     title: text(copy.figures.title),

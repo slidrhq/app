@@ -404,7 +404,8 @@ describe('drafting a template (WG7-T11a)', () => {
         id: `l_${templateId}_text`,
         name: 'Text',
         archetype: 'text',
-        placeholders: 'title, body',
+        // Without a text-and-image layout to take them from, three plain points (ADR-136).
+        placeholders: 'title, subtitle ×3, body ×3',
       },
     ]);
     // The lint ran on the sample as drawn and mirrored, and on the app's own words in Hebrew and
@@ -466,7 +467,7 @@ describe('drafting a template (WG7-T11a)', () => {
     expect(revised.template.layouts.map((l) => [l.name, l.placeholders.length])).toEqual([
       ['Opening', 4],
       ['Cards', 4],
-      ['Text', 2],
+      ['Text', 7],
     ]);
     const cards = revised.sample.slides.find((slide) => slide.name === 'Cards')!.elements[1];
     expect(cards?.type === 'text' && plainText(cards.content)).toBe('Move 1');

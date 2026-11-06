@@ -19,13 +19,10 @@ export const es: TeferCopy = {
     name: 'Orden del día',
     kicker: 'Presentación para compradores',
     title: 'Sobre la mesa esta mañana',
-    intro:
-      'Cuarenta minutos sobre una colección de veinticuatro abrigos: de dónde viene su tela, cómo la cortamos para que casi nada quede en el suelo y cómo pedirla para el otoño. Después, los abrigos mismos, en el perchero.',
     items: [
-      ['La tela: ', '1840 metros de tres fábricas textiles, y por qué el 86\u00a0% era excedente.'],
-      ['El corte: ', 'patrones que dejan en el suelo el 3\u00a0% de la tela, no el 15\u00a0%.'],
-      ['El taller: ', 'treinta y una horas de trabajo a mano en cada abrigo, en Oporto.'],
-      ['Los pedidos: ', 'cómo pedir para septiembre, y qué seguimos haciendo a medida.'],
+      ['La tela', '1840 metros de tres fábricas textiles, y por qué el 86u00a0% era excedente.'],
+      ['El corte', 'Patrones que dejan en el suelo el 3u00a0% de la tela, no el 15u00a0%.'],
+      ['El taller', 'Treinta y una horas de trabajo a mano en cada abrigo, en Oporto.'],
     ],
   },
   cloth: {

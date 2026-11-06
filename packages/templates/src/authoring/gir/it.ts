@@ -19,13 +19,13 @@ export const it: GirCopy = {
     name: 'Stasera',
     kicker: 'Benvenuti',
     title: 'Stasera, in quaranta minuti',
-    intro:
-      'Quaranta minuti su come impareranno le prime quest’anno, su cosa cambia in classe e su come potete aiutare a casa. Poi conoscerete il coordinatore di classe di vostro figlio, nella sua nuova aula.',
     items: [
-      ['Aule nuove: ', 'tavoli da quattro invece di file rivolte alla lavagna.'],
-      ['L’anno che inizia: ', 'quattro date da segnare, dal primo giorno allo spettacolo di fine anno.'],
-      ['Recupero: ', 'cosa facciamo, passo dopo passo, quando un alunno resta indietro.'],
-      ['Le vostre domande: ', 'poi un breve incontro con ogni coordinatore di classe.'],
+      ['Aule nuove', 'Tavoli da quattro invece di file rivolte alla lavagna.'],
+      [
+        'L’anno che inizia',
+        'Quattro date da segnare, dal primo giorno allo spettacolo di fine anno.',
+      ],
+      ['Recupero', 'Cosa facciamo, passo dopo passo, quando un alunno resta indietro.'],
     ],
   },
   figures: {
@@ -79,9 +79,17 @@ export const it: GirCopy = {
     kicker: 'Tre nuovi corsi',
     title: 'Le novità dell’anno per le prime',
     cards: [
-      ['Corso 01', 'Robotica', 'Costruire e programmare un piccolo robot in coppia, per dodici settimane.'],
+      [
+        'Corso 01',
+        'Robotica',
+        'Costruire e programmare un piccolo robot in coppia, per dodici settimane.',
+      ],
       ['Corso 02', 'Dibattito', 'Sostenere una tesi, ascoltare l’altra parte e cambiare idea.'],
-      ['Corso 03', 'Dall’orto alla tavola', 'Coltivare, raccogliere e cucinare: dal seme alla zuppa.'],
+      [
+        'Corso 03',
+        'Dall’orto alla tavola',
+        'Coltivare, raccogliere e cucinare: dal seme alla zuppa.',
+      ],
     ],
     note: 'Ogni alunno sceglie un corso per il primo quadrimestre e uno diverso per il secondo.',
   },
@@ -91,7 +99,11 @@ export const it: GirCopy = {
     title: 'Quattro date da segnare',
     stops: [
       ['Set 2027', 'Primo giorno', 'Le classi conoscono il coordinatore e i nuovi tavoli.'],
-      ['Dic 2027', 'Fiera della scienza', 'Ogni squadra presenta un esperimento dei nuovi laboratori.'],
+      [
+        'Dic 2027',
+        'Fiera della scienza',
+        'Ogni squadra presenta un esperimento dei nuovi laboratori.',
+      ],
       ['Mar 2028', 'Gita scolastica', 'Tre giorni al nord, con una notte sotto le stelle.'],
       ['Giu 2028', 'Spettacolo finale', 'Ogni classe sul palco, con i genitori in prima fila.'],
     ],

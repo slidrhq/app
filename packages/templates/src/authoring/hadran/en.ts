@@ -19,13 +19,10 @@ export const en: HadranCopy = {
     name: 'Setlist',
     kicker: 'Season launch',
     title: 'Tonight’s setlist',
-    intro:
-      'Forty minutes on the season ahead: what the last one taught us, the twelve records we will release, the eighteen cities of the tour and our school. Then the bar opens and the band plays.',
     items: [
-      ['Last season: ', 'thirty-one concerts, nine records, almost every seat sold.'],
-      ['How we record: ', 'one room, one take, a tape machine from 1974.'],
-      ['The 2027 season: ', 'twelve albums and a tour of eighteen cities.'],
-      ['The school: ', 'sixty-four teenagers learning to play and to record.'],
+      ['Last season', 'Thirty-one concerts, nine records, almost every seat sold.'],
+      ['How we record', 'One room, one take, a tape machine from 1974.'],
+      ['The 2027 season', 'Twelve albums and a tour of eighteen cities.'],
     ],
   },
   season: {
@@ -52,14 +49,8 @@ export const en: HadranCopy = {
         'The band plays together',
         'No overdubs, no click: the songs are played as they sound on stage.',
       ],
-      [
-        'Straight to tape',
-        'A reel-to-reel machine from 1974 gives every record its warm sound.',
-      ],
-      [
-        'A week for each album',
-        'Five days to record and two to mix: the room decides.',
-      ],
+      ['Straight to tape', 'A reel-to-reel machine from 1974 gives every record its warm sound.'],
+      ['A week for each album', 'Five days to record and two to mix: the room decides.'],
     ],
   },
   depot: {

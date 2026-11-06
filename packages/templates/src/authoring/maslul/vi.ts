@@ -6,9 +6,7 @@ export const vi: MaslulCopy = {
     name: 'Mở đầu',
     org: 'CLB Điền kinh Kestrel · Khai mạc mùa giải',
     title: ['Mùa giải', '2027'],
-    subtitle: [
-      'Kế hoạch cho cả mùa, từ buổi tập đầu tiên đến giải vô địch quốc gia',
-    ],
+    subtitle: ['Kế hoạch cho cả mùa, từ buổi tập đầu tiên đến giải vô địch quốc gia'],
     meta: 'Nhà câu lạc bộ · Thứ Bảy, 6/2/2027',
   },
   section: {
@@ -21,13 +19,10 @@ export const vi: MaslulCopy = {
     name: 'Tối nay',
     kicker: 'Dành cho hội viên',
     title: 'Nội dung tối nay',
-    intro:
-      'Bốn mươi phút cho vận động viên, phụ huynh và huấn luyện viên: mùa giải 2027 diễn ra thế nào, điều gì đổi khác khi tháng Ba ta chuyển sang đường chạy riêng, và mỗi nhóm tập ra sao. Cuối buổi là hỏi đáp.',
     items: [
-      ['Đường chạy mới: ', 'tám làn có đèn, mở cửa sáu tối mỗi tuần từ ngày 13/3.'],
-      ['Các nhóm tập: ', 'ai tập lúc nào, ở đâu và với huấn luyện viên nào.'],
-      ['Mùa giải: ', 'bốn giải đấu, từ giải khai mạc tháng Ba đến giải vô địch quốc gia tháng Bảy.'],
-      ['Tham gia: ', 'vận động viên mới đi từ buổi tập thử đến cuộc đua đầu tiên ra sao.'],
+      ['Đường chạy mới', 'Tám làn có đèn, mở cửa sáu tối mỗi tuần từ ngày 13/3.'],
+      ['Các nhóm tập', 'Ai tập lúc nào, ở đâu và với huấn luyện viên nào.'],
+      ['Mùa giải', 'Bốn giải đấu, từ giải khai mạc tháng Ba đến giải vô địch quốc gia tháng Bảy.'],
     ],
   },
   figures: {
@@ -101,8 +96,16 @@ export const vi: MaslulCopy = {
     kicker: 'Mùa giải 2027',
     title: 'Bốn giải đấu, một mùa giải',
     stops: [
-      ['Tháng 3', 'Giải khai mạc', 'Những cuộc đua đầu tiên trên đường chạy mới, mở cho mọi hội viên.'],
-      ['Tháng 5', 'Giải vô địch CLB', 'Mọi hội viên đều thi đấu, mỗi kết quả đều ghi điểm cho CLB.'],
+      [
+        'Tháng 3',
+        'Giải khai mạc',
+        'Những cuộc đua đầu tiên trên đường chạy mới, mở cho mọi hội viên.',
+      ],
+      [
+        'Tháng 5',
+        'Giải vô địch CLB',
+        'Mọi hội viên đều thi đấu, mỗi kết quả đều ghi điểm cho CLB.',
+      ],
       ['Tháng 6', 'Giải khu vực', 'Ba lượt đấu trong bốn tuần với mười một CLB khác.'],
       ['Tháng 7', 'Giải quốc gia', 'Các VĐV đạt chuẩn tranh huy chương, sau chín tấm năm 2026.'],
     ],

@@ -193,9 +193,10 @@ function groundsOf(theme: Theme, background: Background, name: string): Rgb[] {
 
 it(
   'a deck that goes to another template and back is the deck it was: every pair, in both languages',
-  { timeout: 120_000 },
+  // Some 120 s for the 2,380 trips of 35 templates (ADR-122, ADR-135), and more beside other files.
+  { timeout: 300_000 },
   () => {
-    // The promise of ADR-023, over the whole library: 90 ordered pairs, Hebrew and English.
+    // The promise of ADR-023, over the whole library: every ordered pair, Hebrew and English.
     const broken: string[] = [];
     for (const from of templates) {
       for (const language of [

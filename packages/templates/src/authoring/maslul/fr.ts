@@ -9,9 +9,7 @@ export const fr: MaslulCopy = {
     name: 'Ouverture',
     org: 'Club d’athlétisme Kestrel · Lancement de saison',
     title: ['À vos', 'marques'],
-    subtitle: [
-      'Notre plan pour la saison 2027, de la première séance aux championnats nationaux',
-    ],
+    subtitle: ['Notre plan pour la saison 2027, de la première séance aux championnats nationaux'],
     meta: 'Club-house · Samedi 6 février 2027',
   },
   section: {
@@ -24,15 +22,16 @@ export const fr: MaslulCopy = {
     name: 'Ce soir',
     kicker: 'Pour nos adhérents',
     title: 'Au programme ce soir',
-    intro: `Quarante minutes pour les athlètes, les parents et les entraîneurs${N}: le déroulé de la saison 2027, ce qui change en mars sur notre propre piste et le programme de chaque groupe. Questions à la fin.`,
     items: [
-      [`La nouvelle piste${N}: `, 'huit couloirs éclairés, ouverts six soirs par semaine dès le 13 mars.'],
-      [`Les groupes${N}: `, 'qui s’entraîne quand, où, et avec quel entraîneur.'],
       [
-        `La saison${N}: `,
-        'quatre rendez-vous, du meeting d’ouverture en mars aux championnats nationaux en juillet.',
+        'La nouvelle piste',
+        'Huit couloirs éclairés, ouverts six soirs par semaine dès le 13 mars.',
       ],
-      [`Nous rejoindre${N}: `, 'comment un nouvel athlète passe d’une séance d’essai à sa première course.'],
+      ['Les groupes', 'Qui s’entraîne quand, où, et avec quel entraîneur.'],
+      [
+        'La saison',
+        'Quatre rendez-vous, du meeting d’ouverture en mars aux championnats nationaux en juillet.',
+      ],
     ],
   },
   figures: {
@@ -114,9 +113,17 @@ export const fr: MaslulCopy = {
         'Meeting d’ouverture',
         'Les premières courses sur notre nouvelle piste, ouvertes à tous les membres.',
       ],
-      ['Mai', 'Championnats du club', 'Tous les membres courent, et chaque résultat compte pour le club.'],
+      [
+        'Mai',
+        'Championnats du club',
+        'Tous les membres courent, et chaque résultat compte pour le club.',
+      ],
       ['Juin', 'Interclubs régionaux', 'Trois tours en quatre semaines contre onze autres clubs.'],
-      ['Juillet', 'Championnats nationaux', 'Nos qualifiés visent des médailles, après les neuf de 2026.'],
+      [
+        'Juillet',
+        'Championnats nationaux',
+        'Nos qualifiés visent des médailles, après les neuf de 2026.',
+      ],
     ],
     note: `Comme un relais, chaque rendez-vous passe le témoin au suivant${N}: ses résultats qualifient pour le prochain.`,
   },
@@ -152,7 +159,8 @@ export const fr: MaslulCopy = {
     name: 'Records personnels',
     kicker: 'Records personnels',
     title: 'Plus rapides chaque saison',
-    source: 'Records personnels battus en compétition par les athlètes du club, par saison, 2023–2026.',
+    source:
+      'Records personnels battus en compétition par les athlètes du club, par saison, 2023–2026.',
     series: ['Moins de 18 ans', 'Seniors et masters'],
     figures: [
       ['212', 'records personnels en 2026, un record pour le club.'],
@@ -178,9 +186,17 @@ export const fr: MaslulCopy = {
     kicker: 'Nos entraîneurs',
     title: 'Ceux qui sont au bord de la piste',
     people: [
-      ['Sprint et haies', 'Amara Okafor', `Entraîneuse en chef, ancienne coureuse de 400${N}m haies`],
+      [
+        'Sprint et haies',
+        'Amara Okafor',
+        `Entraîneuse en chef, ancienne coureuse de 400${N}m haies`,
+      ],
       ['Demi-fond et fond', 'Mateo Ruiz', `Entraîneur de fond${N}; premier marathon à 19 ans`],
-      ['Sauts et lancers', 'Yael Ben-Ami', 'Entraîneuse des sauts et lancers, kinésithérapeute du sport'],
+      [
+        'Sauts et lancers',
+        'Yael Ben-Ami',
+        'Entraîneuse des sauts et lancers, kinésithérapeute du sport',
+      ],
       ['École d’athlétisme', 'Kenji Sato', `Entraîneur des jeunes${N}; anime les samedis matin`],
     ],
   },

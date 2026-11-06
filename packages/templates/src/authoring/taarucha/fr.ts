@@ -22,13 +22,13 @@ export const fr: TaaruchaCopy = {
     name: 'Ce matin',
     kicker: 'Presse et mécènes',
     title: 'La visite de ce matin',
-    intro:
-      'Quarante minutes sur la façon dont nous avons réaccroché les collections après deux ans de travaux, et sur ce qui change pour les visiteurs dès l’ouverture. Puis une promenade dans les premières salles.',
     items: [
-      [`La nouvelle aile${N}: `, 'vingt-deux salles sur trois niveaux, et un seul parcours pour les traverser.'],
-      [`Restauration${N}: `, '312 œuvres nettoyées, consolidées et réencadrées pour l’accrochage.'],
-      [`La visite${N}: `, 'nocturnes gratuites le jeudi, et un atelier pensé pour les scolaires.'],
-      [`L’année à venir${N}: `, 'quatre dates à retenir, de l’ouverture à la première exposition de prêts.'],
+      [
+        'La nouvelle aile',
+        'Vingt-deux salles sur trois niveaux, et un seul parcours pour les traverser.',
+      ],
+      ['Restauration', '312 œuvres nettoyées, consolidées et réencadrées pour l’accrochage.'],
+      ['La visite', 'Nocturnes gratuites le jeudi, et un atelier pensé pour les scolaires.'],
     ],
   },
   figures: {
@@ -51,15 +51,12 @@ export const fr: TaaruchaCopy = {
     kicker: 'L’atelier de restauration',
     title: 'Chaque œuvre, prête pour sa cimaise',
     items: [
-      ['Nettoyée à la main', 'Le vieux vernis retiré au coton-tige, quelques centimètres à la fois.'],
       [
-        'Restaurée, jamais repeinte',
-        'Déchirures et lacunes comblées de matériaux réversibles.',
+        'Nettoyée à la main',
+        'Le vieux vernis retiré au coton-tige, quelques centimètres à la fois.',
       ],
-      [
-        'Éclairée sur mesure',
-        'Une lumière réglée sur ce que la peinture ou le papier supporte.',
-      ],
+      ['Restaurée, jamais repeinte', 'Déchirures et lacunes comblées de matériaux réversibles.'],
+      ['Éclairée sur mesure', 'Une lumière réglée sur ce que la peinture ou le papier supporte.'],
     ],
   },
   gallery: {
@@ -89,7 +86,11 @@ export const fr: TaaruchaCopy = {
         'L’atelier ouvert',
         'Une salle où les classes dessinent d’après les œuvres qu’elles viennent de voir.',
       ],
-      ['Membres', 'Dans les coulisses', 'Une visite par mois de l’atelier de restauration et des réserves.'],
+      [
+        'Membres',
+        'Dans les coulisses',
+        'Une visite par mois de l’atelier de restauration et des réserves.',
+      ],
     ],
     note: 'Toutes les propositions commencent la semaine de l’ouverture.',
   },
@@ -98,8 +99,16 @@ export const fr: TaaruchaCopy = {
     kicker: 'La première année',
     title: 'Quatre dates de la première année',
     stops: [
-      ['14 avril', 'Les portes s’ouvrent', 'Les vingt-deux salles, gratuites le week-end d’ouverture.'],
-      ['1er juillet', 'Soirées d’été', `Le jeudi jusqu’à 22${N}h, avec de la musique dans l’atrium.`],
+      [
+        '14 avril',
+        'Les portes s’ouvrent',
+        'Les vingt-deux salles, gratuites le week-end d’ouverture.',
+      ],
+      [
+        '1er juillet',
+        'Soirées d’été',
+        `Le jeudi jusqu’à 22${N}h, avec de la musique dans l’atrium.`,
+      ],
       [
         '20 octobre',
         'La première exposition de prêts',

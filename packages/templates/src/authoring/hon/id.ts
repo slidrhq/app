@@ -13,13 +13,13 @@ export const id: HonCopy = {
     name: 'Agenda',
     kicker: 'Rapat Anggota Tahunan',
     title: 'Agenda malam ini',
-    intro:
-      'Empat puluh menit tentang tahun 2026 bank milik Anda: berapa yang kami pinjamkan, berapa yang kami simpan sebagai modal, dan apa yang kembali kepada Anda sebagai anggota. Lalu pemungutan suara dan pertanyaan Anda.',
     items: [
-      ['Angka tahun ini: ', 'kredit, modal, dan apa yang kembali ke anggota.'],
-      ['Rumah hijau: ', 'pinjaman renovasi yang tumbuh paling cepat tahun ini.'],
-      ['Tabungan Anda bekerja: ', 'bagaimana simpanan menjadi pinjaman bagi tetangga, dalam lima langkah.'],
-      ['Pemungutan suara: ', 'pengurus, auditor, dan dividen anggota.'],
+      ['Angka tahun ini', 'Kredit, modal, dan apa yang kembali ke anggota.'],
+      ['Rumah hijau', 'Pinjaman renovasi yang tumbuh paling cepat tahun ini.'],
+      [
+        'Tabungan Anda bekerja',
+        'Bagaimana simpanan menjadi pinjaman bagi tetangga, dalam lima langkah.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const id: HonCopy = {
     source: 'Saldo akhir tahun, miliar €, 2023–2026.',
     series: ['Tabungan anggota', 'Pinjaman ke anggota'],
     figures: [
-      ['81%', 'tabungan anggota dipinjamkan kembali ke anggota; sisanya disimpan sebagai margin aman.'],
+      [
+        '81%',
+        'tabungan anggota dipinjamkan kembali ke anggota; sisanya disimpan sebagai margin aman.',
+      ],
       ['+21%', 'pertumbuhan tabungan sejak 2023, tanpa satu euro pun dipinjam dari pasar.'],
     ],
   },
@@ -83,11 +86,7 @@ export const id: HonCopy = {
         'Disimpan sebagai modal',
         'Setiap euro yang disimpan memperkuat bank dan menambah pinjaman tahun depan.',
       ],
-      [
-        '€5 juta · 9%',
-        'Dana komunitas',
-        'Hibah untuk 140 proyek lokal pilihan suara anggota.',
-      ],
+      ['€5 juta · 9%', 'Dana komunitas', 'Hibah untuk 140 proyek lokal pilihan suara anggota.'],
     ],
     note: 'Bank milik anggota tidak punya pemegang saham luar yang harus dibayar, jadi seluruh laba tetap pada anggotanya.',
   },
@@ -155,8 +154,16 @@ export const id: HonCopy = {
     kicker: 'Sembilan puluh enam tahun',
     title: 'Tumbuh, anggota demi anggota',
     stops: [
-      ['1931', 'Didirikan buruh pelabuhan', 'Dua ratus keluarga menghimpun upah untuk saling meminjamkan.'],
-      ['1974', 'Kredit rumah pertama', 'Anggota mulai membeli rumah yang puluhan tahun mereka sewa.'],
+      [
+        '1931',
+        'Didirikan buruh pelabuhan',
+        'Dua ratus keluarga menghimpun upah untuk saling meminjamkan.',
+      ],
+      [
+        '1974',
+        'Kredit rumah pertama',
+        'Anggota mulai membeli rumah yang puluhan tahun mereka sewa.',
+      ],
       ['2009', 'Tanpa dana talangan', 'Melewati krisis keuangan tanpa satu sen pun uang publik.'],
       ['2026', '412.000 anggota', 'Tahun dengan pertumbuhan tercepat dalam dua dekade.'],
     ],

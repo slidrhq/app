@@ -12,15 +12,10 @@ export const ptBR: TechnologyCopies = {
     agenda: {
       kicker: 'Pauta',
       title: 'O que vamos ver hoje',
-      lead: [
-        'Por que uma região deixou de atender ao nosso núcleo de pagamentos.',
-        'Como migramos para três regiões ativas sem parar o serviço.',
-      ],
       points: [
-        ['O motivo: ', 'Uma única falha parava todos os pagamentos.'],
-        ['A arquitetura: ', 'Cada região pode assumir toda a carga.'],
-        ['A migração: ', 'Quatro etapas em dezembro, todas reversíveis.'],
-        ['Os resultados: ', 'Disponibilidade, latência p95 e custo mensal.'],
+        ['O motivo', 'Uma única falha parava todos os pagamentos.'],
+        ['A arquitetura', 'Cada região pode assumir toda a carga.'],
+        ['A migração', 'Quatro etapas em dezembro, todas reversíveis.'],
       ],
     },
     figures: {
@@ -117,15 +112,10 @@ export const ptBR: TechnologyCopies = {
     agenda: {
       kicker: 'Pauta',
       title: 'As perguntas desta revisão',
-      lead: [
-        'Quatro respostas mensuráveis decidem a passagem para DVT em abril.',
-        'Cada pergunta tem uma pessoa responsável dentro da equipe.',
-      ],
       points: [
-        ['Energia: ', 'Uma pilha dura dez anos, mesmo no frio?'],
-        ['Custo: ', 'O preço de uma placa em um lote de 10.000.'],
-        ['Em campo: ', 'O que ensinam os 60 medidores desde janeiro.'],
-        ['Produção: ', 'O que falta antes de pedir o primeiro lote.'],
+        ['Energia', 'Uma pilha dura dez anos, mesmo no frio?'],
+        ['Custo', 'O preço de uma placa em um lote de 10.000.'],
+        ['Em campo', 'O que ensinam os 60 medidores desde janeiro.'],
       ],
     },
     figures: {
@@ -239,15 +229,10 @@ export const ptBR: TechnologyCopies = {
     agenda: {
       kicker: 'O roteiro',
       title: 'A programação de hoje',
-      lead: [
-        'Trinta minutos sobre o que mudou no Zrima 2.0 e nossas escolhas.',
-        'Depois, uma demo ao vivo: da página vazia a um fluxo autônomo.',
-      ],
       points: [
-        ['O editor: ', 'Todo o fluxo em uma tela, com rascunhos de IA.'],
-        ['A beta: ', 'O que 4.200 equipes criaram e pediram.'],
-        ['Os planos: ', 'Três opções, do gratuito ao Business.'],
-        ['O futuro: ', 'Aprovações no celular em fevereiro, fluxos compartilhados em 2027.'],
+        ['O editor', 'Todo o fluxo em uma tela, com rascunhos de IA.'],
+        ['A beta', 'O que 4.200 equipes criaram e pediram.'],
+        ['Os planos', 'Três opções, do gratuito ao Business.'],
       ],
     },
     figures: {

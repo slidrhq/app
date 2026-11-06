@@ -19,13 +19,10 @@ export const de: HadranCopy = {
     name: 'Setlist',
     kicker: 'Saisonauftakt',
     title: 'Die Setlist des Abends',
-    intro:
-      'Vierzig Minuten über die neue Saison: was uns die letzte gelehrt hat, die zwölf Platten, die wir herausbringen, die achtzehn Städte der Tournee und unsere Schule. Dann öffnet die Bar, und die Band spielt.',
     items: [
-      ['Letzte Saison: ', 'einunddreißig Konzerte, neun Platten, fast jeder Platz verkauft.'],
-      ['Wie wir aufnehmen: ', 'ein Raum, ein Take, eine Bandmaschine von 1974.'],
-      ['Die Saison 2027: ', 'zwölf Alben und eine Tournee durch achtzehn Städte.'],
-      ['Die Schule: ', 'vierundsechzig Jugendliche lernen spielen und aufnehmen.'],
+      ['Letzte Saison', 'Einunddreißig Konzerte, neun Platten, fast jeder Platz verkauft.'],
+      ['Wie wir aufnehmen', 'Ein Raum, ein Take, eine Bandmaschine von 1974.'],
+      ['Die Saison 2027', 'Zwölf Alben und eine Tournee durch achtzehn Städte.'],
     ],
   },
   season: {

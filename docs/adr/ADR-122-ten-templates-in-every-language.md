@@ -1,6 +1,6 @@
 # ADR-122 — Ten new templates, written in every language of the app
 
-Status: Implemented in the 2026-10-29 working tree; **not committed**. The templates are staged on a copy of the library and accepted there, **not published**: the library still has the 25 templates it had (below, "Open for the user").
+Status: Implemented in the 2026-10-29 working tree; **not committed**. Published to the library on 2026-11-05 at 23:51:10 UTC, with the text slide of ADR-135 (below, "Published").
 
 ## Request
 
@@ -46,9 +46,14 @@ Status: Implemented in the 2026-10-29 working tree; **not committed**. The templ
 - The acceptance of the ten on a library staged with them (`builtInTemplates.browser.test.ts -t "the <id> template"`, with the published library as it is for everything else): 190 passed. A first run failed one: the model's English deck, switched to Track, opened with "Plan for the fourth quarter" in three lines of its condensed capitals, over the subtitle; Track's opening title box was widened from 940 to 1,100px, and the sixteen openings were looked at again.
 - The ten covers as the galleries draw them (`?covers`), beside the 25.
 
+## Published
+
+- At the user's word ("פרסם את 10 התבניות"), on 2026-11-05 at 23:51:10 UTC (the library's publication `2026-11-05T23:51:10.909Z`), after ADR-135 had given every template the text slide of the text-and-image one: the ten as their sources draw them now, appended to the published catalog (`templates/catalog.json`, 26.4 MB, 35 templates), with `templates/index.json` and `templates/pictures.json`, and new: the ten `templates/<id>/template.json` and their 61 pictures (`images/templates/`). 74 files through the library's API for an author's files (3 changed, each `from` the hash the live manifest still named; 71 new, `from` none, where the library had nothing).
+- Checked before: the staged catalog valid (every template, the role contract, the text slide, the samples of every language); each of the ten under the 900 KB of a template (390–889 KB); the only field the ten use that the 25 do not is a text style's `case`, in the model since its first commit, so an app of before parses them; the round trip of every ordered pair of the 35, Hebrew and English, 2,380 of 2,380; each sample deck drawn from the staged library in Hebrew and English, its pictures served as the library serves them, and looked at.
+- Read back from media.slidr.studio: the manifest names the 74 new hashes, and the catalog, `index.json`, a template and a picture are those bytes. `builtin.test.ts` against the published library: 248 of 248. Its round trip of every pair outgrew its 120 s with 35 templates (it took 122 s) and was given 300 s. The app's acceptance in the browser (`acceptDraft`) was not run again.
+
 ## Open for the user
 
-- **Publishing**: `templates/catalog.json` (26.3 MB), `templates/pictures.json`, the 61 pictures (`images/templates/`) and the manifest's entries, through the files API with a publishing token. Staged in the session's scratch folder by a script that writes only those files from the published ones.
 - The app of this change has to be released for an interface to name the ten in its language; an app of before shows their English names and no tagline.
 - Faces the library gives some scripts: Korean headings of Track and Encore fall to Black Han Sans, which has one weight (the sample sets it at 400; a user's bold heading is drawn faux-bold); Chalk's Russian and Vietnamese headings fall to Amatic SC.
 - `tools/pictures.py` writes its record with CRLF on Windows, and `tools/render-art.mjs` cannot start Playwright on Windows (it imports it by a `C:` path).

@@ -19,13 +19,10 @@ export const id: GirCopy = {
     name: 'Malam ini',
     kicker: 'Selamat datang',
     title: 'Malam ini, dalam empat puluh menit',
-    intro:
-      'Empat puluh menit tentang cara kelas 7 belajar tahun ini, apa yang berubah di kelas, dan bagaimana Bapak/Ibu bisa membantu di rumah. Setelah itu, Bapak/Ibu akan bertemu wali kelas anak di ruang kelas yang baru.',
     items: [
-      ['Ruang kelas baru: ', 'meja berempat, bukan lagi barisan bangku menghadap papan tulis.'],
-      ['Tahun ajaran ini: ', 'empat tanggal penting, dari hari pertama sampai pentas akhir tahun.'],
-      ['Bantuan tambahan: ', 'apa yang kami lakukan, langkah demi langkah, saat murid tertinggal.'],
-      ['Pertanyaan Bapak/Ibu: ', 'lalu pertemuan singkat dengan setiap wali kelas.'],
+      ['Ruang kelas baru', 'Meja berempat, bukan lagi barisan bangku menghadap papan tulis.'],
+      ['Tahun ajaran ini', 'Empat tanggal penting, dari hari pertama sampai pentas akhir tahun.'],
+      ['Bantuan tambahan', 'Apa yang kami lakukan, langkah demi langkah, saat murid tertinggal.'],
     ],
   },
   figures: {
@@ -56,10 +53,7 @@ export const id: GirCopy = {
         'Buka setelah sekolah',
         'Murid boleh kembali pada Selasa dan Kamis sore untuk menyelesaikan tugasnya.',
       ],
-      [
-        'Dibangun bersama orang tua',
-        'Komite sekolah mengumpulkan sepertiga biaya peralatan baru.',
-      ],
+      ['Dibangun bersama orang tua', 'Komite sekolah mengumpulkan sepertiga biaya peralatan baru.'],
     ],
   },
   garden: {
@@ -79,9 +73,21 @@ export const id: GirCopy = {
     kicker: 'Tiga kelas pilihan baru',
     title: 'Baru tahun ini di kelas 7',
     cards: [
-      ['Pilihan 01', 'Robotika', 'Merakit dan memprogram robot kecil secara berpasangan selama dua belas minggu.'],
-      ['Pilihan 02', 'Debat', 'Membela pendapat, mendengarkan pihak lain, dan berani berubah pikiran.'],
-      ['Pilihan 03', 'Kebun dapur', 'Menanam, memetik, dan memasak hasil kebun sendiri, dari benih sampai sup.'],
+      [
+        'Pilihan 01',
+        'Robotika',
+        'Merakit dan memprogram robot kecil secara berpasangan selama dua belas minggu.',
+      ],
+      [
+        'Pilihan 02',
+        'Debat',
+        'Membela pendapat, mendengarkan pihak lain, dan berani berubah pikiran.',
+      ],
+      [
+        'Pilihan 03',
+        'Kebun dapur',
+        'Menanam, memetik, dan memasak hasil kebun sendiri, dari benih sampai sup.',
+      ],
     ],
     note: 'Setiap murid memilih satu kelas untuk semester ganjil dan satu lagi untuk semester genap.',
   },
@@ -93,7 +99,11 @@ export const id: GirCopy = {
       ['Sep 2027', 'Hari pertama', 'Setiap kelas bertemu wali kelas dan meja barunya.'],
       ['Des 2027', 'Pameran sains', 'Setiap tim memamerkan percobaan dari laboratorium baru.'],
       ['Mar 2028', 'Studi wisata', 'Tiga hari di utara, dengan satu malam di bawah bintang.'],
-      ['Jun 2028', 'Pentas akhir tahun', 'Semua kelas tampil di panggung, orang tua di barisan depan.'],
+      [
+        'Jun 2028',
+        'Pentas akhir tahun',
+        'Semua kelas tampil di panggung, orang tua di barisan depan.',
+      ],
     ],
     note: 'Wali kelas akan mengirim jadwal pertemuan orang tua dua minggu sebelumnya.',
   },
@@ -158,7 +168,11 @@ export const id: GirCopy = {
     people: [
       ['7A · IPA', 'Maya Cohen', 'Koordinator kelas 7, mengelola laboratorium baru'],
       ['7B · Matematika', 'Karim Nasser', 'Guru matematika, membina kelas robotika'],
-      ['7C · Bahasa Indonesia', 'Olga Petrenko', 'Guru Bahasa Indonesia, memimpin program literasi'],
+      [
+        '7C · Bahasa Indonesia',
+        'Olga Petrenko',
+        'Guru Bahasa Indonesia, memimpin program literasi',
+      ],
       ['7D · Sejarah', 'Daniel Mekonen', 'Guru sejarah, merencanakan studi wisata'],
     ],
   },

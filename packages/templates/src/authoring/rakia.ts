@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -253,7 +252,8 @@ function specks(
     const x = rand() * w;
     const y = rand() * h;
     const b = rand();
-    if (keepOut.some(([kx, ky, kw, kh]) => x > kx && x < kx + kw && y > ky && y < ky + kh)) continue;
+    if (keepOut.some(([kx, ky, kw, kh]) => x > kx && x < kx + kw && y > ky && y < ky + kh))
+      continue;
     body += `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1((0.6 + b * b * 1.6) * size)}" fill="${colour}" fill-opacity="${r1(0.2 + b * 0.6)}"/>`;
   }
   return body;
@@ -518,22 +518,6 @@ const QUOTE_MARKS =
   'M44 0C20 6 4 24 4 48c0 14 8 24 22 24 12 0 20-8 20-19s-8-18-18-18c-3 0-5 0-7 1 3-12 12-22 26-28Z' +
   'M98 0C74 6 58 24 58 48c0 14 8 24 22 24 12 0 20-8 20-19s-8-18-18-18c-3 0-5 0-7 1 3-12 12-22 26-28Z';
 
-/** A small constellation: its stars joined, one of them spiked. */
-function constellation(stars: readonly [number, number, number][], lines: readonly [number, number][]) {
-  return (
-    `<path d="${lines
-      .map(([a, b]) => `M${stars[a]![0]} ${stars[a]![1]}L${stars[b]![0]} ${stars[b]![1]}`)
-      .join('')}" stroke="${CREAM}" stroke-opacity=".32" stroke-width="1.2" stroke-dasharray="1 4" stroke-linecap="round"/>` +
-    stars
-      .map(([x, y, s], i) =>
-        i === 0
-          ? sparkle(x, y, s * 4.2, VEGA)
-          : `<circle cx="${x}" cy="${y}" r="${r1(s * 1.6)}" fill="${CREAM}" fill-opacity=".14"/><circle cx="${x}" cy="${y}" r="${s}" fill="${CREAM}"/>`,
-      )
-      .join('')
-  );
-}
-
 /** The corner marks of a camera's frame, an L at each corner of a box. */
 function brackets(w: number, h: number, arm: number, colour = CREAM, opacity = 0.55) {
   return `<path d="M1 ${arm}V1H${arm}M${w - arm} 1H${w - 1}V${arm}M${w - 1} ${h - arm}V${h - 1}H${w - arm}M${arm} ${h - 1}H1V${h - arm}" stroke="${colour}" stroke-opacity="${opacity}" stroke-width="2"/>`;
@@ -710,7 +694,9 @@ function telescope(w: number, h: number) {
 function prism() {
   const fan = [0.06, 0.26, 0.44, 0.62, 0.86]
     .map((t, i) => {
-      const colour = SPECTRUM.reduce((best, s) => (Math.abs(s[0] - t) < Math.abs(best[0] - t) ? s : best))[1];
+      const colour = SPECTRUM.reduce((best, s) =>
+        Math.abs(s[0] - t) < Math.abs(best[0] - t) ? s : best,
+      )[1];
       return `<path d="M50 40L4 ${r1(26 + i * 7)}" stroke="${colour}" stroke-width="3" stroke-linecap="round"/>`;
     })
     .join('');
@@ -848,11 +834,7 @@ function foot(name: string, withFooter = true) {
     decorations: [
       art(`d_rakia_${name}_horizon`, at(START, HORIZON, WIDTH, 12), horizon(WIDTH)),
       mark(`d_rakia_${name}_mark`, at(START, 958, 40, 40)),
-      art(
-        `d_rakia_${name}_folio_star`,
-        atEnd(END + 70, 968, 24, 24),
-        sparkle(12, 12, 12, VEGA),
-      ),
+      art(`d_rakia_${name}_folio_star`, atEnd(END + 70, 968, 24, 24), sparkle(12, 12, 12, VEGA)),
       pageNumber(`d_rakia_${name}_number`, atEnd(END, 962, 62, 36), 'caption', {
         color: token('text'),
         weight: 600,
@@ -889,7 +871,8 @@ const KEYS = [
 ];
 
 /** A key drawn at `size`: they are drawn on a square of 34. */
-const key = (i: number, size: number) => `<g transform="scale(${r1((size / 34) * 1000) / 1000})">${KEYS[i]!}</g>`;
+const key = (i: number, size: number) =>
+  `<g transform="scale(${r1((size / 34) * 1000) / 1000})">${KEYS[i]!}</g>`;
 
 // ---------------------------------------------------------------------------------------------
 // The layouts
@@ -902,6 +885,31 @@ const team4 = [START, START + 416, START + 832, START + 1248];
 const readouts3 = [START, START + 568, START + 1136];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 80, 330 + i * 186, width, 50), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 80, 384 + i * 186, width, 120), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_rakia_${name}_thread`,
+          at(START + 26, 384, 2, 370),
+          `<path d="M1 2V368" stroke="${VEGA}" stroke-opacity=".5" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          numberRing(`d_rakia_${name}_ring${i + 1}`, at(START, 328 + i * 186, 54, 54), i + 1),
+        ),
+      ],
+    };
+  }
+
   // The opening: the trails around the pole, and the observatory on its ridge under them.
   const trailsBox = atEnd(0, 0, 1180, 1000);
   const ridgeBox = atEnd(0, 740, 1200, 340);
@@ -975,7 +983,15 @@ function layouts(): Layout[] {
     const [ux, uy] = polar(fc, fc, 400, -49.5);
     const half = photo / 2;
     // The sky in the four segments between the frame and the field.
-    const sky = specks(97, field, field, 260, CREAM, [[fc - half - 8, fc - half - 8, photo + 16, photo + 16]], 1);
+    const sky = specks(
+      97,
+      field,
+      field,
+      260,
+      CREAM,
+      [[fc - half - 8, fc - half - 8, photo + 16, photo + 16]],
+      1,
+    );
     return (
       `<defs><clipPath id="d_rakia_text_image_field-clip"><circle cx="${fc}" cy="${fc}" r="370"/></clipPath></defs>` +
       `<circle cx="${fc}" cy="${fc}" r="370" fill="${GLASS}" fill-opacity=".55"/>` +
@@ -1043,8 +1059,16 @@ function layouts(): Layout[] {
         place('p_meta', 'caption', at(START + 56, 820, 800, 36), 'caption'),
       ],
       decorations: [
-        art('d_rakia_hero_trails', trailsBox, trails('d_rakia_hero_trails', trailsBox.w, trailsBox.h, 560, 360)),
-        art('d_rakia_hero_ridge', ridgeBox, observatory('d_rakia_hero_ridge', ridgeBox.w, ridgeBox.h, 520)),
+        art(
+          'd_rakia_hero_trails',
+          trailsBox,
+          trails('d_rakia_hero_trails', trailsBox.w, trailsBox.h, 560, 360),
+        ),
+        art(
+          'd_rakia_hero_ridge',
+          ridgeBox,
+          observatory('d_rakia_hero_ridge', ridgeBox.w, ridgeBox.h, 520),
+        ),
         kickerStar('d_rakia_hero_star', 304),
         art('d_rakia_hero_horizon', at(START, 790, 800, 12), horizon(800)),
         art('d_rakia_hero_dome', at(START, 823, 28, 28), key(1, 28)),
@@ -1070,7 +1094,11 @@ function layouts(): Layout[] {
       decorations: [
         upright('d_rakia_section_moon', moonBox, moonFor('end'), moonFor('start')),
         kickerStar('d_rakia_section_star', 364),
-        art('d_rakia_section_phases', at(START, 870, 8 * 34 + 7 * 18 + 4, 38), phases(8, 34, 18, 1)),
+        art(
+          'd_rakia_section_phases',
+          at(START, 870, 8 * 34 + 7 * 18 + 4, 38),
+          phases(8, 34, 18, 1),
+        ),
       ],
     },
     {
@@ -1104,13 +1132,15 @@ function layouts(): Layout[] {
             dimension(551, 649, 440),
         ),
         rect('d_rakia_big_number_rule', at(START, 716, WIDTH, 1.5), solid(token('text', 0.16))),
-        ...readouts3.slice(1).map((s, i) =>
-          rect(
-            `d_rakia_big_number_divider${i + 1}`,
-            at(s - 25, 744, 1.5, 140),
-            solid(token('text', 0.14)),
+        ...readouts3
+          .slice(1)
+          .map((s, i) =>
+            rect(
+              `d_rakia_big_number_divider${i + 1}`,
+              at(s - 25, 744, 1.5, 140),
+              solid(token('text', 0.14)),
+            ),
           ),
-        ),
         ...foot('big_number').decorations,
       ],
     },
@@ -1145,53 +1175,16 @@ function layouts(): Layout[] {
       id: 'l_rakia_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a panel of dark glass from margin to margin, down to over the horizon,
-      // from its top; a small constellation stands in the margin beside the title. The kicker
-      // over the title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 330, 1).placeholders,
-        place('p_body', 'body', at(START + 72, 300, WIDTH - 144, 576), 'body'),
+        ...textPoints('text', WIDTH - 80).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 330, 1).decorations,
-        art(
-          'd_rakia_text_constellation',
-          atEnd(END, 112, 250, 116),
-          constellation(
-            [
-              [212, 30, 2.6],
-              [168, 72, 2],
-              [118, 44, 2.4],
-              [70, 86, 1.8],
-              [24, 52, 2.2],
-              [150, 104, 1.4],
-            ],
-            [
-              [0, 1],
-              [1, 2],
-              [2, 3],
-              [3, 4],
-              [1, 5],
-            ],
-          ),
-        ),
-        card('d_rakia_text_panel', at(START, 244, WIDTH, 668), 10),
-        // The corner marks of a camera's frame, each a part of its own.
-        ...(
-          [
-            ['top_start', at(START + 18, 262, 32, 32), 'M0 1H31V32'],
-            ['top_end', atEnd(END + 18, 262, 32, 32), 'M32 1H1V32'],
-            ['bottom_start', at(START + 18, 862, 32, 32), 'M0 31H31V0'],
-            ['bottom_end', atEnd(END + 18, 862, 32, 32), 'M32 31H1V0'],
-          ] as const
-        ).map(([corner, frame, d]) =>
-          art(
-            `d_rakia_text_corner_${corner}`,
-            frame,
-            `<path d="${d}" stroke="${VEGA}" stroke-opacity=".75" stroke-width="2"/>`,
-          ),
-        ),
+        ...textPoints('text', WIDTH - 80).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1202,23 +1195,13 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 940).placeholders,
         place('p_image', 'image', atEnd(470 - photo / 2, 522 - photo / 2, photo, photo)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 80, 330 + i * 186, 820, 50), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 80, 384 + i * 186, 820, 120), 'body'),
-        ]),
+        ...textPoints('text_image', 820).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
         ...head('text_image', 940).decorations,
         art('d_rakia_text_image_field', atEnd(470 - fc, 522 - fc, field, field), reticle),
-        art(
-          'd_rakia_text_image_thread',
-          at(START + 26, 384, 2, 370),
-          `<path d="M1 2V368" stroke="${VEGA}" stroke-opacity=".5" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"/>`,
-        ),
-        ...[0, 1, 2].map((i) =>
-          numberRing(`d_rakia_text_image_ring${i + 1}`, at(START, 328 + i * 186, 54, 54), i + 1),
-        ),
+        ...textPoints('text_image', 820).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1238,7 +1221,11 @@ function layouts(): Layout[] {
       decorations: [
         art('d_rakia_full_image_horizon', atEnd(0, 744, 1920, 14), horizon(1920, 24)),
         kickerStar('d_rakia_full_image_star', 796),
-        rect('d_rakia_full_image_rule', atEnd(END + 690, 808, 1.5, 164), solid(token('text', 0.18))),
+        rect(
+          'd_rakia_full_image_rule',
+          atEnd(END + 690, 808, 1.5, 164),
+          solid(token('text', 0.18)),
+        ),
       ],
     },
     {
@@ -1326,7 +1313,11 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('process', 1100).decorations,
-        art('d_rakia_process_spectrum', at(START, 392, WIDTH, 92), spectrum('d_rakia_process_spectrum', WIDTH, 44, 22, stepCentre)),
+        art(
+          'd_rakia_process_spectrum',
+          at(START, 392, WIDTH, 92),
+          spectrum('d_rakia_process_spectrum', WIDTH, 44, 22, stepCentre),
+        ),
         card('d_rakia_process_note', at(START, 698, WIDTH, 150)),
         art('d_rakia_process_prism', at(START + 40, 730, 100, 84), prism()),
         ...foot('process').decorations,
@@ -1359,8 +1350,16 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('comparison', 1100).decorations,
-        art('d_rakia_comparison_before', at(360, 276, 400, 400), eyepiece('d_rakia_comparison_before', 400, false)),
-        art('d_rakia_comparison_after', atEnd(360, 276, 400, 400), eyepiece('d_rakia_comparison_after', 400, true)),
+        art(
+          'd_rakia_comparison_before',
+          at(360, 276, 400, 400),
+          eyepiece('d_rakia_comparison_before', 400, false),
+        ),
+        art(
+          'd_rakia_comparison_after',
+          atEnd(360, 276, 400, 400),
+          eyepiece('d_rakia_comparison_after', 400, true),
+        ),
         art(
           'd_rakia_comparison_arrow',
           atEnd(924, 440, 72, 72),
@@ -1456,7 +1455,9 @@ function layouts(): Layout[] {
             'd_rakia_team_constellation',
             at(START, 286, WIDTH, 52),
             `<path d="${xs.map((x, i) => `${i ? 'L' : 'M'}${x} ${ys[i]! - 286}`).join('')}" stroke="${CREAM}" stroke-opacity=".35" stroke-width="1.3" stroke-dasharray="2 6" stroke-linecap="round"/>` +
-              xs.map((x, i) => sparkle(x, ys[i]! - 286, 15, [VEGA, CREAM, AMBER, NEBULA][i]!)).join(''),
+              xs
+                .map((x, i) => sparkle(x, ys[i]! - 286, 15, [VEGA, CREAM, AMBER, NEBULA][i]!))
+                .join(''),
           );
         })(),
         ...team4.map((s, i) =>
@@ -1597,15 +1598,8 @@ function drawSample(copy: RakiaCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 36 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

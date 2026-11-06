@@ -19,13 +19,10 @@ export const it: TaaruchaCopy = {
     name: 'Stamattina',
     kicker: 'Per stampa e mecenati',
     title: 'L’anteprima di stamattina',
-    intro:
-      'Quaranta minuti su come abbiamo riallestito la collezione dopo due anni di lavori, e su cosa cambia per i visitatori dal giorno dell’apertura. Poi una passeggiata nelle prime sale.',
     items: [
-      ['La nuova ala: ', 'ventidue sale su tre piani, e un unico percorso che le attraversa.'],
-      ['Restauro: ', '312 opere pulite, risarcite e incorniciate di nuovo per l’allestimento.'],
-      ['La visita: ', 'serate gratuite il giovedì e un laboratorio pensato per le scuole.'],
-      ['L’anno che viene: ', 'quattro date da segnare, dall’apertura alla prima mostra di prestiti.'],
+      ['La nuova ala', 'Ventidue sale su tre piani, e un unico percorso che le attraversa.'],
+      ['Restauro', '312 opere pulite, risarcite e incorniciate di nuovo per l’allestimento.'],
+      ['La visita', 'Serate gratuite il giovedì e un laboratorio pensato per le scuole.'],
     ],
   },
   figures: {
@@ -49,14 +46,8 @@ export const it: TaaruchaCopy = {
     title: 'Ogni opera, pronta per la sua parete',
     items: [
       ['Pulita a mano', 'Vecchia vernice tolta con tamponi, pochi centimetri alla volta.'],
-      [
-        'Risarcita, mai ridipinta',
-        'Strappi e lacune colmati con materiali sempre reversibili.',
-      ],
-      [
-        'Luce su misura',
-        'Ogni opera ha la luce che il suo colore o la sua carta sopporta.',
-      ],
+      ['Risarcita, mai ridipinta', 'Strappi e lacune colmati con materiali sempre reversibili.'],
+      ['Luce su misura', 'Ogni opera ha la luce che il suo colore o la sua carta sopporta.'],
     ],
   },
   gallery: {
@@ -87,13 +78,13 @@ export const it: TaaruchaCopy = {
     kicker: 'Il primo anno',
     title: 'Quattro date nel primo anno dell’ala',
     stops: [
-      ['14 aprile', 'Si aprono le porte', 'Tutte e ventidue le sale, gratis nel weekend di apertura.'],
-      ['1° luglio', 'Serate d’estate', 'Il giovedì fino alle dieci, con musica nell’atrio.'],
       [
-        '20 ottobre',
-        'Opere in prestito',
-        'Cinquanta opere da Lisbona, Seul e Dakar.',
+        '14 aprile',
+        'Si aprono le porte',
+        'Tutte e ventidue le sale, gratis nel weekend di apertura.',
       ],
+      ['1° luglio', 'Serate d’estate', 'Il giovedì fino alle dieci, con musica nell’atrio.'],
+      ['20 ottobre', 'Opere in prestito', 'Cinquanta opere da Lisbona, Seul e Dakar.'],
       ['3 febbraio', 'La collezione online', 'Ogni opera esposta, fotografata e pubblicata.'],
     ],
     note: 'Date nel 2027 e all’inizio del 2028. Tutte le mostre sono incluse nel biglietto.',

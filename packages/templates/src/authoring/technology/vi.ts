@@ -12,15 +12,10 @@ export const vi: TechnologyCopies = {
     agenda: {
       kicker: 'Chương trình',
       title: 'Nội dung hôm nay',
-      lead: [
-        'Vì sao một vùng không còn đủ cho lõi thanh toán của chúng ta.',
-        'Cách chuyển sang ba vùng hoạt động mà không ngừng dịch vụ.',
-      ],
       points: [
-        ['Lý do: ', 'Một sự cố từng làm dừng mọi khoản thanh toán.'],
-        ['Kiến trúc: ', 'Mỗi vùng có thể gánh toàn bộ tải.'],
-        ['Chuyển đổi: ', 'Bốn giai đoạn trong tháng 12, đều có thể hoàn tác.'],
-        ['Kết quả: ', 'Độ sẵn sàng, độ trễ p95 và chi phí tháng.'],
+        ['Lý do', 'Một sự cố từng làm dừng mọi khoản thanh toán.'],
+        ['Kiến trúc', 'Mỗi vùng có thể gánh toàn bộ tải.'],
+        ['Chuyển đổi', 'Bốn giai đoạn trong tháng 12, đều có thể hoàn tác.'],
       ],
     },
     figures: {
@@ -118,15 +113,10 @@ export const vi: TechnologyCopies = {
     agenda: {
       kicker: 'Chương trình',
       title: 'Các câu hỏi cần giải đáp',
-      lead: [
-        'Bốn đáp án đo được quyết định bước DVT vào tháng 4.',
-        'Mỗi câu hỏi có một người phụ trách trong nhóm.',
-      ],
       points: [
-        ['Điện năng: ', 'Một pin có đủ mười năm, kể cả mùa lạnh?'],
-        ['Chi phí: ', 'Giá một bo mạch khi đặt 10.000 chiếc.'],
-        ['Thực địa: ', 'Bài học từ 60 đồng hồ chạy từ tháng 1.'],
-        ['Sản xuất: ', 'Việc cần xong trước khi đặt lô đầu tiên.'],
+        ['Điện năng', 'Một pin có đủ mười năm, kể cả mùa lạnh?'],
+        ['Chi phí', 'Giá một bo mạch khi đặt 10.000 chiếc.'],
+        ['Thực địa', 'Bài học từ 60 đồng hồ chạy từ tháng 1.'],
       ],
     },
     figures: {
@@ -219,15 +209,10 @@ export const vi: TechnologyCopies = {
     agenda: {
       kicker: 'Lịch trình',
       title: 'Chương trình tối nay',
-      lead: [
-        'Ba mươi phút về những điểm mới của Zrima 2.0 và lý do thiết kế.',
-        'Sau đó trình diễn: từ trang trắng đến một quy trình tự chạy.',
-      ],
       points: [
-        ['Trình tạo: ', 'Mọi bước trên một khung, AI phác thảo giúp.'],
-        ['Bản beta: ', 'Sản phẩm và yêu cầu của 4.200 nhóm.'],
-        ['Các gói: ', 'Ba lựa chọn, từ miễn phí đến Business.'],
-        ['Lộ trình: ', 'Duyệt trên điện thoại tháng 2, chia sẻ quy trình năm 2027.'],
+        ['Trình tạo', 'Mọi bước trên một khung, AI phác thảo giúp.'],
+        ['Bản beta', 'Sản phẩm và yêu cầu của 4.200 nhóm.'],
+        ['Các gói', 'Ba lựa chọn, từ miễn phí đến Business.'],
       ],
     },
     figures: {

@@ -13,13 +13,13 @@ export const ptBR: HonCopy = {
     name: 'Pauta',
     kicker: 'Assembleia geral anual',
     title: 'A pauta desta noite',
-    intro:
-      'Quarenta minutos sobre o ano de 2026 do banco que é de vocês: quanto emprestamos, quanto guardamos como capital e o que voltou para vocês, associados. Depois, as votações e as suas perguntas.',
     items: [
-      ['O ano em números: ', 'crédito, capital e o que voltou para os associados.'],
-      ['Casas verdes: ', 'os empréstimos para reforma, a linha que mais cresceu no ano.'],
-      ['Sua poupança trabalhando: ', 'como um depósito vira o empréstimo de um vizinho, em cinco passos.'],
-      ['As votações: ', 'o conselho, os auditores e o dividendo dos associados.'],
+      ['O ano em números', 'Crédito, capital e o que voltou para os associados.'],
+      ['Casas verdes', 'Os empréstimos para reforma, a linha que mais cresceu no ano.'],
+      [
+        'Sua poupança trabalhando',
+        'Como um depósito vira o empréstimo de um vizinho, em cinco passos.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const ptBR: HonCopy = {
     source: 'Saldos no fim de cada ano, em bilhões de euros, 2023–2026.',
     series: ['Poupança dos associados', 'Empréstimos aos associados'],
     figures: [
-      ['81%', 'da poupança dos associados volta para eles em empréstimos; o resto é margem de segurança.'],
+      [
+        '81%',
+        'da poupança dos associados volta para eles em empréstimos; o resto é margem de segurança.',
+      ],
       ['+21%', 'de crescimento da poupança desde 2023, sem um euro tomado no mercado.'],
     ],
   },
@@ -159,8 +162,16 @@ export const ptBR: HonCopy = {
     kicker: 'Noventa e seis anos',
     title: 'Um associado de cada vez',
     stops: [
-      ['1931', 'Fundado por estivadores', 'Duzentas famílias juntam os salários para emprestar umas às outras.'],
-      ['1974', 'Os primeiros financiamentos', 'Os associados começam a comprar as casas que alugavam havia décadas.'],
+      [
+        '1931',
+        'Fundado por estivadores',
+        'Duzentas famílias juntam os salários para emprestar umas às outras.',
+      ],
+      [
+        '1974',
+        'Os primeiros financiamentos',
+        'Os associados começam a comprar as casas que alugavam havia décadas.',
+      ],
       ['2009', 'Sem resgate', 'Atravessa a crise financeira sem um centavo de dinheiro público.'],
       ['2026', '412.000 associados', 'O ano de maior crescimento em duas décadas.'],
     ],

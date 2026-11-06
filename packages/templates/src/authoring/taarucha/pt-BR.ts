@@ -19,13 +19,10 @@ export const ptBR: TaaruchaCopy = {
     name: 'Esta manhã',
     kicker: 'Para imprensa e patronos',
     title: 'A visita desta manhã',
-    intro:
-      'Quarenta minutos sobre como remontamos o acervo depois de dois anos de obras, e sobre o que muda para o público a partir do dia da abertura. Depois, um passeio pelas primeiras salas.',
     items: [
-      ['A nova ala: ', 'vinte e duas salas em três andares, e um só percurso por todas elas.'],
-      ['Conservação: ', '312 obras limpas, restauradas e com novas molduras para a montagem.'],
-      ['A visita: ', 'noites gratuitas às quintas e um ateliê pensado para grupos escolares.'],
-      ['O próximo ano: ', 'quatro datas para guardar, da abertura à primeira mostra de empréstimos.'],
+      ['A nova ala', 'Vinte e duas salas em três andares, e um só percurso por todas elas.'],
+      ['Conservação', '312 obras limpas, restauradas e com novas molduras para a montagem.'],
+      ['A visita', 'Noites gratuitas às quintas e um ateliê pensado para grupos escolares.'],
     ],
   },
   figures: {
@@ -49,10 +46,7 @@ export const ptBR: TaaruchaCopy = {
     title: 'Cada obra, pronta para a sua parede',
     items: [
       ['Limpeza à mão', 'O verniz velho sai com cotonetes, poucos centímetros por vez.'],
-      [
-        'Reparar, nunca repintar',
-        'Rasgos e perdas preenchidos com materiais sempre removíveis.',
-      ],
+      ['Reparar, nunca repintar', 'Rasgos e perdas preenchidos com materiais sempre removíveis.'],
       ['Luz sob medida', 'Cada obra com a luz que sua tinta ou seu papel suporta.'],
     ],
   },
@@ -73,13 +67,21 @@ export const ptBR: TaaruchaCopy = {
     kicker: 'Três novas formas de visitar',
     title: 'Um museu aberto a mais gente',
     cards: [
-      ['Quintas-feiras', 'Noites gratuitas', 'Aberto até as dez, com música no átrio e sem ingresso.'],
+      [
+        'Quintas-feiras',
+        'Noites gratuitas',
+        'Aberto até as dez, com música no átrio e sem ingresso.',
+      ],
       [
         'Escolas',
         'O ateliê aberto',
         'Uma sala onde as turmas desenham a partir das obras que acabaram de ver.',
       ],
-      ['Sócios', 'Nos bastidores', 'Uma visita por mês ao laboratório de restauro e à reserva técnica.'],
+      [
+        'Sócios',
+        'Nos bastidores',
+        'Uma visita por mês ao laboratório de restauro e à reserva técnica.',
+      ],
     ],
     note: 'Todos os programas começam na semana da abertura.',
   },

@@ -6,9 +6,7 @@ export const ptBR: MaslulCopy = {
     name: 'Abertura',
     org: 'Clube de Atletismo Kestrel · Lançamento da temporada',
     title: ['Às suas', 'marcas'],
-    subtitle: [
-      'Nosso plano para 2027, do primeiro treino ao campeonato nacional',
-    ],
+    subtitle: ['Nosso plano para 2027, do primeiro treino ao campeonato nacional'],
     meta: 'Sede do clube · Sábado, 6 de fevereiro de 2027',
   },
   section: {
@@ -21,13 +19,13 @@ export const ptBR: MaslulCopy = {
     name: 'Hoje à noite',
     kicker: 'Para nossos sócios',
     title: 'A reunião de hoje',
-    intro:
-      'Quarenta minutos para atletas, pais e técnicos: como vai ser a temporada 2027, o que muda quando passarmos para a nossa própria pista em março e como cada grupo vai treinar. No final, perguntas.',
     items: [
-      ['A nova pista: ', 'oito raias iluminadas, abertas seis noites por semana a partir de 13 de março.'],
-      ['Grupos de treino: ', 'quem treina quando e onde, e com qual técnico.'],
-      ['A temporada: ', 'quatro competições, do torneio de abertura em março ao nacional em julho.'],
-      ['Como entrar: ', 'como um atleta novo vai do treino experimental à primeira prova.'],
+      [
+        'A nova pista',
+        'Oito raias iluminadas, abertas seis noites por semana a partir de 13 de março.',
+      ],
+      ['Grupos de treino', 'Quem treina quando e onde, e com qual técnico.'],
+      ['A temporada', 'Quatro competições, do torneio de abertura em março ao nacional em julho.'],
     ],
   },
   figures: {
@@ -109,9 +107,17 @@ export const ptBR: MaslulCopy = {
         'Torneio de abertura',
         'As primeiras provas na nossa pista nova, abertas a todos os sócios.',
       ],
-      ['Maio', 'Campeonato do clube', 'Todos os sócios competem, e cada resultado pontua para o clube.'],
+      [
+        'Maio',
+        'Campeonato do clube',
+        'Todos os sócios competem, e cada resultado pontua para o clube.',
+      ],
       ['Junho', 'Liga regional', 'Três rodadas em quatro semanas contra outros onze clubes.'],
-      ['Julho', 'Campeonato nacional', 'Nossos classificados disputam medalhas, depois das nove de 2026.'],
+      [
+        'Julho',
+        'Campeonato nacional',
+        'Nossos classificados disputam medalhas, depois das nove de 2026.',
+      ],
     ],
     note: 'Como num revezamento, cada etapa passa o bastão à seguinte: os resultados definem quem corre depois.',
   },
@@ -175,7 +181,11 @@ export const ptBR: MaslulCopy = {
     people: [
       ['Velocidade e barreiras', 'Amara Okafor', 'Técnica principal e ex-barreirista dos 400 m'],
       ['Meio-fundo e fundo', 'Mateo Ruiz', 'Técnico de fundo; correu a primeira maratona aos 19'],
-      ['Saltos e lançamentos', 'Yael Ben-Ami', 'Técnica de saltos e lançamentos e fisioterapeuta esportiva'],
+      [
+        'Saltos e lançamentos',
+        'Yael Ben-Ami',
+        'Técnica de saltos e lançamentos e fisioterapeuta esportiva',
+      ],
       ['Atletismo infantil', 'Kenji Sato', 'Técnico da base; comanda as manhãs de sábado'],
     ],
   },

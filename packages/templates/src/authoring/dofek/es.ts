@@ -13,13 +13,10 @@ export const es: DofekCopy = {
     name: 'Orden del día',
     kicker: 'Antes de empezar',
     title: 'De qué hablaremos hoy',
-    intro:
-      'Veinte minutos sobre lo que ha cambiado el programa, lo que ocurre hoy en la calle cuando un corazón se detiene y lo que pedimos al consejo para 2027. Después responderemos a sus preguntas.',
     items: [
-      ['Las cifras: ', 'qué ha cambiado para quienes sufren una parada cardiaca fuera del hospital.'],
-      ['En la calle: ', 'cómo vecinos, voluntarios y desfibriladores actúan hoy juntos.'],
-      ['Las personas: ', 'el equipo que dirige el programa y los voluntarios que lo acompañan.'],
-      ['El año que viene: ', 'qué pedimos al consejo y para cuándo.'],
+      ['Las cifras', 'Qué ha cambiado para quienes sufren una parada cardiaca fuera del hospital.'],
+      ['En la calle', 'Cómo vecinos, voluntarios y desfibriladores actúan hoy juntos.'],
+      ['Las personas', 'El equipo que dirige el programa y los voluntarios que lo acompañan.'],
     ],
   },
   section: {
@@ -76,9 +73,18 @@ export const es: DofekCopy = {
     kicker: 'Voluntarios de guardia',
     title: 'Ayuda a la vuelta de la esquina',
     items: [
-      ['Avisados en segundos', 'Una aplicación avisa al momento a los voluntarios formados que están a menos de 500 metros.'],
-      ['Un desfibrilador en camino', 'Un segundo voluntario trae el desfibrilador público más cercano.'],
-      ['Antes que la sirena', 'En seis de cada diez avisos, un voluntario llegó al paciente antes que la ambulancia.'],
+      [
+        'Avisados en segundos',
+        'Una aplicación avisa al momento a los voluntarios formados que están a menos de 500 metros.',
+      ],
+      [
+        'Un desfibrilador en camino',
+        'Un segundo voluntario trae el desfibrilador público más cercano.',
+      ],
+      [
+        'Antes que la sirena',
+        'En seis de cada diez avisos, un voluntario llegó al paciente antes que la ambulancia.',
+      ],
     ],
   },
   park: {
@@ -160,7 +166,11 @@ export const es: DofekCopy = {
     title: 'Quienes hacen los cuatro minutos',
     people: [
       ['Cardiología', 'Amara Mensah', 'Cardióloga, responsable clínica del programa'],
-      ['Ambulancias', 'Tomás Herrera', 'Jefe de técnicos de emergencias, dirige el centro coordinador'],
+      [
+        'Ambulancias',
+        'Tomás Herrera',
+        'Jefe de técnicos de emergencias, dirige el centro coordinador',
+      ],
       ['Voluntarios', 'Noa Katz', 'Enfermera, forma y acompaña a los voluntarios'],
       ['Registro', 'Kenji Morita', 'Epidemiólogo, lleva el registro de paradas cardiacas'],
     ],

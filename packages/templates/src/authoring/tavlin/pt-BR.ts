@@ -19,13 +19,10 @@ export const ptBR: TavlinCopy = {
     name: 'Pauta',
     kicker: 'Para nossos parceiros',
     title: 'No cardápio de hoje',
-    intro:
-      'Quarenta minutos sobre como o Sete Especiarias passou de feira de fim de semana a festival de quarenta e um mil visitantes, e sobre o que pedimos a cada parceiro para maio. Depois, suas perguntas, com um chá.',
     items: [
-      ['O mercado: ', 'sessenta e quatro bancas, e como vamos distribuí-las este ano.'],
-      ['A cozinha das masterclasses: ', 'doze bancadas onde se cozinha ao lado dos chefs.'],
-      ['A mesa comprida: ', 'seiscentos lugares por noite, e quem cozinha para eles.'],
-      ['O caminho até maio: ', 'o que precisamos de cada parceiro, e até quando.'],
+      ['O mercado', 'Sessenta e quatro bancas, e como vamos distribuí-las este ano.'],
+      ['A cozinha das masterclasses', 'Doze bancadas onde se cozinha ao lado dos chefs.'],
+      ['A mesa comprida', 'Seiscentos lugares por noite, e quem cozinha para eles.'],
     ],
   },
   figures: {

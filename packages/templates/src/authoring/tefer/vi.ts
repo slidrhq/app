@@ -19,13 +19,10 @@ export const vi: TeferCopy = {
     name: 'Chương trình',
     kicker: 'Dành cho nhà mua hàng',
     title: 'Trên bàn sáng nay',
-    intro:
-      'Bốn mươi phút về bộ sưu tập hai mươi bốn chiếc áo khoác: vải đến từ đâu, chúng tôi cắt thế nào để gần như không còn gì trên sàn, và cách đặt hàng cho mùa thu. Sau đó là chính những chiếc áo, trên giá treo.',
     items: [
-      ['Vải: ', '1.840 mét từ ba xưởng dệt, và vì sao 86% trong đó là hàng tồn kho.'],
-      ['Đường cắt: ', 'bộ rập chỉ để lại 3% vải trên sàn, thay vì 15%.'],
-      ['Xưởng may: ', 'ba mươi mốt giờ làm thủ công trong mỗi chiếc áo, tại Porto.'],
-      ['Đặt hàng: ', 'cách đặt hàng cho tháng 9, và những gì chúng tôi vẫn may đo.'],
+      ['Vải', '1.840 mét từ ba xưởng dệt, và vì sao 86% trong đó là hàng tồn kho.'],
+      ['Đường cắt', 'Bộ rập chỉ để lại 3% vải trên sàn, thay vì 15%.'],
+      ['Xưởng may', 'Ba mươi mốt giờ làm thủ công trong mỗi chiếc áo, tại Porto.'],
     ],
   },
   cloth: {

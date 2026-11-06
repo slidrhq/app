@@ -19,13 +19,10 @@ export const tr: TaaruchaCopy = {
     name: 'Bu sabah',
     kicker: 'Basın ve müze dostlarına',
     title: 'Bu sabahki önizleme',
-    intro:
-      'Kırk dakika boyunca, iki yıllık inşaatın ardından koleksiyonu nasıl yeniden astığımızı ve açılıştan itibaren ziyaretçiler için nelerin değiştiğini anlatacağız. Ardından ilk salonları gezeceğiz.',
     items: [
-      ['Yeni kanat: ', 'üç katta yirmi iki salon ve hepsinden geçen tek bir rota.'],
-      ['Konservasyon: ', '312 eser temizlendi, onarıldı ve yeni düzen için yeniden çerçevelendi.'],
-      ['Ziyaret: ', 'perşembe akşamları ücretsiz giriş ve okul grupları için bir atölye.'],
-      ['Önümüzdeki yıl: ', 'açılıştan ilk ödünç sergisine kadar not edilecek dört tarih.'],
+      ['Yeni kanat', 'Üç katta yirmi iki salon ve hepsinden geçen tek bir rota.'],
+      ['Konservasyon', '312 eser temizlendi, onarıldı ve yeni düzen için yeniden çerçevelendi.'],
+      ['Ziyaret', 'Perşembe akşamları ücretsiz giriş ve okul grupları için bir atölye.'],
     ],
   },
   figures: {
@@ -48,18 +45,9 @@ export const tr: TaaruchaCopy = {
     kicker: 'Konservasyon atölyesi',
     title: 'Her eser duvarına hazır',
     items: [
-      [
-        'Elle temizlendi',
-        'Eski vernik, pamuklu çubuklarla santim santim kaldırıldı.',
-      ],
-      [
-        'Onarıldı, asla boyanmadı',
-        'Yırtık ve eksikler geri alınabilir malzemelerle dolduruldu.',
-      ],
-      [
-        'Ölçüye göre ışık',
-        'Her esere, boyası ya da kâğıdı ne kadar kaldırırsa o kadar ışık.',
-      ],
+      ['Elle temizlendi', 'Eski vernik, pamuklu çubuklarla santim santim kaldırıldı.'],
+      ['Onarıldı, asla boyanmadı', 'Yırtık ve eksikler geri alınabilir malzemelerle dolduruldu.'],
+      ['Ölçüye göre ışık', 'Her esere, boyası ya da kâğıdı ne kadar kaldırırsa o kadar ışık.'],
     ],
   },
   gallery: {
@@ -85,7 +73,11 @@ export const tr: TaaruchaCopy = {
         ['Saat 22.00’ye kadar açık;', 'atriumda müzik var,', 'bilet gerekmiyor.'],
       ],
       ['Okullar', 'Açık atölye', 'Sınıfların yeni gördükleri eserleri çizdiği bir oda.'],
-      ['Üyeler', 'Perde arkası', ['Her ay, konservasyon', 'atölyesine ve depolara', 'bir ziyaret.']],
+      [
+        'Üyeler',
+        'Perde arkası',
+        ['Her ay, konservasyon', 'atölyesine ve depolara', 'bir ziyaret.'],
+      ],
     ],
     note: 'Tüm programlar kapıların açıldığı hafta başlıyor.',
   },
@@ -96,11 +88,7 @@ export const tr: TaaruchaCopy = {
     stops: [
       ['14 Nisan', 'Kapılar açılıyor', 'Yirmi iki salonun tümü, açılış hafta sonu ücretsiz.'],
       ['1 Temmuz', 'Yaz akşamları', ['Perşembe akşamları', '22.00’ye kadar, müzikle.']],
-      [
-        '20 Ekim',
-        'İlk ödünç sergisi',
-        'Lizbon, Seul ve Dakar müzelerinden elli eser.',
-      ],
+      ['20 Ekim', 'İlk ödünç sergisi', 'Lizbon, Seul ve Dakar müzelerinden elli eser.'],
       ['3 Şubat', 'Koleksiyon çevrimiçi', 'Sergilenen her eser fotoğraflandı ve yayımlandı.'],
     ],
     note: '2027 ve 2028 başındaki tarihler. Tüm sergiler bilete dahildir.',

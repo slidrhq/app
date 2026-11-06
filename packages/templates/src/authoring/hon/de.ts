@@ -13,16 +13,13 @@ export const de: HonCopy = {
     name: 'Tagesordnung',
     kicker: 'Generalversammlung',
     title: 'Heute Abend auf der Tagesordnung',
-    intro:
-      'Vierzig Minuten darüber, wie das Jahr 2026 für die Bank lief, die Ihnen gehört: was wir verliehen, was wir als Kapital behalten haben und was an Sie als Mitglieder zurückgeflossen ist. Danach die Abstimmungen und Ihre Fragen.',
     items: [
-      ['Das Jahr in Zahlen: ', 'Kredite, Kapital und was an die Mitglieder zurückging.'],
-      ['Grüne Häuser: ', 'die Sanierungskredite, die in diesem Jahr am stärksten wuchsen.'],
+      ['Das Jahr in Zahlen', 'Kredite, Kapital und was an die Mitglieder zurückging.'],
+      ['Grüne Häuser', 'Die Sanierungskredite, die in diesem Jahr am stärksten wuchsen.'],
       [
-        'Ihr Erspartes bei der Arbeit: ',
-        'wie aus einer Einlage in fünf Schritten ein Kredit für die Nachbarn wird.',
+        'Ihr Erspartes bei der Arbeit',
+        'Wie aus einer Einlage in fünf Schritten ein Kredit für die Nachbarn wird.',
       ],
-      ['Die Abstimmungen: ', 'Aufsichtsrat, Abschlussprüfer und die Dividende der Mitglieder.'],
     ],
   },
   section: {
@@ -53,7 +50,10 @@ export const de: HonCopy = {
     source: 'Bestände zum Jahresende, Mrd. €, 2023–2026.',
     series: ['Einlagen der Mitglieder', 'Kredite an Mitglieder'],
     figures: [
-      ['81\u00a0%', 'der Einlagen gehen als Kredite an Mitglieder; der Rest bleibt als Sicherheitspuffer.'],
+      [
+        '81\u00a0%',
+        'der Einlagen gehen als Kredite an Mitglieder; der Rest bleibt als Sicherheitspuffer.',
+      ],
       ['+21\u00a0%', 'mehr Einlagen seit 2023, ohne einen Euro vom Kapitalmarkt zu leihen.'],
     ],
   },
@@ -158,8 +158,16 @@ export const de: HonCopy = {
     kicker: 'Sechsundneunzig Jahre',
     title: 'Gewachsen, Mitglied für Mitglied',
     stops: [
-      ['1931', 'Von Hafenarbeitern gegründet', 'Zweihundert Familien legen ihre Löhne zusammen, um einander zu leihen.'],
-      ['1974', 'Die ersten Baukredite', 'Mitglieder kaufen die Häuser, in denen sie jahrzehntelang zur Miete wohnten.'],
+      [
+        '1931',
+        'Von Hafenarbeitern gegründet',
+        'Zweihundert Familien legen ihre Löhne zusammen, um einander zu leihen.',
+      ],
+      [
+        '1974',
+        'Die ersten Baukredite',
+        'Mitglieder kaufen die Häuser, in denen sie jahrzehntelang zur Miete wohnten.',
+      ],
       ['2009', 'Keine Rettung nötig', 'Durch die Finanzkrise ohne einen Cent öffentlicher Gelder.'],
       ['2026', '412.000 Mitglieder', 'Das stärkste Wachstum seit zwanzig Jahren.'],
     ],

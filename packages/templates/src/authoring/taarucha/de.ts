@@ -19,13 +19,10 @@ export const de: TaaruchaCopy = {
     name: 'Heute Vormittag',
     kicker: 'Für Presse und Förderer',
     title: 'Unser Rundgang heute Vormittag',
-    intro:
-      'Vierzig Minuten darüber, wie wir die Sammlung nach zwei Jahren Bauzeit neu gehängt haben und was sich für Besucher ab dem ersten Öffnungstag ändert. Danach ein Gang durch die ersten Säle.',
     items: [
-      ['Der neue Flügel: ', 'zweiundzwanzig Säle auf drei Etagen und ein Rundgang durch alle.'],
-      ['Restaurierung: ', '312 Werke gereinigt, ausgebessert und für die Hängung neu gerahmt.'],
-      ['Der Besuch: ', 'freier Eintritt donnerstagabends und ein Atelier für Schulklassen.'],
-      ['Das erste Jahr: ', 'vier Termine zum Vormerken, von der Eröffnung bis zur ersten Leihausstellung.'],
+      ['Der neue Flügel', 'Zweiundzwanzig Säle auf drei Etagen und ein Rundgang durch alle.'],
+      ['Restaurierung', '312 Werke gereinigt, ausgebessert und für die Hängung neu gerahmt.'],
+      ['Der Besuch', 'Freier Eintritt donnerstagabends und ein Atelier für Schulklassen.'],
     ],
   },
   figures: {
@@ -48,12 +45,18 @@ export const de: TaaruchaCopy = {
     kicker: 'Die Restaurierungswerkstatt',
     title: 'Jedes Werk bereit für seine Wand',
     items: [
-      ['Von Hand gereinigt', 'Alter Firnis, mit Wattestäbchen abgenommen, wenige Zentimeter auf einmal.'],
+      [
+        'Von Hand gereinigt',
+        'Alter Firnis, mit Wattestäbchen abgenommen, wenige Zentimeter auf einmal.',
+      ],
       [
         'Ausgebessert, nie übermalt',
         'Risse und Fehlstellen, gefüllt mit Materialien, die sich jederzeit wieder entfernen lassen.',
       ],
-      ['Licht nach Maß', 'Jedes Werk bekommt so viel Licht, wie seine Farbe oder sein Papier verträgt.'],
+      [
+        'Licht nach Maß',
+        'Jedes Werk bekommt so viel Licht, wie seine Farbe oder sein Papier verträgt.',
+      ],
     ],
   },
   gallery: {
@@ -74,7 +77,11 @@ export const de: TaaruchaCopy = {
     title: 'Ein Museum für mehr Menschen',
     cards: [
       ['Donnerstags', 'Freie Abende', 'Bis 22 Uhr geöffnet, mit Musik im Atrium und ohne Ticket.'],
-      ['Schulen', 'Das offene Atelier', 'Ein Raum, in dem Klassen die eben gesehenen Werke nachzeichnen.'],
+      [
+        'Schulen',
+        'Das offene Atelier',
+        'Ein Raum, in dem Klassen die eben gesehenen Werke nachzeichnen.',
+      ],
       [
         'Mitglieder',
         'Hinter den Kulissen',
@@ -88,14 +95,22 @@ export const de: TaaruchaCopy = {
     kicker: 'Das erste Jahr',
     title: 'Vier Termine im ersten Jahr des Flügels',
     stops: [
-      ['14. April', 'Die Türen öffnen sich', 'Alle zweiundzwanzig Säle, am ersten Wochenende kostenlos.'],
+      [
+        '14. April',
+        'Die Türen öffnen sich',
+        'Alle zweiundzwanzig Säle, am ersten Wochenende kostenlos.',
+      ],
       ['1. Juli', 'Sommerabende', 'Donnerstags bis 22 Uhr, mit Musik im Atrium.'],
       [
         '20. Oktober',
         'Die erste Leihausstellung',
         'Fünfzig Leihgaben aus Museen in Lissabon, Seoul und Dakar.',
       ],
-      ['3. Februar', 'Die Sammlung online', 'Jedes ausgestellte Werk, fotografiert und veröffentlicht.'],
+      [
+        '3. Februar',
+        'Die Sammlung online',
+        'Jedes ausgestellte Werk, fotografiert und veröffentlicht.',
+      ],
     ],
     note: 'Termine 2027 und Anfang 2028. Alle Ausstellungen sind im Eintritt inbegriffen.',
   },

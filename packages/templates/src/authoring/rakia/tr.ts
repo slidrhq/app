@@ -18,14 +18,11 @@ export const tr: RakiaCopy = {
   agenda: {
     name: 'Bu akşam',
     kicker: 'Bilgilendirme',
-    title: 'Bu akşam, dört bölümde',
-    intro:
-      'Bu hafta ilk yıldız ışığını alan teleskop üzerine kırk dakika: ilk sezonunda neleri gözlemleyeceği ve her ortak üniversitenin gecelerini nasıl paylaşacağı. Ardından kubbeyi açıyoruz.',
+    title: 'Bu akşam, üç bölümde',
     items: [
-      ['Teleskop: ', 'ilk taslaktan cilalı 2,4 metrelik aynaya uzanan on iki yıl.'],
-      ['Gözlem yeri: ', 'Meridian Peak neden ölçtüğümüz her yerden daha karanlık ve durgun.'],
-      ['İlk sezon: ', 'üç araştırma programı ve ilk gözlemleyecekleri gök cisimleri.'],
-      ['Gecelerin paylaşımı: ', 'bir ortak nasıl gözlem zamanı ister, halk nasıl katılır.'],
+      ['Teleskop', 'İlk taslaktan cilalı 2,4 metrelik aynaya uzanan on iki yıl.'],
+      ['Gözlem yeri', 'Meridian Peak neden ölçtüğümüz her yerden daha karanlık ve durgun.'],
+      ['İlk sezon', 'Üç araştırma programı ve ilk gözlemleyecekleri gök cisimleri.'],
     ],
   },
   figures: {
@@ -49,7 +46,10 @@ export const tr: RakiaCopy = {
     title: 'İki yıl cilalanan bir ayna',
     items: [
       ['Tek parça döküldü', 'Cam, çatlamasın diye kalıbında üç ay boyunca soğudu.'],
-      ['18 nanometre hassasiyet', 'Yüzeyin kusursuz eğriden sapması, bir saç telinin binde birinden azdır.'],
+      [
+        '18 nanometre hassasiyet',
+        'Yüzeyin kusursuz eğriden sapması, bir saç telinin binde birinden azdır.',
+      ],
       [
         'Alüminyum değil, gümüş',
         'Gümüş kaplama, soğuk yıldızların en parlak olduğu kızılötesini daha iyi yansıtır.',

@@ -12,15 +12,10 @@ export const tr: TechnologyCopies = {
     agenda: {
       kicker: 'Gündem',
       title: 'Bugün neleri ele alacağız?',
-      lead: [
-        'Ödeme çekirdeğimiz için tek bölgenin neden yetersiz kaldığını konuşacağız.',
-        'Ardından, üç etkin bölgeye kesintisiz geçişin nasıl yapıldığını göreceğiz.',
-      ],
       points: [
-        ['Gerekçe: ', 'Tek bir arıza bütün ödemeleri durduruyordu.'],
-        ['Mimari: ', 'Her bölge tüm yükü tek başına taşıyabiliyor.'],
-        ['Geçiş: ', 'Aralık ayında geri alınabilir dört aşama.'],
-        ['Sonuçlar: ', 'Erişilebilirlik, p95 gecikmesi ve aylık maliyet.'],
+        ['Gerekçe', 'Tek bir arıza bütün ödemeleri durduruyordu.'],
+        ['Mimari', 'Her bölge tüm yükü tek başına taşıyabiliyor.'],
+        ['Geçiş', 'Aralık ayında geri alınabilir dört aşama.'],
       ],
     },
     figures: {
@@ -117,15 +112,10 @@ export const tr: TechnologyCopies = {
     agenda: {
       kicker: 'Gündem',
       title: 'Bu incelemenin soruları',
-      lead: [
-        'Nisanda DVT’ye geçişi dört ölçülebilir yanıt belirleyecek.',
-        'Her sorunun ekip içinde bir sorumlusu var.',
-      ],
       points: [
-        ['Enerji: ', 'Tek pil, soğukta bile on yıl dayanır mı?'],
-        ['Maliyet: ', '10.000 adetlik siparişte bir kartın bedeli.'],
-        ['Saha: ', 'Ocaktan beri çalışan 60 sayacın öğrettikleri.'],
-        ['Üretim: ', 'İlk siparişten önce tamamlanacak işler.'],
+        ['Enerji', 'Tek pil, soğukta bile on yıl dayanır mı?'],
+        ['Maliyet', '10.000 adetlik siparişte bir kartın bedeli.'],
+        ['Saha', 'Ocaktan beri çalışan 60 sayacın öğrettikleri.'],
       ],
     },
     figures: {
@@ -222,15 +212,10 @@ export const tr: TechnologyCopies = {
     agenda: {
       kicker: 'Etkinlik akışı',
       title: 'Bu akşamın programı',
-      lead: [
-        'Zrima 2.0’ın yeniliklerini ve kararlarımızı otuz dakikada anlatacağız.',
-        'Ardından canlı demo: boş sayfadan kendi çalışan bir iş akışına.',
-      ],
       points: [
-        ['Düzenleyici: ', 'Tüm adımlar tek tuvalde, yapay zekâ desteğiyle.'],
-        ['Beta: ', '4.200 ekibin ürettikleri ve talepleri.'],
-        ['Planlar: ', 'Ücretsizden Business’a üç seçenek.'],
-        ['Yol haritası: ', 'Şubatta mobil onaylar, 2027’de ortak akışlar.'],
+        ['Düzenleyici', 'Tüm adımlar tek tuvalde, yapay zekâ desteğiyle.'],
+        ['Beta', '4.200 ekibin ürettikleri ve talepleri.'],
+        ['Planlar', 'Ücretsizden Business’a üç seçenek.'],
       ],
     },
     figures: {

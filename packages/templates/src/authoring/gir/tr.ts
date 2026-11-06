@@ -19,13 +19,10 @@ export const tr: GirCopy = {
     name: 'Bu akşam',
     kicker: 'Hoş geldiniz',
     title: 'Bu akşam, kırk dakikada',
-    intro:
-      'Kırk dakika boyunca 7. sınıfların bu yıl nasıl öğreneceğini, sınıfta neyin değiştiğini ve evde nasıl destek olabileceğinizi anlatacağız. Ardından çocuğunuzun sınıf öğretmeniyle yeni sınıfında tanışacaksınız.',
     items: [
-      ['Yeni sınıflar: ', 'tahtaya dönük sıralar yerine dörder kişilik masalar.'],
-      ['Önümüzdeki yıl: ', 'ilk günden yıl sonu gösterisine, akılda tutulacak dört tarih.'],
-      ['Ek destek: ', 'bir öğrenci geride kaldığında adım adım neler yapıyoruz.'],
-      ['Sorularınız: ', 'ardından her sınıf öğretmeniyle kısa bir görüşme.'],
+      ['Yeni sınıflar', 'Tahtaya dönük sıralar yerine dörder kişilik masalar.'],
+      ['Önümüzdeki yıl', 'İlk günden yıl sonu gösterisine, akılda tutulacak dört tarih.'],
+      ['Ek destek', 'Bir öğrenci geride kaldığında adım adım neler yapıyoruz.'],
     ],
   },
   figures: {
@@ -56,10 +53,7 @@ export const tr: GirCopy = {
         'Okuldan sonra açık',
         'Öğrenciler salı ve perşembe öğleden sonraları gelip çalışmalarını bitirebilir.',
       ],
-      [
-        'Velilerle birlikte',
-        'Okul-Aile Birliği yeni ekipmanın maliyetinin üçte birini topladı.',
-      ],
+      ['Velilerle birlikte', 'Okul-Aile Birliği yeni ekipmanın maliyetinin üçte birini topladı.'],
     ],
   },
   garden: {
@@ -79,9 +73,21 @@ export const tr: GirCopy = {
     kicker: 'Üç yeni seçmeli ders',
     title: '7. sınıfta bu yıl yeni',
     cards: [
-      ['Seçmeli 01', 'Robotik', 'Çiftler hâlinde, on iki haftada küçük bir robot yapıp programlamak.'],
-      ['Seçmeli 02', 'Münazara', 'Bir görüşü savunmak, karşı tarafı dinlemek ve fikir değiştirebilmek.'],
-      ['Seçmeli 03', 'Mutfak bahçesi', 'Ektiğimizi büyütmek, toplamak ve pişirmek: tohumdan çorbaya.'],
+      [
+        'Seçmeli 01',
+        'Robotik',
+        'Çiftler hâlinde, on iki haftada küçük bir robot yapıp programlamak.',
+      ],
+      [
+        'Seçmeli 02',
+        'Münazara',
+        'Bir görüşü savunmak, karşı tarafı dinlemek ve fikir değiştirebilmek.',
+      ],
+      [
+        'Seçmeli 03',
+        'Mutfak bahçesi',
+        'Ektiğimizi büyütmek, toplamak ve pişirmek: tohumdan çorbaya.',
+      ],
     ],
     note: 'Her öğrenci birinci dönem için bir ders, ikinci dönem için başka bir ders seçer.',
   },
@@ -157,10 +163,18 @@ export const tr: GirCopy = {
     kicker: '7. sınıf ekibi',
     title: 'Çocuklarınızın tanışacağı öğretmenler',
     people: [
-      ['7-A · Fen bilimleri', 'Maya Cohen', '7. sınıflar koordinatörü, yeni laboratuvarları yönetiyor'],
+      [
+        '7-A · Fen bilimleri',
+        'Maya Cohen',
+        '7. sınıflar koordinatörü, yeni laboratuvarları yönetiyor',
+      ],
       ['7-B · Matematik', 'Karim Nasser', 'Matematik öğretmeni, robotik dersini yürütüyor'],
       ['7-C · Türkçe', 'Olga Petrenko', 'Türkçe öğretmeni, okuma programına öncülük ediyor'],
-      ['7-D · Sosyal bilgiler', 'Daniel Mekonen', 'Sosyal bilgiler öğretmeni, sınıf gezisini planlıyor'],
+      [
+        '7-D · Sosyal bilgiler',
+        'Daniel Mekonen',
+        'Sosyal bilgiler öğretmeni, sınıf gezisini planlıyor',
+      ],
     ],
   },
   closing: {

@@ -6,7 +6,9 @@ export const ptBR: TeferCopy = {
     name: 'Abertura',
     org: 'Ourela · Casacos feitos no Porto',
     title: ['Casacos', 'para durar'],
-    subtitle: ['Vinte e quatro casacos cortados em tecidos que as tecelagens não conseguiram vender'],
+    subtitle: [
+      'Vinte e quatro casacos cortados em tecidos que as tecelagens não conseguiram vender',
+    ],
     meta: 'Apresentação para compradores · Paris · 4 de março de 2027',
   },
   section: {
@@ -19,13 +21,10 @@ export const ptBR: TeferCopy = {
     name: 'Pauta',
     kicker: 'Apresentação para compradores',
     title: 'Na mesa nesta manhã',
-    intro:
-      'Quarenta minutos sobre uma coleção de vinte e quatro casacos: de onde veio o tecido, como o cortamos para que quase nada fique no chão e como encomendá-la para o outono. Depois, os próprios casacos, na arara.',
     items: [
-      ['O tecido: ', '1.840 metros de três tecelagens, e por que 86% eram sobras.'],
-      ['O corte: ', 'moldes que deixam no chão 3% do tecido, não 15%.'],
-      ['O ateliê: ', 'trinta e uma horas de trabalho manual em cada casaco, no Porto.'],
-      ['Pedidos: ', 'como encomendar para setembro, e o que ainda fazemos sob medida.'],
+      ['O tecido', '1.840 metros de três tecelagens, e por que 86% eram sobras.'],
+      ['O corte', 'Moldes que deixam no chão 3% do tecido, não 15%.'],
+      ['O ateliê', 'Trinta e uma horas de trabalho manual em cada casaco, no Porto.'],
     ],
   },
   cloth: {
@@ -97,7 +96,11 @@ export const ptBR: TeferCopy = {
     title: 'Da tecelagem à loja',
     stops: [
       ['Jan. 2027', 'Tecido escolhido', 'Compramos 1.582 metros de sobras de três tecelagens.'],
-      ['Mar. 2027', 'Pedidos abertos', 'Vinte e quatro casacos apresentados a compradores em Paris.'],
+      [
+        'Mar. 2027',
+        'Pedidos abertos',
+        'Vinte e quatro casacos apresentados a compradores em Paris.',
+      ],
       ['Jun. 2027', 'Começa o corte', 'Cada pedido cortado à mão na oficina do Porto.'],
       ['Set. 2027', 'Nas lojas', 'Casacos entregues a 40 lojas em 11 países.'],
     ],
@@ -164,7 +167,11 @@ export const ptBR: TeferCopy = {
       ['Ateliê', 'Inês Moreira', 'Chefe do ateliê, corta o casaco-piloto de cada molde'],
       ['Design', 'Aiko Mori', 'Designer, traça cada molde para o seu tecido'],
       ['Modelagem', 'Kofi Asante', 'Modelista, encaixa as peças no tecido'],
-      ['Tecidos', 'Omar Khalil', 'Comprador de tecidos, conhece o estoque de cada uma das tecelagens'],
+      [
+        'Tecidos',
+        'Omar Khalil',
+        'Comprador de tecidos, conhece o estoque de cada uma das tecelagens',
+      ],
     ],
   },
   closing: {

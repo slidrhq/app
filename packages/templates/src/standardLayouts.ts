@@ -6,6 +6,7 @@ import {
   type Layout,
   type Placeholder,
 } from '@slidr/model';
+import { pointsAcross, type Points } from './pointsAcross';
 import type { Template } from './template';
 
 /**
@@ -33,9 +34,10 @@ const FOOT_ZONE = 24;
 /**
  * The simple text layout every template offers, including older personal templates. A template
  * that draws its own keeps them; for one that does not they are made from its content slides:
- * the title on one line where their title stands, the body right under it, and the ground, the
- * frame and the foot (rule, mark, slide number) those slides have, with the kicker over their
- * title and their footer, as the text-and-image slide seats them.
+ * the title on one line where their title stands, and the ground, the frame and the foot (rule,
+ * mark, slide number) those slides have, with the kicker over their title and their footer. Under
+ * the title, the points of the text-and-image slide across the width, with what it draws with
+ * them (ADR-136); three plain ones for a template without that slide.
  */
 export function withStandardLayouts(template: Template): Template {
   template = withoutTitleLayout(template);
@@ -53,6 +55,8 @@ export function withStandardLayouts(template: Template): Template {
     seat?.styleRef ??
     'title';
   const bodyStyle = styles?.placeholders.find((place) => place.role === 'body')?.styleRef ?? 'body';
+  const headingStyle =
+    styles?.placeholders.find((place) => place.role === 'subtitle')?.styleRef ?? 'heading';
 
   // One line of the title, where the source's title sets its first line (or its last, when the
   // title grows upwards from a line), across the width between the margins of that title.
@@ -122,6 +126,23 @@ export function withStandardLayouts(template: Template): Template {
   });
   if (!layouts.some((layout) => layout.archetype === 'text')) {
     const beforeImage = layouts.findIndex((layout) => layout.archetype === 'textImage');
+    const rename = (old: string) => `${old}_text`;
+    const measured = styles ? pointsAcross(styles, { rename }) : undefined;
+    const points: Points =
+      styles && measured && measured.placeholders.length > 0
+        ? pointsAcross(styles, {
+            rename,
+            // Right under the title, and never into the foot.
+            rise: Math.min(bodyTop - measured.top, bodyBottom - measured.bottom),
+          })
+        : plainPoints(
+            { x: margin, y: bodyTop, w: SLIDE_WIDTH - 2 * margin, h: bodyBottom - bodyTop },
+            template.theme.textStyles[headingStyle],
+            headingStyle,
+            bodyStyle,
+          );
+    const kept = drawn('text');
+    const objects = [...(kept.objects ?? []), ...points.objects];
     layouts.splice(beforeImage < 0 ? layouts.length : beforeImage, 0, {
       id: id('text'),
       name: 'Text',
@@ -129,17 +150,12 @@ export function withStandardLayouts(template: Template): Template {
       placeholders: [
         ...seated(kicker, 'p_kicker'),
         title(),
-        {
-          id: 'p_body',
-          role: 'body',
-          frame: { x: margin, y: bodyTop, w: SLIDE_WIDTH - 2 * margin, h: bodyBottom - bodyTop },
-          styleRef: bodyStyle,
-          align: 'start',
-          vAlign: 'top',
-        },
+        ...points.placeholders,
         ...seated(footer, 'p_footer'),
       ],
-      ...drawn('text'),
+      ...kept,
+      decorations: [...kept.decorations, ...points.decorations],
+      ...(objects.length > 0 ? { objects } : {}),
     });
   }
   const textIndex = layouts.findIndex((layout) => layout.archetype === 'text');
@@ -153,6 +169,42 @@ export function withStandardLayouts(template: Template): Template {
     );
   }
   return { ...template, layouts };
+}
+
+/** Three points one under the other in a box, for a template without a text-and-image slide. */
+function plainPoints(
+  box: Frame,
+  look: { size: number; lineHeight: number } | undefined,
+  headingStyle: Placeholder['styleRef'],
+  bodyStyle: Placeholder['styleRef'],
+): Points {
+  const row = Math.floor(box.h / 3);
+  const heading = Math.ceil(look ? look.size * look.lineHeight : 52);
+  const gap = Math.round(heading / 4);
+  const placeholders = [0, 1, 2].flatMap((i): Placeholder[] => [
+    {
+      id: `p_point${i + 1}`,
+      role: 'subtitle',
+      frame: { x: box.x, y: box.y + i * row, w: box.w, h: heading },
+      styleRef: headingStyle,
+      align: 'start',
+      vAlign: 'top',
+    },
+    {
+      id: `p_detail${i + 1}`,
+      role: 'body',
+      frame: {
+        x: box.x,
+        y: box.y + i * row + heading + gap,
+        w: box.w,
+        h: Math.max(row - heading - 3 * gap, heading),
+      },
+      styleRef: bodyStyle,
+      align: 'start',
+      vAlign: 'top',
+    },
+  ]);
+  return { placeholders, decorations: [], objects: [], top: box.y, bottom: box.y + box.h };
 }
 
 /**

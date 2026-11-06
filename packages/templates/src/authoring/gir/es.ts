@@ -19,13 +19,13 @@ export const es: GirCopy = {
     name: 'Esta noche',
     kicker: 'Bienvenida',
     title: 'Esta noche, en cuarenta minutos',
-    intro:
-      'Cuarenta minutos sobre cómo aprenderá primero de secundaria este año, qué cambia en el aula y cómo pueden ayudar en casa. Después conocerán al tutor de su hijo o hija en su nueva aula.',
     items: [
-      ['Aulas nuevas: ', 'mesas de cuatro en lugar de filas frente a la pizarra.'],
-      ['El curso que empieza: ', 'cuatro fechas para apuntar, del primer día al festival de fin de curso.'],
-      ['Apoyo: ', 'lo que hacemos, paso a paso, cuando un alumno se queda atrás.'],
-      ['Sus preguntas: ', 'y después, una breve reunión con cada tutor.'],
+      ['Aulas nuevas', 'Mesas de cuatro en lugar de filas frente a la pizarra.'],
+      [
+        'El curso que empieza',
+        'Cuatro fechas para apuntar, del primer día al festival de fin de curso.',
+      ],
+      ['Apoyo', 'Lo que hacemos, paso a paso, cuando un alumno se queda atrás.'],
     ],
   },
   figures: {
@@ -79,9 +79,21 @@ export const es: GirCopy = {
     kicker: 'Tres talleres nuevos',
     title: 'Novedades de este año en primero',
     cards: [
-      ['Taller 01', 'Robótica', 'Construir y programar un pequeño robot en parejas, durante doce semanas.'],
-      ['Taller 02', 'Debate', 'Defender una postura, escuchar a la otra parte y cambiar de opinión.'],
-      ['Taller 03', 'Huerto y cocina', 'Sembrar, cosechar y cocinar lo que plantamos, de la semilla a la sopa.'],
+      [
+        'Taller 01',
+        'Robótica',
+        'Construir y programar un pequeño robot en parejas, durante doce semanas.',
+      ],
+      [
+        'Taller 02',
+        'Debate',
+        'Defender una postura, escuchar a la otra parte y cambiar de opinión.',
+      ],
+      [
+        'Taller 03',
+        'Huerto y cocina',
+        'Sembrar, cosechar y cocinar lo que plantamos, de la semilla a la sopa.',
+      ],
     ],
     note: 'Cada alumno elige un taller para el otoño y otro distinto para la primavera.',
   },
@@ -91,9 +103,17 @@ export const es: GirCopy = {
     title: 'Cuatro fechas para apuntar',
     stops: [
       ['Sep. 2027', 'Primer día', 'Cada grupo conoce a su tutor y sus nuevas mesas.'],
-      ['Dic. 2027', 'Feria de ciencias', 'Cada equipo presenta un experimento de los nuevos laboratorios.'],
+      [
+        'Dic. 2027',
+        'Feria de ciencias',
+        'Cada equipo presenta un experimento de los nuevos laboratorios.',
+      ],
       ['Mar. 2028', 'Viaje escolar', 'Tres días en el norte, con una noche bajo las estrellas.'],
-      ['Jun. 2028', 'Festival de fin de curso', 'Todos los grupos en el escenario, con las familias en primera fila.'],
+      [
+        'Jun. 2028',
+        'Festival de fin de curso',
+        'Todos los grupos en el escenario, con las familias en primera fila.',
+      ],
     ],
     note: 'Los tutores enviarán las fechas de las reuniones con las familias con dos semanas de antelación.',
   },
@@ -158,8 +178,16 @@ export const es: GirCopy = {
     title: 'A quién conocerán sus hijos',
     people: [
       ['1.º A · Ciencias', 'Maya Cohen', 'Coordina primero y los nuevos laboratorios'],
-      ['1.º B · Matemáticas', 'Karim Nasser', 'Profesor de matemáticas, dirige el taller de robótica'],
-      ['1.º C · Lengua y Literatura', 'Olga Petrenko', 'Profesora de lengua, lleva el plan de lectura'],
+      [
+        '1.º B · Matemáticas',
+        'Karim Nasser',
+        'Profesor de matemáticas, dirige el taller de robótica',
+      ],
+      [
+        '1.º C · Lengua y Literatura',
+        'Olga Petrenko',
+        'Profesora de lengua, lleva el plan de lectura',
+      ],
       ['1.º D · Historia', 'Daniel Mekonen', 'Profesor de historia, organiza el viaje escolar'],
     ],
   },

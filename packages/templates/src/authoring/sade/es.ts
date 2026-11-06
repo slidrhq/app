@@ -19,13 +19,10 @@ export const es: SadeCopy = {
     name: 'Orden del día',
     kicker: 'Asamblea de socios',
     title: 'Lo que veremos esta mañana',
-    intro:
-      'Cuarenta minutos sobre la cosecha de 2026: qué cultivamos, cuánta agua hizo falta y qué nos contó el suelo. Después, el plan para la temporada 2027 y tiempo para sus preguntas.',
     items: [
-      ['La cosecha: ', '18.400 toneladas de grano de 212 fincas, y adónde fueron.'],
-      ['El agua: ', 'cómo el goteo y los cultivos de cobertura redujeron el agua por tonelada.'],
-      ['El suelo: ', 'lo que tres años de análisis muestran bajo nuestros campos.'],
-      ['La temporada 2027: ', 'el banco de semillas, la maquinaria compartida y el calendario.'],
+      ['La cosecha', '18.400 toneladas de grano de 212 fincas, y adónde fueron.'],
+      ['El agua', 'Cómo el goteo y los cultivos de cobertura redujeron el agua por tonelada.'],
+      ['El suelo', 'Lo que tres años de análisis muestran bajo nuestros campos.'],
     ],
   },
   figures: {
@@ -170,7 +167,11 @@ export const es: SadeCopy = {
       ['Presidenta del consejo', 'Nadia Haddad', 'Cultiva trigo y garbanzo en 64 hectáreas'],
       ['Agrónomo jefe', 'Tomás Ferreira', 'Dirige el laboratorio de suelos y los vuelos del dron'],
       ['Ingeniero hidráulico', 'Kwame Asante', 'Diseñó la red de goteo compartida'],
-      ['Guardiana de semillas', 'Mei Lin', 'Prueba cuarenta variedades locales en parcelas de ensayo'],
+      [
+        'Guardiana de semillas',
+        'Mei Lin',
+        'Prueba cuarenta variedades locales en parcelas de ensayo',
+      ],
     ],
   },
   closing: {

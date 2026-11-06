@@ -19,13 +19,10 @@ export const tr: TeferCopy = {
     name: 'Gündem',
     kicker: 'Alıcı sunumu',
     title: 'Bu sabah masada neler var',
-    intro:
-      'Yirmi dört paltoluk bir koleksiyon üzerine kırk dakika: kumaşı nereden geldi, yerde neredeyse hiçbir şey kalmayacak şekilde onu nasıl kesiyoruz ve sonbahar için nasıl sipariş verilir. Ardından askıdaki paltoların kendisi.',
     items: [
-      ['Kumaş: ', 'üç dokuma fabrikasından 1.840 metre ve neden %86’sı stok fazlasıydı.'],
-      ['Kesim: ', 'kumaşın %15’ini değil, yalnızca %3’ünü yerde bırakan kalıplar.'],
-      ['Atölye: ', 'Porto’da, her paltoda otuz bir saatlik el emeği.'],
-      ['Siparişler: ', 'eylül için nasıl sipariş verilir ve hâlâ neleri ölçüye göre dikiyoruz.'],
+      ['Kumaş', 'Üç dokuma fabrikasından 1.840 metre ve neden %86’sı stok fazlasıydı.'],
+      ['Kesim', 'Kumaşın %15’ini değil, yalnızca %3’ünü yerde bırakan kalıplar.'],
+      ['Atölye', 'Porto’da, her paltoda otuz bir saatlik el emeği.'],
     ],
   },
   cloth: {

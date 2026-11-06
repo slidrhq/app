@@ -19,13 +19,10 @@ export const vi: SadeCopy = {
     name: 'Chương trình',
     kicker: 'Đại hội thành viên',
     title: 'Sáng nay chúng ta sẽ bàn những gì',
-    intro:
-      'Bốn mươi phút về vụ thu hoạch 2026: chúng ta đã trồng gì, tốn bao nhiêu nước và đất cho thấy điều gì. Sau đó là kế hoạch mùa vụ 2027 và thời gian để quý vị đặt câu hỏi.',
     items: [
-      ['Thu hoạch: ', '18.400 tấn ngũ cốc từ 212 nông trại, và chúng đã đi đâu.'],
-      ['Nước: ', 'tưới nhỏ giọt và cây che phủ đã giảm lượng nước cho mỗi tấn ra sao.'],
-      ['Đất: ', 'ba năm phân tích cho thấy gì bên dưới các cánh đồng.'],
-      ['Mùa vụ 2027: ', 'ngân hàng hạt giống, máy móc dùng chung và lịch mùa vụ.'],
+      ['Thu hoạch', '18.400 tấn ngũ cốc từ 212 nông trại, và chúng đã đi đâu.'],
+      ['Nước', 'Tưới nhỏ giọt và cây che phủ đã giảm lượng nước cho mỗi tấn ra sao.'],
+      ['Đất', 'Ba năm phân tích cho thấy gì bên dưới các cánh đồng.'],
     ],
   },
   figures: {
@@ -173,7 +170,11 @@ export const vi: SadeCopy = {
     title: 'Những người đứng sau vụ mùa',
     people: [
       ['Chủ tịch hội đồng quản trị', 'Nadia Haddad', 'Trồng lúa mì và đậu gà trên 64 héc-ta'],
-      ['Kỹ sư nông nghiệp trưởng', 'Tomás Ferreira', 'Phụ trách phòng thí nghiệm đất và khảo sát bằng drone'],
+      [
+        'Kỹ sư nông nghiệp trưởng',
+        'Tomás Ferreira',
+        'Phụ trách phòng thí nghiệm đất và khảo sát bằng drone',
+      ],
       ['Kỹ sư thủy lợi', 'Kwame Asante', 'Thiết kế mạng tưới nhỏ giọt dùng chung'],
       ['Phụ trách ngân hàng giống', 'Mei Lin', 'Thử 40 giống địa phương ở các ô thí nghiệm'],
     ],

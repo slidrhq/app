@@ -19,13 +19,10 @@ export const fr: TavlinCopy = {
     name: 'Ordre du jour',
     kicker: 'Pour nos partenaires',
     title: 'Au menu aujourd’hui',
-    intro:
-      'Quarante minutes sur Sept Épices, d’un marché du week-end à un festival de quarante et un mille visiteurs, et sur ce que nous demandons à chaque partenaire pour mai. Puis vos questions, autour d’un thé.',
     items: [
-      ['Le marché\u00a0: ', 'soixante-quatre étals, et comment nous les attribuons cette année.'],
-      ['La cuisine des ateliers\u00a0: ', 'douze postes où l’on cuisine aux côtés des chefs.'],
-      ['La longue table\u00a0: ', 'six cents couverts par soir, et qui cuisine pour eux.'],
-      ['La route vers mai\u00a0: ', 'ce qu’il nous faut de chaque partenaire, et pour quand.'],
+      ['Le marchéu00a0', 'Soixante-quatre étals, et comment nous les attribuons cette année.'],
+      ['La cuisine des ateliersu00a0', 'Douze postes où l’on cuisine aux côtés des chefs.'],
+      ['La longue tableu00a0', 'Six cents couverts par soir, et qui cuisine pour eux.'],
     ],
   },
   figures: {
@@ -48,7 +45,10 @@ export const fr: TavlinCopy = {
     kicker: 'Nouveau en 2027 · La cuisine des ateliers',
     title: 'Cuisiner aux côtés des chefs',
     items: [
-      ['Douze postes', 'Chacun cuisine à son propre poste, les épices déjà pesées qui l’attendent.'],
+      [
+        'Douze postes',
+        'Chacun cuisine à son propre poste, les épices déjà pesées qui l’attendent.',
+      ],
       [
         'Quatre-vingt-dix minutes par atelier',
         'De la graine entière au plat fini : torréfier, moudre, mélanger et goûter.',
@@ -111,7 +111,11 @@ export const fr: TavlinCopy = {
         'Attribution des étals',
         'Chaque partenaire reçoit un plan de la halle et un créneau de livraison.',
       ],
-      ['14 mai', 'Ouverture des portes', 'Le marché dès midi, la première longue table à 20\u00a0h.'],
+      [
+        '14 mai',
+        'Ouverture des portes',
+        'Le marché dès midi, la première longue table à 20\u00a0h.',
+      ],
     ],
     note: 'Ces dates valent pour les trois programmes\u00a0; les retardataires passent en liste d’attente.',
   },

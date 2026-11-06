@@ -18,14 +18,11 @@ export const ptBR: RakiaCopy = {
   agenda: {
     name: 'Hoje à noite',
     kicker: 'O briefing',
-    title: 'Hoje à noite, em quatro partes',
-    intro:
-      'Quarenta minutos sobre o telescópio que recebe nesta semana sua primeira luz das estrelas, o que ele vai observar na primeira temporada e como cada universidade parceira vai dividir suas noites. Depois, abrimos a cúpula.',
+    title: 'Hoje à noite, em três partes',
     items: [
-      ['O telescópio: ', 'doze anos do primeiro esboço a um espelho polido de 2,4 metros.'],
-      ['O local: ', 'por que Meridian Peak é mais escuro e estável que qualquer lugar medido.'],
-      ['A primeira temporada: ', 'três programas de pesquisa e os objetos que observam primeiro.'],
-      ['Dividir as noites: ', 'como um parceiro pede tempo, e como o público participa.'],
+      ['O telescópio', 'Doze anos do primeiro esboço a um espelho polido de 2,4 metros.'],
+      ['O local', 'Por que Meridian Peak é mais escuro e estável que qualquer lugar medido.'],
+      ['A primeira temporada', 'Três programas de pesquisa e os objetos que observam primeiro.'],
     ],
   },
   figures: {
@@ -99,9 +96,17 @@ export const ptBR: RakiaCopy = {
     kicker: 'Do vidro à luz das estrelas',
     title: 'Quatro anos, quatro marcos',
     stops: [
-      ['2024', 'O espelho é fundido', 'O vidro esfria por três meses antes do início do polimento.'],
+      [
+        '2024',
+        'O espelho é fundido',
+        'O vidro esfria por três meses antes do início do polimento.',
+      ],
       ['2025', 'A cúpula sobe', 'Uma cúpula de 14 metros ergue-se no cume em uma só temporada.'],
-      ['2026', 'A óptica chega', 'O espelho polido sobe a estrada da montanha a passo de caminhada.'],
+      [
+        '2026',
+        'A óptica chega',
+        'O espelho polido sobe a estrada da montanha a passo de caminhada.',
+      ],
       ['2027', 'Primeira luz', 'O telescópio faz sua primeira imagem do céu em 12 de março.'],
     ],
     note: 'O espelho passou dois desses quatro anos na máquina de polimento.',

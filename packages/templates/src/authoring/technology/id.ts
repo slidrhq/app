@@ -12,15 +12,10 @@ export const id: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Yang kita bahas hari ini',
-      lead: [
-        'Mengapa satu wilayah tidak lagi cukup untuk inti pembayaran kami.',
-        'Bagaimana kami pindah ke tiga wilayah aktif tanpa menghentikan layanan.',
-      ],
       points: [
-        ['Alasan: ', 'Satu gangguan menghentikan semua pembayaran.'],
-        ['Arsitektur: ', 'Setiap wilayah mampu menanggung seluruh beban.'],
-        ['Migrasi: ', 'Empat tahap pada Desember, semuanya bisa dibatalkan.'],
-        ['Hasil: ', 'Ketersediaan, latensi p95, dan biaya bulanan.'],
+        ['Alasan', 'Satu gangguan menghentikan semua pembayaran.'],
+        ['Arsitektur', 'Setiap wilayah mampu menanggung seluruh beban.'],
+        ['Migrasi', 'Empat tahap pada Desember, semuanya bisa dibatalkan.'],
       ],
     },
     figures: {
@@ -117,15 +112,10 @@ export const id: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Pertanyaan dalam tinjauan ini',
-      lead: [
-        'Empat jawaban terukur menentukan tahap DVT pada April.',
-        'Setiap pertanyaan memiliki penanggung jawab dalam tim.',
-      ],
       points: [
-        ['Daya: ', 'Apakah satu baterai tahan sepuluh tahun saat dingin?'],
-        ['Biaya: ', 'Harga satu papan untuk pesanan 10.000 unit.'],
-        ['Lapangan: ', 'Pelajaran dari 60 meter yang aktif sejak Januari.'],
-        ['Produksi: ', 'Hal yang perlu selesai sebelum pesanan pertama.'],
+        ['Daya', 'Apakah satu baterai tahan sepuluh tahun saat dingin?'],
+        ['Biaya', 'Harga satu papan untuk pesanan 10.000 unit.'],
+        ['Lapangan', 'Pelajaran dari 60 meter yang aktif sejak Januari.'],
       ],
     },
     figures: {
@@ -230,15 +220,10 @@ export const id: TechnologyCopies = {
     agenda: {
       kicker: 'Susunan acara',
       title: 'Acara malam ini',
-      lead: [
-        'Tiga puluh menit tentang pembaruan Zrima 2.0 dan alasan di baliknya.',
-        'Lalu demo langsung: dari halaman kosong menjadi alur yang mandiri.',
-      ],
       points: [
-        ['Editor: ', 'Semua langkah dalam satu kanvas, dibantu AI.'],
-        ['Beta: ', 'Karya dan masukan dari 4.200 tim.'],
-        ['Paket: ', 'Tiga pilihan, dari gratis hingga Business.'],
-        ['Rencana: ', 'Persetujuan seluler Februari, alur bersama pada 2027.'],
+        ['Editor', 'Semua langkah dalam satu kanvas, dibantu AI.'],
+        ['Beta', 'Karya dan masukan dari 4.200 tim.'],
+        ['Paket', 'Tiga pilihan, dari gratis hingga Business.'],
       ],
     },
     figures: {

@@ -21,14 +21,14 @@ export const fr: RakiaCopy = {
   agenda: {
     name: 'Ce soir',
     kicker: 'Le briefing',
-    title: 'Ce soir, en quatre temps',
-    intro:
-      'Quarante minutes sur le télescope qui capte cette semaine sa première lumière, sur ce qu’il observera lors de sa première saison et sur le partage de ses nuits entre les universités partenaires. Puis nous ouvrons la coupole.',
+    title: 'Ce soir, en trois temps',
     items: [
-      [`Le télescope${N}: `, 'douze ans de la première esquisse à un miroir poli de 2,4 mètres.'],
-      [`Le site${N}: `, 'pourquoi Meridian Peak est plus sombre et plus stable que tout site mesuré.'],
-      [`La première saison${N}: `, 'trois programmes de recherche et les objets qu’ils observent en premier.'],
-      [`Partager les nuits${N}: `, 'comment un partenaire demande du temps, et comment le public participe.'],
+      ['Le télescope', 'Douze ans de la première esquisse à un miroir poli de 2,4 mètres.'],
+      ['Le site', 'Pourquoi Meridian Peak est plus sombre et plus stable que tout site mesuré.'],
+      [
+        'La première saison',
+        'Trois programmes de recherche et les objets qu’ils observent en premier.',
+      ],
     ],
   },
   figures: {
@@ -51,7 +51,10 @@ export const fr: RakiaCopy = {
     kicker: 'Sous la coupole',
     title: 'Un miroir poli pendant deux ans',
     items: [
-      ['Coulé d’une seule pièce', 'Le verre a refroidi trois mois dans son moule, pour ne pas se fissurer.'],
+      [
+        'Coulé d’une seule pièce',
+        'Le verre a refroidi trois mois dans son moule, pour ne pas se fissurer.',
+      ],
       [
         'Poli à 18 nanomètres près',
         'Sa surface s’écarte de la courbe parfaite de moins d’un millième de cheveu.',
@@ -103,7 +106,11 @@ export const fr: RakiaCopy = {
     title: 'Quatre ans, quatre jalons',
     stops: [
       ['2024', 'Le miroir est coulé', 'Le verre refroidit trois mois avant le début du polissage.'],
-      ['2025', 'La coupole s’élève', 'Une coupole de 14 mètres monte au sommet en une seule saison.'],
+      [
+        '2025',
+        'La coupole s’élève',
+        'Une coupole de 14 mètres monte au sommet en une seule saison.',
+      ],
       ['2026', 'L’optique arrive', 'Le miroir poli gravit la route de montagne au pas.'],
       ['2027', 'Première lumière', 'Le télescope prend sa première image du ciel le 12 mars.'],
     ],
@@ -171,7 +178,11 @@ export const fr: RakiaCopy = {
       ['Direction', 'Amara Okafor', 'Directrice, mène le projet depuis la première esquisse'],
       ['Optique', 'Tomás Arriaga', 'Ingénieur opticien, a guidé deux ans de polissage'],
       ['Données', 'Hana Sato', 'Data scientist, fait de chaque nuit des images nettes'],
-      ['Nuits publiques', 'Yonatan Levi', 'Médiateur, fait monter écoles et visiteurs à la coupole'],
+      [
+        'Nuits publiques',
+        'Yonatan Levi',
+        'Médiateur, fait monter écoles et visiteurs à la coupole',
+      ],
     ],
   },
   closing: {

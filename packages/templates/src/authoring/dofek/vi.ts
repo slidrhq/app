@@ -6,20 +6,20 @@ export const vi: DofekCopy = {
     name: 'Mở đầu',
     org: 'Y tế Quận Ven Biển · Báo cáo sức khỏe cộng đồng',
     title: ['Bốn phút', 'giữ nhịp tim'],
-    subtitle: ['Một quận 640.000 dân đã học cách hành động', 'trước khi xe cấp cứu đến như thế nào'],
+    subtitle: [
+      'Một quận 640.000 dân đã học cách hành động',
+      'trước khi xe cấp cứu đến như thế nào',
+    ],
     meta: 'Báo cáo trước Hội đồng quận · 15 tháng 4 năm 2027',
   },
   agenda: {
     name: 'Chương trình',
     kicker: 'Trước khi bắt đầu',
     title: 'Nội dung hôm nay',
-    intro:
-      'Hai mươi phút về những gì chương trình đã thay đổi, điều gì diễn ra trên phố khi một trái tim ngừng đập, và những đề xuất của chúng tôi với hội đồng cho năm 2027. Sau đó là phần hỏi đáp.',
     items: [
-      ['Các con số: ', 'điều gì đã thay đổi với người bị ngừng tim ngoài bệnh viện.'],
-      ['Trên đường phố: ', 'hàng xóm, tình nguyện viên và máy khử rung tim nay phối hợp ra sao.'],
-      ['Con người: ', 'đội ngũ điều hành chương trình và các tình nguyện viên đồng hành.'],
-      ['Năm tới: ', 'những gì chúng tôi đề nghị hội đồng, và thời hạn.'],
+      ['Các con số', 'Điều gì đã thay đổi với người bị ngừng tim ngoài bệnh viện.'],
+      ['Trên đường phố', 'Hàng xóm, tình nguyện viên và máy khử rung tim nay phối hợp ra sao.'],
+      ['Con người', 'Đội ngũ điều hành chương trình và các tình nguyện viên đồng hành.'],
     ],
   },
   section: {
@@ -76,9 +76,18 @@ export const vi: DofekCopy = {
     kicker: 'Tình nguyện viên trực chiến',
     title: 'Trợ giúp ngay góc phố',
     items: [
-      ['Báo động trong vài giây', 'Một ứng dụng báo cho tình nguyện viên đã qua huấn luyện trong bán kính 500 mét.'],
-      ['Máy khử rung tim đang đến', 'Một tình nguyện viên thứ hai mang máy khử rung tim công cộng gần nhất tới.'],
-      ['Có mặt trước tiếng còi', 'Cứ mười ca thì sáu ca có tình nguyện viên đến bên bệnh nhân trước xe cấp cứu.'],
+      [
+        'Báo động trong vài giây',
+        'Một ứng dụng báo cho tình nguyện viên đã qua huấn luyện trong bán kính 500 mét.',
+      ],
+      [
+        'Máy khử rung tim đang đến',
+        'Một tình nguyện viên thứ hai mang máy khử rung tim công cộng gần nhất tới.',
+      ],
+      [
+        'Có mặt trước tiếng còi',
+        'Cứ mười ca thì sáu ca có tình nguyện viên đến bên bệnh nhân trước xe cấp cứu.',
+      ],
     ],
   },
   park: {
@@ -145,7 +154,13 @@ export const vi: DofekCopy = {
     kicker: 'Năm khu vực',
     title: 'Từng khu vực ra sao',
     note: 'Số liệu năm 2026, từ sổ đăng ký ngừng tim của quận, tháng 1 năm 2027.',
-    header: ['Khu vực', 'Máy khử rung tim', 'Dân được huấn luyện', 'CPR trước cấp cứu', 'Cú sốc đầu tiên'],
+    header: [
+      'Khu vực',
+      'Máy khử rung tim',
+      'Dân được huấn luyện',
+      'CPR trước cấp cứu',
+      'Cú sốc đầu tiên',
+    ],
     rows: [
       ['Bến Cảng', '240', '16.200', '72%', '5 phút'],
       ['Phố Cổ', '210', '13.900', '70%', '5 phút'],

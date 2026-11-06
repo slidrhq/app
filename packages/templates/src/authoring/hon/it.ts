@@ -13,13 +13,13 @@ export const it: HonCopy = {
     name: 'Ordine del giorno',
     kicker: 'Assemblea annuale dei soci',
     title: 'Stasera all’ordine del giorno',
-    intro:
-      'Quaranta minuti sul 2026 della banca che vi appartiene: quanto abbiamo prestato, quanto abbiamo tenuto come capitale e che cosa è tornato a voi soci. Poi le votazioni e le vostre domande.',
     items: [
-      ['L’anno in cifre: ', 'credito, capitale e ciò che è tornato ai soci.'],
-      ['Case verdi: ', 'i prestiti per la riqualificazione, cresciuti più di tutti quest’anno.'],
-      ['Il vostro risparmio al lavoro: ', 'come un deposito diventa il prestito di un vicino, in cinque passi.'],
-      ['Le votazioni: ', 'il consiglio, i revisori e il dividendo ai soci.'],
+      ['L’anno in cifre', 'Credito, capitale e ciò che è tornato ai soci.'],
+      ['Case verdi', 'I prestiti per la riqualificazione, cresciuti più di tutti quest’anno.'],
+      [
+        'Il vostro risparmio al lavoro',
+        'Come un deposito diventa il prestito di un vicino, in cinque passi.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const it: HonCopy = {
     source: 'Saldi a fine anno, in miliardi di euro, 2023–2026.',
     series: ['Risparmio dei soci', 'Prestiti ai soci'],
     figures: [
-      ['81%', 'del risparmio dei soci torna ai soci come prestiti; il resto è un margine di sicurezza.'],
+      [
+        '81%',
+        'del risparmio dei soci torna ai soci come prestiti; il resto è un margine di sicurezza.',
+      ],
       ['+21%', 'di risparmio dal 2023, senza un euro preso in prestito sui mercati.'],
     ],
   },
@@ -155,9 +158,21 @@ export const it: HonCopy = {
     kicker: 'Novantasei anni',
     title: 'Costruita un socio alla volta',
     stops: [
-      ['1931', 'Fondata dai portuali', 'Duecento famiglie mettono insieme i salari per prestarsi denaro a vicenda.'],
-      ['1974', 'I primi mutui', 'I soci iniziano a comprare le case in cui erano in affitto da decenni.'],
-      ['2009', 'Nessun salvataggio', 'Attraversa la crisi finanziaria senza un centesimo di denaro pubblico.'],
+      [
+        '1931',
+        'Fondata dai portuali',
+        'Duecento famiglie mettono insieme i salari per prestarsi denaro a vicenda.',
+      ],
+      [
+        '1974',
+        'I primi mutui',
+        'I soci iniziano a comprare le case in cui erano in affitto da decenni.',
+      ],
+      [
+        '2009',
+        'Nessun salvataggio',
+        'Attraversa la crisi finanziaria senza un centesimo di denaro pubblico.',
+      ],
       ['2026', '412.000 soci', 'L’anno di crescita più rapida degli ultimi vent’anni.'],
     ],
     note: 'In novantasei anni la banca non ha mai pagato un azionista esterno, perché non ne ha mai avuto uno.',

@@ -6,7 +6,9 @@ export const fr: TeferCopy = {
     name: 'Ouverture',
     org: 'Ourela · Manteaux faits à Porto',
     title: ['Des manteaux', 'qui durent'],
-    subtitle: ['Vingt-quatre manteaux taillés dans des étoffes que les tissages n’ont pas pu vendre'],
+    subtitle: [
+      'Vingt-quatre manteaux taillés dans des étoffes que les tissages n’ont pas pu vendre',
+    ],
     meta: 'Présentation aux acheteurs · Paris · 4 mars 2027',
   },
   section: {
@@ -19,13 +21,13 @@ export const fr: TeferCopy = {
     name: 'Ordre du jour',
     kicker: 'Présentation aux acheteurs',
     title: 'Sur la table ce matin',
-    intro:
-      'Quarante minutes sur une collection de vingt-quatre manteaux\u00a0: d’où vient son étoffe, comment nous la coupons pour qu’il ne reste presque rien au sol, et comment la commander pour l’automne. Puis les manteaux eux-mêmes, sur le portant.',
     items: [
-      ['L’étoffe\u00a0: ', '1\u00a0840 mètres venus de trois tissages, et pourquoi 86\u00a0% étaient des invendus.'],
-      ['La coupe\u00a0: ', 'des patrons qui laissent 3\u00a0% de l’étoffe au sol, et non 15\u00a0%.'],
-      ['L’atelier\u00a0: ', 'trente et une heures de travail à la main dans chaque manteau, à Porto.'],
-      ['Les commandes\u00a0: ', 'comment commander pour septembre, et ce que nous faisons encore sur mesure.'],
+      [
+        'L’étoffeu00a0',
+        '1u00a0840 mètres venus de trois tissages, et pourquoi 86u00a0% étaient des invendus.',
+      ],
+      ['La coupeu00a0', 'Des patrons qui laissent 3u00a0% de l’étoffe au sol, et non 15u00a0%.'],
+      ['L’atelieru00a0', 'Trente et une heures de travail à la main dans chaque manteau, à Porto.'],
     ],
   },
   cloth: {
@@ -96,8 +98,16 @@ export const fr: TeferCopy = {
     kicker: 'La saison',
     title: 'Du tissage à la boutique',
     stops: [
-      ['Janv. 2027', 'L’étoffe choisie', 'Nous achetons 1\u00a0582 mètres de surplus à trois tissages.'],
-      ['Mars 2027', 'Ouverture des commandes', 'Vingt-quatre manteaux devant les acheteurs, à Paris.'],
+      [
+        'Janv. 2027',
+        'L’étoffe choisie',
+        'Nous achetons 1\u00a0582 mètres de surplus à trois tissages.',
+      ],
+      [
+        'Mars 2027',
+        'Ouverture des commandes',
+        'Vingt-quatre manteaux devant les acheteurs, à Paris.',
+      ],
       ['Juin 2027', 'Début de la coupe', 'Chaque commande coupée à la main, à Porto.'],
       ['Sept. 2027', 'En boutique', 'Manteaux livrés dans 40 boutiques de 11 pays.'],
     ],

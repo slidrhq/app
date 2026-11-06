@@ -6,7 +6,8 @@ export const it: TavlinCopy = {
     name: 'Apertura',
     org: 'Sette Spezie · Un festival gastronomico a Lisbona',
     title: ['Sette spezie,', 'una tavolata'],
-    subtitle: 'Il piano della nostra terza edizione, dai banchi del mercato alla cucina delle masterclass',
+    subtitle:
+      'Il piano della nostra terza edizione, dai banchi del mercato alla cucina delle masterclass',
     meta: 'Incontro con i partner · Lisbona · 2 febbraio 2027',
   },
   section: {
@@ -19,13 +20,10 @@ export const it: TavlinCopy = {
     name: 'Ordine del giorno',
     kicker: 'Per i nostri partner',
     title: 'Oggi nel menù',
-    intro:
-      'Quaranta minuti su come Sette Spezie è passato da mercato del fine settimana a festival da quarantunomila ospiti, e su ciò che chiediamo a ogni partner per maggio. Poi le vostre domande, davanti a un tè.',
     items: [
-      ['Il mercato: ', 'sessantaquattro banchi, e come li assegniamo quest’anno.'],
-      ['La cucina delle masterclass: ', 'dodici postazioni dove si cucina accanto agli chef.'],
-      ['La lunga tavolata: ', 'seicento coperti a sera, e chi cucina per loro.'],
-      ['Verso maggio: ', 'cosa ci serve da ogni partner, ed entro quando.'],
+      ['Il mercato', 'Sessantaquattro banchi, e come li assegniamo quest’anno.'],
+      ['La cucina delle masterclass', 'Dodici postazioni dove si cucina accanto agli chef.'],
+      ['La lunga tavolata', 'Seicento coperti a sera, e chi cucina per loro.'],
     ],
   },
   figures: {

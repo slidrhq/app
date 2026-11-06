@@ -13,13 +13,10 @@ export const ptBR: DofekCopy = {
     name: 'Pauta',
     kicker: 'Antes de começar',
     title: 'O que vamos ver hoje',
-    intro:
-      'Vinte minutos sobre o que o programa mudou, o que acontece hoje na rua quando um coração para e o que pedimos ao conselho para 2027. Depois, abrimos espaço para as perguntas de vocês.',
     items: [
-      ['Os números: ', 'o que mudou para quem sofre uma parada cardíaca fora do hospital.'],
-      ['Na rua: ', 'como vizinhos, voluntários e desfibriladores agem juntos hoje.'],
-      ['As pessoas: ', 'a equipe que conduz o programa e os voluntários ao seu lado.'],
-      ['O próximo ano: ', 'o que pedimos ao conselho, e até quando.'],
+      ['Os números', 'O que mudou para quem sofre uma parada cardíaca fora do hospital.'],
+      ['Na rua', 'Como vizinhos, voluntários e desfibriladores agem juntos hoje.'],
+      ['As pessoas', 'A equipe que conduz o programa e os voluntários ao seu lado.'],
     ],
   },
   section: {
@@ -76,9 +73,18 @@ export const ptBR: DofekCopy = {
     kicker: 'Voluntários de plantão',
     title: 'Ajuda logo ali na esquina',
     items: [
-      ['Alertados em segundos', 'Um aplicativo alerta na hora os voluntários treinados que estão a até 500 metros.'],
-      ['Um desfibrilador a caminho', 'Um segundo voluntário corre para buscar o desfibrilador público mais próximo.'],
-      ['Antes da sirene', 'Em seis de cada dez chamados, um voluntário chegou ao paciente antes da ambulância.'],
+      [
+        'Alertados em segundos',
+        'Um aplicativo alerta na hora os voluntários treinados que estão a até 500 metros.',
+      ],
+      [
+        'Um desfibrilador a caminho',
+        'Um segundo voluntário corre para buscar o desfibrilador público mais próximo.',
+      ],
+      [
+        'Antes da sirene',
+        'Em seis de cada dez chamados, um voluntário chegou ao paciente antes da ambulância.',
+      ],
     ],
   },
   park: {
@@ -145,7 +151,13 @@ export const ptBR: DofekCopy = {
     kicker: 'As cinco regiões',
     title: 'Como está cada região',
     note: 'Dados de 2026, do registro distrital de paradas cardíacas, janeiro de 2027.',
-    header: ['Região', 'Desfibriladores', 'Moradores treinados', 'RCP antes da ambulância', 'Primeiro choque'],
+    header: [
+      'Região',
+      'Desfibriladores',
+      'Moradores treinados',
+      'RCP antes da ambulância',
+      'Primeiro choque',
+    ],
     rows: [
       ['Porto', '240', '16.200', '72%', '5 min'],
       ['Cidade Velha', '210', '13.900', '70%', '5 min'],

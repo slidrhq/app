@@ -13,13 +13,10 @@ export const en: HonCopy = {
     name: 'Agenda',
     kicker: 'Annual General Meeting',
     title: 'On the agenda tonight',
-    intro:
-      'Forty minutes on how the bank you own did in 2026: what we lent, what we kept as capital and what came back to you as members. Then the votes, and your questions.',
     items: [
-      ['The year in figures: ', 'lending, capital and what came back to members.'],
-      ['Green homes: ', 'the renovation loans that grew fastest this year.'],
-      ['Your savings at work: ', 'how a deposit becomes a neighbour’s loan, in five steps.'],
-      ['The votes: ', 'the board, the auditors and the member dividend.'],
+      ['The year in figures', 'Lending, capital and what came back to members.'],
+      ['Green homes', 'The renovation loans that grew fastest this year.'],
+      ['Your savings at work', 'How a deposit becomes a neighbour’s loan, in five steps.'],
     ],
   },
   section: {
@@ -155,8 +152,16 @@ export const en: HonCopy = {
     kicker: 'Ninety-six years',
     title: 'Built one member at a time',
     stops: [
-      ['1931', 'Founded by dockers', 'Two hundred families pool their wages to lend to each other.'],
-      ['1974', 'The first home loans', 'Members begin buying the houses they had rented for decades.'],
+      [
+        '1931',
+        'Founded by dockers',
+        'Two hundred families pool their wages to lend to each other.',
+      ],
+      [
+        '1974',
+        'The first home loans',
+        'Members begin buying the houses they had rented for decades.',
+      ],
       ['2009', 'No rescue needed', 'Through the financial crisis without a cent of public money.'],
       ['2026', '412,000 members', 'The fastest year of growth in two decades.'],
     ],

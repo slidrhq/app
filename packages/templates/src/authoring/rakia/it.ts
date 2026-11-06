@@ -18,14 +18,11 @@ export const it: RakiaCopy = {
   agenda: {
     name: 'Stasera',
     kicker: 'Il briefing',
-    title: 'Stasera, in quattro parti',
-    intro:
-      'Quaranta minuti sul telescopio che questa settimana riceve la sua prima luce stellare, su ciò che osserverà nella prima stagione e su come ogni università partner ne condividerà le notti. Poi apriamo la cupola.',
+    title: 'Stasera, in tre parti',
     items: [
-      ['Il telescopio: ', 'dodici anni dal primo schizzo a uno specchio lucidato di 2,4 metri.'],
-      ['Il sito: ', 'perché Meridian Peak è più buio e stabile di ogni altro luogo misurato.'],
-      ['La prima stagione: ', 'tre programmi di ricerca e i primi oggetti che osserveranno.'],
-      ['Condividere le notti: ', 'come un partner chiede tempo, e come partecipa il pubblico.'],
+      ['Il telescopio', 'Dodici anni dal primo schizzo a uno specchio lucidato di 2,4 metri.'],
+      ['Il sito', 'Perché Meridian Peak è più buio e stabile di ogni altro luogo misurato.'],
+      ['La prima stagione', 'Tre programmi di ricerca e i primi oggetti che osserveranno.'],
     ],
   },
   figures: {
@@ -48,7 +45,10 @@ export const it: RakiaCopy = {
     kicker: 'Sotto la cupola',
     title: 'Uno specchio lucidato per due anni',
     items: [
-      ['Fuso in un solo pezzo', 'Il vetro si è raffreddato per tre mesi nello stampo, così da non incrinarsi.'],
+      [
+        'Fuso in un solo pezzo',
+        'Il vetro si è raffreddato per tre mesi nello stampo, così da non incrinarsi.',
+      ],
       [
         'Lucidato a 18 nanometri',
         'La superficie si scosta dalla curva perfetta meno di un millesimo di capello.',
@@ -99,9 +99,21 @@ export const it: RakiaCopy = {
     kicker: 'Dal vetro alla luce delle stelle',
     title: 'Quattro anni, quattro tappe',
     stops: [
-      ['2024', 'Si fonde lo specchio', 'Il vetro si raffredda per tre mesi prima che inizi la lucidatura.'],
-      ['2025', 'Sorge la cupola', 'Una cupola di 14 metri si alza sulla vetta in una sola stagione.'],
-      ['2026', 'Arriva l’ottica', 'Lo specchio lucidato sale la strada di montagna a passo d’uomo.'],
+      [
+        '2024',
+        'Si fonde lo specchio',
+        'Il vetro si raffredda per tre mesi prima che inizi la lucidatura.',
+      ],
+      [
+        '2025',
+        'Sorge la cupola',
+        'Una cupola di 14 metri si alza sulla vetta in una sola stagione.',
+      ],
+      [
+        '2026',
+        'Arriva l’ottica',
+        'Lo specchio lucidato sale la strada di montagna a passo d’uomo.',
+      ],
       ['2027', 'Prima luce', 'Il 12 marzo il telescopio scatta la sua prima immagine del cielo.'],
     ],
     note: 'Due di questi quattro anni lo specchio li ha passati sulla macchina lucidatrice.',
@@ -168,7 +180,11 @@ export const it: RakiaCopy = {
       ['Direzione', 'Amara Okafor', 'Direttrice, guida il progetto dal primo schizzo'],
       ['Ottica', 'Tomás Arriaga', 'Ingegnere ottico, ha seguito due anni di lucidatura'],
       ['Dati', 'Hana Sato', 'Data scientist, fa di ogni notte immagini pulite'],
-      ['Notti pubbliche', 'Yonatan Levi', 'Educatore, porta scuole e visitatori fin sotto la cupola'],
+      [
+        'Notti pubbliche',
+        'Yonatan Levi',
+        'Educatore, porta scuole e visitatori fin sotto la cupola',
+      ],
     ],
   },
   closing: {

@@ -13,13 +13,13 @@ export const es: HonCopy = {
     name: 'Orden del día',
     kicker: 'Asamblea general anual',
     title: 'Esta noche, en el orden del día',
-    intro:
-      'Cuarenta minutos sobre el año 2026 del banco que es suyo: cuánto prestamos, cuánto guardamos como capital y qué les volvió a ustedes, los socios. Después, las votaciones y sus preguntas.',
     items: [
-      ['El año en cifras: ', 'crédito, capital y lo que volvió a los socios.'],
-      ['Hogares verdes: ', 'los préstamos de rehabilitación, los que más crecieron este año.'],
-      ['Su ahorro, trabajando: ', 'cómo un depósito se convierte en el préstamo de un vecino, en cinco pasos.'],
-      ['Las votaciones: ', 'el consejo, los auditores y el dividendo de los socios.'],
+      ['El año en cifras', 'Crédito, capital y lo que volvió a los socios.'],
+      ['Hogares verdes', 'Los préstamos de rehabilitación, los que más crecieron este año.'],
+      [
+        'Su ahorro, trabajando',
+        'Cómo un depósito se convierte en el préstamo de un vecino, en cinco pasos.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const es: HonCopy = {
     source: 'Saldos a final de cada año, en miles de millones de euros, 2023–2026.',
     series: ['Ahorro de los socios', 'Préstamos a socios'],
     figures: [
-      ['81\u00a0%', 'del ahorro de los socios vuelve a ellos como préstamos; el resto es margen de seguridad.'],
+      [
+        '81\u00a0%',
+        'del ahorro de los socios vuelve a ellos como préstamos; el resto es margen de seguridad.',
+      ],
       ['+21\u00a0%', 'de crecimiento del ahorro desde 2023, sin pedir un euro a los mercados.'],
     ],
   },
@@ -160,7 +163,11 @@ export const es: HonCopy = {
     title: 'Construido socio a socio',
     stops: [
       ['1931', 'Fundado por estibadores', 'Doscientas familias juntan sus sueldos para prestarse.'],
-      ['1974', 'Las primeras hipotecas', 'Los socios compran las casas que llevaban décadas alquilando.'],
+      [
+        '1974',
+        'Las primeras hipotecas',
+        'Los socios compran las casas que llevaban décadas alquilando.',
+      ],
       ['2009', 'Sin rescate', 'Atraviesa la crisis financiera sin un céntimo de dinero público.'],
       ['2026', '412.000 socios', 'El año de mayor crecimiento en dos décadas.'],
     ],

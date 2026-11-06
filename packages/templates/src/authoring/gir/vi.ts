@@ -19,13 +19,10 @@ export const vi: GirCopy = {
     name: 'Tối nay',
     kicker: 'Chào mừng quý phụ huynh',
     title: 'Tối nay, trong bốn mươi phút',
-    intro:
-      'Bốn mươi phút về cách khối 7 sẽ học trong năm nay, những gì thay đổi trong lớp và cách quý phụ huynh có thể hỗ trợ ở nhà. Sau đó, quý vị sẽ gặp giáo viên chủ nhiệm của con tại lớp học mới.',
     items: [
-      ['Lớp học mới: ', 'bàn nhóm bốn người thay cho những dãy bàn hướng lên bảng.'],
-      ['Năm học mới: ', 'bốn mốc cần nhớ, từ ngày đầu tiên đến buổi văn nghệ cuối năm.'],
-      ['Hỗ trợ thêm: ', 'những gì chúng tôi làm, từng bước một, khi một học sinh bị hổng kiến thức.'],
-      ['Câu hỏi của quý vị: ', 'sau đó là buổi gặp ngắn với từng giáo viên chủ nhiệm.'],
+      ['Lớp học mới', 'Bàn nhóm bốn người thay cho những dãy bàn hướng lên bảng.'],
+      ['Năm học mới', 'Bốn mốc cần nhớ, từ ngày đầu tiên đến buổi văn nghệ cuối năm.'],
+      ['Hỗ trợ thêm', 'Những gì chúng tôi làm, từng bước một, khi một học sinh bị hổng kiến thức.'],
     ],
   },
   figures: {
@@ -91,9 +88,17 @@ export const vi: GirCopy = {
     title: 'Bốn mốc cần ghi nhớ',
     stops: [
       ['Tháng 9/2027', 'Ngày đầu tiên', 'Các lớp gặp giáo viên chủ nhiệm và những bộ bàn mới.'],
-      ['Tháng 12/2027', 'Hội chợ khoa học', 'Mỗi nhóm trình bày một thí nghiệm từ phòng thí nghiệm mới.'],
+      [
+        'Tháng 12/2027',
+        'Hội chợ khoa học',
+        'Mỗi nhóm trình bày một thí nghiệm từ phòng thí nghiệm mới.',
+      ],
       ['Tháng 3/2028', 'Dã ngoại', 'Ba ngày ở phía bắc, có một đêm dưới bầu trời sao.'],
-      ['Tháng 6/2028', 'Văn nghệ cuối năm', 'Mọi lớp đều lên sân khấu, phụ huynh ngồi hàng ghế đầu.'],
+      [
+        'Tháng 6/2028',
+        'Văn nghệ cuối năm',
+        'Mọi lớp đều lên sân khấu, phụ huynh ngồi hàng ghế đầu.',
+      ],
     ],
     note: 'Giáo viên chủ nhiệm sẽ gửi lịch họp phụ huynh trước hai tuần.',
   },
@@ -156,7 +161,11 @@ export const vi: GirCopy = {
     kicker: 'Đội ngũ giáo viên khối 7',
     title: 'Thầy cô mà các con sẽ gặp',
     people: [
-      ['7A · Khoa học tự nhiên', 'Maya Cohen', 'Khối trưởng khối 7, phụ trách phòng thí nghiệm mới'],
+      [
+        '7A · Khoa học tự nhiên',
+        'Maya Cohen',
+        'Khối trưởng khối 7, phụ trách phòng thí nghiệm mới',
+      ],
       ['7B · Toán', 'Karim Nasser', 'Giáo viên Toán, hướng dẫn môn Robot'],
       ['7C · Ngữ văn', 'Olga Petrenko', 'Giáo viên Ngữ văn, phụ trách chương trình đọc'],
       ['7D · Lịch sử', 'Daniel Mekonen', 'Giáo viên Lịch sử, lên kế hoạch dã ngoại'],

@@ -6,7 +6,9 @@ export const es: HadranCopy = {
     name: 'Apertura',
     org: 'Night Tram Records · Lisboa',
     title: ['La temporada', 'empieza hoy'],
-    subtitle: ['Doce discos nuevos, una gira por dieciocho ciudades y una escuela para nuevas voces'],
+    subtitle: [
+      'Doce discos nuevos, una gira por dieciocho ciudades y una escuela para nuevas voces',
+    ],
     meta: 'Presentación · La Cochera de Tranvías · 21 de enero de 2027',
   },
   section: {
@@ -19,13 +21,13 @@ export const es: HadranCopy = {
     name: 'Repertorio',
     kicker: 'Presentación de temporada',
     title: 'El repertorio de esta noche',
-    intro:
-      'Cuarenta minutos sobre la temporada que viene: lo que nos enseñó la anterior, los doce discos que publicaremos, las dieciocho ciudades de la gira y nuestra escuela. Después se abre la barra y toca la banda.',
     items: [
-      ['La temporada pasada: ', 'treinta y un conciertos, nueve discos, casi todas las entradas vendidas.'],
-      ['Cómo grabamos: ', 'una sala, una toma, un magnetófono de cinta de 1974.'],
-      ['La temporada 2027: ', 'doce álbumes y una gira por dieciocho ciudades.'],
-      ['La escuela: ', 'sesenta y cuatro adolescentes aprenden a tocar y a grabar.'],
+      [
+        'La temporada pasada',
+        'Treinta y un conciertos, nueve discos, casi todas las entradas vendidas.',
+      ],
+      ['Cómo grabamos', 'Una sala, una toma, un magnetófono de cinta de 1974.'],
+      ['La temporada 2027', 'Doce álbumes y una gira por dieciocho ciudades.'],
     ],
   },
   season: {
@@ -52,14 +54,8 @@ export const es: HadranCopy = {
         'La banda toca junta',
         'Sin overdubs ni metrónomo: las canciones suenan como en el escenario.',
       ],
-      [
-        'Directo a cinta',
-        'Un magnetófono de bobina de 1974 da a cada disco su sonido cálido.',
-      ],
-      [
-        'Una semana por álbum',
-        'Cinco días para grabar y dos para mezclar: la sala decide.',
-      ],
+      ['Directo a cinta', 'Un magnetófono de bobina de 1974 da a cada disco su sonido cálido.'],
+      ['Una semana por álbum', 'Cinco días para grabar y dos para mezclar: la sala decide.'],
     ],
   },
   depot: {

@@ -19,13 +19,10 @@ export const fr: SadeCopy = {
     name: 'Ordre du jour',
     kicker: 'Assemblée des adhérents',
     title: 'Au programme de cette matinée',
-    intro:
-      'Quarante minutes sur la récolte 2026\u00a0: ce que nous avons cultivé, l’eau qu’il a fallu et ce que le sol nous a appris. Puis le plan de la saison 2027, et du temps pour vos questions.',
     items: [
-      ['La récolte\u00a0: ', '18\u00a0400 tonnes de grain de 212 fermes, et leur destination.'],
-      ['L’eau\u00a0: ', 'comment goutte-à-goutte et couverts végétaux ont réduit l’eau par tonne.'],
-      ['Le sol\u00a0: ', 'ce que trois ans d’analyses révèlent sous nos champs.'],
-      ['La saison 2027\u00a0: ', 'la banque de semences, les machines partagées et le calendrier.'],
+      ['La récolteu00a0', '18u00a0400 tonnes de grain de 212 fermes, et leur destination.'],
+      ['L’eauu00a0', 'Comment goutte-à-goutte et couverts végétaux ont réduit l’eau par tonne.'],
+      ['Le solu00a0', 'Ce que trois ans d’analyses révèlent sous nos champs.'],
     ],
   },
   figures: {
@@ -103,7 +100,11 @@ export const fr: SadeCopy = {
     title: 'L’année à venir, saison par saison',
     stops: [
       ['Hiver', 'La banque de semences ouvre', 'Les membres réservent leurs variétés de semis.'],
-      ['Printemps', 'Goutte-à-goutte, phase deux', 'Soixante fermes de plus rejoignent les pompes.'],
+      [
+        'Printemps',
+        'Goutte-à-goutte, phase deux',
+        'Soixante fermes de plus rejoignent les pompes.',
+      ],
       ['Été', 'Moisson', 'Les moissonneuses partagées suivent un seul calendrier de réservation.'],
       ['Automne', 'Semis', 'Les couverts laissent la place au blé et aux pois chiches.'],
     ],
@@ -168,7 +169,11 @@ export const fr: SadeCopy = {
     title: 'Les visages de la récolte',
     people: [
       ['Présidente du conseil', 'Nadia Haddad', 'Cultive blé et pois chiches sur 64 hectares'],
-      ['Agronome en chef', 'Tomás Ferreira', 'Dirige le laboratoire des sols et les relevés par drone'],
+      [
+        'Agronome en chef',
+        'Tomás Ferreira',
+        'Dirige le laboratoire des sols et les relevés par drone',
+      ],
       ['Ingénieur hydraulique', 'Kwame Asante', 'A conçu le réseau commun de goutte-à-goutte'],
       ['Gardienne des semences', 'Mei Lin', 'Essaie quarante variétés locales sur nos parcelles'],
     ],

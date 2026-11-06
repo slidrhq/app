@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -268,11 +267,6 @@ const pick = (w: number, h: number) =>
   `<path d="${pickPath(w, h)}" fill="${CRIMSON}"/>` +
   `<path d="M${n1(w * 0.2)} ${n1(h * 0.2)}C${n1(w * 0.3)} ${n1(h * 0.1)} ${n1(w * 0.48)} ${n1(h * 0.08)} ${n1(w * 0.62)} ${n1(h * 0.1)}" stroke="${WHITE}" stroke-opacity=".38" stroke-width="${n1(Math.max(1.6, w * 0.035))}" stroke-linecap="round"/>`;
 
-/** A strip of gaffer tape with torn ends, turned a little, in a box of 200 by 76. */
-const gaffer = (turn: number) =>
-  `<g transform="rotate(${turn} 100 38)"><path d="M10 20L16 24L10 28L16 32L10 36L16 40L10 44L16 48L10 52H190L184 48L190 44L184 40L190 36L184 32L190 28L184 24L190 20Z" fill="${INK}" fill-opacity=".82"/>` +
-  `<path d="M16 26H184" stroke="${WHITE}" stroke-opacity=".12" stroke-width="3"/></g>`;
-
 /** The bars of a level meter, the size of an icon. */
 const levelBars = (heights: number[], h: number, colour = CRIMSON) =>
   heights
@@ -345,7 +339,11 @@ function foot(name: string, withFooter = true) {
       : [],
     decorations: [
       mark(`d_hadran_${name}_mark`, at(START, 953, 44, 44)),
-      art(`d_hadran_${name}_level`, atEnd(END + 92, 958, 37, 32), levelBars([14, 24, 18, 30, 10], 32)),
+      art(
+        `d_hadran_${name}_level`,
+        atEnd(END + 92, 958, 37, 32),
+        levelBars([14, 24, 18, 30, 10], 32),
+      ),
       art(`d_hadran_${name}_pick`, atEnd(END, 942, 60, 66), pick(60, 66)),
       pageNumber(`d_hadran_${name}_number`, atEnd(END, 950, 60, 34), 'caption', {
         color: token('surface'),
@@ -931,8 +929,32 @@ const ICONS = {
 };
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 86, 298 + i * 190, width, 46), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 86, 348 + i * 190, width, 120), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_hadran_${name}_groove`,
+          at(START + 22, 362, 14, 318),
+          `<path d="M7 2V316" stroke="${INK}" stroke-opacity=".25" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          numberRecord(`d_hadran_${name}_marker${i + 1}`, at(START, 294 + i * 190, 58, 58), i + 1),
+        ),
+      ],
+    };
+  }
+
   const kit = drumKit();
-  const sheet = at(START, 244, WIDTH, 672);
   const tableCase = at(START, 252, WIDTH, 608);
   const ticket = at(176, 190, 1568, 640);
   const stub = 440;
@@ -979,7 +1001,11 @@ function layouts(): Layout[] {
         }),
       ],
       decorations: [
-        art('d_hadran_section_stage', { x: 0, y: 0, w: W, h: H }, stage('d_hadran_section_stage', 510, false)),
+        art(
+          'd_hadran_section_stage',
+          { x: 0, y: 0, w: W, h: H },
+          stage('d_hadran_section_stage', 510, false),
+        ),
         ...kit.decorations,
         play('d_hadran_section_play', 372, AMBER),
       ],
@@ -1005,10 +1031,18 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('big_number', 1000).decorations,
-        upright('d_hadran_big_number_meter', at(START, 258, 620, 300), vuMeter('d_hadran_big_number_meter', 620, 300)),
+        upright(
+          'd_hadran_big_number_meter',
+          at(START, 258, 620, 300),
+          vuMeter('d_hadran_big_number_meter', 620, 300),
+        ),
         ...[0, 1, 2].map((i) =>
           lifted(
-            art(`d_hadran_big_number_rack${i + 1}`, atEnd(END, 258 + i * 206, 900, 190), rackUnit(900, 190, [12, 15, 18][i]!)),
+            art(
+              `d_hadran_big_number_rack${i + 1}`,
+              atEnd(END, 258 + i * 206, 900, 190),
+              rackUnit(900, 190, [12, 15, 18][i]!),
+            ),
             8,
             20,
             0.1,
@@ -1047,14 +1081,18 @@ function layouts(): Layout[] {
               const band = `M${w - 70} 0H${w - r}A${r} ${r} 0 0 1 ${w} ${r}V${h - r}A${r} ${r} 0 0 1 ${w - r} ${h}H${w - 70}Z`;
               const waves = Array.from({ length: 7 }, (_, i) => {
                 let d = `M${w - 70 + 10 * i + 5} 0`;
-                for (let y = 0; y <= h; y += 8) d += `L${n1(w - 70 + 10 * i + 5 + Math.sin(y / 14 + i) * 3)} ${y}`;
+                for (let y = 0; y <= h; y += 8)
+                  d += `L${n1(w - 70 + 10 * i + 5 + Math.sin(y / 14 + i) * 3)} ${y}`;
                 return d;
               }).join('');
               const guilloche = Array.from({ length: 8 }, (_, i) => {
                 let d = '';
                 for (let x = stub + 60; x <= w - 110; x += 5) {
                   const y =
-                    h - 112 + (i % 4) * 8 + Math.sin(x / (i < 4 ? 26 : 19) + i * 0.9) * (i < 4 ? 14 : 10);
+                    h -
+                    112 +
+                    (i % 4) * 8 +
+                    Math.sin(x / (i < 4 ? 26 : 19) + i * 0.9) * (i < 4 ? 14 : 10);
                   d += `${x === stub + 60 ? 'M' : 'L'}${x} ${n1(y)}`;
                 }
                 return d;
@@ -1092,31 +1130,16 @@ function layouts(): Layout[] {
       id: 'l_hadran_text',
       name: 'Text',
       archetype: 'text',
-      // The setlist: a sheet taped to the stage from margin to margin, down to over the foot,
-      // the text from its top; a pick dropped on its corner. The kicker over the title and the
-      // footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 220).placeholders,
-        place('p_body', 'body', at(START + 72, sheet.y + 66, WIDTH - 144, 500), 'body'),
+        ...textPoints('text', WIDTH - 86).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 220).decorations,
-        card('d_hadran_text_sheet', sheet, 6),
-        // Gaffer tape over the two top corners of the sheet.
-        art('d_hadran_text_tape1', at(START - 44, 214, 200, 76), gaffer(9)),
-        art('d_hadran_text_tape2', atEnd(END - 44, 214, 200, 76), gaffer(-7)),
-        // A pick left on the sheet's last corner, clear of the text.
-        lifted(
-          art(
-            'd_hadran_text_plectrum',
-            atEnd(END + 26, 790, 108, 116),
-            `<g transform="rotate(-18 54 58)"><g transform="translate(12 12)">${pick(84, 92)}</g></g>`,
-          ),
-          6,
-          12,
-          0.22,
-        ),
+        ...textPoints('text', WIDTH - 86).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1127,10 +1150,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 960).placeholders,
         place('p_image', 'image', atEnd(290, 240, 620, 620)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 86, 298 + i * 190, 720, 46), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 86, 348 + i * 190, 720, 120), 'body'),
-        ]),
+        ...textPoints('text_image', 720).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1140,14 +1160,7 @@ function layouts(): Layout[] {
         rect('d_hadran_text_image_sleeve', atEnd(290, 240, 620, 620), solid(token('text')), {
           effects: { shadow: { x: 0, y: 22, blur: 50, color: { value: '#3a0f1c', alpha: 0.3 } } },
         }),
-        art(
-          'd_hadran_text_image_groove',
-          at(START + 22, 362, 14, 318),
-          `<path d="M7 2V316" stroke="${INK}" stroke-opacity=".25" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>`,
-        ),
-        ...[0, 1, 2].map((i) =>
-          numberRecord(`d_hadran_text_image_marker${i + 1}`, at(START, 294 + i * 190, 58, 58), i + 1),
-        ),
+        ...textPoints('text_image', 720).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1194,13 +1207,17 @@ function layouts(): Layout[] {
           art(
             `d_hadran_cards_cassette${i + 1}`,
             at(s + 28, 278, 464, 280),
-            cassette(`d_hadran_cards_cassette${i + 1}`, [CRIMSON, COBALT, AMBER][i]!, (
-              [
-                [44, 22],
-                [33, 33],
-                [22, 44],
-              ] as [number, number][]
-            )[i]!),
+            cassette(
+              `d_hadran_cards_cassette${i + 1}`,
+              [CRIMSON, COBALT, AMBER][i]!,
+              (
+                [
+                  [44, 22],
+                  [33, 33],
+                  [22, 44],
+                ] as [number, number][]
+              )[i]!,
+            ),
           ),
         ]),
         art('d_hadran_cards_note_icon', at(START, 877, 26, 26), ICONS.ticket(26, CRIMSON)),
@@ -1225,7 +1242,12 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('timeline', 1100).decorations,
-        upright('d_hadran_timeline_staff', at(START, 240, WIDTH, 222), staff(WIDTH, true), staff(WIDTH, false)),
+        upright(
+          'd_hadran_timeline_staff',
+          at(START, 240, WIDTH, 222),
+          staff(WIDTH, true),
+          staff(WIDTH, false),
+        ),
         // A note reads one way in both directions.
         upright('d_hadran_timeline_note_icon', at(START, 863, 26, 32), ICONS.note(26)),
         ...foot('timeline').decorations,
@@ -1267,7 +1289,11 @@ function layouts(): Layout[] {
           })(),
         ),
         ...steps5.map((s, i) =>
-          art(`d_hadran_process_fader${i + 1}`, at(s + 80, 352, 140, 280), fader(FADERS[i]!, i === 4)),
+          art(
+            `d_hadran_process_fader${i + 1}`,
+            at(s + 80, 352, 140, 280),
+            fader(FADERS[i]!, i === 4),
+          ),
         ),
         art('d_hadran_process_note_icon', at(START, 850, 40, 40), ICONS.headphones(40)),
         ...foot('process').decorations,
@@ -1300,13 +1326,19 @@ function layouts(): Layout[] {
         art(
           'd_hadran_comparison_then',
           at(START + 24, 286, 742, 236),
-          orchestra(742, 236, [
-            [84, 5],
-            [132, 7],
-          ], undefined, [
-            [176, 18],
-            [214, 22],
-          ]),
+          orchestra(
+            742,
+            236,
+            [
+              [84, 5],
+              [132, 7],
+            ],
+            undefined,
+            [
+              [176, 18],
+              [214, 22],
+            ],
+          ),
         ),
         art(
           'd_hadran_comparison_now',
@@ -1510,7 +1542,11 @@ function layouts(): Layout[] {
         }),
       ],
       decorations: [
-        art('d_hadran_closing_stage', { x: 0, y: 0, w: W, h: H }, stage('d_hadran_closing_stage', 460, true)),
+        art(
+          'd_hadran_closing_stage',
+          { x: 0, y: 0, w: W, h: H },
+          stage('d_hadran_closing_stage', 460, true),
+        ),
         // The microphone on its stand, in the light: the stand, its base, the capsule.
         art(
           'd_hadran_closing_stand',
@@ -1653,15 +1689,8 @@ function drawSample(copy: HadranCopy): SampleSlide[] {
       content: {
         caption: text(copy.setlist.kicker),
         title: lines(copy.setlist.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.setlist.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 46 } : p,
-            ),
-            ...points(copy.setlist.items, { kind: 'number', mark: token('primary'), gap: 34 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.setlist.items.map(([title]) => text(title)),
+        body: copy.setlist.items.map(([, body]) => text(body)),
         footer,
       },
     },
@@ -1679,15 +1708,9 @@ function drawSample(copy: HadranCopy): SampleSlide[] {
       layout: 'l_hadran_big_number',
       name: copy.season.name,
       content: {
-        caption: [
-          text(copy.season.kicker),
-          ...copy.season.others.map(([, label]) => text(label)),
-        ],
+        caption: [text(copy.season.kicker), ...copy.season.others.map(([, label]) => text(label))],
         title: lines(copy.season.title),
-        number: [
-          text(copy.season.hero.value),
-          ...copy.season.others.map(([value]) => text(value)),
-        ],
+        number: [text(copy.season.hero.value), ...copy.season.others.map(([value]) => text(value))],
         subtitle: text(copy.season.hero.label),
         body: lines(copy.season.hero.note),
         footer,
@@ -1802,7 +1825,11 @@ function drawSample(copy: HadranCopy): SampleSlide[] {
       layout: 'l_hadran_comparison',
       name: copy.school.name,
       content: {
-        caption: [text(copy.school.kicker), text(copy.school.before[0]), text(copy.school.after[0])],
+        caption: [
+          text(copy.school.kicker),
+          text(copy.school.before[0]),
+          text(copy.school.after[0]),
+        ],
         title: lines(copy.school.title),
         subtitle: [text(copy.school.before[1]), text(copy.school.after[1])],
         body: [text(copy.school.before[2]), text(copy.school.after[2])],

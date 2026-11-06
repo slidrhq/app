@@ -19,13 +19,10 @@ export const id: TeferCopy = {
     name: 'Agenda',
     kicker: 'Presentasi untuk pembeli',
     title: 'Di atas meja pagi ini',
-    intro:
-      'Empat puluh menit tentang koleksi dua puluh empat mantel: dari mana kainnya, bagaimana kami memotongnya hingga hampir tak ada yang tersisa di lantai, dan cara memesannya untuk musim gugur. Lalu mantelnya sendiri, di rak.',
     items: [
-      ['Kain: ', '1.840 meter dari tiga pabrik tenun, dan mengapa 86% di antaranya kain sisa.'],
-      ['Potongan: ', 'pola yang menyisakan 3% kain di lantai, bukan 15%.'],
-      ['Bengkel jahit: ', 'tiga puluh satu jam kerja tangan di setiap mantel, di Porto.'],
-      ['Pesanan: ', 'cara memesan untuk September, dan apa yang masih kami buat sesuai ukuran.'],
+      ['Kain', '1.840 meter dari tiga pabrik tenun, dan mengapa 86% di antaranya kain sisa.'],
+      ['Potongan', 'Pola yang menyisakan 3% kain di lantai, bukan 15%.'],
+      ['Bengkel jahit', 'Tiga puluh satu jam kerja tangan di setiap mantel, di Porto.'],
     ],
   },
   cloth: {
@@ -97,7 +94,11 @@ export const id: TeferCopy = {
     title: 'Dari pabrik tenun ke toko',
     stops: [
       ['Jan 2027', 'Kain dipilih', 'Kami membeli 1.582 meter kain sisa dari tiga pabrik.'],
-      ['Mar 2027', 'Pesanan dibuka', 'Dua puluh empat mantel diperlihatkan kepada pembeli di Paris.'],
+      [
+        'Mar 2027',
+        'Pesanan dibuka',
+        'Dua puluh empat mantel diperlihatkan kepada pembeli di Paris.',
+      ],
       ['Jun 2027', 'Pemotongan dimulai', 'Setiap pesanan dipotong tangan di bengkel Porto.'],
       ['Sep 2027', 'Di toko', 'Mantel tiba di 40 toko, di 11 negara berbeda.'],
     ],

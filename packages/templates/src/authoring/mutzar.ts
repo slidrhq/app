@@ -10,9 +10,7 @@ import {
   dot,
   drawing,
   pageNumber,
-  para,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -708,9 +706,6 @@ const NAMES: Words[] = [
   w2('מאיה', 'Maya'),
 ];
 
-/** The text layout's window: the document, from margin to margin, down to over the foot. */
-const PAGE = at(START, 236, WIDTH, 690);
-
 /** Where the opening's command palette starts: at the end side, beside the title. */
 const PALETTE = 1920 - END - 700;
 
@@ -768,6 +763,26 @@ function paletteRow(
 }
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...rows3.flatMap((top, i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 84, top, width, 53), 'heading'),
+          place(`p_point${i + 1}_body`, 'body', at(START + 84, top + 56, width, 132), 'body'),
+        ]),
+      ],
+      decorations: [
+        ...rows3.map((top, i) =>
+          toggle(`d_mutzar_${name}_switch${i + 1}`, at(START, top + 8, 64, 36), true),
+        ),
+      ],
+    };
+  }
+
   const textWindow = atEnd(END, 84, 676, 836);
   const shot = { x: 96, y: 96, w: 1728, h: 568 };
   return [
@@ -1057,34 +1072,17 @@ function layouts(): Layout[] {
       id: 'l_mutzar_text',
       name: 'Text',
       archetype: 'text',
-      // The text is the page of a document, in its window from margin to margin and down to over
-      // the foot, from the top of the page; the people on the page stand beside the title. The
-      // kicker over a title of one line and the footer, as on the text-and-image slide
-      // (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 300, 92).placeholders,
-        place('p_body', 'body', at(START + 64, PAGE.y + 132, WIDTH - 128, 512), 'body'),
+        ...textPoints('text', WIDTH - 84).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         board('text'),
         ...head('text', WIDTH - 300, 92).decorations,
-        ...browser('text', PAGE, 'zrima.app/docs/launch-night'),
-        // The page's cover, a band of the theme's colours under the bar of the window.
-        rect(
-          'd_mutzar_text_cover',
-          { x: PAGE.x, y: PAGE.y + 52, w: PAGE.w, h: 36 },
-          {
-            kind: 'linear',
-            angle: 90,
-            stops: [
-              { color: token('secondary', 0.26), at: 0 },
-              { color: token('secondary', 0.1), at: 0.55 },
-              { color: token('accent', 0.16), at: 1 },
-            ],
-          },
-        ),
-        presence('text'),
+        ...textPoints('text', WIDTH - 84).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1095,19 +1093,14 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 920).placeholders,
         place('p_image', 'image', atEnd(END + 12, 136, 652, 772)),
-        ...rows3.flatMap((top, i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 84, top, 880, 53), 'heading'),
-          place(`p_point${i + 1}_body`, 'body', at(START + 84, top + 56, 880, 132), 'body'),
-        ]),
+        ...textPoints('text_image', 880).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
         board('text_image'),
         ...head('text_image', 920).decorations,
         ...browser('text_image', textWindow, 'zrima.app/builder'),
-        ...rows3.map((top, i) =>
-          toggle(`d_mutzar_text_image_switch${i + 1}`, at(START, top + 8, 64, 36), true),
-        ),
+        ...textPoints('text_image', 880).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1786,23 +1779,12 @@ const sampleHe: SampleSlide[] = [
     content: {
       caption: text('התוכנית'),
       title: text('על מה נדבר הערב'),
-      body: {
-        paragraphs: [
-          para(
-            'שלושים דקות על מה שחדש ב-Zrima 2.0, ולמה בנינו אותו כך. אחר כך הדגמה חיה על הבמה הזו: מעמוד ריק ועד תהליך עבודה שרץ לבד, בלי שורת קוד אחת ובלי עזרה מצוות הפיתוח.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['הבונה: ', 'כל שלבי התהליך על קנבס אחד, ו-AI שמנסח את הטיוטה הראשונה.'],
-              ['הבטא: ', 'מה בנו 4,200 צוותי תפעול, ומה הם ביקשו מאיתנו.'],
-              ['המסלולים: ', 'שלושה, מהמסלול החינמי ועד Business, במחירי השקה.'],
-              ['מפת הדרכים: ', 'אישורים מהטלפון בפברואר, ותהליכים משותפים בהמשך 2027.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('הבונה'), text('הבטא'), text('המסלולים')],
+      body: [
+        text('כל שלבי התהליך על קנבס אחד, ו-AI שמנסח את הטיוטה הראשונה.'),
+        text('מה בנו 4,200 צוותי תפעול, ומה הם ביקשו מאיתנו.'),
+        text('שלושה, מהמסלול החינמי ועד Business, במחירי השקה.'),
+      ],
       footer: FOOTER_HE,
     },
   },
@@ -2050,23 +2032,12 @@ const sampleEn: SampleSlide[] = [
     content: {
       caption: text('The programme'),
       title: text("Tonight's agenda"),
-      body: {
-        paragraphs: [
-          para(
-            'Thirty minutes on what is new in Zrima 2.0, and why we built it the way we did. Then a live demo on this stage, from an empty page to a workflow that runs on its own.',
-            { spaceAfter: 36 },
-          ),
-          ...points(
-            [
-              ['The builder: ', 'every step of a workflow on one canvas, with AI to draft it.'],
-              ['The beta: ', 'what 4,200 ops teams built, and what they asked us for.'],
-              ['Plans: ', 'three of them, from the free plan to Business, at launch prices.'],
-              ['The roadmap: ', 'approvals by phone in February, and shared flows later in 2027.'],
-            ],
-            { kind: 'number', mark: token('primary'), gap: 22 },
-          ).paragraphs,
-        ],
-      },
+      subtitle: [text('The builder'), text('The beta'), text('Plans')],
+      body: [
+        text('Every step of a workflow on one canvas, with AI to draft it.'),
+        text('What 4,200 ops teams built, and what they asked us for.'),
+        text('Three of them, from the free plan to Business, at launch prices.'),
+      ],
       footer: FOOTER_EN,
     },
   },

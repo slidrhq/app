@@ -19,13 +19,10 @@ export const tr: HadranCopy = {
     name: 'Set listesi',
     kicker: 'Sezon açılışı',
     title: 'Bu gecenin set listesi',
-    intro:
-      'Önümüzdeki sezon üzerine kırk dakika: geçen sezonun bize öğrettikleri, çıkaracağımız on iki plak, turnenin on sekiz şehri ve okulumuz. Ardından bar açılıyor ve grup sahneye çıkıyor.',
     items: [
-      ['Geçen sezon: ', 'otuz bir konser, dokuz plak, neredeyse bütün koltuklar satıldı.'],
-      ['Nasıl kaydediyoruz: ', 'tek oda, tek kayıt, 1974 yapımı bir makaralı teyp.'],
-      ['2027 sezonu: ', 'on iki albüm ve on sekiz şehirlik bir turne.'],
-      ['Okul: ', 'altmış dört genç, çalmayı ve kayıt yapmayı öğreniyor.'],
+      ['Geçen sezon', 'Otuz bir konser, dokuz plak, neredeyse bütün koltuklar satıldı.'],
+      ['Nasıl kaydediyoruz', 'Tek oda, tek kayıt, 1974 yapımı bir makaralı teyp.'],
+      ['2027 sezonu', 'On iki albüm ve on sekiz şehirlik bir turne.'],
     ],
   },
   season: {
@@ -48,18 +45,9 @@ export const tr: HadranCopy = {
     kicker: 'Nasıl kaydediyoruz',
     title: 'Tek oda, tek kayıt',
     items: [
-      [
-        'Grup birlikte çalıyor',
-        'Üst kayıt yok, metronom yok: her şey sahnedeki gibi.',
-      ],
-      [
-        'Doğrudan banda',
-        '1974 yapımı makaralı teyp, her plağa o sıcak sesini veriyor.',
-      ],
-      [
-        'Her albüme bir hafta',
-        'Beş gün kayıt, iki gün miks: kararı oda veriyor.',
-      ],
+      ['Grup birlikte çalıyor', 'Üst kayıt yok, metronom yok: her şey sahnedeki gibi.'],
+      ['Doğrudan banda', '1974 yapımı makaralı teyp, her plağa o sıcak sesini veriyor.'],
+      ['Her albüme bir hafta', 'Beş gün kayıt, iki gün miks: kararı oda veriyor.'],
     ],
   },
   depot: {

@@ -18,7 +18,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -373,7 +372,9 @@ function bend(id: string, w: number, h: number, ltr: boolean) {
     `<circle cx="${cx}" cy="${cy}" r="${R0}" fill="${GRASS}"/>` +
     `<g clip-path="url(#${g('field')})">` +
     Array.from({ length: Math.ceil(w / 56) }, (_, i) =>
-      i % 2 ? '' : `<rect x="${i * 56}" y="0" width="56" height="${h}" fill="${WHITE}" fill-opacity=".06"/>`,
+      i % 2
+        ? ''
+        : `<rect x="${i * 56}" y="0" width="56" height="${h}" fill="${WHITE}" fill-opacity=".06"/>`,
     ).join('') +
     `</g>` +
     `<circle cx="${cx}" cy="${cy}" r="${R0}" stroke="${WHITE}" stroke-width="7"/>`;
@@ -497,7 +498,12 @@ function stopwatch(id: string) {
 
 /** A strap of a medal's ribbon between two edges, with its stripes. */
 function strap(a: [number, number][], shade: number) {
-  const [tl, tr, br, bl] = a as [[number, number], [number, number], [number, number], [number, number]];
+  const [tl, tr, br, bl] = a as [
+    [number, number],
+    [number, number],
+    [number, number],
+    [number, number],
+  ];
   const lerp = (p: [number, number], q: [number, number], t: number) =>
     `${r1(p[0] + (q[0] - p[0]) * t)} ${r1(p[1] + (q[1] - p[1]) * t)}`;
   const band = (t0: number, t1: number, fill: string) =>
@@ -507,7 +513,9 @@ function strap(a: [number, number][], shade: number) {
     band(0.36, 0.64, NAVY) +
     band(0.1, 0.15, WHITE) +
     band(0.85, 0.9, WHITE) +
-    (shade ? `<path d="M${lerp(tl, tr, 0)}L${lerp(tl, tr, 1)}L${lerp(bl, br, 1)}L${lerp(bl, br, 0)}Z" fill="${INK}" fill-opacity="${shade}"/>` : '')
+    (shade
+      ? `<path d="M${lerp(tl, tr, 0)}L${lerp(tl, tr, 1)}L${lerp(bl, br, 1)}L${lerp(bl, br, 0)}Z" fill="${INK}" fill-opacity="${shade}"/>`
+      : '')
   );
 }
 
@@ -797,7 +805,9 @@ function stadium(id: string, w: number, h: number) {
     `<path d="${lap(RIN)}" fill="${GRASS}"/>` +
     `<g clip-path="url(#${g('in')})">` +
     Array.from({ length: 12 }, (_, i) =>
-      i % 2 ? '' : `<rect x="${r1(cx - S - RIN + i * 50)}" y="0" width="50" height="${h}" fill="${WHITE}" fill-opacity=".07"/>`,
+      i % 2
+        ? ''
+        : `<rect x="${r1(cx - S - RIN + i * 50)}" y="0" width="50" height="${h}" fill="${WHITE}" fill-opacity=".07"/>`,
     ).join('') +
     `</g>`;
   for (let k = 1; k <= N; k++) {
@@ -858,6 +868,26 @@ const steps5 = [START, START + 341, START + 682, START + 1023, START + 1364];
 const team4 = [START, START + 424, START + 848, START + 1272];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 336 + i * 190, width, 50), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 88, 390 + i * 190, width, 122), 'body'),
+        ]),
+      ],
+      decorations: [
+        ...[0, 1, 2].map((i) =>
+          numberTile(`d_maslul_${name}_lane${i + 1}`, at(START, 336 + i * 190, 60, 56), i + 1),
+        ),
+      ],
+    };
+  }
+
   const heroArt = atEnd(0, 0, 700, 1064);
   const timelineBand = at(0, 270, W, 164);
   const markX = stops4.map((s) => W - s);
@@ -867,9 +897,12 @@ function layouts(): Layout[] {
     // The legs by turns a shade darker, from one hand-over to the next.
     markX.forEach((x, i) => {
       const to = markX[i + 1] ?? END;
-      if (i % 2) body += `<rect x="${to}" y="0" width="${x - to}" height="164" fill="${INK}" fill-opacity=".08"/>`;
+      if (i % 2)
+        body += `<rect x="${to}" y="0" width="${x - to}" height="164" fill="${INK}" fill-opacity=".08"/>`;
     });
-    body += lanes.map((y) => `<path d="M0 ${y}H${W}" stroke="${WHITE}" stroke-width="3"/>`).join('');
+    body += lanes
+      .map((y) => `<path d="M0 ${y}H${W}" stroke="${WHITE}" stroke-width="3"/>`)
+      .join('');
     markX.forEach((x, i) => {
       if (i === 0) {
         body += `<path d="M${x} 6V158" stroke="${WHITE}" stroke-width="7"/>`;
@@ -946,7 +979,11 @@ function layouts(): Layout[] {
       decorations: [
         mark('d_maslul_section_mark', at(START, 96, 56, 34)),
         speedBars('d_maslul_section_bars', at(START, 166, 32, 22)),
-        art('d_maslul_section_straight', at(0, 614, W, 466), straight('d_maslul_section_straight', W, 466, W - START - 332)),
+        art(
+          'd_maslul_section_straight',
+          at(0, 614, W, 466),
+          straight('d_maslul_section_straight', W, 466, W - START - 332),
+        ),
       ],
     },
     {
@@ -979,7 +1016,11 @@ function layouts(): Layout[] {
         ...head('big_number', WIDTH, 1).decorations,
         // The laps of the stopwatch's memory: a red tick at the start of each line.
         ...[0, 1, 2].map((i) =>
-          rect(`d_maslul_big_number_lap${i + 1}`, at(START, 474 + i * 150, 6, 40), solid(token('primary'))),
+          rect(
+            `d_maslul_big_number_lap${i + 1}`,
+            at(START, 474 + i * 150, 6, 40),
+            solid(token('primary')),
+          ),
         ),
         upright('d_maslul_big_number_watch', watch, stopwatch('d_maslul_big_number_watch')),
         ...[0, 1, 2, 3].map((i) =>
@@ -1008,7 +1049,11 @@ function layouts(): Layout[] {
           at(START, 196, 104, 80),
           `<path d="M8 80V48C8 20 24 4 48 0L52 11C37 17 30 28 30 44H48V80Z M60 80V48C60 20 76 4 100 0L104 11C89 17 82 28 82 44H100V80Z" fill="${RED}"/>`,
         ),
-        upright('d_maslul_quote_medal', atEnd(END + 70, 0, 440, 800), medal('d_maslul_quote_medal', 440)),
+        upright(
+          'd_maslul_quote_medal',
+          atEnd(END + 70, 0, 440, 800),
+          medal('d_maslul_quote_medal', 440),
+        ),
         rect('d_maslul_quote_rule', at(START, 710, 96, 6), solid(token('primary'))),
         ...foot('quote').decorations,
       ],
@@ -1017,19 +1062,16 @@ function layouts(): Layout[] {
       id: 'l_maslul_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a white sheet from margin to margin, down to over the foot, from its top;
-      // a hurdle stands on the sheet's corner, beside the title. The kicker over the title and
-      // the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 230, 1).placeholders,
-        // The body's start on the footer's, by the same edge.
-        place('p_body', 'body', at(START + 74, 298, WIDTH - 146, 582), 'body'),
+        ...textPoints('text', WIDTH - 88).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 230, 1).decorations,
-        ...sheet('d_maslul_text_sheet', at(START, 244, WIDTH, 676)),
-        art('d_maslul_text_hurdle', atEnd(END + 44, 128, 170, 118), hurdle(170, 118, RED)),
+        ...textPoints('text', WIDTH - 88).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1040,10 +1082,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 900, 2).placeholders,
         place('p_image', 'image', atEnd(END + 56, 128, 640, 736)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 336 + i * 190, 812, 50), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 88, 390 + i * 190, 812, 122), 'body'),
-        ]),
+        ...textPoints('text_image', 812).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1054,9 +1093,7 @@ function layouts(): Layout[] {
           trackBlock(696, 724, false),
           trackBlock(696, 724, true),
         ),
-        ...[0, 1, 2].map((i) =>
-          numberTile(`d_maslul_text_image_lane${i + 1}`, at(START, 336 + i * 190, 60, 56), i + 1),
-        ),
+        ...textPoints('text_image', 812).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1086,7 +1123,11 @@ function layouts(): Layout[] {
           }).join(''),
         ),
         speedBars('d_maslul_full_image_bars', at(START, 812, 32, 22), GOLD),
-        rect('d_maslul_full_image_rule', atEnd(END + 708, 830, 2, 180), solid(token('surface', 0.25))),
+        rect(
+          'd_maslul_full_image_rule',
+          atEnd(END + 708, 830, 2, 180),
+          solid(token('surface', 0.25)),
+        ),
       ],
     },
     {
@@ -1113,12 +1154,10 @@ function layouts(): Layout[] {
         ...cards3.flatMap((s, i) => {
           const colour = [RED, NAVY, GOLD][i]!;
           return [
-            lifted(art(`d_maslul_cards_bib${i + 1}`, at(s, 276, 512, 584), bib(512, 584, 92, colour))),
-            art(
-              `d_maslul_cards_icon${i + 1}`,
-              at(s + 36, 384, 120, 120),
-              PICTOGRAMS[i]!,
+            lifted(
+              art(`d_maslul_cards_bib${i + 1}`, at(s, 276, 512, 584), bib(512, 584, 92, colour)),
             ),
+            art(`d_maslul_cards_icon${i + 1}`, at(s + 36, 384, 120, 120), PICTOGRAMS[i]!),
           ];
         }),
         ...foot('cards').decorations,
@@ -1200,9 +1239,15 @@ function layouts(): Layout[] {
           place(`p_${side}_label`, 'caption', at(s + 56, board.y + 50, half - 112, 34), 'caption', {
             color: token('accent'),
           }),
-          place(`p_${side}_title`, 'subtitle', at(s + 56, board.y + 90, half - 112, 96), 'heading', {
-            color: token('surface'),
-          }),
+          place(
+            `p_${side}_title`,
+            'subtitle',
+            at(s + 56, board.y + 90, half - 112, 96),
+            'heading',
+            {
+              color: token('surface'),
+            },
+          ),
           place(`p_${side}_body`, 'body', at(s + 56, board.y + 190, half - 112, 124), 'body', {
             color: token('surface', 0.86),
           }),
@@ -1211,7 +1256,11 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('comparison', 1100).decorations,
-        art('d_maslul_comparison_board', board, scoreboard('d_maslul_comparison_board', board.w, board.h)),
+        art(
+          'd_maslul_comparison_board',
+          board,
+          scoreboard('d_maslul_comparison_board', board.w, board.h),
+        ),
         art(
           'd_maslul_comparison_then',
           at(START + 14 + 56, board.y + board.h - 50 - 150, 480, 150),
@@ -1273,7 +1322,12 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('table', 1300).decorations,
-        lifted(art('d_maslul_table_clipboard', at(START, 232, WIDTH, 688), clipboard(WIDTH, 688)), 14, 30, 0.18),
+        lifted(
+          art('d_maslul_table_clipboard', at(START, 232, WIDTH, 688), clipboard(WIDTH, 688)),
+          14,
+          30,
+          0.18,
+        ),
         ...foot('table').decorations,
       ],
     },
@@ -1327,7 +1381,11 @@ function layouts(): Layout[] {
       decorations: [
         mark('d_maslul_closing_mark', at(START, 96, 56, 34)),
         speedBars('d_maslul_closing_bars', at(START, 256, 32, 22)),
-        art('d_maslul_closing_stadium', atEnd(48, 214, 880, 580), stadium('d_maslul_closing_stadium', 880, 580)),
+        art(
+          'd_maslul_closing_stadium',
+          atEnd(48, 214, 880, 580),
+          stadium('d_maslul_closing_stadium', 880, 580),
+        ),
         ...[0, 1, 2].map((i) =>
           art(
             `d_maslul_closing_key${i + 1}`,
@@ -1501,15 +1559,8 @@ function drawSample(copy: MaslulCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 34 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

@@ -19,16 +19,10 @@ export const es: TaaruchaCopy = {
     name: 'Esta mañana',
     kicker: 'Para prensa y mecenas',
     title: 'La visita de esta mañana',
-    intro:
-      'Cuarenta minutos sobre cómo hemos vuelto a montar la colección tras dos años de obras, y sobre lo que cambia para el público desde el día de la apertura. Después, un paseo por las primeras salas.',
     items: [
-      ['La nueva ala: ', 'veintidós salas en tres plantas y un solo recorrido que las une.'],
-      ['Restauración: ', '312 obras limpiadas, reparadas y enmarcadas de nuevo para el montaje.'],
-      ['La visita: ', 'jueves por la tarde gratis y un taller pensado para grupos escolares.'],
-      [
-        'El año que viene: ',
-        'cuatro fechas para apuntar, de la apertura a la primera exposición de préstamos.',
-      ],
+      ['La nueva ala', 'Veintidós salas en tres plantas y un solo recorrido que las une.'],
+      ['Restauración', '312 obras limpiadas, reparadas y enmarcadas de nuevo para el montaje.'],
+      ['La visita', 'Jueves por la tarde gratis y un taller pensado para grupos escolares.'],
     ],
   },
   figures: {
@@ -52,10 +46,7 @@ export const es: TaaruchaCopy = {
     title: 'Cada obra, lista para su pared',
     items: [
       ['Limpieza a mano', 'Barniz viejo retirado con hisopos, unos centímetros cada vez.'],
-      [
-        'Reparar, nunca repintar',
-        'Rotos y faltas rellenados con materiales siempre reversibles.',
-      ],
+      ['Reparar, nunca repintar', 'Rotos y faltas rellenados con materiales siempre reversibles.'],
       ['Luz a medida', 'Cada obra, con la luz que su pintura o su papel soporta.'],
     ],
   },
@@ -95,7 +86,11 @@ export const es: TaaruchaCopy = {
     kicker: 'El primer año',
     title: 'Cuatro fechas del primer año del ala',
     stops: [
-      ['14 de abril', 'Se abren las puertas', 'Las veintidós salas, gratis el fin de semana de apertura.'],
+      [
+        '14 de abril',
+        'Se abren las puertas',
+        'Las veintidós salas, gratis el fin de semana de apertura.',
+      ],
       ['1 de julio', 'Tardes de verano', 'Los jueves hasta las diez, con música en el atrio.'],
       [
         '20 de octubre',

@@ -28,8 +28,8 @@ export interface TechnologyCopy {
     /** The kicker over the title, as the text-and-image slide has one (ADR-135). */
     kicker: string;
     title: string;
-    lead: [string, string];
-    points: [string, string][];
+    /** The text slide's three points, a title and its body each (ADR-136). */
+    points: [title: string, body: string][];
   };
   figures: { title: string; subtitle: string; labels: Three; body: string };
   features: { title: string; heads: Three; bodies: Three };

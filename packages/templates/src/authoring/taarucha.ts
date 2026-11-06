@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -275,9 +274,14 @@ function sketch(w: number, h: number) {
   return (
     `<rect width="${r1(w)}" height="${r1(h)}" fill="${WHITE}"/>` +
     `<g transform="translate(${r1((w - 160 * s) / 2)} ${r1((h - 200 * s) / 2)}) scale(${r1(s * 100) / 100})">` +
-    g('M62 176C48 170 44 150 52 132C58 118 66 110 64 96C63 90 60 86 60 82H100C100 86 97 90 96 96C94 110 102 118 108 132C116 150 112 170 98 176Z') +
+    g(
+      'M62 176C48 170 44 150 52 132C58 118 66 110 64 96C63 90 60 86 60 82H100C100 86 97 90 96 96C94 110 102 118 108 132C116 150 112 170 98 176Z',
+    ) +
     g('M56 176H104', 1.2) +
-    g('M80 82C78 60 70 44 58 30M74 60C64 56 54 58 46 64M80 82C84 58 96 42 112 34M92 56C100 50 110 50 118 54', 1.4) +
+    g(
+      'M80 82C78 60 70 44 58 30M74 60C64 56 54 58 46 64M80 82C84 58 96 42 112 34M92 56C100 50 110 50 118 54',
+      1.4,
+    ) +
     `<circle cx="58" cy="30" r="5" fill="${CLARET}"/><circle cx="112" cy="34" r="4" fill="${BRASS}"/>` +
     `</g>`
   );
@@ -359,8 +363,7 @@ function wallFrame(w: number, h: number, gap: [number, number]) {
     .map(([x, y]) => `<rect x="${x}" y="${y}" width="12" height="12" fill="${BRASS}"/>`)
     .join('');
   const [a, b] = gap;
-  const rules = (i: number) =>
-    `M${a} ${i}H${i}V${h - i}H${w - i}V${i}H${b}`;
+  const rules = (i: number) => `M${a} ${i}H${i}V${h - i}H${w - i}V${i}H${b}`;
   return (
     `<rect x="1.5" y="1.5" width="${w - 3}" height="${h - 3}" fill="${WHITE}" fill-opacity=".04"/>` +
     `<path d="${rules(1.5)}" stroke="${BRASS}" stroke-width="3"/>` +
@@ -519,7 +522,10 @@ function foot(name: string, { dark = false, footer = true } = {}) {
 const card = (id: string, frame: Frame) =>
   rect(id, frame, solid(token('surface')), {
     stroke: { color: token('text', 0.08), width: 1 },
-    effects: { radius: 3, shadow: { x: 0, y: 12, blur: 30, color: { value: '#2a1a14', alpha: 0.13 } } },
+    effects: {
+      radius: 3,
+      shadow: { x: 0, y: 12, blur: 30, color: { value: '#2a1a14', alpha: 0.13 } },
+    },
   });
 
 /** An object tag with its figure: a number of a list. */
@@ -851,6 +857,33 @@ const team4 = [START, START + 428, START + 856, START + 1284];
 const PLINTH_TOPS = [700, 660, 620];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 78, 316 + i * 192, width, 52), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 78, 372 + i * 192, width, 116), 'body'),
+        ]),
+      ],
+      decorations: [
+        ...[0, 1, 2].map((i) =>
+          figureTag(`d_taarucha_${name}_tag${i + 1}`, at(START, 322 + i * 192, 46, 46), i + 1),
+        ),
+        ...[0, 1].map((i) =>
+          rect(
+            `d_taarucha_${name}_rule${i + 1}`,
+            at(START + 78, 494 + i * 192, width, 1.5),
+            solid(token('text', 0.12)),
+          ),
+        ),
+      ],
+    };
+  }
+
   // The opening's salon hang, on the end side of the claret wall.
   const heroMain = atEnd(380, 176, 500, 640);
   const heroLook: Look = { moulding: 20, mat: 44, finish: INK };
@@ -904,7 +937,12 @@ function layouts(): Layout[] {
         rail('d_taarucha_hero_rail'),
         art('d_taarucha_hero_spots', atEnd(200, 52, 520, 96), spot(50, 14) + spot(430, -4)),
         // A colour field that runs on past the edge of the slide, as the wall runs on.
-        framed('d_taarucha_hero_edge', atEnd(-96, 290, 200, 360), BLACK_FRAME, colourField(88, 248)),
+        framed(
+          'd_taarucha_hero_edge',
+          atEnd(-96, 290, 200, 360),
+          BLACK_FRAME,
+          colourField(88, 248),
+        ),
         hung(art('d_taarucha_hero_tondo', atEnd(148, 176, 204, 204), tondo(204))),
         framed(
           'd_taarucha_hero_sea',
@@ -1058,43 +1096,17 @@ function layouts(): Layout[] {
       id: 'l_taarucha_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on the panel that opens an exhibition, from margin to margin and down to
-      // over the foot, from its top; two small works hang on nails beside the title. The kicker
-      // over a title of one line and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', 1380, true, 92).placeholders,
-        place('p_body', 'body', at(START + 84, 250 + 58, WIDTH - 148, 548), 'body'),
+        ...textPoints('text', WIDTH - 78).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', 1380, true, 92).decorations,
-        card('d_taarucha_text_panel', at(START, 250, WIDTH, 664)),
-        rect('d_taarucha_text_band', at(START, 250, 14, 664), solid(token('primary'))),
         rail('d_taarucha_text_rail'),
-        art('d_taarucha_text_nail1', atEnd(END + 10, 74, 96, 40), wire(96, 40, 30)),
-        framed(
-          'd_taarucha_text_work1',
-          atEnd(END + 10, 112, 96, 96),
-          { moulding: 7, mat: 12, finish: INK },
-          colourField(58, 58),
-        ),
-        art('d_taarucha_text_nail2', atEnd(END + 132, 58, 84, 40), wire(84, 40, 24)),
-        framed(
-          'd_taarucha_text_work2',
-          atEnd(END + 132, 96, 84, 112),
-          { moulding: 5, mat: 12, finish: WHITE },
-          sketch(50, 78),
-        ),
-        // The exhibition's colours in the panel's lower corner, as its key: a brass rule and
-        // three chips of its pigments.
-        art(
-          'd_taarucha_text_key',
-          atEnd(END + 48, 864, 176, 22),
-          `<path d="M0 11H88" stroke="${BRASS}" stroke-width="2"/>` +
-            [CLARET, ULTRA, BRASS]
-              .map((c, i) => `<rect x="${100 + i * 26}" y="1" width="20" height="20" fill="${c}"/>`)
-              .join(''),
-        ),
+        ...textPoints('text', WIDTH - 78).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1110,10 +1122,7 @@ function layouts(): Layout[] {
           w: studioWindow.w,
           h: studioWindow.h,
         }),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 78, 316 + i * 192, 840, 52), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 78, 372 + i * 192, 840, 116), 'body'),
-        ]),
+        ...textPoints('text_image', 840).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1125,16 +1134,7 @@ function layouts(): Layout[] {
           wire(studioFrame.w, studioFrame.y - 54 + 2, studioFrame.w / 2 - 26),
         ),
         framed('d_taarucha_text_image_frame', studioFrame, studioLook),
-        ...[0, 1, 2].map((i) =>
-          figureTag(`d_taarucha_text_image_tag${i + 1}`, at(START, 322 + i * 192, 46, 46), i + 1),
-        ),
-        ...[0, 1].map((i) =>
-          rect(
-            `d_taarucha_text_image_rule${i + 1}`,
-            at(START + 78, 494 + i * 192, 840, 1.5),
-            solid(token('text', 0.12)),
-          ),
-        ),
+        ...textPoints('text_image', 840).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1153,7 +1153,11 @@ function layouts(): Layout[] {
       decorations: [
         rail('d_taarucha_full_image_rail', 724),
         tag('d_taarucha_full_image_tag', at(START, 800, 14, 14)),
-        rect('d_taarucha_full_image_rule', at(START + 876, 790, 1.5, 186), solid(token('text', 0.18))),
+        rect(
+          'd_taarucha_full_image_rule',
+          at(START + 876, 790, 1.5, 186),
+          solid(token('text', 0.18)),
+        ),
         art('d_taarucha_full_image_plan', atEnd(END, 790, 196, 186), youAreHere(196, 186)),
       ],
     },
@@ -1255,17 +1259,30 @@ function layouts(): Layout[] {
           place(`p_step${i + 1}`, 'subtitle', at(s + 14, 576, WIDTH / 5 - 28, 52), 'heading', {
             align: 'center',
           }),
-          place(`p_step${i + 1}_caption`, 'caption', at(s + 14, 632, WIDTH / 5 - 28, 104), 'caption', {
-            align: 'center',
-          }),
+          place(
+            `p_step${i + 1}_caption`,
+            'caption',
+            at(s + 14, 632, WIDTH / 5 - 28, 104),
+            'caption',
+            {
+              align: 'center',
+            },
+          ),
         ]),
-        place('p_note', 'body', at(START + 124, 770, WIDTH - 172, 96), 'body', { vAlign: 'middle' }),
+        place('p_note', 'body', at(START + 124, 770, WIDTH - 172, 96), 'body', {
+          vAlign: 'middle',
+        }),
         ...foot('process').placeholders,
       ],
       decorations: [
         ...head('process', 1100).decorations,
         rail('d_taarucha_process_rail'),
-        hung(art('d_taarucha_process_plan', at(START, 302, WIDTH, 240), floorPlan(WIDTH, 240, 168)), 8, 20, 0.12),
+        hung(
+          art('d_taarucha_process_plan', at(START, 302, WIDTH, 240), floorPlan(WIDTH, 240, 168)),
+          8,
+          20,
+          0.12,
+        ),
         card('d_taarucha_process_legend', at(START, 756, WIDTH, 124)),
         art(
           'd_taarucha_process_key',
@@ -1288,10 +1305,21 @@ function layouts(): Layout[] {
             ['after', atEnd(END, 300, 788, 530)],
           ] as const
         ).flatMap(([side, f]) => [
-          place(`p_${side}_label`, 'caption', { x: f.x + 40, y: f.y + 300, w: 708, h: 34 }, 'caption', {
-            color: side === 'after' ? token('primary') : token('muted'),
-          }),
-          place(`p_${side}_title`, 'subtitle', { x: f.x + 40, y: f.y + 338, w: 708, h: 52 }, 'heading'),
+          place(
+            `p_${side}_label`,
+            'caption',
+            { x: f.x + 40, y: f.y + 300, w: 708, h: 34 },
+            'caption',
+            {
+              color: side === 'after' ? token('primary') : token('muted'),
+            },
+          ),
+          place(
+            `p_${side}_title`,
+            'subtitle',
+            { x: f.x + 40, y: f.y + 338, w: 708, h: 52 },
+            'heading',
+          ),
           place(`p_${side}_body`, 'body', { x: f.x + 40, y: f.y + 396, w: 708, h: 106 }, 'body'),
         ]),
         ...foot('comparison').placeholders,
@@ -1384,7 +1412,11 @@ function layouts(): Layout[] {
         rail('d_taarucha_team_rail'),
         ...team4.flatMap((s, i) => [
           pool(`d_taarucha_team_light${i + 1}`, at(s - 10, 286, 400, 360), 0.7),
-          framed(`d_taarucha_team_frame${i + 1}`, at(s + 30, 316, portrait.w, portrait.h), portraitLook),
+          framed(
+            `d_taarucha_team_frame${i + 1}`,
+            at(s + 30, 316, portrait.w, portrait.h),
+            portraitLook,
+          ),
           art(`d_taarucha_team_lamp${i + 1}`, at(s + 110, 268, 160, 60), pictureLight(160)),
           rect(`d_taarucha_team_rule${i + 1}`, at(s + 30, 700, 48, 3), solid(token('accent'))),
         ]),
@@ -1428,7 +1460,11 @@ function layouts(): Layout[] {
         art('d_taarucha_closing_bench', atEnd(190, 886, 520, 86), bench(520, 86)),
         tag('d_taarucha_closing_tag', at(START, 258, 14, 14), true),
         ...[0, 1, 2].map((i) =>
-          art(`d_taarucha_closing_icon${i + 1}`, at(START, 582 + i * 80, 34, 34), CLOSING_ICONS[i]!),
+          art(
+            `d_taarucha_closing_icon${i + 1}`,
+            at(START, 582 + i * 80, 34, 34),
+            CLOSING_ICONS[i]!,
+          ),
         ),
         tag('d_taarucha_closing_meta_tag', at(START, 860, 14, 14), true),
         mark('d_taarucha_closing_mark', at(START, 108, 48, 48)),
@@ -1534,15 +1570,8 @@ function drawSample(copy: TaaruchaCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 44 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 30 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },
@@ -1688,7 +1717,10 @@ function drawSample(copy: TaaruchaCopy): SampleSlide[] {
       layout: 'l_taarucha_team',
       name: copy.team.name,
       content: {
-        caption: [text(copy.team.kicker), ...copy.team.people.map(([department]) => text(department))],
+        caption: [
+          text(copy.team.kicker),
+          ...copy.team.people.map(([department]) => text(department)),
+        ],
         title: lines(copy.team.title),
         image: pictures.team.map((p) => ({ assetId: p.id })),
         subtitle: copy.team.people.map(([, name]) => text(name)),

@@ -19,13 +19,10 @@ export const it: HadranCopy = {
     name: 'Scaletta',
     kicker: 'Lancio della stagione',
     title: 'La scaletta di stasera',
-    intro:
-      'Quaranta minuti sulla stagione che arriva: cosa ci ha insegnato l’ultima, i dodici dischi che pubblicheremo, le diciotto città del tour e la nostra scuola. Poi apre il bar e suona la band.',
     items: [
-      ['La stagione scorsa: ', 'trentuno concerti, nove dischi, quasi tutti i posti venduti.'],
-      ['Come registriamo: ', 'una stanza, una sola ripresa, un registratore a nastro del 1974.'],
-      ['La stagione 2027: ', 'dodici album e un tour in diciotto città.'],
-      ['La scuola: ', 'sessantaquattro ragazzi imparano a suonare e a registrare.'],
+      ['La stagione scorsa', 'Trentuno concerti, nove dischi, quasi tutti i posti venduti.'],
+      ['Come registriamo', 'Una stanza, una sola ripresa, un registratore a nastro del 1974.'],
+      ['La stagione 2027', 'Dodici album e un tour in diciotto città.'],
     ],
   },
   season: {
@@ -48,18 +45,9 @@ export const it: HadranCopy = {
     kicker: 'Come registriamo',
     title: 'Una stanza, una ripresa',
     items: [
-      [
-        'La band suona insieme',
-        'Niente sovraincisioni né click: i brani suonano come dal vivo.',
-      ],
-      [
-        'Dritto su nastro',
-        'Un registratore a bobine del 1974 dà calore a ogni disco.',
-      ],
-      [
-        'Una settimana per album',
-        'Cinque giorni di riprese e due di mix: decide la stanza.',
-      ],
+      ['La band suona insieme', 'Niente sovraincisioni né click: i brani suonano come dal vivo.'],
+      ['Dritto su nastro', 'Un registratore a bobine del 1974 dà calore a ogni disco.'],
+      ['Una settimana per album', 'Cinque giorni di riprese e due di mix: decide la stanza.'],
     ],
   },
   depot: {

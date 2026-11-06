@@ -19,13 +19,10 @@ export const en: TeferCopy = {
     name: 'Agenda',
     kicker: 'Buyers’ presentation',
     title: 'On the table this morning',
-    intro:
-      'Forty minutes on a collection of twenty-four coats: where its cloth came from, how we cut it so that almost nothing is left on the floor, and how to order it for the autumn. Then the coats themselves, on the rail.',
     items: [
-      ['The cloth: ', '1,840 metres from three mills, and why 86% of it was surplus.'],
-      ['The cut: ', 'patterns that leave 3% of the cloth on the floor, not 15%.'],
-      ['The atelier: ', 'thirty-one hours of handwork in every coat, in Porto.'],
-      ['Orders: ', 'how to order for September, and what we still make to measure.'],
+      ['The cloth', '1,840 metres from three mills, and why 86% of it was surplus.'],
+      ['The cut', 'Patterns that leave 3% of the cloth on the floor, not 15%.'],
+      ['The atelier', 'Thirty-one hours of handwork in every coat, in Porto.'],
     ],
   },
   cloth: {

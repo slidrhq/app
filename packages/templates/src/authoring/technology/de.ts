@@ -12,15 +12,10 @@ export const de: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Darüber sprechen wir heute',
-      lead: [
-        'Warum eine Region für unseren Zahlungskern nicht mehr reichte.',
-        'Wie der Wechsel in drei aktive Regionen ohne Ausfall gelang.',
-      ],
       points: [
-        ['Der Anlass: ', 'Ein einziger Ausfall stoppte alle Zahlungen.'],
-        ['Die Architektur: ', 'Jede der drei Regionen trägt die gesamte Last.'],
-        ['Der Wechsel: ', 'Vier Schritte im Dezember, jederzeit umkehrbar.'],
-        ['Das Ergebnis: ', 'Verfügbarkeit, Antwortzeit und Kosten im Vergleich.'],
+        ['Der Anlass', 'Ein einziger Ausfall stoppte alle Zahlungen.'],
+        ['Die Architektur', 'Jede der drei Regionen trägt die gesamte Last.'],
+        ['Der Wechsel', 'Vier Schritte im Dezember, jederzeit umkehrbar.'],
       ],
     },
     figures: {
@@ -121,15 +116,10 @@ export const de: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Die Fragen dieser Prüfung',
-      lead: [
-        'Vier messbare Antworten entscheiden über die DVT im April.',
-        'Für jede Frage übernimmt ein Mitglied des Teams die Verantwortung.',
-      ],
       points: [
-        ['Energie: ', 'Reicht eine Zelle auch im kalten Winter zehn Jahre?'],
-        ['Kosten: ', 'Was kostet eine Platine bei 10.000 Stück?'],
-        ['Feldtest: ', 'Was zeigen die 60 Zähler seit Januar?'],
-        ['Fertigung: ', 'Was fehlt noch vor der ersten Bestellung?'],
+        ['Energie', 'Reicht eine Zelle auch im kalten Winter zehn Jahre?'],
+        ['Kosten', 'Was kostet eine Platine bei 10.000 Stück?'],
+        ['Feldtest', 'Was zeigen die 60 Zähler seit Januar?'],
       ],
     },
     figures: {
@@ -230,15 +220,10 @@ export const de: TechnologyCopies = {
     agenda: {
       kicker: 'Der Ablauf',
       title: 'Das Programm heute Abend',
-      lead: [
-        'In 30 Minuten: Was Zrima 2.0 neu kann und warum wir es gebaut haben.',
-        'Danach live: von der leeren Seite zum selbstständigen Arbeitsablauf.',
-      ],
       points: [
-        ['Der Editor: ', 'Ein Ablauf auf einer Fläche, von KI entworfen.'],
-        ['Die Beta: ', 'Was 4.200 Teams gebaut und sich gewünscht haben.'],
-        ['Die Tarife: ', 'Drei Angebote, vom Gratiseinstieg bis Business.'],
-        ['Der Fahrplan: ', 'Mobile Freigaben im Februar, geteilte Abläufe 2027.'],
+        ['Der Editor', 'Ein Ablauf auf einer Fläche, von KI entworfen.'],
+        ['Die Beta', 'Was 4.200 Teams gebaut und sich gewünscht haben.'],
+        ['Die Tarife', 'Drei Angebote, vom Gratiseinstieg bis Business.'],
       ],
     },
     figures: {

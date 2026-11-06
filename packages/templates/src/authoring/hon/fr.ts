@@ -13,13 +13,13 @@ export const fr: HonCopy = {
     name: 'Ordre du jour',
     kicker: 'Assemblée générale annuelle',
     title: 'Ce soir, à l’ordre du jour',
-    intro:
-      'Quarante minutes sur l’année 2026 de la banque qui vous appartient\u00a0: ce que nous avons prêté, ce que nous avons gardé en capital et ce qui vous est revenu, à vous, sociétaires. Puis les votes, et vos questions.',
     items: [
-      ['L’année en chiffres\u00a0: ', 'les crédits, le capital et ce qui est revenu aux sociétaires.'],
-      ['Logements verts\u00a0: ', 'les prêts à la rénovation, qui ont le plus progressé cette année.'],
-      ['Votre épargne au travail\u00a0: ', 'comment un dépôt devient le prêt d’un voisin, en cinq étapes.'],
-      ['Les votes\u00a0: ', 'le conseil, les commissaires aux comptes et le dividende des sociétaires.'],
+      ['L’année en chiffresu00a0', 'Les crédits, le capital et ce qui est revenu aux sociétaires.'],
+      ['Logements vertsu00a0', 'Les prêts à la rénovation, qui ont le plus progressé cette année.'],
+      [
+        'Votre épargne au travailu00a0',
+        'Comment un dépôt devient le prêt d’un voisin, en cinq étapes.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const fr: HonCopy = {
     source: 'Encours en fin d’année, en milliards d’euros, 2023–2026.',
     series: ['Épargne des sociétaires', 'Prêts aux sociétaires'],
     figures: [
-      ['81\u00a0%', 'de l’épargne des sociétaires leur est prêtée\u00a0; le reste forme une marge de sécurité.'],
+      [
+        '81\u00a0%',
+        'de l’épargne des sociétaires leur est prêtée\u00a0; le reste forme une marge de sécurité.',
+      ],
       ['+21\u00a0%', 'd’épargne depuis 2023, sans un euro emprunté sur les marchés.'],
     ],
   },
@@ -155,8 +158,16 @@ export const fr: HonCopy = {
     kicker: 'Quatre-vingt-seize ans',
     title: 'Bâtie un sociétaire à la fois',
     stops: [
-      ['1931', 'Fondée par des dockers', 'Deux cents familles mettent leurs salaires en commun pour se prêter entre elles.'],
-      ['1974', 'Les premiers prêts immobiliers', 'Les sociétaires achètent les maisons qu’ils louaient depuis des décennies.'],
+      [
+        '1931',
+        'Fondée par des dockers',
+        'Deux cents familles mettent leurs salaires en commun pour se prêter entre elles.',
+      ],
+      [
+        '1974',
+        'Les premiers prêts immobiliers',
+        'Les sociétaires achètent les maisons qu’ils louaient depuis des décennies.',
+      ],
       ['2009', 'Aucun sauvetage', 'La crise financière traversée sans un centime d’argent public.'],
       ['2026', '412\u00a0000 sociétaires', 'La plus forte croissance depuis vingt ans.'],
     ],

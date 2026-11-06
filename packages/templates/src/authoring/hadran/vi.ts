@@ -19,13 +19,10 @@ export const vi: HadranCopy = {
     name: 'Danh sách bài',
     kicker: 'Ra mắt mùa diễn',
     title: 'Danh sách bài tối nay',
-    intro:
-      'Bốn mươi phút về mùa diễn sắp tới: những gì mùa trước dạy chúng tôi, mười hai đĩa nhạc sẽ phát hành, mười tám thành phố của tour và trường nhạc của chúng tôi. Sau đó quầy bar mở cửa và ban nhạc lên sân khấu.',
     items: [
-      ['Mùa diễn vừa qua: ', 'ba mươi mốt buổi diễn, chín đĩa nhạc, gần như kín chỗ.'],
-      ['Cách chúng tôi thu âm: ', 'một phòng, một lần thu, một máy băng cối từ năm 1974.'],
-      ['Mùa diễn 2027: ', 'mười hai album và một tour qua mười tám thành phố.'],
-      ['Trường nhạc: ', 'sáu mươi bốn thiếu niên học chơi nhạc và thu âm.'],
+      ['Mùa diễn vừa qua', 'Ba mươi mốt buổi diễn, chín đĩa nhạc, gần như kín chỗ.'],
+      ['Cách chúng tôi thu âm', 'Một phòng, một lần thu, một máy băng cối từ năm 1974.'],
+      ['Mùa diễn 2027', 'Mười hai album và một tour qua mười tám thành phố.'],
     ],
   },
   season: {
@@ -52,14 +49,8 @@ export const vi: HadranCopy = {
         'Cả ban nhạc chơi cùng lúc',
         'Không thu chồng, không máy đếm nhịp: bài hát vang lên như trên sân khấu.',
       ],
-      [
-        'Thu thẳng vào băng',
-        'Máy băng cối từ năm 1974 cho mỗi đĩa nhạc một âm thanh ấm áp.',
-      ],
-      [
-        'Mỗi album một tuần',
-        'Năm ngày thu, hai ngày phối: căn phòng quyết định.',
-      ],
+      ['Thu thẳng vào băng', 'Máy băng cối từ năm 1974 cho mỗi đĩa nhạc một âm thanh ấm áp.'],
+      ['Mỗi album một tuần', 'Năm ngày thu, hai ngày phối: căn phòng quyết định.'],
     ],
   },
   depot: {
@@ -103,7 +94,11 @@ export const vi: HadranCopy = {
     title: 'Mùa diễn, từ tháng Ba đến tháng Mười',
     stops: [
       ['Tháng Ba', 'Đĩa nhạc đầu tiên', 'Album của Maré Alta, thu trong một đêm.'],
-      ['Tháng Năm', 'Trường nhạc riêng', 'Bốn phòng tập mở cửa cho sáu\u00a0mươi\u00a0bốn học viên.'],
+      [
+        'Tháng Năm',
+        'Trường nhạc riêng',
+        'Bốn phòng tập mở cửa cho sáu\u00a0mươi\u00a0bốn học viên.',
+      ],
       ['Tháng Bảy', 'Đêm ở Xưởng', 'Ba đêm diễn ngoài trời trong sân xưởng.'],
       ['Tháng Mười', 'Lên đường', 'Tour mở màn tại Lisbon và đi qua mười tám thành phố.'],
     ],

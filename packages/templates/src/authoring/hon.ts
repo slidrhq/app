@@ -18,7 +18,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -227,7 +226,10 @@ function turned(d: string, style: string, cx: number, cy: number, angles: number
   return (
     `<path id="${id}" d="${d}" ${style}/>` +
     angles
-      .map((a) => `<use href="#${id}" transform="rotate(${Math.round(a * 1000) / 1000} ${cx} ${cy})"/>`)
+      .map(
+        (a) =>
+          `<use href="#${id}" transform="rotate(${Math.round(a * 1000) / 1000} ${cx} ${cy})"/>`,
+      )
       .join('')
   );
 }
@@ -259,7 +261,10 @@ function braidRing(
   perLobe = 7,
 ): string {
   const d = polar(cx, cy, (a) => r + amp * Math.sin(lobes * a), lobes * perLobe);
-  const angles = Array.from({ length: strands - 1 }, (_, k) => (-360 * (k + 1)) / (strands * lobes));
+  const angles = Array.from(
+    { length: strands - 1 },
+    (_, k) => (-360 * (k + 1)) / (strands * lobes),
+  );
   return turned(d, style, r1(cx), r1(cy), angles);
 }
 
@@ -321,7 +326,15 @@ function braidV(x: number, y: number, length: number, amp: number, period: numbe
 }
 
 /** A band of braided waves, `w` by `h`, cut at its ends. */
-function band(x: number, y: number, w: number, h: number, colour: string, opacity = 0.8, strands = 3) {
+function band(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  colour: string,
+  opacity = 0.8,
+  strands = 3,
+) {
   const vertical = h > w;
   const amp = (vertical ? w : h) * 0.3;
   const period = (vertical ? w : h) * 2.4;
@@ -377,7 +390,16 @@ function rosetteSmall(cx: number, cy: number, r: number, outer = CLARET, inner =
   const w = r1(Math.max(0.8, r / 36));
   return (
     `<circle cx="${cx}" cy="${cy}" r="${r1(r)}" ${stroke(outer, r1(w * 1.4))}/>` +
-    braidRing(cx, cy, r * 0.74, r * 0.12, Math.max(8, Math.round(r / 2.6)), 3, stroke(outer, w, 0.85), 8) +
+    braidRing(
+      cx,
+      cy,
+      r * 0.74,
+      r * 0.12,
+      Math.max(8, Math.round(r / 2.6)),
+      3,
+      stroke(outer, w, 0.85),
+      8,
+    ) +
     petals(cx, cy, r * 0.12, r * 0.5, 8, 2, stroke(inner, w)) +
     `<circle cx="${cx}" cy="${cy}" r="${r1(r * 0.1)}" fill="${inner}"/>`
   );
@@ -603,7 +625,10 @@ function foot(name: string, withFooter = true) {
 const card = (id: string, frame: Frame) =>
   rect(id, frame, solid(token('surface')), {
     stroke: { color: token('primary', 0.22), width: 1.2 },
-    effects: { radius: 4, shadow: { x: 0, y: 14, blur: 36, color: { value: '#3b1626', alpha: 0.1 } } },
+    effects: {
+      radius: 4,
+      shadow: { x: 0, y: 14, blur: 36, color: { value: '#3b1626', alpha: 0.1 } },
+    },
   });
 
 /** The braided band along the head of a card or a panel, `w` wide. */
@@ -707,6 +732,31 @@ const COINS = [132, 154, 176, 198, 220];
 const COIN_BASE = 560;
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 312 + i * 186, width, 48), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 88, 364 + i * 186, width, 122), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_hon_${name}_thread`,
+          at(START + 26, 337, 16, 372),
+          `<path d="M8 4V368" ${stroke(CLARET, 2.2, 0.6)} stroke-dasharray="0 8" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          coinBadge(`d_hon_${name}_coin${i + 1}`, at(START, 303 + i * 186, 68, 68), i + 1),
+        ),
+      ],
+    };
+  }
+
   // The opening's medallion: a rosette at the end of the slide, its serial number over it.
   const heroArt = atEnd(34, 130, 860, 860);
 
@@ -745,11 +795,7 @@ function layouts(): Layout[] {
           `<circle cx="430" cy="430" r="428" fill="${WHITE}" fill-opacity=".55"/>` +
             rosette(430, 430, 424, { reverse: true }),
         ),
-        upright(
-          'd_hon_hero_serial',
-          atEnd(56, 64, 420, 52),
-          serial('0412 1931 2026', 24, 40),
-        ),
+        upright('d_hon_hero_serial', atEnd(56, 64, 420, 52), serial('0412 1931 2026', 24, 40)),
         lozenge('d_hon_hero_lozenge', at(START, 297, 22, 22)),
         doubleRule('d_hon_hero_rule', at(START, 726, 860, 14)),
         art(
@@ -925,30 +971,16 @@ function layouts(): Layout[] {
       id: 'l_hon_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a ledger sheet from margin to margin, down to over the foot, from its
-      // top; a small seal is pressed on the sheet's corner, beside the title. The kicker over
-      // the title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 280, 1).placeholders,
-        // The body's start on the footer's, by the same edge.
-        place('p_body', 'body', at(START + 62, 300, WIDTH - 102, 580), 'body'),
+        ...textPoints('text', WIDTH - 88).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 280, 1).decorations,
-        card('d_hon_text_sheet', at(START, 242, WIDTH, 686)),
-        headBand('d_hon_text_band', at(START, 242, WIDTH, 22)),
-        ledgerRule('d_hon_text_ledger', at(START + 24, 264, 8, 664)),
-        lifted(
-          art(
-            'd_hon_text_seal',
-            atEnd(END + 40, 160, 124, 124),
-            `<circle cx="62" cy="62" r="61" fill="${WHITE}"/>` + rosetteSmall(62, 62, 58),
-          ),
-          6,
-          14,
-          0.16,
-        ),
+        ...textPoints('text', WIDTH - 88).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -959,23 +991,17 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 960).placeholders,
         place('p_image', 'image', atEnd(END + 26, 154, 592, 732)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 312 + i * 186, 860, 48), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 88, 364 + i * 186, 860, 122), 'body'),
-        ]),
+        ...textPoints('text_image', 860).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
         ...head('text_image', 960).decorations,
-        art('d_hon_text_image_frame', atEnd(END, 128, 644, 784), braidedFrame(644, 784, 26, COPPER, 16)),
         art(
-          'd_hon_text_image_thread',
-          at(START + 26, 337, 16, 372),
-          `<path d="M8 4V368" ${stroke(CLARET, 2.2, 0.6)} stroke-dasharray="0 8" stroke-linecap="round"/>`,
+          'd_hon_text_image_frame',
+          atEnd(END, 128, 644, 784),
+          braidedFrame(644, 784, 26, COPPER, 16),
         ),
-        ...[0, 1, 2].map((i) =>
-          coinBadge(`d_hon_text_image_coin${i + 1}`, at(START, 303 + i * 186, 68, 68), i + 1),
-        ),
+        ...textPoints('text_image', 860).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1050,7 +1076,13 @@ function layouts(): Layout[] {
                   `<path d="${braidH(-20, (f.h - 10) / 2, f.w + 40, 26, 92, 6)}" ${stroke(colour, 1, 0.45)}/>`,
                 ) +
                 `<circle cx="${f.w - 92}" cy="${r1(f.h / 2 + 5)}" r="64" fill="${WHITE}"/>` +
-                rosetteSmall(f.w - 92, r1(f.h / 2 + 5), 60, colour, colour === COPPER ? CLARET : COPPER) +
+                rosetteSmall(
+                  f.w - 92,
+                  r1(f.h / 2 + 5),
+                  60,
+                  colour,
+                  colour === COPPER ? CLARET : COPPER,
+                ) +
                 `<path d="M34 ${f.h - 34}H${f.w - 190}" ${stroke(colour, 1, 0.5)}/>`,
             ),
           ];
@@ -1098,7 +1130,10 @@ function layouts(): Layout[] {
             };
             return (
               [60, 110, 160]
-                .map((y) => `<path d="M24 ${y}H${cw - 24}" ${stroke(INK, 1, 0.14)} stroke-dasharray="2 6"/>`)
+                .map(
+                  (y) =>
+                    `<path d="M24 ${y}H${cw - 24}" ${stroke(INK, 1, 0.14)} stroke-dasharray="2 6"/>`,
+                )
                 .join('') +
               `<path d="${along(0)}L24 ${base}H${cw - 24}Z" fill="${CLARET}" fill-opacity=".06"/>` +
               `<path d="${hatch}" ${stroke(CLARET, 1.1, 0.42)}/>` +
@@ -1138,13 +1173,17 @@ function layouts(): Layout[] {
               vAlign: 'middle',
               color: i === 4 ? token('secondary') : token('primary'),
             }),
-            place(`p_step${i + 1}`, 'subtitle', at(s, 584, 300, 50), 'heading', { align: 'center' }),
+            place(`p_step${i + 1}`, 'subtitle', at(s, 584, 300, 50), 'heading', {
+              align: 'center',
+            }),
             place(`p_step${i + 1}_caption`, 'caption', at(s, 638, 300, 100), 'caption', {
               align: 'center',
             }),
           ];
         }),
-        place('p_note', 'body', at(START + 118, 778, WIDTH - 158, 92), 'body', { vAlign: 'middle' }),
+        place('p_note', 'body', at(START + 118, 778, WIDTH - 158, 92), 'body', {
+          vAlign: 'middle',
+        }),
         ...foot('process').placeholders,
       ],
       decorations: [
@@ -1181,8 +1220,7 @@ function layouts(): Layout[] {
               (j) =>
                 `<ellipse cx="31" cy="${70 - j * 14}" rx="28" ry="10" fill="${COPPER}" ${stroke(WHITE, 1.4, 0.8)}/>`,
             )
-            .join('') +
-            `<ellipse cx="31" cy="28" rx="20" ry="6" ${stroke(WHITE, 1.2, 0.6)}/>`,
+            .join('') + `<ellipse cx="31" cy="28" rx="20" ry="6" ${stroke(WHITE, 1.2, 0.6)}/>`,
         ),
         ...foot('process').decorations,
       ],
@@ -1300,7 +1338,8 @@ function layouts(): Layout[] {
           art(
             'd_hon_table_seal',
             atEnd(END + 36, 764, 96, 96),
-            `<circle cx="48" cy="48" r="47" fill="${WHITE}"/>` + rosetteSmall(48, 48, 44, GREEN, COPPER),
+            `<circle cx="48" cy="48" r="47" fill="${WHITE}"/>` +
+              rosetteSmall(48, 48, 44, GREEN, COPPER),
           ),
           4,
           10,
@@ -1329,7 +1368,11 @@ function layouts(): Layout[] {
       decorations: [
         ...head('team', 1100).decorations,
         ...team4.map((s, i) =>
-          art(`d_hon_team_frame${i + 1}`, at(s, 266, 372, 372), braidedFrame(372, 372, 22, COPPER, 13)),
+          art(
+            `d_hon_team_frame${i + 1}`,
+            at(s, 266, 372, 372),
+            braidedFrame(372, 372, 22, COPPER, 13),
+          ),
         ),
         ...foot('team').decorations,
       ],
@@ -1450,15 +1493,8 @@ function drawSample(copy: HonCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 36 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

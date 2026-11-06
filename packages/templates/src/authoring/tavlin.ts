@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -501,7 +500,15 @@ const pinch = (id: string, frame: Frame) =>
  * A burlap sack with its rim rolled down, filled to a cone of spice: the merchant's display.
  * `heapH` is how far the cone rises over the rim.
  */
-function sack(id: string, w: number, h: number, colour: string, heapH: number, seed: number, pods = false) {
+function sack(
+  id: string,
+  w: number,
+  h: number,
+  colour: string,
+  heapH: number,
+  seed: number,
+  pods = false,
+) {
   const cx = w / 2;
   const rx = w * 0.34;
   const ry = rx * 0.28;
@@ -584,7 +591,13 @@ function scoop(w: number, h: number) {
     `</g>` +
     // Where the bowl goes into the heap, the spice falls back over it.
     `<path d="M${r1(w * 0.74 - 40)} ${r1(h * 0.76 + 18)}C${r1(w * 0.74 - 30)} ${r1(h * 0.76 - 8)} ${r1(w * 0.74 - 6)} ${r1(h * 0.76 - 22)} ${r1(w * 0.74 + 10)} ${r1(h * 0.76 - 14)}C${r1(w * 0.74 + 26)} ${r1(h * 0.76 - 4)} ${r1(w * 0.74 + 34)} ${r1(h * 0.76 + 10)} ${r1(w * 0.74 + 40)} ${r1(h * 0.76 + 24)}Z" fill="${PAPRIKA}"/>` +
-    grains(random(17), 24, { x: w * 0.74 - 36, y: h * 0.76 - 16, w: 72, h: 38 }, (x, y) => y > h * 0.76 - 8 + Math.abs(x - w * 0.74) * 0.3, [1, 2])
+    grains(
+      random(17),
+      24,
+      { x: w * 0.74 - 36, y: h * 0.76 - 16, w: 72, h: 38 },
+      (x, y) => y > h * 0.76 - 8 + Math.abs(x - w * 0.74) * 0.3,
+      [1, 2],
+    )
   );
 }
 
@@ -658,10 +671,17 @@ function layeredJar(id: string, w: number, h: number) {
     // The cork, pressed into the neck.
     `<path d="M${r1(neckL - 10)} ${top - 96}H${r1(neckR + 10)}L${r1(neckR - 2)} ${top + 18}H${r1(neckL + 2)}Z" fill="url(#${id}-cork)"/>` +
     `<ellipse cx="${r1(w / 2)}" cy="${top - 96}" rx="${r1((neckR - neckL) / 2 + 10)}" ry="12" fill="#dcbd8f" stroke="#9c7448" stroke-width="1.2"/>` +
-    grains(random(9), 40, { x: neckL, y: top - 90, w: neckR - neckL, h: 100 }, () => true, [1, 2], [
-      [CINNAMON_DARK, 0.35],
-      [WHITE, 0.3],
-    ]) +
+    grains(
+      random(9),
+      40,
+      { x: neckL, y: top - 90, w: neckR - neckL, h: 100 },
+      () => true,
+      [1, 2],
+      [
+        [CINNAMON_DARK, 0.35],
+        [WHITE, 0.3],
+      ],
+    ) +
     `<path d="M${r1(neckL - 6)} ${top + 16}H${r1(neckR + 6)}" stroke="${CLOVE}" stroke-opacity=".3" stroke-width="2"/>` +
     // A twine tied round the neck.
     `<path d="M${r1(neckL - 4)} ${top + 30}Q${r1(w / 2)} ${top + 44} ${r1(neckR + 4)} ${top + 30}" stroke="${TWINE}" stroke-width="5" stroke-linecap="round"/>` +
@@ -870,8 +890,7 @@ function measuringSpoon(id: string, w: number, h: number, r: number, step: numbe
   const cx = w / 2;
   const cy = h - r - 10;
   const rand = random(40 + step);
-  const handle =
-    `M${cx - 11} ${r1(cy - r + 8)}L${cx - 14} 34Q${cx - 15} 6 ${cx} 6Q${cx + 15} 6 ${cx + 14} 34L${cx + 11} ${r1(cy - r + 8)}Z`;
+  const handle = `M${cx - 11} ${r1(cy - r + 8)}L${cx - 14} 34Q${cx - 15} 6 ${cx} 6Q${cx + 15} 6 ${cx + 14} 34L${cx + 11} ${r1(cy - r + 8)}Z`;
   const inner = r - 7;
   const insideBowl = (x: number, y: number) => (x - cx) ** 2 + (y - cy) ** 2 < (inner - 4) ** 2;
   const box = { x: cx - inner, y: cy - inner, w: inner * 2, h: inner * 2 };
@@ -895,10 +914,17 @@ function measuringSpoon(id: string, w: number, h: number, r: number, step: numbe
       `<circle cx="${cx}" cy="${r1(cy)}" r="${inner - 2}" fill="${colour}"/>` +
       grains(rand, Math.round(inner * 2.2), box, insideBowl, [1, 2.2]) +
       (step === 3
-        ? grains(rand, 14, box, insideBowl, [1.6, 2.6], [
-            [TURMERIC, 0.9],
-            [WHITE, 0.4],
-          ])
+        ? grains(
+            rand,
+            14,
+            box,
+            insideBowl,
+            [1.6, 2.6],
+            [
+              [TURMERIC, 0.9],
+              [WHITE, 0.4],
+            ],
+          )
         : '') +
       (step === 4
         ? // Beads of olive oil on the blend, each catching the light, and a leaf of thyme.
@@ -946,7 +972,13 @@ function grainTrail(w: number, h: number, centres: number[]) {
       const y = h / 2 + Math.sin(t * Math.PI) * -10 + (rand() - 0.5) * 9;
       const r = 1.4 + rand() * 1.8;
       // The specks of the trail at two strengths: deep and faint.
-      dots.add(x, y, r, [CINNAMON, PAPRIKA, SEED][k % 3]!, 0.55 + rand() * 0.4 < 0.75 ? 0.65 : 0.85);
+      dots.add(
+        x,
+        y,
+        r,
+        [CINNAMON, PAPRIKA, SEED][k % 3]!,
+        0.55 + rand() * 0.4 < 0.75 ? 0.65 : 0.85,
+      );
     }
   }
   return dots.markup();
@@ -1092,11 +1124,18 @@ function mortarFront(id: string, w: number, h: number) {
     floorShadow(`${id}-floor`, cx + 20, foot + 4, rx * 0.95, 20, 0.3) +
     `<path d="${bowl}" fill="${STONE}"/>` +
     `<g clip-path="url(#${id}-clip)">` +
-    grains(rand, 520, { x: cx - rx, y: rim, w: rx * 2, h: foot - rim }, () => true, [0.8, 2], [
-      [WHITE, 0.3],
-      [BLACK, 0.25],
-      [STONE_DARK, 0.6],
-    ]) +
+    grains(
+      rand,
+      520,
+      { x: cx - rx, y: rim, w: rx * 2, h: foot - rim },
+      () => true,
+      [0.8, 2],
+      [
+        [WHITE, 0.3],
+        [BLACK, 0.25],
+        [STONE_DARK, 0.6],
+      ],
+    ) +
     `<rect x="0" y="0" width="${w}" height="${h}" fill="url(#${id}-light)"/></g>` +
     `<path d="M${cx - rx} ${rim}A${rx} ${ry} 0 0 0 ${cx + rx} ${rim}" stroke="${WHITE}" stroke-opacity=".4" stroke-width="3"/>` +
     `<path d="M${cx - rx * 0.46} ${foot - 30}H${cx + rx * 0.44}" stroke="${BLACK}" stroke-opacity=".2" stroke-width="2"/>`
@@ -1110,11 +1149,28 @@ function pestle(id: string, w: number, h: number) {
     `<g transform="rotate(24 ${w / 2} ${h / 2})">` +
     `<path d="M${w / 2 - 20} 10Q${w / 2} 0 ${w / 2 + 20} 10L${w / 2 + 40} ${h - 90}Q${w / 2 + 46} ${h - 10} ${w / 2} ${h - 8}Q${w / 2 - 46} ${h - 10} ${w / 2 - 40} ${h - 90}Z" fill="${STONE}"/>` +
     `<path d="M${w / 2 - 20} 10Q${w / 2} 0 ${w / 2 + 20} 10L${w / 2 + 40} ${h - 90}Q${w / 2 + 46} ${h - 10} ${w / 2} ${h - 8}Q${w / 2 - 46} ${h - 10} ${w / 2 - 40} ${h - 90}Z" fill="url(#${id}-light)"/>` +
-    grains(random(23), 120, { x: w / 2 - 40, y: 10, w: 80, h: h - 20 }, (x, y) => Math.abs(x - w / 2) < 14 + (y / h) * 26, [0.8, 1.8], [
-      [WHITE, 0.3],
-      [BLACK, 0.22],
-    ]) +
-    grains(random(29), 70, { x: w / 2 - 44, y: h - 80, w: 88, h: 70 }, (x, y) => Math.abs(x - w / 2) < 40 && y > h - 78, [1, 2.2], [[PAPRIKA, 0.85], [PAPRIKA, 0.55]]) +
+    grains(
+      random(23),
+      120,
+      { x: w / 2 - 40, y: 10, w: 80, h: h - 20 },
+      (x, y) => Math.abs(x - w / 2) < 14 + (y / h) * 26,
+      [0.8, 1.8],
+      [
+        [WHITE, 0.3],
+        [BLACK, 0.22],
+      ],
+    ) +
+    grains(
+      random(29),
+      70,
+      { x: w / 2 - 44, y: h - 80, w: 88, h: 70 },
+      (x, y) => Math.abs(x - w / 2) < 40 && y > h - 78,
+      [1, 2.2],
+      [
+        [PAPRIKA, 0.85],
+        [PAPRIKA, 0.55],
+      ],
+    ) +
     `</g>`
   );
 }
@@ -1146,7 +1202,15 @@ function mark(id: string, frame: Frame): Element {
   const markup = svg(
     s,
     s,
-    own(id, starAnise(s / 2, s / 2, s / 2 - 1, { pod: PAPRIKA, edge: CLOVE, seed: TURMERIC, width: s / 36 })),
+    own(
+      id,
+      starAnise(s / 2, s / 2, s / 2 - 1, {
+        pod: PAPRIKA,
+        edge: CLOVE,
+        seed: TURMERIC,
+        width: s / 36,
+      }),
+    ),
   );
   return drawing(id, frame, markup, paint(markup), { role: 'logo', name: 'logo' });
 }
@@ -1177,7 +1241,10 @@ function foot(name: string, withFooter = true) {
 const card = (id: string, frame: Frame, radius = 18) =>
   rect(id, frame, solid(token('surface')), {
     stroke: { color: token('text', 0.09), width: 1.5 },
-    effects: { radius, shadow: { x: 0, y: 14, blur: 36, color: { value: '#5a3a14', alpha: 0.12 } } },
+    effects: {
+      radius,
+      shadow: { x: 0, y: 14, blur: 36, color: { value: '#5a3a14', alpha: 0.12 } },
+    },
   });
 
 /** A figure of a list in the cookbook's serif, upright in both directions. */
@@ -1198,12 +1265,20 @@ const CLOSING_ICONS = [
 
 /** The signature spice of each person of the team, drawn small. */
 const SIGNATURES = [
-  (s: number) => podGlyph(s / 2, s / 2, s * 0.4, -30, POD) + podGlyph(s / 2 + 6, s / 2 + 8, s * 0.3, 20, '#a5b770'),
+  (s: number) =>
+    podGlyph(s / 2, s / 2, s * 0.4, -30, POD) +
+    podGlyph(s / 2 + 6, s / 2 + 8, s * 0.3, 20, '#a5b770'),
   // A pinch of ground cumin, as the sacks of the opening hold it.
   (s: number) =>
     `<path d="M${r1(s * 0.06)} ${r1(s * 0.86)}C${r1(s * 0.22)} ${r1(s * 0.84)} ${r1(s * 0.38)} ${r1(s * 0.2)} ${r1(s * 0.5)} ${r1(s * 0.16)}C${r1(s * 0.62)} ${r1(s * 0.2)} ${r1(s * 0.78)} ${r1(s * 0.84)} ${r1(s * 0.94)} ${r1(s * 0.86)}Z" fill="${CUMIN}"/>` +
     `<path d="M${r1(s * 0.5)} ${r1(s * 0.16)}C${r1(s * 0.62)} ${r1(s * 0.2)} ${r1(s * 0.78)} ${r1(s * 0.84)} ${r1(s * 0.94)} ${r1(s * 0.86)}H${r1(s * 0.5)}Z" fill="${BLACK}" fill-opacity=".2"/>` +
-    grains(random(91), 18, { x: s * 0.2, y: s * 0.3, w: s * 0.6, h: s * 0.52 }, (x, y) => y > s * 0.2 + Math.abs(x - s * 0.5) * 1.4, [0.8, 1.6]),
+    grains(
+      random(91),
+      18,
+      { x: s * 0.2, y: s * 0.3, w: s * 0.6, h: s * 0.52 },
+      (x, y) => y > s * 0.2 + Math.abs(x - s * 0.5) * 1.4,
+      [0.8, 1.6],
+    ),
   (s: number) => chili(s * 0.16, s * 0.4, s * 0.78, 18),
   (s: number) => starAnise(s / 2, s / 2, s / 2 - 2),
 ];
@@ -1218,6 +1293,33 @@ const steps5 = [START, START + 341, START + 682, START + 1023, START + 1364];
 const team4 = [START, START + 428, START + 856, START + 1284];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 92, 296 + i * 200, width, 48), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 92, 350 + i * 200, width, 120), 'body'),
+        ]),
+      ],
+      decorations: [
+        ...[0, 1, 2].map((i) =>
+          figure(`d_tavlin_${name}_figure${i + 1}`, at(START, 290 + i * 200, 64, 66), i + 1),
+        ),
+        ...[1, 2].map((i) =>
+          art(
+            `d_tavlin_${name}_seeds${i}`,
+            at(START + 92, 270 + i * 200, width, 14),
+            seedLine(width, MUTED, 26),
+          ),
+        ),
+      ],
+    };
+  }
+
   // The opening's sacks: three behind, two in front, at the end of the slide.
   const sacks: [string, Frame, string, number, number, boolean][] = [
     ['sumac', atEnd(56, 318, 250, 380), SUMAC, 150, 11, false],
@@ -1263,7 +1365,11 @@ function layouts(): Layout[] {
         pinch('d_tavlin_hero_pinch', at(START, 293, 30, 22)),
         art('d_tavlin_hero_seeds', at(START, 764, 520, 14), seedLine(520, PAPRIKA)),
         ...sacks.map(([name, frame, colour, heapH, seed, pods]) =>
-          art(`d_tavlin_hero_${name}`, frame, sack(`d_tavlin_hero_${name}`, frame.w, frame.h, colour, heapH, seed, pods)),
+          art(
+            `d_tavlin_hero_${name}`,
+            frame,
+            sack(`d_tavlin_hero_${name}`, frame.w, frame.h, colour, heapH, seed, pods),
+          ),
         ),
         art('d_tavlin_hero_scoop', atEnd(118, 500, 200, 184), scoop(200, 184)),
         art(
@@ -1298,14 +1404,25 @@ function layouts(): Layout[] {
         place('p_subtitle', 'subtitle', at(START, 680, 820, 130), 'heading'),
       ],
       decorations: [
-        art('d_tavlin_section_jar', atEnd(200, 110, 460, 880), layeredJar('d_tavlin_section_jar', 460, 880)),
-        lifted(art('d_tavlin_section_label', atEnd(270, 494, 320, 202), apothecaryLabel(320, 202)), 6, 14, 0.18),
+        art(
+          'd_tavlin_section_jar',
+          atEnd(200, 110, 460, 880),
+          layeredJar('d_tavlin_section_jar', 460, 880),
+        ),
+        lifted(
+          art('d_tavlin_section_label', atEnd(270, 494, 320, 202), apothecaryLabel(320, 202)),
+          6,
+          14,
+          0.18,
+        ),
         pinch('d_tavlin_section_pinch', at(START, 387, 30, 22)),
         art('d_tavlin_section_seeds', at(START, 830, 420, 14), seedLine(420, PAPRIKA)),
         art(
           'd_tavlin_section_scatter',
           atEnd(612, 906, 250, 84),
-          starAnise(44, 44, 32, { rot: 8 }) + cinnamon(96, 52, 130, -10, 18) + peppercorn(236, 66, 6.5),
+          starAnise(44, 44, 32, { rot: 8 }) +
+            cinnamon(96, 52, 130, -10, 18) +
+            peppercorn(236, 66, 6.5),
         ),
       ],
     },
@@ -1321,14 +1438,26 @@ function layouts(): Layout[] {
         place('p_label', 'subtitle', at(START, 536, 700, 90), 'heading'),
         place('p_note', 'body', at(START, 640, 680, 160), 'body'),
         ...[0, 1, 2].flatMap((i) => [
-          place(`p_number${i + 2}`, 'number', at(tagX(i) + 20, tagTops[i]! + 66, 216, 76), 'title', {
-            align: 'center',
-            color: token('primary'),
-          }),
-          place(`p_label${i + 2}`, 'caption', at(tagX(i) + 20, tagTops[i]! + 148, 216, 136), 'caption', {
-            align: 'center',
-            color: token('text'),
-          }),
+          place(
+            `p_number${i + 2}`,
+            'number',
+            at(tagX(i) + 20, tagTops[i]! + 66, 216, 76),
+            'title',
+            {
+              align: 'center',
+              color: token('primary'),
+            },
+          ),
+          place(
+            `p_label${i + 2}`,
+            'caption',
+            at(tagX(i) + 20, tagTops[i]! + 148, 216, 136),
+            'caption',
+            {
+              align: 'center',
+              color: token('text'),
+            },
+          ),
         ]),
         ...foot('big_number').placeholders,
       ],
@@ -1339,12 +1468,26 @@ function layouts(): Layout[] {
           'd_tavlin_big_number_swoosh',
           at(START, 480, 540, 40),
           (() => {
-            const d = 'M6 22C80 10 220 6 360 12C430 15 500 20 536 28C470 30 400 34 320 33C200 32 90 34 6 22Z';
+            const d =
+              'M6 22C80 10 220 6 360 12C430 15 500 20 536 28C470 30 400 34 320 33C200 32 90 34 6 22Z';
             const rand = random(4);
             return (
               `<path d="${d}" fill="${PAPRIKA}"/>` +
-              grains(rand, 90, { x: 0, y: 4, w: 540, h: 34 }, (x, y) => y > 10 + x * 0.004 && y < 33 - Math.abs(x - 300) * 0.01, [0.8, 1.8]) +
-              grains(rand, 26, { x: 440, y: 18, w: 100, h: 20 }, () => true, [1, 2], [[PAPRIKA, 0.8]])
+              grains(
+                rand,
+                90,
+                { x: 0, y: 4, w: 540, h: 34 },
+                (x, y) => y > 10 + x * 0.004 && y < 33 - Math.abs(x - 300) * 0.01,
+                [0.8, 1.8],
+              ) +
+              grains(
+                rand,
+                26,
+                { x: 440, y: 18, w: 100, h: 20 },
+                () => true,
+                [1, 2],
+                [[PAPRIKA, 0.8]],
+              )
             );
           })(),
         ),
@@ -1392,7 +1535,16 @@ function layouts(): Layout[] {
             )
             .join(''),
         ),
-        lifted(art('d_tavlin_quote_spoon', at(START, 592, WIDTH, 136), woodenSpoon('d_tavlin_quote_spoon', WIDTH, 136)), 10, 18, 0.18),
+        lifted(
+          art(
+            'd_tavlin_quote_spoon',
+            at(START, 592, WIDTH, 136),
+            woodenSpoon('d_tavlin_quote_spoon', WIDTH, 136),
+          ),
+          10,
+          18,
+          0.18,
+        ),
         art(
           'd_tavlin_quote_scatter',
           atEnd(END + 40, 744, 520, 110),
@@ -1400,7 +1552,14 @@ function layouts(): Layout[] {
             peppercorn(150, 70, 7.5) +
             peppercorn(170, 86, 6.5) +
             peppercorn(136, 92, 6) +
-            grains(random(8), 40, { x: 200, y: 50, w: 260, h: 40 }, () => true, [1.2, 2.6], [[PAPRIKA, 0.85]]) +
+            grains(
+              random(8),
+              40,
+              { x: 200, y: 50, w: 260, h: 40 },
+              () => true,
+              [1.2, 2.6],
+              [[PAPRIKA, 0.85]],
+            ) +
             bayLeaf(330, 80, 120, -12),
         ),
         ...foot('quote').decorations,
@@ -1410,27 +1569,16 @@ function layouts(): Layout[] {
       id: 'l_tavlin_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a recipe card from margin to margin, down to over the foot, from its
-      // top; a star anise lies on the card's far corner, beside the title. The kicker over the
-      // title and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 260).placeholders,
-        place('p_body', 'body', at(START + 72, 310, WIDTH - 144, 580), 'body'),
+        ...textPoints('text', WIDTH - 92).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 260).decorations,
-        card('d_tavlin_text_card', at(START, 232, WIDTH, 696)),
-        art(
-          'd_tavlin_text_rules',
-          at(START + 40, 260, WIDTH - 80, 10),
-          `<path d="M0 2H${WIDTH - 80}M0 8H${WIDTH - 80}" stroke="${PAPRIKA}" stroke-width="1.6"/>`,
-        ),
-        art(
-          'd_tavlin_text_anise',
-          atEnd(END - 34, 162, 140, 132),
-          `<g transform="rotate(-8 70 66)">${starAnise(62, 70, 56, { rot: 10 })}</g>` + peppercorn(124, 32, 6.5) + peppercorn(132, 50, 5.5),
-        ),
+        ...textPoints('text', WIDTH - 92).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1441,19 +1589,22 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 900).placeholders,
         place('p_image', 'image', atEnd(END + 112, 188, 584, 686)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 92, 296 + i * 200, 780, 48), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 92, 350 + i * 200, 780, 120), 'body'),
-        ]),
+        ...textPoints('text_image', 780).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
         ...head('text_image', 900).decorations,
-        lifted(art('d_tavlin_text_image_board', atEnd(END, 150, 732, 762), servingBoard('d_tavlin_text_image_board', 732, 762, 76)), 18, 40, 0.2),
-        ...[0, 1, 2].map((i) => figure(`d_tavlin_text_image_figure${i + 1}`, at(START, 290 + i * 200, 64, 66), i + 1)),
-        ...[1, 2].map((i) =>
-          art(`d_tavlin_text_image_seeds${i}`, at(START + 92, 270 + i * 200, 780, 14), seedLine(780, MUTED, 26)),
+        lifted(
+          art(
+            'd_tavlin_text_image_board',
+            atEnd(END, 150, 732, 762),
+            servingBoard('d_tavlin_text_image_board', 732, 762, 76),
+          ),
+          18,
+          40,
+          0.2,
         ),
+        ...textPoints('text_image', 780).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1475,11 +1626,18 @@ function layouts(): Layout[] {
           'd_tavlin_full_image_ribbon',
           at(0, 740, 1920, 16),
           [TURMERIC, PAPRIKA, LEAF, SUMAC, CINNAMON, CLOVE]
-            .map((c, i) => `<rect x="${r1((i * 1920) / 6)}" y="0" width="${r1(1920 / 6 + 1)}" height="16" fill="${c}"/>`)
+            .map(
+              (c, i) =>
+                `<rect x="${r1((i * 1920) / 6)}" y="0" width="${r1(1920 / 6 + 1)}" height="16" fill="${c}"/>`,
+            )
             .join(''),
         ),
         pinch('d_tavlin_full_image_pinch', at(START, 799, 30, 22)),
-        rect('d_tavlin_full_image_rule', atEnd(END + 724, 812, 1.5, 156), solid(token('text', 0.18))),
+        rect(
+          'd_tavlin_full_image_rule',
+          atEnd(END + 724, 812, 1.5, 156),
+          solid(token('text', 0.18)),
+        ),
       ],
     },
     {
@@ -1489,13 +1647,30 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('cards').placeholders,
         ...cards3.flatMap((s, i) => [
-          place(`p_label${i + 1}`, 'caption', at(s + 58, jarTop + jarLabel.y + 26, 384, 36), 'caption', {
-            color: token('primary'),
-          }),
-          place(`p_card${i + 1}_title`, 'subtitle', at(s + 58, jarTop + jarLabel.y + 62, 384, 88), 'heading', {
-            vAlign: 'bottom',
-          }),
-          place(`p_card${i + 1}_body`, 'body', at(s + 58, jarTop + jarLabel.y + 156, 384, 156), 'body'),
+          place(
+            `p_label${i + 1}`,
+            'caption',
+            at(s + 58, jarTop + jarLabel.y + 26, 384, 36),
+            'caption',
+            {
+              color: token('primary'),
+            },
+          ),
+          place(
+            `p_card${i + 1}_title`,
+            'subtitle',
+            at(s + 58, jarTop + jarLabel.y + 62, 384, 88),
+            'heading',
+            {
+              vAlign: 'bottom',
+            },
+          ),
+          place(
+            `p_card${i + 1}_body`,
+            'body',
+            at(s + 58, jarTop + jarLabel.y + 156, 384, 156),
+            'body',
+          ),
         ]),
         place('p_note', 'body', at(START + 42, 888, 1500, 42), 'body'),
         ...foot('cards').placeholders,
@@ -1507,7 +1682,14 @@ function layouts(): Layout[] {
             art(
               `d_tavlin_cards_jar${i + 1}`,
               at(s, jarTop, jarW, jarH),
-              spiceJar(`d_tavlin_cards_jar${i + 1}`, jarW, jarH, [TURMERIC, PAPRIKA, GREEN_SPICE][i]!, i + 2, jarLabel),
+              spiceJar(
+                `d_tavlin_cards_jar${i + 1}`,
+                jarW,
+                jarH,
+                [TURMERIC, PAPRIKA, GREEN_SPICE][i]!,
+                i + 2,
+                jarLabel,
+              ),
             ),
             14,
             30,
@@ -1528,7 +1710,9 @@ function layouts(): Layout[] {
           place(`p_when${i + 1}`, 'number', at(s + 22, 350, 354, 70), 'title', {
             color: token('primary'),
           }),
-          place(`p_stop${i + 1}`, 'subtitle', at(s + 22, 424, 354, 92), 'heading', { vAlign: 'bottom' }),
+          place(`p_stop${i + 1}`, 'subtitle', at(s + 22, 424, 354, 92), 'heading', {
+            vAlign: 'bottom',
+          }),
           place(`p_stop${i + 1}_body`, 'body', at(s + 22, 524, 354, 166), 'body'),
         ]),
         place('p_note', 'caption', at(START + 42, 774, 1300, 72), 'caption'),
@@ -1538,7 +1722,11 @@ function layouts(): Layout[] {
         ...head('timeline').decorations,
         ...stops4.map((s, i) =>
           lifted(
-            art(`d_tavlin_timeline_ticket${i + 1}`, at(s, 296, 398, 424), ticket(398, 424, i === 3)),
+            art(
+              `d_tavlin_timeline_ticket${i + 1}`,
+              at(s, 296, 398, 424),
+              ticket(398, 424, i === 3),
+            ),
             10,
             22,
             0.14,
@@ -1617,10 +1805,21 @@ function layouts(): Layout[] {
             ['after', atEnd(END, 492, 700, 330)],
           ] as const
         ).flatMap(([side, f]) => [
-          place(`p_${side}_label`, 'caption', { x: f.x + 40, y: f.y + 36, w: 620, h: 36 }, 'caption', {
-            color: side === 'after' ? token('primary') : token('muted'),
-          }),
-          place(`p_${side}_title`, 'subtitle', { x: f.x + 40, y: f.y + 78, w: 620, h: 50 }, 'heading'),
+          place(
+            `p_${side}_label`,
+            'caption',
+            { x: f.x + 40, y: f.y + 36, w: 620, h: 36 },
+            'caption',
+            {
+              color: side === 'after' ? token('primary') : token('muted'),
+            },
+          ),
+          place(
+            `p_${side}_title`,
+            'subtitle',
+            { x: f.x + 40, y: f.y + 78, w: 620, h: 50 },
+            'heading',
+          ),
           place(`p_${side}_body`, 'body', { x: f.x + 40, y: f.y + 136, w: 620, h: 170 }, 'body'),
         ]),
         ...foot('comparison').placeholders,
@@ -1630,9 +1829,14 @@ function layouts(): Layout[] {
         art('d_tavlin_comparison_post', at(START + WIDTH / 2 - 100, 300, 200, 616), post(200, 616)),
         card('d_tavlin_comparison_before', at(START, 492, 700, 330)),
         card('d_tavlin_comparison_after', atEnd(END, 492, 700, 330)),
-        rect('d_tavlin_comparison_before_band', at(START, 492, 700, 8), solid(token('muted', 0.5)), {
-          effects: { radius: 4 },
-        }),
+        rect(
+          'd_tavlin_comparison_before_band',
+          at(START, 492, 700, 8),
+          solid(token('muted', 0.5)),
+          {
+            effects: { radius: 4 },
+          },
+        ),
         rect('d_tavlin_comparison_after_band', atEnd(END, 492, 700, 8), solid(token('primary')), {
           effects: { radius: 4 },
         }),
@@ -1647,7 +1851,11 @@ function layouts(): Layout[] {
           atEnd(END + 350 - 170, r1(286 + drop + 4), 340, 170),
           pan('d_tavlin_comparison_pan_after', 340, 170, PAPRIKA, 74, 52),
         ),
-        art('d_tavlin_comparison_beam', at(START + WIDTH / 2 - reach - 40, 236, reach * 2 + 80, 100), beam(reach * 2 + 80, 100, -tilt)),
+        art(
+          'd_tavlin_comparison_beam',
+          at(START + WIDTH / 2 - reach - 40, 236, reach * 2 + 80, 100),
+          beam(reach * 2 + 80, 100, -tilt),
+        ),
         ...foot('comparison').decorations,
       ],
     },
@@ -1671,7 +1879,16 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('chart').decorations,
-        lifted(art('d_tavlin_chart_board', at(START, 262, 1160, 612), cuttingBoard('d_tavlin_chart_board', 1160, 612, 100)), 16, 36, 0.16),
+        lifted(
+          art(
+            'd_tavlin_chart_board',
+            at(START, 262, 1160, 612),
+            cuttingBoard('d_tavlin_chart_board', 1160, 612, 100),
+          ),
+          16,
+          36,
+          0.16,
+        ),
         art(
           'd_tavlin_chart_leaves',
           at(START + 1010, 206, 140, 96),
@@ -1726,9 +1943,14 @@ function layouts(): Layout[] {
       decorations: [
         ...head('team').decorations,
         ...team4.flatMap((s, i) => [
-          rect(`d_tavlin_team_block${i + 1}`, at(s + 24, 286, 340, 340), solid({ value: [GREEN_SPICE, CUMIN, PAPRIKA, TURMERIC][i]! }), {
-            effects: { radius: 4 },
-          }),
+          rect(
+            `d_tavlin_team_block${i + 1}`,
+            at(s + 24, 286, 340, 340),
+            solid({ value: [GREEN_SPICE, CUMIN, PAPRIKA, TURMERIC][i]! }),
+            {
+              effects: { radius: 4 },
+            },
+          ),
           art(`d_tavlin_team_spice${i + 1}`, at(s, 652, 46, 46), SIGNATURES[i]!(46)),
         ]),
         ...foot('team').decorations,
@@ -1753,11 +1975,25 @@ function layouts(): Layout[] {
       decorations: [
         mark('d_tavlin_closing_mark', at(START, 112, 58, 58)),
         pinch('d_tavlin_closing_pinch', at(START, 267, 30, 22)),
-        ...[0, 1, 2].map((i) => art(`d_tavlin_closing_icon${i + 1}`, at(START, 576 + i * 86, 40, 40), CLOSING_ICONS[i]!)),
+        ...[0, 1, 2].map((i) =>
+          art(`d_tavlin_closing_icon${i + 1}`, at(START, 576 + i * 86, 40, 40), CLOSING_ICONS[i]!),
+        ),
         art('d_tavlin_closing_seeds', at(START, 852, 520, 14), seedLine(520, PAPRIKA)),
-        art('d_tavlin_closing_mortar_back', atEnd(160, 520, 620, 440), mortarBack('d_tavlin_closing_mortar_back', 620, 440)),
-        art('d_tavlin_closing_pestle', atEnd(420, 214, 240, 470), pestle('d_tavlin_closing_pestle', 240, 470)),
-        art('d_tavlin_closing_mortar', atEnd(160, 520, 620, 440), mortarFront('d_tavlin_closing_mortar', 620, 440)),
+        art(
+          'd_tavlin_closing_mortar_back',
+          atEnd(160, 520, 620, 440),
+          mortarBack('d_tavlin_closing_mortar_back', 620, 440),
+        ),
+        art(
+          'd_tavlin_closing_pestle',
+          atEnd(420, 214, 240, 470),
+          pestle('d_tavlin_closing_pestle', 240, 470),
+        ),
+        art(
+          'd_tavlin_closing_mortar',
+          atEnd(160, 520, 620, 440),
+          mortarFront('d_tavlin_closing_mortar', 620, 440),
+        ),
         art(
           'd_tavlin_closing_scatter',
           atEnd(70, 930, 800, 100),
@@ -1866,15 +2102,8 @@ function drawSample(copy: TavlinCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 40 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 28 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

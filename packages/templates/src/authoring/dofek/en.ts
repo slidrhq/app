@@ -13,13 +13,10 @@ export const en: DofekCopy = {
     name: 'Agenda',
     kicker: 'Before we begin',
     title: 'What we will cover today',
-    intro:
-      'Twenty minutes on what the programme has changed, what now happens on the street when a heart stops, and what we ask of the council for 2027. Then we will take your questions.',
     items: [
-      ['The numbers: ', 'what changed for people whose heart stopped outside hospital.'],
-      ['On the street: ', 'how neighbours, volunteers and defibrillators now work together.'],
-      ['The people: ', 'the team that runs the programme, and the volunteers beside it.'],
-      ['Next year: ', 'what we ask of the council, and by when.'],
+      ['The numbers', 'What changed for people whose heart stopped outside hospital.'],
+      ['On the street', 'How neighbours, volunteers and defibrillators now work together.'],
+      ['The people', 'The team that runs the programme, and the volunteers beside it.'],
     ],
   },
   section: {
@@ -76,18 +73,12 @@ export const en: DofekCopy = {
     kicker: 'Responders on call',
     title: 'Help from around the corner',
     items: [
-      [
-        'Alerted in seconds',
-        'An app alerts trained volunteers within 500 metres of the call.',
-      ],
+      ['Alerted in seconds', 'An app alerts trained volunteers within 500 metres of the call.'],
       [
         'A defibrillator on its way',
         'A second volunteer fetches the nearest public defibrillator.',
       ],
-      [
-        'There before the siren',
-        'In six calls out of ten, a volunteer reached the patient first.',
-      ],
+      ['There before the siren', 'In six calls out of ten, a volunteer reached the patient first.'],
     ],
   },
   park: {

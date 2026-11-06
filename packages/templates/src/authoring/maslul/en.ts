@@ -6,7 +6,9 @@ export const en: MaslulCopy = {
     name: 'Opening',
     org: 'Kestrel Athletics Club · Season launch',
     title: ['On your', 'marks'],
-    subtitle: ['Our plan for the 2027 season, from the first session to the national championships'],
+    subtitle: [
+      'Our plan for the 2027 season, from the first session to the national championships',
+    ],
     meta: 'Club house · Saturday 6 February 2027',
   },
   section: {
@@ -19,13 +21,10 @@ export const en: MaslulCopy = {
     name: 'Tonight',
     kicker: 'For our members',
     title: 'Tonight’s briefing',
-    intro:
-      'Forty minutes for athletes, parents and coaches: how the 2027 season will run, what changes when we move to our own track in March, and how each group will train. Questions at the end.',
     items: [
-      ['The new track: ', 'eight floodlit lanes, open six evenings a week from 13 March.'],
-      ['Training groups: ', 'who trains when and where, and with which coach.'],
-      ['The season: ', 'four meets, from the opening meet in March to the nationals in July.'],
-      ['Joining in: ', 'how a new athlete goes from a taster session to a first race.'],
+      ['The new track', 'Eight floodlit lanes, open six evenings a week from 13 March.'],
+      ['Training groups', 'Who trains when and where, and with which coach.'],
+      ['The season', 'Four meets, from the opening meet in March to the nationals in July.'],
     ],
   },
   figures: {

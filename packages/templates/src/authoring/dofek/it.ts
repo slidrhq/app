@@ -13,13 +13,10 @@ export const it: DofekCopy = {
     name: 'Ordine del giorno',
     kicker: 'Prima di cominciare',
     title: 'Di cosa parleremo oggi',
-    intro:
-      'Venti minuti su ciò che il programma ha cambiato, su ciò che accade oggi per strada quando un cuore si ferma e su ciò che chiediamo al consiglio per il 2027. Poi spazio alle vostre domande.',
     items: [
-      ['I numeri: ', 'cosa è cambiato per chi ha un arresto cardiaco fuori dall’ospedale.'],
-      ['Per strada: ', 'come vicini, volontari e defibrillatori oggi lavorano insieme.'],
-      ['Le persone: ', 'la squadra che guida il programma e i volontari al suo fianco.'],
-      ['Il prossimo anno: ', 'cosa chiediamo al consiglio, ed entro quando.'],
+      ['I numeri', 'Cosa è cambiato per chi ha un arresto cardiaco fuori dall’ospedale.'],
+      ['Per strada', 'Come vicini, volontari e defibrillatori oggi lavorano insieme.'],
+      ['Le persone', 'La squadra che guida il programma e i volontari al suo fianco.'],
     ],
   },
   section: {
@@ -76,9 +73,18 @@ export const it: DofekCopy = {
     kicker: 'Volontari in allerta',
     title: 'L’aiuto dietro l’angolo',
     items: [
-      ['Allertati in pochi secondi', 'Un’app avvisa i volontari formati entro 500 metri dalla chiamata.'],
-      ['Un defibrillatore in arrivo', 'Un secondo volontario prende il defibrillatore pubblico più vicino.'],
-      ['Prima della sirena', 'In sei chiamate su dieci, un volontario è arrivato dal paziente prima dell’ambulanza.'],
+      [
+        'Allertati in pochi secondi',
+        'Un’app avvisa i volontari formati entro 500 metri dalla chiamata.',
+      ],
+      [
+        'Un defibrillatore in arrivo',
+        'Un secondo volontario prende il defibrillatore pubblico più vicino.',
+      ],
+      [
+        'Prima della sirena',
+        'In sei chiamate su dieci, un volontario è arrivato dal paziente prima dell’ambulanza.',
+      ],
     ],
   },
   park: {

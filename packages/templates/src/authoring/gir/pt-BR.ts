@@ -19,13 +19,10 @@ export const ptBR: GirCopy = {
     name: 'Hoje à noite',
     kicker: 'Boas-vindas',
     title: 'Hoje à noite, em quarenta minutos',
-    intro:
-      'Quarenta minutos sobre como o 7º ano vai aprender este ano, o que muda na sala de aula e como vocês podem ajudar em casa. Depois, vocês conhecem o professor conselheiro do seu filho na sala nova.',
     items: [
-      ['Salas novas: ', 'mesas para quatro em vez de fileiras de frente para a lousa.'],
-      ['O ano letivo: ', 'quatro datas para guardar, do primeiro dia à mostra de fim de ano.'],
-      ['Reforço: ', 'o que fazemos, passo a passo, quando um aluno fica para trás.'],
-      ['Suas perguntas: ', 'e depois uma conversa rápida com cada professor conselheiro.'],
+      ['Salas novas', 'Mesas para quatro em vez de fileiras de frente para a lousa.'],
+      ['O ano letivo', 'Quatro datas para guardar, do primeiro dia à mostra de fim de ano.'],
+      ['Reforço', 'O que fazemos, passo a passo, quando um aluno fica para trás.'],
     ],
   },
   figures: {
@@ -79,9 +76,17 @@ export const ptBR: GirCopy = {
     kicker: 'Três novas oficinas',
     title: 'Novidades do 7º ano',
     cards: [
-      ['Oficina 01', 'Robótica', 'Montar e programar um pequeno robô em dupla, ao longo de doze semanas.'],
+      [
+        'Oficina 01',
+        'Robótica',
+        'Montar e programar um pequeno robô em dupla, ao longo de doze semanas.',
+      ],
       ['Oficina 02', 'Debate', 'Defender uma ideia, ouvir o outro lado e mudar de opinião.'],
-      ['Oficina 03', 'Horta e cozinha', 'Plantar, colher e cozinhar o que plantamos, da semente à sopa.'],
+      [
+        'Oficina 03',
+        'Horta e cozinha',
+        'Plantar, colher e cozinhar o que plantamos, da semente à sopa.',
+      ],
     ],
     note: 'Cada aluno escolhe uma oficina para o primeiro semestre e outra para o segundo.',
   },
@@ -91,9 +96,17 @@ export const ptBR: GirCopy = {
     title: 'Quatro datas para guardar',
     stops: [
       ['Set. 2027', 'Primeiro dia', 'As turmas conhecem o professor conselheiro e as mesas novas.'],
-      ['Dez. 2027', 'Feira de ciências', 'Cada equipe apresenta um experimento dos novos laboratórios.'],
+      [
+        'Dez. 2027',
+        'Feira de ciências',
+        'Cada equipe apresenta um experimento dos novos laboratórios.',
+      ],
       ['Mar. 2028', 'Viagem da turma', 'Três dias no norte, com uma noite sob as estrelas.'],
-      ['Jun. 2028', 'Mostra de fim de ano', 'Todas as turmas no palco, com os pais nas primeiras fileiras.'],
+      [
+        'Jun. 2028',
+        'Mostra de fim de ano',
+        'Todas as turmas no palco, com os pais nas primeiras fileiras.',
+      ],
     ],
     note: 'Os professores conselheiros vão enviar as datas das reuniões de pais com duas semanas de antecedência.',
   },
@@ -158,7 +171,11 @@ export const ptBR: GirCopy = {
     title: 'Quem seus filhos vão conhecer',
     people: [
       ['7º A · Ciências', 'Maya Cohen', 'Coordenadora do 7º ano, cuida dos novos laboratórios'],
-      ['7º B · Matemática', 'Karim Nasser', 'Professor de matemática, orienta a oficina de robótica'],
+      [
+        '7º B · Matemática',
+        'Karim Nasser',
+        'Professor de matemática, orienta a oficina de robótica',
+      ],
       ['7º C · Português', 'Olga Petrenko', 'Professora de português, lidera o projeto de leitura'],
       ['7º D · História', 'Daniel Mekonen', 'Professor de história, organiza a viagem da turma'],
     ],

@@ -18,14 +18,11 @@ export const vi: RakiaCopy = {
   agenda: {
     name: 'Tối nay',
     kicker: 'Buổi giới thiệu',
-    title: 'Tối nay, bốn phần',
-    intro:
-      'Bốn mươi phút về chiếc kính thiên văn đón ánh sao đầu tiên trong tuần này, những gì nó sẽ quan sát trong mùa đầu tiên, và cách mỗi trường đại học đối tác chia sẻ các đêm quan sát. Sau đó chúng ta mở mái vòm.',
+    title: 'Tối nay, ba phần',
     items: [
-      ['Kính thiên văn: ', 'mười hai năm từ bản phác thảo đầu tiên đến tấm gương 2,4 mét.'],
-      ['Địa điểm: ', 'vì sao Meridian Peak tối và ổn định hơn mọi nơi chúng tôi đã đo.'],
-      ['Mùa đầu tiên: ', 'ba chương trình nghiên cứu và những thiên thể chúng quan sát trước.'],
-      ['Chia sẻ các đêm: ', 'đối tác xin thời gian thế nào, công chúng tham gia ra sao.'],
+      ['Kính thiên văn', 'Mười hai năm từ bản phác thảo đầu tiên đến tấm gương 2,4 mét.'],
+      ['Địa điểm', 'Vì sao Meridian Peak tối và ổn định hơn mọi nơi chúng tôi đã đo.'],
+      ['Mùa đầu tiên', 'Ba chương trình nghiên cứu và những thiên thể chúng quan sát trước.'],
     ],
   },
   figures: {
@@ -67,7 +64,11 @@ export const vi: RakiaCopy = {
   },
   quote: {
     name: 'Ánh sáng đầu tiên',
-    text: ['Mười hai năm, chúng tôi chế tạo', 'cỗ máy cho một khoảnh khắc:', 'ánh sao đầu tiên chạm vào gương.'],
+    text: [
+      'Mười hai năm, chúng tôi chế tạo',
+      'cỗ máy cho một khoảnh khắc:',
+      'ánh sao đầu tiên chạm vào gương.',
+    ],
     who: 'Amara Okafor',
     role: 'Giám đốc Đài thiên văn Meridian Peak',
   },

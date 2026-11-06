@@ -13,13 +13,13 @@ export const vi: HonCopy = {
     name: 'Chương trình',
     kicker: 'Đại hội thường niên',
     title: 'Chương trình tối nay',
-    intro:
-      'Bốn mươi phút về năm 2026 của ngân hàng do chính quý vị sở hữu: chúng tôi đã cho vay bao nhiêu, giữ lại bao nhiêu làm vốn và những gì đã trở về với quý vị, các thành viên. Sau đó là phần biểu quyết và câu hỏi của quý vị.',
     items: [
-      ['Năm qua các con số: ', 'tín dụng, vốn và những gì trở về với thành viên.'],
-      ['Nhà xanh: ', 'các khoản vay cải tạo nhà, tăng nhanh nhất trong năm.'],
-      ['Tiền gửi của quý vị làm việc: ', 'một khoản gửi trở thành khoản vay cho hàng xóm qua năm bước.'],
-      ['Biểu quyết: ', 'hội đồng quản trị, kiểm toán viên và cổ tức cho thành viên.'],
+      ['Năm qua các con số', 'Tín dụng, vốn và những gì trở về với thành viên.'],
+      ['Nhà xanh', 'Các khoản vay cải tạo nhà, tăng nhanh nhất trong năm.'],
+      [
+        'Tiền gửi của quý vị làm việc',
+        'Một khoản gửi trở thành khoản vay cho hàng xóm qua năm bước.',
+      ],
     ],
   },
   section: {
@@ -50,7 +50,10 @@ export const vi: HonCopy = {
     source: 'Số dư cuối mỗi năm, tỷ €, 2023–2026.',
     series: ['Tiền gửi của thành viên', 'Cho thành viên vay'],
     figures: [
-      ['81%', 'tiền gửi của thành viên được cho chính thành viên vay; phần còn lại là biên an toàn.'],
+      [
+        '81%',
+        'tiền gửi của thành viên được cho chính thành viên vay; phần còn lại là biên an toàn.',
+      ],
       ['+21%', 'tăng trưởng tiền gửi từ năm 2023, không vay một euro nào từ thị trường.'],
     ],
   },
@@ -160,8 +163,16 @@ export const vi: HonCopy = {
     title: 'Lớn lên từng thành viên một',
     stops: [
       ['1931', 'Do công nhân bến cảng lập nên', 'Hai trăm gia đình góp lương để cho nhau vay.'],
-      ['1974', 'Những khoản vay mua nhà đầu tiên', 'Thành viên bắt đầu mua những căn nhà họ đã thuê hàng chục năm.'],
-      ['2009', 'Không cần giải cứu', 'Vượt qua khủng hoảng tài chính mà không cần một xu tiền công.'],
+      [
+        '1974',
+        'Những khoản vay mua nhà đầu tiên',
+        'Thành viên bắt đầu mua những căn nhà họ đã thuê hàng chục năm.',
+      ],
+      [
+        '2009',
+        'Không cần giải cứu',
+        'Vượt qua khủng hoảng tài chính mà không cần một xu tiền công.',
+      ],
       ['2026', '412.000 thành viên', 'Năm tăng trưởng nhanh nhất trong hai thập kỷ.'],
     ],
     note: 'Trong chín mươi sáu năm, ngân hàng chưa từng trả tiền cho cổ đông bên ngoài, vì chưa từng có cổ đông như vậy.',

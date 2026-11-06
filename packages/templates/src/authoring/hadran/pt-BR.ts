@@ -6,7 +6,9 @@ export const ptBR: HadranCopy = {
     name: 'Abertura',
     org: 'Night Tram Records · Lisboa',
     title: ['A temporada', 'começa hoje'],
-    subtitle: ['Doze discos novos, uma turnê por dezoito cidades e uma escola para as próximas vozes'],
+    subtitle: [
+      'Doze discos novos, uma turnê por dezoito cidades e uma escola para as próximas vozes',
+    ],
     meta: 'Lançamento · Depósito dos Bondes · 21 de janeiro de 2027',
   },
   section: {
@@ -19,13 +21,10 @@ export const ptBR: HadranCopy = {
     name: 'Repertório',
     kicker: 'Lançamento da temporada',
     title: 'O repertório desta noite',
-    intro:
-      'Quarenta minutos sobre a temporada que vem: o que a última nos ensinou, os doze discos que vamos lançar, as dezoito cidades da turnê e a nossa escola. Depois o bar abre e a banda toca.',
     items: [
-      ['A temporada passada: ', 'trinta e um shows, nove discos, quase todos os lugares vendidos.'],
-      ['Como gravamos: ', 'uma sala, um take, um gravador de rolo de 1974.'],
-      ['A temporada 2027: ', 'doze álbuns e uma turnê por dezoito cidades.'],
-      ['A escola: ', 'sessenta e quatro adolescentes aprendendo a tocar e a gravar.'],
+      ['A temporada passada', 'Trinta e um shows, nove discos, quase todos os lugares vendidos.'],
+      ['Como gravamos', 'Uma sala, um take, um gravador de rolo de 1974.'],
+      ['A temporada 2027', 'Doze álbuns e uma turnê por dezoito cidades.'],
     ],
   },
   season: {
@@ -48,18 +47,9 @@ export const ptBR: HadranCopy = {
     kicker: 'Como gravamos',
     title: 'Uma sala, um take',
     items: [
-      [
-        'A banda toca junta',
-        'Sem overdubs nem metrônomo: tocamos como no palco.',
-      ],
-      [
-        'Direto na fita',
-        'Um gravador de rolo de 1974 dá calor a cada disco.',
-      ],
-      [
-        'Uma semana por álbum',
-        'Cinco dias para gravar, dois para mixar: a sala decide.',
-      ],
+      ['A banda toca junta', 'Sem overdubs nem metrônomo: tocamos como no palco.'],
+      ['Direto na fita', 'Um gravador de rolo de 1974 dá calor a cada disco.'],
+      ['Uma semana por álbum', 'Cinco dias para gravar, dois para mixar: a sala decide.'],
     ],
   },
   depot: {
@@ -84,11 +74,7 @@ export const ptBR: HadranCopy = {
         'Doze álbuns',
         'Da morna cabo-verdiana ao jazz coreano, tudo gravado ao vivo e prensado em vinil.',
       ],
-      [
-        'No palco',
-        'Dezoito cidades',
-        'De Lisboa a Dacar, com um novo artista abrindo cada noite.',
-      ],
+      ['No palco', 'Dezoito cidades', 'De Lisboa a Dacar, com um novo artista abrindo cada noite.'],
       [
         'Na sala de aula',
         'Sessenta e quatro alunos',

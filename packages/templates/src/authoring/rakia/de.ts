@@ -18,14 +18,11 @@ export const de: RakiaCopy = {
   agenda: {
     name: 'Heute Abend',
     kicker: 'Das Briefing',
-    title: 'Heute Abend, in vier Teilen',
-    intro:
-      'Vierzig Minuten über das Teleskop, das diese Woche sein erstes Sternenlicht empfängt, über seine erste Beobachtungssaison und darüber, wie die Partneruniversitäten seine Nächte teilen. Danach öffnen wir die Kuppel.',
+    title: 'Heute Abend, in drei Teilen',
     items: [
-      ['Das Teleskop: ', 'zwölf Jahre von der ersten Skizze bis zum polierten 2,4-Meter-Spiegel.'],
-      ['Der Standort: ', 'warum kein gemessener Ort dunkler und ruhiger ist als Meridian Peak.'],
-      ['Die erste Saison: ', 'drei Forschungsprogramme und die Objekte, die sie zuerst beobachten.'],
-      ['Nächte teilen: ', 'wie Partner Beobachtungszeit beantragen und wie das Publikum dabei ist.'],
+      ['Das Teleskop', 'Zwölf Jahre von der ersten Skizze bis zum polierten 2,4-Meter-Spiegel.'],
+      ['Der Standort', 'Warum kein gemessener Ort dunkler und ruhiger ist als Meridian Peak.'],
+      ['Die erste Saison', 'Drei Forschungsprogramme und die Objekte, die sie zuerst beobachten.'],
     ],
   },
   figures: {
@@ -48,7 +45,10 @@ export const de: RakiaCopy = {
     kicker: 'In der Kuppel',
     title: 'Ein Spiegel, zwei Jahre poliert',
     items: [
-      ['In einem Stück gegossen', 'Das Glas kühlte drei Monate lang in seiner Form ab, damit es nicht reißt.'],
+      [
+        'In einem Stück gegossen',
+        'Das Glas kühlte drei Monate lang in seiner Form ab, damit es nicht reißt.',
+      ],
       [
         'Auf 18 Nanometer genau',
         'Seine Fläche weicht um weniger als ein Tausendstel Haar von der idealen Kurve ab.',
@@ -99,9 +99,21 @@ export const de: RakiaCopy = {
     kicker: 'Vom Glas zum Sternenlicht',
     title: 'Vier Jahre, vier Meilensteine',
     stops: [
-      ['2024', 'Der Spiegelguss', 'Das Glas kühlt drei Monate lang ab, bevor das Polieren beginnt.'],
-      ['2025', 'Die Kuppel steht', 'Eine 14-Meter-Kuppel entsteht in einer einzigen Saison auf dem Gipfel.'],
-      ['2026', 'Die Optik kommt', 'Der polierte Spiegel fährt im Schritttempo die Bergstraße hinauf.'],
+      [
+        '2024',
+        'Der Spiegelguss',
+        'Das Glas kühlt drei Monate lang ab, bevor das Polieren beginnt.',
+      ],
+      [
+        '2025',
+        'Die Kuppel steht',
+        'Eine 14-Meter-Kuppel entsteht in einer einzigen Saison auf dem Gipfel.',
+      ],
+      [
+        '2026',
+        'Die Optik kommt',
+        'Der polierte Spiegel fährt im Schritttempo die Bergstraße hinauf.',
+      ],
       ['2027', 'Erstes Licht', 'Am 12. März nimmt das Teleskop sein erstes Bild des Himmels auf.'],
     ],
     note: 'Zwei dieser vier Jahre verbrachte der Spiegel auf der Poliermaschine.',
@@ -143,7 +155,10 @@ export const de: RakiaCopy = {
     series: ['Klare Nächte', 'Nächte mit scharfem Seeing'],
     figures: [
       ['291', 'klare Nächte im Jahr: vier von fünf Nächten.'],
-      ['0,7″', 'typische Unschärfe eines Sterns durch die Luft, halb so viel wie am alten Standort.'],
+      [
+        '0,7″',
+        'typische Unschärfe eines Sterns durch die Luft, halb so viel wie am alten Standort.',
+      ],
     ],
   },
   targets: {

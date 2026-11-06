@@ -19,13 +19,10 @@ export const id: MaslulCopy = {
     name: 'Malam ini',
     kicker: 'Untuk para anggota',
     title: 'Agenda malam ini',
-    intro:
-      'Empat puluh menit untuk atlet, orang tua, dan pelatih: bagaimana musim 2027 berjalan, apa yang berubah saat kita pindah ke lintasan sendiri pada bulan Maret, dan bagaimana setiap kelompok berlatih. Lalu tanya jawab.',
     items: [
-      ['Lintasan baru: ', 'delapan lintasan berlampu, buka enam malam seminggu mulai 13 Maret.'],
-      ['Kelompok latihan: ', 'siapa berlatih kapan dan di mana, serta dengan pelatih siapa.'],
-      ['Musim: ', 'empat kejuaraan, dari kejuaraan pembuka pada Maret hingga kejurnas pada Juli.'],
-      ['Bergabung: ', 'bagaimana atlet baru melangkah dari latihan percobaan ke lomba pertama.'],
+      ['Lintasan baru', 'Delapan lintasan berlampu, buka enam malam seminggu mulai 13 Maret.'],
+      ['Kelompok latihan', 'Siapa berlatih kapan dan di mana, serta dengan pelatih siapa.'],
+      ['Musim', 'Empat kejuaraan, dari kejuaraan pembuka pada Maret hingga kejurnas pada Juli.'],
     ],
   },
   figures: {
@@ -102,10 +99,18 @@ export const id: MaslulCopy = {
     kicker: 'Musim 2027',
     title: 'Empat kejuaraan, satu musim',
     stops: [
-      ['Maret', 'Kejuaraan pembuka', 'Lomba pertama di lintasan baru kita, terbuka untuk semua anggota.'],
+      [
+        'Maret',
+        'Kejuaraan pembuka',
+        'Lomba pertama di lintasan baru kita, terbuka untuk semua anggota.',
+      ],
       ['Mei', 'Kejuaraan klub', 'Semua anggota berlomba, dan setiap hasil menambah poin klub.'],
       ['Juni', 'Liga regional', 'Tiga seri dalam empat minggu melawan sebelas klub lain.'],
-      ['Juli', 'Kejuaraan nasional', 'Atlet yang lolos berburu medali, setelah sembilan medali pada 2026.'],
+      [
+        'Juli',
+        'Kejuaraan nasional',
+        'Atlet yang lolos berburu medali, setelah sembilan medali pada 2026.',
+      ],
     ],
     note: 'Seperti estafet, tiap kejuaraan meneruskan tongkat: hasilnya menentukan siapa yang turun di babak berikutnya.',
   },

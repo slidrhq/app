@@ -12,15 +12,10 @@ export const it: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Di cosa parliamo oggi',
-      lead: [
-        'Perché una regione non bastava più al nucleo dei pagamenti.',
-        'Come siamo passati a tre regioni attive senza fermare il servizio.',
-      ],
       points: [
-        ['Il motivo: ', 'Un solo guasto bloccava tutti i pagamenti.'],
-        ['L’architettura: ', 'Ogni regione può sostenere l’intero carico.'],
-        ['La migrazione: ', 'Quattro fasi a dicembre, tutte reversibili.'],
-        ['I risultati: ', 'Disponibilità, latenza p95 e costi mensili.'],
+        ['Il motivo', 'Un solo guasto bloccava tutti i pagamenti.'],
+        ['L’architettura', 'Ogni regione può sostenere l’intero carico.'],
+        ['La migrazione', 'Quattro fasi a dicembre, tutte reversibili.'],
       ],
     },
     figures: {
@@ -121,15 +116,10 @@ export const it: TechnologyCopies = {
     agenda: {
       kicker: 'Agenda',
       title: 'Le domande della revisione',
-      lead: [
-        'Quattro risposte misurabili decidono il passaggio a DVT in aprile.',
-        'Ogni domanda ha un responsabile all’interno del team.',
-      ],
       points: [
-        ['Energia: ', 'Una pila dura dieci anni anche al freddo?'],
-        ['Costo: ', 'Il prezzo di una scheda su 10.000 unità.'],
-        ['Sul campo: ', 'Le lezioni dei 60 contatori attivi da gennaio.'],
-        ['Produzione: ', 'Cosa manca prima di ordinare il primo lotto.'],
+        ['Energia', 'Una pila dura dieci anni anche al freddo?'],
+        ['Costo', 'Il prezzo di una scheda su 10.000 unità.'],
+        ['Sul campo', 'Le lezioni dei 60 contatori attivi da gennaio.'],
       ],
     },
     figures: {
@@ -242,15 +232,10 @@ export const it: TechnologyCopies = {
     agenda: {
       kicker: 'La scaletta',
       title: 'Il programma della serata',
-      lead: [
-        'Trenta minuti sulle novità di Zrima 2.0 e sulle nostre scelte.',
-        'Poi una demo dal vivo: da una pagina vuota a un flusso autonomo.',
-      ],
       points: [
-        ['L’editor: ', 'Tutto il flusso su una tela, con l’aiuto dell’IA.'],
-        ['La beta: ', 'Cosa hanno creato e chiesto 4.200 team.'],
-        ['I piani: ', 'Tre opzioni, dal gratuito a Business.'],
-        ['Il futuro: ', 'Approvazioni mobili a febbraio, flussi condivisi nel 2027.'],
+        ['L’editor', 'Tutto il flusso su una tela, con l’aiuto dell’IA.'],
+        ['La beta', 'Cosa hanno creato e chiesto 4.200 team.'],
+        ['I piani', 'Tre opzioni, dal gratuito a Business.'],
       ],
     },
     figures: {

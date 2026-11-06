@@ -6,9 +6,7 @@ export const de: MaslulCopy = {
     name: 'Eröffnung',
     org: 'Leichtathletikclub Kestrel · Saisonauftakt',
     title: ['Bereit', 'zum Start'],
-    subtitle: [
-      'Unser Plan für 2027: vom ersten Training bis zu den nationalen Meisterschaften',
-    ],
+    subtitle: ['Unser Plan für 2027: vom ersten Training bis zu den nationalen Meisterschaften'],
     meta: 'Clubhaus · Samstag, 6. Februar 2027',
   },
   section: {
@@ -21,13 +19,16 @@ export const de: MaslulCopy = {
     name: 'Heute Abend',
     kicker: 'Für unsere Mitglieder',
     title: 'Die Themen des Abends',
-    intro:
-      'Vierzig Minuten für Athleten, Eltern und Trainer: wie die Saison 2027 läuft, was sich im März mit dem Umzug auf unsere eigene Bahn ändert und wie jede Gruppe trainiert. Am Ende Ihre Fragen.',
     items: [
-      ['Die neue Bahn: ', 'acht Laufbahnen unter Flutlicht, ab 13. März an sechs Abenden pro Woche offen.'],
-      ['Trainingsgruppen: ', 'wer wann und wo trainiert, und mit welchem Trainer.'],
-      ['Die Saison: ', 'vier Wettkämpfe, vom Eröffnungsmeeting im März bis zu den Meisterschaften im Juli.'],
-      ['Einstieg: ', 'wie neue Athleten vom Schnuppertraining zum ersten Wettkampf kommen.'],
+      [
+        'Die neue Bahn',
+        'Acht Laufbahnen unter Flutlicht, ab 13. März an sechs Abenden pro Woche offen.',
+      ],
+      ['Trainingsgruppen', 'Wer wann und wo trainiert, und mit welchem Trainer.'],
+      [
+        'Die Saison',
+        'Vier Wettkämpfe, vom Eröffnungsmeeting im März bis zu den Meisterschaften im Juli.',
+      ],
     ],
   },
   figures: {
@@ -104,8 +105,16 @@ export const de: MaslulCopy = {
     kicker: 'Die Saison 2027',
     title: 'Vier Wettkämpfe, eine Saison',
     stops: [
-      ['März', 'Eröffnungsmeeting', 'Die ersten Rennen auf unserer neuen Bahn, offen für alle Mitglieder.'],
-      ['Mai', 'Vereinsmeisterschaften', 'Alle Mitglieder starten, und jedes Ergebnis zählt für den Verein.'],
+      [
+        'März',
+        'Eröffnungsmeeting',
+        'Die ersten Rennen auf unserer neuen Bahn, offen für alle Mitglieder.',
+      ],
+      [
+        'Mai',
+        'Vereinsmeisterschaften',
+        'Alle Mitglieder starten, und jedes Ergebnis zählt für den Verein.',
+      ],
       ['Juni', 'Regionalliga', 'Drei Runden in vier Wochen gegen elf andere Vereine.'],
       [
         'Juli',
@@ -174,7 +183,11 @@ export const de: MaslulCopy = {
     title: 'Die Menschen an der Bahn',
     people: [
       ['Sprint und Hürden', 'Amara Okafor', 'Cheftrainerin und frühere 400-m-Hürdenläuferin'],
-      ['Mittel- und Langstrecke', 'Mateo Ruiz', 'Ausdauertrainer; lief mit 19 seinen ersten Marathon'],
+      [
+        'Mittel- und Langstrecke',
+        'Mateo Ruiz',
+        'Ausdauertrainer; lief mit 19 seinen ersten Marathon',
+      ],
       ['Sprung und Wurf', 'Yael Ben-Ami', 'Sprung- und Wurftrainerin, Sportphysiotherapeutin'],
       ['Kinderleichtathletik', 'Kenji Sato', 'Nachwuchstrainer; leitet die Samstagvormittage'],
     ],

@@ -19,13 +19,13 @@ export const de: GirCopy = {
     name: 'Heute Abend',
     kicker: 'Herzlich willkommen',
     title: 'Heute Abend, in vierzig Minuten',
-    intro:
-      'Vierzig Minuten darüber, wie Klasse 7 in diesem Jahr lernt, was sich im Unterricht ändert und wie Sie zu Hause helfen können. Danach lernen Sie die Klassenleitung Ihres Kindes im neuen Klassenzimmer kennen.',
     items: [
-      ['Neue Klassenzimmer: ', 'Vierertische statt Reihen mit Blick zur Tafel.'],
-      ['Das Schuljahr: ', 'vier Termine zum Vormerken, vom ersten Schultag bis zur Aufführung im Sommer.'],
-      ['Förderung: ', 'was wir Schritt für Schritt tun, wenn ein Kind den Anschluss verliert.'],
-      ['Ihre Fragen: ', 'danach ein kurzes Gespräch mit jeder Klassenleitung.'],
+      ['Neue Klassenzimmer', 'Vierertische statt Reihen mit Blick zur Tafel.'],
+      [
+        'Das Schuljahr',
+        'Vier Termine zum Vormerken, vom ersten Schultag bis zur Aufführung im Sommer.',
+      ],
+      ['Förderung', 'Was wir Schritt für Schritt tun, wenn ein Kind den Anschluss verliert.'],
     ],
   },
   figures: {
@@ -79,9 +79,17 @@ export const de: GirCopy = {
     kicker: 'Drei neue Kurse',
     title: 'Neu in Klasse 7',
     cards: [
-      ['Kurs 01', 'Robotik', 'Zu zweit einen kleinen Roboter bauen und programmieren, zwölf Wochen lang.'],
+      [
+        'Kurs 01',
+        'Robotik',
+        'Zu zweit einen kleinen Roboter bauen und programmieren, zwölf Wochen lang.',
+      ],
       ['Kurs 02', 'Debattieren', 'Argumentieren, der Gegenseite zuhören und auch mal umdenken.'],
-      ['Kurs 03', 'Küchengarten', 'Säen, ernten und kochen, was wir gepflanzt haben: vom Samen zur Suppe.'],
+      [
+        'Kurs 03',
+        'Küchengarten',
+        'Säen, ernten und kochen, was wir gepflanzt haben: vom Samen zur Suppe.',
+      ],
     ],
     note: 'Jedes Kind wählt einen Kurs für das erste Halbjahr und einen anderen für das zweite.',
   },
@@ -90,10 +98,18 @@ export const de: GirCopy = {
     kicker: 'Das Schuljahr',
     title: 'Vier Termine zum Vormerken',
     stops: [
-      ['Sept. 2027', 'Erster Schultag', 'Die Klassen lernen ihre Klassenleitung und ihre neuen Tische kennen.'],
+      [
+        'Sept. 2027',
+        'Erster Schultag',
+        'Die Klassen lernen ihre Klassenleitung und ihre neuen Tische kennen.',
+      ],
       ['Dez. 2027', 'Forschertag', 'Jedes Team zeigt ein Experiment aus den neuen Laboren.'],
       ['März 2028', 'Klassenfahrt', 'Drei Tage im Norden, mit einer Nacht unter den Sternen.'],
-      ['Juni 2028', 'Sommeraufführung', 'Jede Klasse auf der Bühne, die Eltern in den ersten Reihen.'],
+      [
+        'Juni 2028',
+        'Sommeraufführung',
+        'Jede Klasse auf der Bühne, die Eltern in den ersten Reihen.',
+      ],
     ],
     note: 'Die Klassenleitungen schicken die Termine der Elternsprechtage zwei Wochen vorher.',
   },

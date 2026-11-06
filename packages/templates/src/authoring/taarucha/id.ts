@@ -19,13 +19,10 @@ export const id: TaaruchaCopy = {
     name: 'Pagi ini',
     kicker: 'Untuk pers dan donatur',
     title: 'Pratinjau pagi ini',
-    intro:
-      'Empat puluh menit tentang cara kami menata ulang koleksi setelah dua tahun pembangunan, dan apa yang berubah bagi pengunjung sejak hari pintu dibuka. Lalu berjalan-jalan di ruang-ruang pertama.',
     items: [
-      ['Sayap baru: ', 'dua puluh dua ruang di tiga lantai, dan satu rute yang melewati semuanya.'],
-      ['Konservasi: ', '312 karya dibersihkan, diperbaiki, dan dibingkai ulang untuk penataan.'],
-      ['Kunjungan: ', 'malam Kamis gratis, dan studio yang dibuat untuk rombongan sekolah.'],
-      ['Tahun depan: ', 'empat tanggal penting, dari pembukaan hingga pameran pinjaman pertama.'],
+      ['Sayap baru', 'Dua puluh dua ruang di tiga lantai, dan satu rute yang melewati semuanya.'],
+      ['Konservasi', '312 karya dibersihkan, diperbaiki, dan dibingkai ulang untuk penataan.'],
+      ['Kunjungan', 'Malam Kamis gratis, dan studio yang dibuat untuk rombongan sekolah.'],
     ],
   },
   figures: {
@@ -76,8 +73,16 @@ export const id: TaaruchaCopy = {
     kicker: 'Tiga cara baru berkunjung',
     title: 'Museum yang terbuka bagi lebih banyak orang',
     cards: [
-      ['Kamis', 'Malam gratis', 'Buka hingga pukul sepuluh malam, dengan musik di atrium, tanpa tiket.'],
-      ['Sekolah', 'Studio terbuka', 'Ruang tempat kelas menggambar dari karya yang baru saja mereka lihat.'],
+      [
+        'Kamis',
+        'Malam gratis',
+        'Buka hingga pukul sepuluh malam, dengan musik di atrium, tanpa tiket.',
+      ],
+      [
+        'Sekolah',
+        'Studio terbuka',
+        'Ruang tempat kelas menggambar dari karya yang baru saja mereka lihat.',
+      ],
       ['Anggota', 'Di balik layar', 'Kunjungan bulanan ke studio konservasi dan gudang koleksi.'],
     ],
     note: 'Semua program dimulai pada pekan pintu dibuka.',
@@ -87,7 +92,11 @@ export const id: TaaruchaCopy = {
     kicker: 'Tahun pertama',
     title: 'Empat tanggal di tahun pertama sayap ini',
     stops: [
-      ['14 April', 'Pintu dibuka', 'Seluruh dua puluh dua ruang, gratis pada akhir pekan pembukaan.'],
+      [
+        '14 April',
+        'Pintu dibuka',
+        'Seluruh dua puluh dua ruang, gratis pada akhir pekan pembukaan.',
+      ],
       ['1 Juli', 'Malam musim panas', 'Kamis hingga pukul sepuluh malam, dengan musik di atrium.'],
       [
         '20 Oktober',
@@ -130,7 +139,8 @@ export const id: TaaruchaCopy = {
     name: 'Karya yang dipamerkan',
     kicker: 'Karya yang dipamerkan',
     title: 'Lebih banyak koleksi, dari setiap zaman',
-    source: 'Karya yang dipamerkan menurut periode pembuatan, sebelum penutupan dan mulai April 2027.',
+    source:
+      'Karya yang dipamerkan menurut periode pembuatan, sebelum penutupan dan mulai April 2027.',
     series: ['Hingga 2025', 'Mulai 2027'],
     periods: ['Sebelum 1800', '1800–1900', '1900–1960', '1960–2000', 'Sejak 2000'],
     figures: [

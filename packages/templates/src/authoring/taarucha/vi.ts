@@ -19,13 +19,10 @@ export const vi: TaaruchaCopy = {
     name: 'Sáng nay',
     kicker: 'Dành cho báo chí và nhà bảo trợ',
     title: 'Chương trình sáng nay',
-    intro:
-      'Bốn mươi phút về cách chúng tôi treo lại bộ sưu tập sau hai năm thi công, và những gì thay đổi với khách tham quan từ ngày mở cửa. Sau đó là một vòng dạo qua các phòng đầu tiên.',
     items: [
-      ['Cánh nhà mới: ', 'hai mươi hai phòng trên ba tầng, và một lối đi xuyên suốt.'],
-      ['Bảo quản: ', '312 tác phẩm được làm sạch, tu sửa và đóng khung lại để trưng bày.'],
-      ['Tham quan: ', 'tối thứ Năm miễn phí, và một xưởng vẽ dành cho các nhóm học sinh.'],
-      ['Năm tới: ', 'bốn mốc cần nhớ, từ ngày mở cửa đến triển lãm mượn đầu tiên.'],
+      ['Cánh nhà mới', 'Hai mươi hai phòng trên ba tầng, và một lối đi xuyên suốt.'],
+      ['Bảo quản', '312 tác phẩm được làm sạch, tu sửa và đóng khung lại để trưng bày.'],
+      ['Tham quan', 'Tối thứ Năm miễn phí, và một xưởng vẽ dành cho các nhóm học sinh.'],
     ],
   },
   figures: {
@@ -50,10 +47,7 @@ export const vi: TaaruchaCopy = {
     items: [
       ['Làm sạch bằng tay', 'Lớp vecni cũ được gỡ bằng tăm bông, mỗi lần vài xăng-ti-mét.'],
       ['Tu sửa, không vẽ lại', 'Vết rách và chỗ mất được trám bằng vật liệu luôn có thể gỡ bỏ.'],
-      [
-        'Ánh sáng vừa đủ',
-        'Mỗi tác phẩm có độ sáng vừa với sức chịu của màu hay giấy.',
-      ],
+      ['Ánh sáng vừa đủ', 'Mỗi tác phẩm có độ sáng vừa với sức chịu của màu hay giấy.'],
     ],
   },
   gallery: {

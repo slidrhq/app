@@ -19,13 +19,10 @@ export const en: GirCopy = {
     name: 'Tonight',
     kicker: 'Welcome',
     title: 'Tonight, in forty minutes',
-    intro:
-      'Forty minutes on how Grade 7 will learn this year, what changes in the classroom and how you can help at home. Then you will meet your child’s homeroom teacher in the new classroom.',
     items: [
-      ['New classrooms: ', 'tables of four instead of rows that face the board.'],
-      ['The year ahead: ', 'four dates to keep, from the first day to the year-end show.'],
-      ['Extra help: ', 'what we do, step by step, when a pupil falls behind.'],
-      ['Your questions: ', 'then a short meeting with each homeroom teacher.'],
+      ['New classrooms', 'Tables of four instead of rows that face the board.'],
+      ['The year ahead', 'Four dates to keep, from the first day to the year-end show.'],
+      ['Extra help', 'What we do, step by step, when a pupil falls behind.'],
     ],
   },
   figures: {
@@ -129,8 +126,7 @@ export const en: GirCopy = {
     name: 'Reading',
     kicker: 'Reading',
     title: 'Our pupils read more every month',
-    source:
-      'Minutes of free reading a week, last year’s Grade 7, from the pupils’ reading logs.',
+    source: 'Minutes of free reading a week, last year’s Grade 7, from the pupils’ reading logs.',
     months: ['Sep', 'Nov', 'Jan', 'Mar', 'May'],
     series: ['Hillside Grade 7', 'Town average'],
     figures: [

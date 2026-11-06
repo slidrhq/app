@@ -17,10 +17,7 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
-  rect,
   sampleSlides,
-  solid,
   SURFACE,
   text,
   token,
@@ -644,7 +641,12 @@ function compass(id: string, b: Pt, p: Pt, hinge: Pt, knob: Pt): string {
     const b2 = n(w1 / 2, end, 1);
     const c = n(w1 / 2, end, -1);
     const d = n(w0 / 2, from, -1);
-    return { d: `M${r1(a[0])} ${r1(a[1])}L${r1(b2[0])} ${r1(b2[1])}L${r1(c[0])} ${r1(c[1])}L${r1(d[0])} ${r1(d[1])}Z`, end, ux, uy };
+    return {
+      d: `M${r1(a[0])} ${r1(a[1])}L${r1(b2[0])} ${r1(b2[1])}L${r1(c[0])} ${r1(c[1])}L${r1(d[0])} ${r1(d[1])}Z`,
+      end,
+      ux,
+      uy,
+    };
   };
   const one = leg(hinge, b, 24, 15, 34);
   const two = leg(hinge, p, 24, 15, 66);
@@ -864,7 +866,9 @@ function classroomPlan(
         `<g id="${id}-table${i}">` +
         pen(box(0, 0, 27, 24, seed + 40 + i * 7), YELLOW, 3.4) +
         pen(
-          chairs.map(([cx, cy], j) => loop(cx, cy, 7, 7, 0, 370, seed + 70 + i * 5 + j, 0.05)).join(''),
+          chairs
+            .map(([cx, cy], j) => loop(cx, cy, 7, 7, 0, 370, seed + 70 + i * 5 + j, 0.05))
+            .join(''),
           CHALK,
           2.8,
         ) +
@@ -956,6 +960,40 @@ const PINNED = [0, 16, 0, 16];
 
 /** The treads of the staircase of the process, from the first step up. */
 const treads = [744, 680, 616, 552, 488];
+
+/**
+ * The three points of the text-and-image slide, a heading over its body, each numbered in a chalk
+ * ring on a thread; the text slide sets them across the board (ADR-136).
+ */
+function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+  return {
+    placeholders: [0, 1, 2].flatMap((i) => [
+      place(`p_point${i + 1}`, 'subtitle', at(START + 92, 320 + i * 196, width, 46), 'heading'),
+      place(`p_detail${i + 1}`, 'body', at(START + 92, 370 + i * 196, width, 124), 'body'),
+    ]),
+    decorations: [
+      chalk(
+        `d_gir_${name}_thread`,
+        at(START + 27, 388, 14, 324),
+        pen(
+          hand([7, 4], [7, 120], 3, 0, 0.8) + hand([7, 200], [7, 320], 4, 0, 0.8),
+          CHALK,
+          2.6,
+          0.5,
+        ),
+      ),
+      ...[0, 1, 2].map((i) => {
+        const id = `d_gir_${name}_n${i + 1}`;
+        return chalkFigures(
+          id,
+          at(START, 312 + i * 196, 68, 68),
+          pen(loop(34, 34, 28, 27, -120, 375, seedOf(id), 0.03, 0.1), YELLOW, 3.4),
+          () => figure(34, 47, String(i + 1), 34, CHALK),
+        );
+      }),
+    ],
+  };
+}
 
 function layouts(): Layout[] {
   // The opening: Euclid's first construction. Two circles on a line, each through the other's
@@ -1053,7 +1091,10 @@ function layouts(): Layout[] {
         [x1 + 6, y - 18],
       ]);
       const angle = Math.atan2(y - 18 - (peak + 16), x1 + 6 - (x0 + (x1 - x0) * 0.75));
-      return pen(path, YELLOW, 3.6) + pen(arrowHead([x1 + 6, y - 18], angle, 18, k + 50 + i), YELLOW, 3.6);
+      return (
+        pen(path, YELLOW, 3.6) +
+        pen(arrowHead([x1 + 6, y - 18], angle, 18, k + 50 + i), YELLOW, 3.6)
+      );
     });
     return (
       twice((s2) => hand([lineBox.w - 24, y], [24, y + 2], s2, 0, 1.2), k, CHALK, 4) +
@@ -1091,7 +1132,12 @@ function layouts(): Layout[] {
       body:
         `<path d="M${profile.map(([x, y]) => `${Math.round(x)} ${Math.round(y)}`).join('L')}Z" fill="url(#d_gir_process_stairs-hatch)"/>` +
         twice((k2) => strokes(profile, k2, 0.8), k, CHALK, 4.2) +
-        pen(hand([sx(START - 10), base], [sx(START + 1348 + 310), base], k + 7, 0, 1), CHALK, 3.4, 0.8),
+        pen(
+          hand([sx(START - 10), base], [sx(START + 1348 + 310), base], k + 7, 0, 1),
+          CHALK,
+          3.4,
+          0.8,
+        ),
     };
   })();
 
@@ -1203,9 +1249,15 @@ function layouts(): Layout[] {
             place(`p_number${i + 2}`, 'number', atEnd(END + off + 34, y + 18, 492, 72), 'title', {
               color: token('bg'),
             }),
-            place(`p_label${i + 2}`, 'caption', atEnd(END + off + 34, y + 104, 492, 68), 'caption', {
-              color: token('bg', 0.84),
-            }),
+            place(
+              `p_label${i + 2}`,
+              'caption',
+              atEnd(END + off + 34, y + 104, 492, 68),
+              'caption',
+              {
+                color: token('bg', 0.84),
+              },
+            ),
           ];
         }),
         ...foot('big_number').placeholders,
@@ -1228,7 +1280,13 @@ function layouts(): Layout[] {
                 return (
                   [0, 1, 2, 3]
                     .map((i) =>
-                      hand([x0 - i * 14, 16 + (i % 2) * 3], [x0 - i * 14 + 2, 100], 40 + g * 9 + i, 0, 0.8),
+                      hand(
+                        [x0 - i * 14, 16 + (i % 2) * 3],
+                        [x0 - i * 14 + 2, 100],
+                        40 + g * 9 + i,
+                        0,
+                        0.8,
+                      ),
                     )
                     .join('') + hand([x0 + 10, 30], [x0 - 54, 86], 80 + g, 2, 0.6)
                 );
@@ -1330,57 +1388,17 @@ function layouts(): Layout[] {
       id: 'l_gir_text',
       name: 'Text',
       archetype: 'text',
-      // The text on a patch of the board, ruled by hand from margin to margin down to over the
-      // foot, and set from its top; an hourglass beside the title. The kicker over the title
-      // and the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, its title on one line,
+      // its footer, and its points across the board at the height they have there.
       placeholders: [
         ...head('text', 1480, 1).placeholders,
-        // The body's start on the footer's, by the same edge.
-        place('p_body', 'body', at(START + 62, 286, WIDTH - 126, 594), 'body'),
+        ...textPoints('text', WIDTH - 92).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         board('d_gir_text_board'),
         ...head('text', 1480, 1).decorations,
-        rect('d_gir_text_patch', at(START, 232, WIDTH, 696), solid(token('surface', 0.5)), {
-          effects: { radius: 4 },
-        }),
-        chalk(
-          'd_gir_text_rule',
-          at(START - 12, 220, WIDTH + 24, 720),
-          twice((k) => ruled(12, 12, WIDTH, 696, k, 9), 61, CHALK, 3.2),
-        ),
-        chalk(
-          'd_gir_text_hourglass',
-          atEnd(END + 20, 62, 92, 128),
-          twice(
-            (k) =>
-              hand([10, 10], [82, 10], k, 0, 0.4) + hand([10, 118], [82, 118], k + 1, 0, 0.4),
-            1,
-            CHALK,
-            4.4,
-          ) +
-            pen(
-              through([
-                [18, 12],
-                [22, 44],
-                [46, 64],
-                [70, 84],
-                [74, 116],
-              ]) +
-                through([
-                  [74, 12],
-                  [70, 44],
-                  [46, 64],
-                  [22, 84],
-                  [18, 116],
-                ]),
-              CHALK,
-              3.8,
-            ) +
-            pen(hand([30, 34], [62, 34], 3, 0, 0.3) + hand([28, 108], [64, 108], 4, 0, 0.3), YELLOW, 7, 0.85) +
-            pen(hand([46, 66], [46, 100], 5, 0, 0.2), YELLOW, 3, 0.85),
-        ),
+        ...textPoints('text', WIDTH - 92).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1391,10 +1409,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 980).placeholders,
         place('p_image', 'image', atEnd(END + 30, 172, 604, 724)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 92, 320 + i * 196, 880, 46), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 92, 370 + i * 196, 880, 124), 'body'),
-        ]),
+        ...textPoints('text_image', 880).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1402,20 +1417,7 @@ function layouts(): Layout[] {
         ...head('text_image', 980).decorations,
         paper('d_gir_text_image_print', atEnd(END + 6, 148, 652, 772)),
         tape('d_gir_text_image_tape', atEnd(END + 6 + 326 - 76, 126, 152, 40)),
-        chalk(
-          'd_gir_text_image_thread',
-          at(START + 27, 388, 14, 324),
-          pen(hand([7, 4], [7, 120], 3, 0, 0.8) + hand([7, 200], [7, 320], 4, 0, 0.8), CHALK, 2.6, 0.5),
-        ),
-        ...[0, 1, 2].map((i) => {
-          const id = `d_gir_text_image_n${i + 1}`;
-          return chalkFigures(
-            id,
-            at(START, 312 + i * 196, 68, 68),
-            pen(loop(34, 34, 28, 27, -120, 375, seedOf(id), 0.03, 0.1), YELLOW, 3.4),
-            () => figure(34, 47, String(i + 1), 34, CHALK),
-          );
-        }),
+        ...textPoints('text_image', 880).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1537,7 +1539,19 @@ function layouts(): Layout[] {
           'd_gir_process_flag',
           at(1744, treads[4]! - 132, 64, 136),
           pen(hand([56, 132], [54, 6], 3, 0, 0.6), CHALK, 3.4) +
-            pen(strokes([[54, 8], [6, 26], [54, 46]], 5, 0.4), CORAL, 3.4) +
+            pen(
+              strokes(
+                [
+                  [54, 8],
+                  [6, 26],
+                  [54, 46],
+                ],
+                5,
+                0.4,
+              ),
+              CORAL,
+              3.4,
+            ) +
             `<path d="M52 10L10 26L52 44Z" fill="${CORAL}" fill-opacity=".35"/>`,
         ),
         kickerStar('d_gir_process_note_star', START, 841),
@@ -1592,7 +1606,11 @@ function layouts(): Layout[] {
               96,
               96,
               pen(loop(48, 48, 40, 40, 0, 372, 7, 0.03, 0.06), YELLOW, 4) +
-                pen(hand([70, 48], [24, 48], 8, 0, 0.4) + arrowHead([24, 48], Math.PI, 17, 9), YELLOW, 4.6),
+                pen(
+                  hand([70, 48], [24, 48], 8, 0, 0.4) + arrowHead([24, 48], Math.PI, 17, 9),
+                  YELLOW,
+                  4.6,
+                ),
             ),
         ),
         ...foot('comparison').decorations,
@@ -1660,7 +1678,12 @@ function layouts(): Layout[] {
         board('d_gir_table_board'),
         ...head('table', 1200).decorations,
         {
-          ...lifted(upright('d_gir_table_ruler', at(START, 264, WIDTH, 46), ruler(WIDTH, 46)), 8, 14, 0.45),
+          ...lifted(
+            upright('d_gir_table_ruler', at(START, 264, WIDTH, 46), ruler(WIDTH, 46)),
+            8,
+            14,
+            0.45,
+          ),
           rotation: -0.8,
         },
         chalk(
@@ -1737,8 +1760,30 @@ function layouts(): Layout[] {
               id,
               40,
               40,
-              pen(strokes([[5, 8], [32, 8], [32, 35], [5, 35]], seedOf(id), 0.4, true), CHALK, 3) +
-                pen(through([[10, 21], [17, 29], [36, 4]]), YELLOW, 4.2),
+              pen(
+                strokes(
+                  [
+                    [5, 8],
+                    [32, 8],
+                    [32, 35],
+                    [5, 35],
+                  ],
+                  seedOf(id),
+                  0.4,
+                  true,
+                ),
+                CHALK,
+                3,
+              ) +
+                pen(
+                  through([
+                    [10, 21],
+                    [17, 29],
+                    [36, 4],
+                  ]),
+                  YELLOW,
+                  4.2,
+                ),
             ),
           );
         }),
@@ -1848,15 +1893,8 @@ function drawSample(copy: GirCopy, books?: number): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 34 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 20 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },

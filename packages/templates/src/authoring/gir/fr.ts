@@ -19,13 +19,13 @@ export const fr: GirCopy = {
     name: 'Ce soir',
     kicker: 'Bienvenue',
     title: 'Ce soir, en quarante minutes',
-    intro:
-      'Quarante minutes sur la façon dont les 6e apprendront cette année, ce qui change en classe et comment vous pouvez aider à la maison. Puis vous rencontrerez le professeur principal de votre enfant dans sa salle.',
     items: [
-      ['Nouvelles salles\u00a0: ', 'des tables de quatre au lieu de rangées face au tableau.'],
-      ['L’année qui vient\u00a0: ', 'quatre dates à retenir, de la rentrée au spectacle de fin d’année.'],
-      ['Soutien\u00a0: ', 'ce que nous faisons, étape par étape, quand un élève décroche.'],
-      ['Vos questions\u00a0: ', 'puis un court échange avec chaque professeur principal.'],
+      ['Nouvelles sallesu00a0', 'Des tables de quatre au lieu de rangées face au tableau.'],
+      [
+        'L’année qui vientu00a0',
+        'Quatre dates à retenir, de la rentrée au spectacle de fin d’année.',
+      ],
+      ['Soutienu00a0', 'Ce que nous faisons, étape par étape, quand un élève décroche.'],
     ],
   },
   figures: {
@@ -79,7 +79,11 @@ export const fr: GirCopy = {
     kicker: 'Trois nouveaux ateliers',
     title: 'Nouveau cette année en 6e',
     cards: [
-      ['Atelier 01', 'Robotique', 'Construire et programmer un petit robot en binôme, sur douze semaines.'],
+      [
+        'Atelier 01',
+        'Robotique',
+        'Construire et programmer un petit robot en binôme, sur douze semaines.',
+      ],
       ['Atelier 02', 'Débat', 'Défendre une idée, écouter l’autre camp, et changer d’avis.'],
       ['Atelier 03', 'Potager', 'Semer, cueillir et cuisiner\u00a0: de la graine à la soupe.'],
     ],
@@ -90,10 +94,26 @@ export const fr: GirCopy = {
     kicker: 'L’année à venir',
     title: 'Quatre dates à retenir',
     stops: [
-      ['Sept. 2027', 'La rentrée', 'Chaque classe découvre son professeur principal et ses nouvelles tables.'],
-      ['Déc. 2027', 'Fête de la science', 'Chaque équipe présente une expérience des nouveaux labos.'],
-      ['Mars 2028', 'Voyage scolaire', 'Trois jours dans le nord, avec une nuit à la belle étoile.'],
-      ['Juin 2028', 'Spectacle de juin', 'Toutes les classes sur scène, les parents aux premiers rangs.'],
+      [
+        'Sept. 2027',
+        'La rentrée',
+        'Chaque classe découvre son professeur principal et ses nouvelles tables.',
+      ],
+      [
+        'Déc. 2027',
+        'Fête de la science',
+        'Chaque équipe présente une expérience des nouveaux labos.',
+      ],
+      [
+        'Mars 2028',
+        'Voyage scolaire',
+        'Trois jours dans le nord, avec une nuit à la belle étoile.',
+      ],
+      [
+        'Juin 2028',
+        'Spectacle de juin',
+        'Toutes les classes sur scène, les parents aux premiers rangs.',
+      ],
     ],
     note: 'Les professeurs principaux enverront les dates des rencontres parents-professeurs deux semaines avant.',
   },
@@ -149,7 +169,13 @@ export const fr: GirCopy = {
       ['Chorale', 'Mardi', '14\u00a0h\u00a030–16\u00a0h', 'Salle de musique', '40'],
       ['Football', 'Mercredi', '15\u00a0h–16\u00a0h\u00a030', 'Terrain de sport', '24'],
       ['Codage', 'Jeudi', '14\u00a0h\u00a030–16\u00a0h', 'Labo 2', '18'],
-      ['Arts plastiques', 'Vendredi', '13\u00a0h\u00a030–15\u00a0h', 'Salle d’arts plastiques', '16'],
+      [
+        'Arts plastiques',
+        'Vendredi',
+        '13\u00a0h\u00a030–15\u00a0h',
+        'Salle d’arts plastiques',
+        '16',
+      ],
     ],
   },
   team: {

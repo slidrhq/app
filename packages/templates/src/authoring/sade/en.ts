@@ -19,13 +19,10 @@ export const en: SadeCopy = {
     name: 'Agenda',
     kicker: 'Members’ assembly',
     title: 'What we will cover this morning',
-    intro:
-      'Forty minutes on the 2026 harvest: what we grew, how much water it took and what the soil told us. Then the plan for the 2027 season, and time for your questions.',
     items: [
-      ['The harvest: ', '18,400 tonnes of grain from 212 farms, and where it went.'],
-      ['Water: ', 'how drip lines and cover crops cut what a tonne of grain takes.'],
-      ['The soil: ', 'what three years of tests show under our fields.'],
-      ['The 2027 season: ', 'the seed bank, the shared machines and the calendar.'],
+      ['The harvest', '18,400 tonnes of grain from 212 farms, and where it went.'],
+      ['Water', 'How drip lines and cover crops cut what a tonne of grain takes.'],
+      ['The soil', 'What three years of tests show under our fields.'],
     ],
   },
   figures: {

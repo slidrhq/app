@@ -17,7 +17,6 @@ import {
   drawing,
   pageNumber,
   place,
-  points,
   rect,
   sampleSlides,
   solid,
@@ -488,7 +487,8 @@ function spool(w: number, h: number, thread = GARNET) {
   const fl = 24;
   const inset = w * 0.12;
   let wound = '';
-  for (let y = fl + 3; y < h - fl - 2; y += 5) wound += `M${r1(inset)} ${y}L${r1(w - inset)} ${y + 3}`;
+  for (let y = fl + 3; y < h - fl - 2; y += 5)
+    wound += `M${r1(inset)} ${y}L${r1(w - inset)} ${y + 3}`;
   return (
     `<defs><linearGradient id="tefer-spool-shade" x1="0" x2="1" y1="0" y2="0">` +
     `<stop offset="0" stop-color="${INK}" stop-opacity=".32"/><stop offset=".35" stop-color="${INK}" stop-opacity="0"/>` +
@@ -513,7 +513,8 @@ function thimble(w: number, h: number) {
     for (let col = 0; col < 4; col++) {
       const x = w * 0.3 + col * w * 0.13 + (row % 2) * w * 0.065;
       const y = h * 0.3 + row * h * 0.12;
-      if (x < w * 0.78) dimples += `<circle cx="${r1(x)}" cy="${r1(y)}" r="1.6" fill="${INK}" fill-opacity=".35"/>`;
+      if (x < w * 0.78)
+        dimples += `<circle cx="${r1(x)}" cy="${r1(y)}" r="1.6" fill="${INK}" fill-opacity=".35"/>`;
     }
   }
   return (
@@ -604,7 +605,10 @@ function coatPiece(w: number, h: number, turn: number) {
     `<path d="M196 230V600M184 248L196 230L208 248M184 582L196 600L208 582" ${ink} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>` +
     // Buttonholes on the front edge, and the notches of the side seam, the armhole and the shoulder.
     [430, 520, 610]
-      .map((y) => `<path d="M58 ${y}H94M94 ${y - 6}V${y + 6}" ${ink} stroke-width="2" stroke-linecap="round"/>`)
+      .map(
+        (y) =>
+          `<path d="M58 ${y}H94M94 ${y - 6}V${y + 6}" ${ink} stroke-width="2" stroke-linecap="round"/>`,
+      )
       .join('') +
     `<path d="M470 520H450M447 232L428 236M450 250L431 254M360 68L356 87M296 828L298 808" ${ink} stroke-width="2" stroke-linecap="round"/>` +
     pin(372, 60, 128, 64) +
@@ -625,7 +629,10 @@ function dressForm(w: number, h: number) {
   // The tape round the waist: two curves, and its ticks.
   const waist = (t: number, dy: number): Pt => {
     const u = 1 - t;
-    return [u * u * 104 + 2 * u * t * 235 + t * t * 366, u * u * 414 + 2 * u * t * 446 + t * t * 414 + dy];
+    return [
+      u * u * 104 + 2 * u * t * 235 + t * t * 366,
+      u * u * 414 + 2 * u * t * 446 + t * t * 414 + dy,
+    ];
   };
   let ticks = '';
   for (let i = 1; i < 36; i++) {
@@ -633,7 +640,8 @@ function dressForm(w: number, h: number) {
     ticks += `M${xy(p)}L${xy([p[0], p[1] + (i % 2 ? 6 : 10)])}`;
   }
   let tail = '';
-  for (let y = 452; y < 586; y += 9) tail += `M${r1(358 + (y - 430) * 0.19)} ${y}L${r1(366 + (y - 430) * 0.19)} ${y + 0.6}`;
+  for (let y = 452; y < 586; y += 9)
+    tail += `M${r1(358 + (y - 430) * 0.19)} ${y}L${r1(366 + (y - 430) * 0.19)} ${y + 0.6}`;
   return (
     `<defs><linearGradient id="tefer-form-shade" x1="0" x2="1" y1="0" y2="0">` +
     `<stop offset="0" stop-color="${INK}" stop-opacity=".2"/><stop offset=".28" stop-color="${INK}" stop-opacity="0"/>` +
@@ -675,7 +683,8 @@ function sewnLabel(w: number, h: number) {
   let weave = '';
   for (let y = 5; y < h; y += 5) weave += `M0 ${y}H${body}`;
   let border = '';
-  for (let x = 6; x < body - 40; x += 12) border += `M${x} 24L${x + 8} 32M${x} ${h - 32}L${x + 8} ${h - 24}`;
+  for (let x = 6; x < body - 40; x += 12)
+    border += `M${x} 24L${x + 8} 32M${x} ${h - 32}L${x + 8} ${h - 24}`;
   return (
     `<rect x="0" y="0" width="${body}" height="${h}" fill="${GARNET}"/>` +
     `<path d="${weave}" stroke="${IVORY}" stroke-opacity=".06" stroke-width="1.2"/>` +
@@ -709,7 +718,8 @@ function swingTag(w: number, h: number) {
 /** The selvedge of a cloth: its woven edge, the line of its mill, and the tenter holes. */
 function selvedge(w: number, h: number) {
   let holes = '';
-  for (let x = 12; x < w; x += 24) holes += `<circle cx="${x}" cy="${h - 9}" r="2.4" fill="${INK}" fill-opacity=".35"/>`;
+  for (let x = 12; x < w; x += 24)
+    holes += `<circle cx="${x}" cy="${h - 9}" r="2.4" fill="${INK}" fill-opacity=".35"/>`;
   return (
     `<rect x="0" y="0" width="${w}" height="${h}" fill="${IVORY}"/>` +
     `<path d="M0 .75H${w}" stroke="${INK}" stroke-opacity=".2" stroke-width="1.5"/>` +
@@ -816,9 +826,7 @@ function head(name: string, width = 1100, lines = 1, kicker = true) {
   const title = at(START, 124, width, Math.round(62 * 1.3 * lines) + 4);
   if (!kicker) {
     return {
-      placeholders: [
-        place('p_title', 'title', at(START + 48, 112, width - 48, title.h), 'title'),
-      ],
+      placeholders: [place('p_title', 'title', at(START + 48, 112, width - 48, title.h), 'title')],
       decorations: [crossStitch(`d_tefer_${name}_stitch`, at(START, 142, 26, 26))],
     };
   }
@@ -895,26 +903,54 @@ const steps5 = [START, START + 345, START + 690, START + 1035, START + 1380];
 const team4 = [START, START + 430, START + 860, START + 1290];
 
 function layouts(): Layout[] {
+  /**
+   * The three points of the text-and-image slide, a heading over its body each, and what is
+   * drawn with them; the text slide sets them across the slide (ADR-136).
+   */
+  function textPoints(name: string, width: number): Pick<Layout, 'placeholders' | 'decorations'> {
+    return {
+      placeholders: [
+        ...[0, 1, 2].flatMap((i) => [
+          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 300 + i * 186, width, 48), 'heading'),
+          place(`p_detail${i + 1}`, 'body', at(START + 88, 354 + i * 186, width, 120), 'body'),
+        ]),
+      ],
+      decorations: [
+        art(
+          `d_tefer_${name}_thread`,
+          at(START + 27, 362, 4, 306),
+          `<path d="M2 2V304" stroke="${GARNET}" stroke-width="2" stroke-dasharray="8 7" stroke-linecap="round"/>`,
+        ),
+        ...[0, 1, 2].map((i) =>
+          numberRing(`d_tefer_${name}_ring${i + 1}`, at(START, 296 + i * 186, 58, 58), i + 1),
+        ),
+      ],
+    };
+  }
+
   // The opening's tape measure, from its brass tip near the top of the end side down across
   // the pattern piece and off the foot of the slide.
   const heroTapeBox = atEnd(0, 0, 900, 1080);
-  const heroTape = bezier([64, 96], [
+  const heroTape = bezier(
+    [64, 96],
     [
-      [250, 40],
-      [430, 200],
-      [470, 400],
+      [
+        [250, 40],
+        [430, 200],
+        [470, 400],
+      ],
+      [
+        [510, 600],
+        [690, 640],
+        [780, 790],
+      ],
+      [
+        [860, 920],
+        [820, 1020],
+        [720, 1110],
+      ],
     ],
-    [
-      [510, 600],
-      [690, 640],
-      [780, 790],
-    ],
-    [
-      [860, 920],
-      [820, 1020],
-      [720, 1110],
-    ],
-  ]);
+  );
   // The timeline's tape: across the slide from the start edge, as the slide reads.
   const lineBox = atEnd(0, 312, 1920, 150);
   const wave = (x: number) => 74 + 14 * Math.sin((x / 1920) * Math.PI * 2.2 + 0.6);
@@ -939,15 +975,24 @@ function layouts(): Layout[] {
       decorations: [
         mark('d_tefer_hero_mark', at(START, 112, 52, 52)),
         lifted(
-          art('d_tefer_hero_swatch', atEnd(60, 600, 420, 340), (() => {
-            const body = swatch('d_tefer_hero_swatch', 330, 250, 'herringbone');
-            return `<g transform="translate(210 170) rotate(-11) translate(-165 -125)">${body}</g>`;
-          })()),
+          art(
+            'd_tefer_hero_swatch',
+            atEnd(60, 600, 420, 340),
+            (() => {
+              const body = swatch('d_tefer_hero_swatch', 330, 250, 'herringbone');
+              return `<g transform="translate(210 170) rotate(-11) translate(-165 -125)">${body}</g>`;
+            })(),
+          ),
           8,
           18,
           0.18,
         ),
-        lifted(art('d_tefer_hero_pattern', atEnd(150, 70, 700, 930), coatPiece(700, 930, 6)), 16, 34, 0.14),
+        lifted(
+          art('d_tefer_hero_pattern', atEnd(150, 70, 700, 930), coatPiece(700, 930, 6)),
+          16,
+          34,
+          0.14,
+        ),
         art('d_tefer_hero_chalk', atEnd(520, 900, 170, 100), chalk(170, 100)),
         lifted(
           upright(
@@ -986,7 +1031,12 @@ function layouts(): Layout[] {
         place('p_subtitle', 'subtitle', at(START, 698, 760, 112), 'heading'),
       ],
       decorations: [
-        lifted(art('d_tefer_section_label', atEnd(0, 330, 860, 380), sewnLabel(860, 380)), 14, 30, 0.2),
+        lifted(
+          art('d_tefer_section_label', atEnd(0, 330, 860, 380), sewnLabel(860, 380)),
+          14,
+          30,
+          0.2,
+        ),
         art(
           'd_tefer_section_seam',
           atEnd(0, 0, 48, 1080),
@@ -1044,7 +1094,12 @@ function layouts(): Layout[] {
         ...foot('quote').placeholders,
       ],
       decorations: [
-        lifted(art('d_tefer_quote_tag', at(230, 160, 1460, 690), swingTag(1460, 690)), 18, 40, 0.14),
+        lifted(
+          art('d_tefer_quote_tag', at(230, 160, 1460, 690), swingTag(1460, 690)),
+          18,
+          40,
+          0.14,
+        ),
         art(
           'd_tefer_quote_string',
           at(130, 0, 260, 520),
@@ -1052,10 +1107,14 @@ function layouts(): Layout[] {
             `<path d="M96 505C78 430 140 380 136 260C132 180 104 90 112 -4" stroke="${GARNET}" stroke-width="3" stroke-linecap="round"/>`,
         ),
         lifted(
-          art('d_tefer_quote_swatch', atEnd(300, 226, 280, 340), (() => {
-            const body = swatch('d_tefer_quote_swatch', 230, 290, 'herringbone');
-            return `<g transform="translate(140 170) rotate(5) translate(-115 -145)">${body}</g>`;
-          })()),
+          art(
+            'd_tefer_quote_swatch',
+            atEnd(300, 226, 280, 340),
+            (() => {
+              const body = swatch('d_tefer_quote_swatch', 230, 290, 'herringbone');
+              return `<g transform="translate(140 170) rotate(5) translate(-115 -145)">${body}</g>`;
+            })(),
+          ),
           6,
           14,
           0.2,
@@ -1073,41 +1132,16 @@ function layouts(): Layout[] {
       id: 'l_tefer_text',
       name: 'Text',
       archetype: 'text',
-      // The text is on a sheet of pattern paper from margin to margin, down to over the foot,
-      // from its top; two pins hold its corner, beside the title. The kicker over the title and
-      // the footer, as on the text-and-image slide (ADR-135).
+      // The text-and-image slide without its picture (ADR-136): its kicker, title and footer,
+      // and its points across the slide at the height they have there.
       placeholders: [
         ...head('text', WIDTH - 220, 1).placeholders,
-        place('p_body', 'body', at(START + 56, 232 + 54, WIDTH - 112, 600), 'body'),
+        ...textPoints('text', WIDTH - 88).placeholders,
         ...foot('text').placeholders,
       ],
       decorations: [
         ...head('text', WIDTH - 220, 1).decorations,
-        lifted(
-          art(
-            'd_tefer_text_sheet',
-            at(START, 232, WIDTH, 694),
-            (() => {
-              const w = WIDTH;
-              const h = 694;
-              const v = (x: number) => `L${x - 9} 0L${x} 14L${x + 9} 0`;
-              const vb = (x: number) => `L${x + 9} ${h}L${x} ${h - 14}L${x - 9} ${h}`;
-              return (
-                `<path d="M0 0${v(420)}${v(1260)}L${w} 0V${h}${vb(860)}${vb(840)}L0 ${h}Z" fill="${IVORY}" stroke="${INK}" stroke-opacity=".1" stroke-width="1.2"/>` +
-                `<rect x="18" y="18" width="${w - 36}" height="${h - 36}" rx="2" stroke="${GARNET}" stroke-opacity=".5" stroke-width="1.6" stroke-dasharray="10 8"/>` +
-                `<path d="M0 ${h / 2 - 10}H14M${w} ${h / 2 - 10}H${w - 14}M0 ${h / 2 + 10}H14M${w} ${h / 2 + 10}H${w - 14}" stroke="${INK}" stroke-opacity=".45" stroke-width="2"/>`
-              );
-            })(),
-          ),
-          14,
-          34,
-          0.1,
-        ),
-        art(
-          'd_tefer_text_pins',
-          atEnd(END - 56, 166, 180, 112),
-          pin(40, 22, 32, 96) + pin(150, 30, 148, 92, IVORY),
-        ),
+        ...textPoints('text', WIDTH - 88).decorations,
         ...foot('text').decorations,
       ],
     },
@@ -1118,10 +1152,7 @@ function layouts(): Layout[] {
       placeholders: [
         ...head('text_image', 960).placeholders,
         place('p_image', 'image', atEnd(END + 32, 236, 560, 620)),
-        ...[0, 1, 2].flatMap((i) => [
-          place(`p_point${i + 1}`, 'subtitle', at(START + 88, 300 + i * 186, 880, 48), 'heading'),
-          place(`p_detail${i + 1}`, 'body', at(START + 88, 354 + i * 186, 880, 120), 'body'),
-        ]),
+        ...textPoints('text_image', 880).placeholders,
         ...foot('text_image').placeholders,
       ],
       decorations: [
@@ -1145,19 +1176,12 @@ function layouts(): Layout[] {
           atEnd(END + 262, 0, 100, 212),
           // A pattern hook, its wire through the card's hole, hung on a brass peg.
           `<circle cx="70" cy="40" r="11" fill="${INK}" fill-opacity=".14"/>` +
-          `<circle cx="68" cy="36" r="10" fill="${TAPE}" stroke="${INK}" stroke-opacity=".45" stroke-width="1.4"/>` +
+            `<circle cx="68" cy="36" r="10" fill="${TAPE}" stroke="${INK}" stroke-opacity=".45" stroke-width="1.4"/>` +
             `<circle cx="65" cy="33" r="3" fill="${IVORY}" fill-opacity=".6"/>` +
             `<path d="M50 206V58C50 34 64 24 78 30C90 36 90 52 82 58" stroke="${STEEL}" stroke-width="5" stroke-linecap="round"/>` +
             `<path d="M47 200V60C47 44 56 34 66 32" stroke="${IVORY}" stroke-opacity=".6" stroke-width="1.4" stroke-linecap="round"/>`,
         ),
-        art(
-          'd_tefer_text_image_thread',
-          at(START + 27, 362, 4, 306),
-          `<path d="M2 2V304" stroke="${GARNET}" stroke-width="2" stroke-dasharray="8 7" stroke-linecap="round"/>`,
-        ),
-        ...[0, 1, 2].map((i) =>
-          numberRing(`d_tefer_text_image_ring${i + 1}`, at(START, 296 + i * 186, 58, 58), i + 1),
-        ),
+        ...textPoints('text_image', 880).decorations,
         ...foot('text_image').decorations,
       ],
     },
@@ -1219,7 +1243,12 @@ function layouts(): Layout[] {
             art(
               `d_tefer_cards_swatch${i + 1}`,
               at(s + 40, 290, 440, 196),
-              swatch(`d_tefer_cards_swatch${i + 1}`, 440, 196, (['herringbone', 'boucle', 'twill'] as const)[i]!),
+              swatch(
+                `d_tefer_cards_swatch${i + 1}`,
+                440,
+                196,
+                (['herringbone', 'boucle', 'twill'] as const)[i]!,
+              ),
             ),
             4,
             8,
@@ -1296,7 +1325,12 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('process', 1100).decorations,
-        lifted(art('d_tefer_process_placket', at(START, 392, WIDTH, 118), placket(WIDTH, 118, buttons)), 10, 24, 0.16),
+        lifted(
+          art('d_tefer_process_placket', at(START, 392, WIDTH, 118), placket(WIDTH, 118, buttons)),
+          10,
+          24,
+          0.16,
+        ),
         card('d_tefer_process_note', at(START, 740, WIDTH, 124)),
         art('d_tefer_process_thimble', at(START + 40, 771, 54, 62), thimble(54, 62)),
         ...foot('process').decorations,
@@ -1314,10 +1348,21 @@ function layouts(): Layout[] {
             ['after', atEnd(END, 266, 780, 580)],
           ] as const
         ).flatMap(([side, f]) => [
-          place(`p_${side}_label`, 'caption', { x: f.x + 40, y: f.y + 350, w: 700, h: 36 }, 'caption', {
-            color: side === 'after' ? token('primary') : token('muted'),
-          }),
-          place(`p_${side}_title`, 'subtitle', { x: f.x + 40, y: f.y + 388, w: 700, h: 50 }, 'heading'),
+          place(
+            `p_${side}_label`,
+            'caption',
+            { x: f.x + 40, y: f.y + 350, w: 700, h: 36 },
+            'caption',
+            {
+              color: side === 'after' ? token('primary') : token('muted'),
+            },
+          ),
+          place(
+            `p_${side}_title`,
+            'subtitle',
+            { x: f.x + 40, y: f.y + 388, w: 700, h: 50 },
+            'heading',
+          ),
           place(`p_${side}_body`, 'body', { x: f.x + 40, y: f.y + 446, w: 700, h: 120 }, 'body'),
         ]),
         ...foot('comparison').placeholders,
@@ -1353,7 +1398,11 @@ function layouts(): Layout[] {
       decorations: [
         ...head('chart', 1080).decorations,
         card('d_tefer_chart_panel', at(START, 256, 1080, 640)),
-        art('d_tefer_chart_pins', at(START, 226, 1080, 64), pin(1046, 22, 118, 46) + pin(34, 22, 62, 46, IVORY)),
+        art(
+          'd_tefer_chart_pins',
+          at(START, 226, 1080, 64),
+          pin(1046, 22, 118, 46) + pin(34, 22, 62, 46, IVORY),
+        ),
         art('d_tefer_chart_card1', atEnd(END + 470, 292, 44, 112), threadCard(44, 112, GARNET)),
         art('d_tefer_chart_card2', atEnd(END + 470, 604, 44, 112), threadCard(44, 112, LODEN)),
         art('d_tefer_chart_rule', atEnd(END, 566, 514, 6), stitch('M2 3H512', MUTED, 1.6, '6 6')),
@@ -1372,7 +1421,12 @@ function layouts(): Layout[] {
       ],
       decorations: [
         ...head('table', 1200).decorations,
-        lifted(art('d_tefer_table_cloth', at(START, 254, WIDTH, 616), cutCloth(WIDTH, 616)), 12, 30, 0.12),
+        lifted(
+          art('d_tefer_table_cloth', at(START, 254, WIDTH, 616), cutCloth(WIDTH, 616)),
+          12,
+          30,
+          0.12,
+        ),
         art('d_tefer_table_shears', at(START, 886, 52, 44), shears(52, 44)),
         ...foot('table').decorations,
       ],
@@ -1401,7 +1455,10 @@ function layouts(): Layout[] {
           `<path d="M18 18H${WIDTH + 100 - 18}" stroke="${INK}" stroke-width="10" stroke-linecap="round"/>` +
             `<path d="M24 15H${WIDTH + 100 - 24}" stroke="${IVORY}" stroke-opacity=".28" stroke-width="2" stroke-linecap="round"/>` +
             [18, WIDTH + 100 - 18]
-              .map((x) => `<circle cx="${x}" cy="18" r="15" fill="${INK}"/><circle cx="${x}" cy="18" r="5" fill="${STEEL}"/>`)
+              .map(
+                (x) =>
+                  `<circle cx="${x}" cy="18" r="15" fill="${INK}"/><circle cx="${x}" cy="18" r="5" fill="${STEEL}"/>`,
+              )
               .join(''),
         ),
         ...team4.flatMap((s, i) => [
@@ -1475,7 +1532,7 @@ function layouts(): Layout[] {
           art(
             `d_tefer_closing_key${i + 1}`,
             at(START + 20 + i * 560 + 232, 650, 56, 56),
-            `<g transform="scale(${r1(56 / 44 * 100) / 100})">${[tagGlyph, button(22, 22, 19, IVORY, GARNET), hangerGlyph][i]!}</g>`,
+            `<g transform="scale(${r1((56 / 44) * 100) / 100})">${[tagGlyph, button(22, 22, 19, IVORY, GARNET), hangerGlyph][i]!}</g>`,
           ),
         ),
         mark('d_tefer_closing_mark', at(936, 836, 48, 48)),
@@ -1569,15 +1626,8 @@ function drawSample(copy: TeferCopy): SampleSlide[] {
       content: {
         caption: text(copy.agenda.kicker),
         title: lines(copy.agenda.title),
-        body: {
-          paragraphs: [
-            ...lines(copy.agenda.intro).paragraphs.map((p, i, all) =>
-              i === all.length - 1 ? { ...p, spaceAfter: 36 } : p,
-            ),
-            ...points(copy.agenda.items, { kind: 'number', mark: token('primary'), gap: 22 })
-              .paragraphs,
-          ],
-        },
+        subtitle: copy.agenda.items.map(([title]) => text(title)),
+        body: copy.agenda.items.map(([, body]) => text(body)),
         footer,
       },
     },
@@ -1686,7 +1736,10 @@ function drawSample(copy: TeferCopy): SampleSlide[] {
       layout: 'l_tefer_process',
       name: copy.making.name,
       content: {
-        caption: [text(copy.making.kicker), ...copy.making.steps.map(([, , caption]) => text(caption))],
+        caption: [
+          text(copy.making.kicker),
+          ...copy.making.steps.map(([, , caption]) => text(caption)),
+        ],
         title: lines(copy.making.title),
         number: copy.making.steps.map(([hours]) => text(hours)),
         subtitle: copy.making.steps.map(([, step]) => text(step)),

@@ -1,6 +1,6 @@
 # ADR-135 — The text slide seated as the text-and-image slide
 
-Status: Implemented on 2026-11-05 in the working tree; not committed. Published to the library on 2026-11-05 at 23:38:06 UTC (below, "Published").
+Status: Implemented on 2026-11-05 in the working tree; not committed. Published to the library on 2026-11-05 at 23:38:06 UTC (below, "Published"). The body and the card it kept are replaced by ADR-136: the text slide is the text-and-image slide without its picture.
 
 ## Request
 
@@ -35,5 +35,5 @@ Status: Implemented on 2026-11-05 in the working tree; not committed. Published 
 
 ## Open for the user
 
-- The ten templates of ADR-122 carry the change in their sources and are published with it whenever they are.
+- The ten templates of ADR-122 carry the change in their sources; they were published with it on 2026-11-05 at 23:51:10 UTC (ADR-122, "Published").
 - The published samples of Anan, Shvav, Mutzar and Atlas still had the text slide of before ADR-094's addition of 2026-10-17 (a line of lead and bullets); taken from their sources, the staged catalog has the lead and four numbered points that addition wrote.

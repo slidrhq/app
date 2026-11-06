@@ -55,58 +55,75 @@ function coversTheSlide(d: Element): boolean {
 }
 
 /**
- * The text slide (ADR-094): the body from margin to margin, about 1600px wide, set from the top
- * of its card or panel, which runs down to over the foot; the title across the slide, or beside
- * no more than a small accent; the kicker over the title and the footer in the foot, as on the
- * text-and-image slide (ADR-135). Its sample, in every language, fills the kicker and the
- * footer, and is a lead and four points that each open with a few words in bold. Whether the
- * lead takes two lines and a point one, only the renders show.
+ * The text slide (ADR-136): the text-and-image slide without its picture. The kicker, the title
+ * across the slide and the footer, as on the template's other slides (ADR-135); the points of
+ * the text-and-image slide, each heading over its body in the same text styles, across the
+ * width the picture left, none in another's way or in the foot's. Its sample, in every language,
+ * fills the kicker, the footer and the three points.
  */
 export function textSlideGaps(template: Template, samples: Authored['samples']): string[] {
   const layout = template.layouts.find((l) => l.archetype === 'text');
+  const beside = template.layouts.find((l) => l.archetype === 'textImage');
   if (!layout) return [];
   const problems: string[] = [];
-  const body = layout.placeholders.find((p) => p.role === 'body');
+  type Seat = Layout['placeholders'][number];
+  const points = (l: Layout | undefined) =>
+    (l?.placeholders ?? []).filter((p) => p.role === 'subtitle' || p.role === 'body');
+  const own = points(layout);
+  const theirs = points(beside);
   const title = layout.placeholders.find((p) => p.role === 'title');
-  if (!body) return [`${layout.id}: no body`];
-  if (body.frame.w < 1500)
-    problems.push(
-      `${layout.id}: the body is ${body.frame.w}px wide; on the text slide it runs from margin to margin, about 1600px`,
-    );
-  if (body.vAlign && body.vAlign !== 'top')
-    problems.push(`${layout.id}: the body is set to the ${body.vAlign}; it starts at the top`);
-  if (body.frame.y + body.frame.h < 800)
-    problems.push(
-      `${layout.id}: the body ends at ${body.frame.y + body.frame.h}; it runs down to over the foot`,
-    );
+  const kicker = layout.placeholders.find((p) => p.role === 'caption');
+  const footer = layout.placeholders.find((p) => p.role === 'footer');
   if (title && title.frame.w < 1300)
     problems.push(`${layout.id}: the title is ${title.frame.w}px wide; it runs across the slide`);
-  const kicker = layout.placeholders.find((p) => p.role === 'caption');
-  const meet = (a: Layout['placeholders'][number], b: Layout['placeholders'][number]) =>
+  if (own.length !== theirs.length || own.some((p, i) => p.role !== theirs[i]?.role))
+    problems.push(
+      `${layout.id}: seat the points of ${beside?.id ?? 'the text-and-image slide'}, in its order`,
+    );
+  own.forEach((p, i) => {
+    const them = theirs[i];
+    if (!them) return;
+    if (p.styleRef !== them.styleRef)
+      problems.push(
+        `${layout.id}: ${p.id} is set in ${p.styleRef}; ${them.id} of ${beside!.id} is in ${them.styleRef}`,
+      );
+    // The bodies take the picture's width too; a heading beside its body may keep its own.
+    const wider = p.role === 'body' ? 300 : 0;
+    if (p.frame.w < them.frame.w + wider)
+      problems.push(
+        `${layout.id}: ${p.id} is ${p.frame.w}px wide, ${them.frame.w}px beside the picture; across the slide it takes the picture's width too`,
+      );
+  });
+  const meet = (a: Seat, b: Seat) =>
     a.frame.x < b.frame.x + b.frame.w &&
     b.frame.x < a.frame.x + a.frame.w &&
     a.frame.y < b.frame.y + b.frame.h &&
     b.frame.y < a.frame.y + a.frame.h;
-  for (const other of [title, body])
-    if (kicker && other && meet(kicker, other))
-      problems.push(`${layout.id}: the kicker runs into the ${other.role}`);
+  const seats = [kicker, title, ...own].filter((p): p is Seat => p !== undefined);
+  // What meets on the text-and-image slide too (a heading on its body's first pixels) is its design.
+  const there = (a: Seat, b: Seat) => {
+    const [x, y] = [a, b].map((p) => beside?.placeholders.find((q) => q.id === p.id));
+    return x !== undefined && y !== undefined && meet(x, y);
+  };
+  seats.forEach((a, i) => {
+    for (const b of seats.slice(i + 1))
+      if (meet(a, b) && !there(a, b)) problems.push(`${layout.id}: ${a.id} runs into ${b.id}`);
+  });
+  for (const p of own)
+    if (footer && p.frame.y + p.frame.h > footer.frame.y - 8)
+      problems.push(`${layout.id}: ${p.id} ends at ${p.frame.y + p.frame.h}, in the foot`);
   for (const lang of languagesOf(samples)) {
     const slide = samples[lang]!.find((s) => s.layout === layout.id);
-    if (slide && (!slide.content.caption || !slide.content.footer))
+    if (!slide) continue;
+    const filled = (role: 'subtitle' | 'body') => {
+      const fill = slide.content[role];
+      return Array.isArray(fill) ? fill.filter((f) => f && 'paragraphs' in f).length : fill ? 1 : 0;
+    };
+    if (!slide.content.caption || !slide.content.footer)
+      problems.push(`${lang} sample of ${layout.id}: fill its kicker and its footer`);
+    if (filled('subtitle') !== 3 || filled('body') !== 3)
       problems.push(
-        `${lang} sample of ${layout.id}: fill its kicker and its footer, as the text-and-image slide's`,
-      );
-    const fill = slide?.content.body;
-    const paragraphs = fill && !Array.isArray(fill) && 'paragraphs' in fill ? fill.paragraphs : [];
-    const lead = paragraphs.filter((p) => !p.list);
-    const listed = paragraphs.filter((p) => p.list);
-    if (
-      lead.length === 0 ||
-      listed.length !== 4 ||
-      !listed.every((p) => p.runs[0]?.marks?.weight === 700)
-    )
-      problems.push(
-        `${lang} sample of ${layout.id}: a lead, then four points that each open with a few words in bold`,
+        `${lang} sample of ${layout.id}: three points, a heading and its body each, as on the text-and-image slide`,
       );
   }
   return problems;

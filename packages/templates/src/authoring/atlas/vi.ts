@@ -19,13 +19,10 @@ export const vi: AtlasCopy = {
     name: 'Chương trình',
     kicker: 'Mở đầu',
     title: 'Nội dung hôm nay',
-    intro:
-      'Hai mươi lăm phút về những gì mười bốn thành phố cảng đã học được trong năm nay về tái sử dụng và khử mặn nước, và về những điều chúng tôi sẽ đề nghị mỗi đối tác thời gian tới. Sau đó là phần hỏi đáp.',
     items: [
-      ['Mạng lưới: ', 'mười bốn thành phố đang ở đâu sau ba năm cùng làm việc.'],
-      ['Dự án của năm: ', 'một bến cảng ở Limassol nay đã tự làm ra nước.'],
-      ['Tham gia: ', 'một thành phố mới gia nhập mạng lưới qua năm bước.'],
-      ['Năm tới: ', 'điều chúng tôi đề nghị mỗi đối tác, và thời hạn.'],
+      ['Mạng lưới', 'Mười bốn thành phố đang ở đâu sau ba năm cùng làm việc.'],
+      ['Dự án của năm', 'Một bến cảng ở Limassol nay đã tự làm ra nước.'],
+      ['Tham gia', 'Một thành phố mới gia nhập mạng lưới qua năm bước.'],
     ],
   },
   figures: {

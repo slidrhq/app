@@ -6,20 +6,20 @@ export const de: DofekCopy = {
     name: 'Eröffnung',
     org: 'Gesundheitsamt Küstenkreis · Bericht zur Gesundheit',
     title: ['Vier Minuten', 'für ein Herz'],
-    subtitle: ['Wie ein Kreis mit 640.000 Menschen lernte,', 'zu handeln, bevor der Rettungswagen kommt'],
+    subtitle: [
+      'Wie ein Kreis mit 640.000 Menschen lernte,',
+      'zu handeln, bevor der Rettungswagen kommt',
+    ],
     meta: 'Bericht an den Kreistag · 15. April 2027',
   },
   agenda: {
     name: 'Tagesordnung',
     kicker: 'Bevor wir beginnen',
     title: 'Was wir heute besprechen',
-    intro:
-      'Zwanzig Minuten dazu, was das Programm verändert hat, was heute auf der Straße geschieht, wenn ein Herz stillsteht, und worum wir den Kreistag für 2027 bitten. Danach beantworten wir gern Ihre Fragen.',
     items: [
-      ['Die Zahlen: ', 'was sich für Menschen mit Herzstillstand außerhalb der Klinik geändert hat.'],
-      ['Auf der Straße: ', 'wie Nachbarn, Ersthelfer und Defibrillatoren heute zusammenwirken.'],
-      ['Die Menschen: ', 'das Team hinter dem Programm und die Freiwilligen an seiner Seite.'],
-      ['Das nächste Jahr: ', 'worum wir den Kreistag bitten, und bis wann.'],
+      ['Die Zahlen', 'Was sich für Menschen mit Herzstillstand außerhalb der Klinik geändert hat.'],
+      ['Auf der Straße', 'Wie Nachbarn, Ersthelfer und Defibrillatoren heute zusammenwirken.'],
+      ['Die Menschen', 'Das Team hinter dem Programm und die Freiwilligen an seiner Seite.'],
     ],
   },
   section: {
@@ -76,9 +76,18 @@ export const de: DofekCopy = {
     kicker: 'Ersthelfer in Bereitschaft',
     title: 'Hilfe von nebenan',
     items: [
-      ['In Sekunden alarmiert', 'Eine App alarmiert sofort geschulte Ersthelfer, die weniger als 500 Meter entfernt sind.'],
-      ['Ein Defibrillator unterwegs', 'Ein zweiter Ersthelfer holt den nächsten öffentlichen Defibrillator.'],
-      ['Vor dem Martinshorn da', 'Bei sechs von zehn Einsätzen war ein Ersthelfer noch vor dem Rettungswagen beim Patienten.'],
+      [
+        'In Sekunden alarmiert',
+        'Eine App alarmiert sofort geschulte Ersthelfer, die weniger als 500 Meter entfernt sind.',
+      ],
+      [
+        'Ein Defibrillator unterwegs',
+        'Ein zweiter Ersthelfer holt den nächsten öffentlichen Defibrillator.',
+      ],
+      [
+        'Vor dem Martinshorn da',
+        'Bei sechs von zehn Einsätzen war ein Ersthelfer noch vor dem Rettungswagen beim Patienten.',
+      ],
     ],
   },
   park: {
