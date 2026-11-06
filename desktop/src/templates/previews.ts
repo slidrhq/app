@@ -134,6 +134,62 @@ export function madePreview(entry: LibraryEntry, like: Deck): TemplatePreview | 
   return made.get(entry.template)?.get(lookOf(like))?.done;
 }
 
+/** An opening on its way, and the opening once it has come: null for a template without one. */
+interface Opening {
+  promise: Promise<TemplatePreview | null>;
+  done?: TemplatePreview | null;
+}
+
+/** The openings made or on their way, by template and by language and direction. */
+const openings = new WeakMap<Template, Map<string, Opening>>();
+
+/**
+ * The opening slide of a built-in template's sample alone, as the card of the template in the
+ * library shows it: the slide a deck made with it opens with, in the words its author wrote,
+ * with its pictures loaded. Null for a personal template, which has no sample, and for one the
+ * catalog has none of; the card shows the cover then (`./covers`), and while it waits. A sample
+ * that could not be read is tried again the next time.
+ */
+export function readyOpening(entry: LibraryEntry, like: Deck): Promise<TemplatePreview | null> {
+  const key = lookOf(like);
+  let looks = openings.get(entry.template);
+  if (!looks) openings.set(entry.template, (looks = new Map<string, Opening>()));
+  const known = looks.get(key);
+  if (known) return known.promise;
+  const opening = async (): Promise<TemplatePreview | null> => {
+    if (entry.personal) return null;
+    const { builtInSampleDeck, pictureUrl } = await import('./samples');
+    const deck = await builtInSampleDeck(entry.template, like, 1);
+    if (!deck) return null;
+    const preview = {
+      deck,
+      resolveAsset: (asset: AssetMeta) => pictureUrl(asset) ?? coverAsset(asset),
+    };
+    await picturesOf(preview);
+    return preview;
+  };
+  const making: Opening = {
+    promise: opening().then(
+      (done) => {
+        making.done = done;
+        return done;
+      },
+      // The card keeps its cover; the preview, when it is opened, says what went wrong.
+      () => {
+        looks.delete(key);
+        return null;
+      },
+    ),
+  };
+  looks.set(key, making);
+  return making.promise;
+}
+
+/** The opening `readyOpening` has made already; undefined until it has. */
+export function madeOpening(entry: LibraryEntry, like: Deck): TemplatePreview | null | undefined {
+  return openings.get(entry.template)?.get(lookOf(like))?.done;
+}
+
 /** Reads the samples of the built-in templates ahead, so the first preview waits for nothing. */
 export async function readSamplesAhead(): Promise<void> {
   const { readSamples } = await import('./samples');

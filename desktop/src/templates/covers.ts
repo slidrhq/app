@@ -1,6 +1,8 @@
 /**
- * The cover of a template, as the library and the deck tool's gallery draw it: one slide that
- * shows the template, and where its pictures load from.
+ * The cover of a template, as the welcome screen and the deck tool's gallery draw it: one slide
+ * that shows the template, and where its pictures load from. The library's card of a template
+ * draws the opening slide of its sample (`readyOpening`), and the cover only while that is made
+ * and for a template with no sample.
  *
  * The photograph on the cover of a built-in template is the one the opening slide of its sample
  * deck shows, from the media library (`images/templates`). Without the library, or without the

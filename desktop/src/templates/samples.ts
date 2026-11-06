@@ -87,16 +87,23 @@ function finished(slide: SampleSlide, template: Template): boolean {
 /**
  * The sample deck of a built-in template in the language and direction of `like`; undefined
  * when the catalog has no sample for it. `template` is the one the library holds, which comes
- * without the pictures of its sample.
+ * without the pictures of its sample. `count`: only so many of its first slides, as the card of
+ * a template shows its opening alone.
  */
-export async function builtInSampleDeck(template: Template, like: Deck): Promise<Deck | undefined> {
+export async function builtInSampleDeck(
+  template: Template,
+  like: Deck,
+  count?: number,
+): Promise<Deck | undefined> {
   const mine = (await samples())[template.theme.id];
   if (!mine) return undefined;
   // A deck in a language the sample is not written in is shown the English one as it was
   // written, left to right, and not English text in a mirrored layout.
   const own = writtenIn(mine, like.meta.lang);
   const written = own !== undefined;
-  const slides = (own ? mine[own]! : mine.en).filter((slide) => finished(slide, template));
+  const slides = (own ? mine[own]! : mine.en)
+    .filter((slide) => finished(slide, template))
+    .slice(0, count);
   if (slides.length === 0) return undefined;
   const assets = { ...pictureAssets, ...template.assets };
   return sampleDeck(

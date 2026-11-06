@@ -1,7 +1,8 @@
+import type { Deck } from '@slidr/model';
 import { FittedSlide } from '@slidr/renderer';
 import { cx, Icon, IconButton, Input } from '@slidr/ui';
 import { Check, Pencil, RefreshCw, Trash2 } from '@slidr/ui/icons';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
 import { useLanguage } from '../i18n';
@@ -10,8 +11,8 @@ import { renameTemplate, updateTemplate } from './actions';
 import { library } from './app';
 import { coverAsset, libraryCover } from './covers';
 import type { LibraryEntry } from './library';
-import { templateName } from './names';
-import { readyPreview } from './previews';
+import { templateName, templateTagline } from './names';
+import { madeOpening, readyOpening, readyPreview, type TemplatePreview } from './previews';
 import { useLike } from './PreviewGrid';
 import { showTemplateSlides, templateSlides } from './TemplateSlides';
 import { useTemplatesIn } from './written';
@@ -19,9 +20,92 @@ import { useTemplatesIn } from './written';
 /*
  * The Templates panel (WG7-T09 and the wiring of T04; THM-04, THM-05, THM-08): the library with
  * the default for new decks, where pressing the picture of a template spreads the slides that
- * show it over the Stage (`./TemplateSlides`). The design of the open deck, its colours, fonts
- * and the rest, is in the deck's properties, from the File menu (`./DeckProperties`).
+ * show it over the Stage (`./TemplateSlides`). The picture is the opening slide of the
+ * template's sample, under it the template's name. The design of the open deck, its colours,
+ * fonts and the rest, is in the deck's properties, from the File menu (`./DeckProperties`).
  */
+
+/**
+ * The opening slide of a template's sample once it is ready (`readyOpening`); null for a
+ * template without one, undefined while it is made.
+ */
+function useOpening(entry: LibraryEntry, like: Deck): TemplatePreview | null | undefined {
+  const [ready, setReady] = useState<{
+    entry: LibraryEntry;
+    like: Deck;
+    opening: TemplatePreview | null;
+  }>();
+  useEffect(() => {
+    let gone = false;
+    void readyOpening(entry, like).then((opening) => {
+      if (!gone) setReady({ entry, like, opening });
+    });
+    return () => {
+      gone = true;
+    };
+  }, [entry, like]);
+  return ready?.entry === entry && ready.like === like ? ready.opening : madeOpening(entry, like);
+}
+
+/**
+ * Where a clause of a sentence ends, in the scripts of the app's languages: a comma (Arabic,
+ * Chinese and Japanese ones too), a colon, a semicolon, a full stop, a dash between words.
+ */
+const CLAUSE_END = /[,،、，:：;；。]|\.(?=\s)|\s[–—](?=\s)/gu;
+
+/**
+ * The fewest words the start of a sentence is shown with alone: "A globe", the first of a list
+ * ("A globe, routes and postage stamps"), says nothing by itself.
+ */
+const FEWEST_WORDS = 3;
+
+const words = new Intl.Segmenter(undefined, { granularity: 'word' });
+const wordsIn = (text: string) => [...words.segment(text)].filter((s) => s.isWordLike).length;
+
+let measuring: CanvasRenderingContext2D | null | undefined;
+
+/**
+ * The sentence that says what a template feels like, on one line: as much of it as the line
+ * holds, up to where one of its clauses ends, so that what is shown is whole and does not stop
+ * in the middle of a phrase. A sentence with no such end that fits ends in an ellipsis.
+ */
+function Tagline({ text }: { text: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [shown, setShown] = useState(text);
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    // The sentence up to the end of each clause, shortest first, and the whole of it last.
+    const ends = [...text.matchAll(CLAUSE_END)].map((end) => text.slice(0, end.index).trimEnd());
+    const choices = [...ends.filter((end) => wordsIn(end) >= FEWEST_WORDS), text];
+    let live = true;
+    const fit = () => {
+      const width = element.getBoundingClientRect().width;
+      measuring ??= document.createElement('canvas').getContext('2d');
+      // A panel drawn ahead is hidden and not laid out: it is fitted once it is shown.
+      if (!live || width === 0 || !measuring) return;
+      const style = getComputedStyle(element);
+      measuring.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      let fitting = choices[0]!;
+      for (const choice of choices)
+        if (measuring.measureText(choice).width <= width) fitting = choice;
+      setShown(fitting);
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(element);
+    void document.fonts.ready.then(fit);
+    return () => {
+      live = false;
+      observer.disconnect();
+    };
+  }, [text]);
+  return (
+    <span ref={ref} title={text} className="min-w-0 flex-1 truncate text-xs text-ui-fg-muted">
+      {shown}
+    </span>
+  );
+}
 
 function TemplateCard({
   entry,
@@ -45,23 +129,26 @@ function TemplateCard({
   const [busy, setBusy] = useState(false);
   const [renaming, setRenaming] = useState(false);
   const name = templateName(theme, i18n.language);
+  const tagline = templateTagline(theme, i18n.language);
   const cover = libraryCover(template, like);
-  // The same picture while the cover stays: a card drawn again for its ring or its mark does not
-  // draw its slide again. It fits the card by itself, so it is drawn with the panel ahead of time;
-  // its photograph is decoded with it, so the card does not appear first without it.
+  const opening = useOpening(entry, like);
+  // The same picture while the slide on it stays: a card drawn again for its ring or its mark
+  // does not draw its slide again. It fits the card by itself, so it is drawn with the panel
+  // ahead of time; its photograph is decoded with it, so the card does not appear first without
+  // it. The cover, with the template's name on it, while there is no opening to show.
   const picture = useMemo(
     () => (
       <span aria-hidden className="block">
         <FittedSlide
-          deck={cover.deck}
-          slide={cover.slide}
+          deck={opening ? opening.deck : cover.deck}
+          slide={opening ? opening.deck.slides[0]! : cover.slide}
           mode="thumbnail"
-          resolveAsset={coverAsset}
+          resolveAsset={opening ? opening.resolveAsset : coverAsset}
           decoding="sync"
         />
       </span>
     ),
-    [cover],
+    [cover, opening],
   );
 
   const remove = async () => {
@@ -145,30 +232,39 @@ function TemplateCard({
           }}
         />
       ) : (
-        personal && (
-          // A personal template is the user's own: its name, what it holds, and whether it stays.
-          <div className="flex items-center justify-end gap-1" data-testid="template-actions">
-            <IconButton
-              icon={Pencil}
-              size="sm"
-              label={t('panel.rename')}
-              onClick={() => setRenaming(true)}
-            />
-            <IconButton
-              icon={RefreshCw}
-              size="sm"
-              label={t('panel.update')}
-              disabled={busy}
-              onClick={() => void update()}
-            />
-            <IconButton
-              icon={Trash2}
-              size="sm"
-              label={t('panel.remove')}
-              onClick={() => void remove()}
-            />
+        <div className="flex min-w-0 items-center gap-2 px-0.5">
+          {/* The template's name, and the sentence that says what a built-in one feels like. */}
+          <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
+            <span dir="auto" className="max-w-full shrink-0 truncate text-sm font-semibold">
+              {name}
+            </span>
+            {tagline && <Tagline text={tagline} />}
           </div>
-        )
+          {personal && (
+            // A personal template is the user's own: its name, what it holds, and whether it stays.
+            <div className="flex shrink-0 items-center gap-1" data-testid="template-actions">
+              <IconButton
+                icon={Pencil}
+                size="sm"
+                label={t('panel.rename')}
+                onClick={() => setRenaming(true)}
+              />
+              <IconButton
+                icon={RefreshCw}
+                size="sm"
+                label={t('panel.update')}
+                disabled={busy}
+                onClick={() => void update()}
+              />
+              <IconButton
+                icon={Trash2}
+                size="sm"
+                label={t('panel.remove')}
+                onClick={() => void remove()}
+              />
+            </div>
+          )}
+        </div>
       )}
     </article>
   );
@@ -197,8 +293,8 @@ function Library() {
   // The library is all the panel holds, so it has no heading of its own: the panel's title names it.
   return (
     <div className="flex flex-col gap-3">
-      {/* Two cards to a row, each as wide as its picture. */}
-      <div className="grid grid-cols-2 gap-3" data-testid="template-library">
+      {/* One card to a row, as wide as the panel: the opening slide on it can be read. */}
+      <div className="grid grid-cols-1 gap-4" data-testid="template-library">
         {entries.map((entry) => {
           const { id } = entry.template.theme;
           return (
