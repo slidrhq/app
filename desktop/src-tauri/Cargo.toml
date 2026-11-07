@@ -1,6 +1,6 @@
 [package]
 name = "slidr"
-version = "0.2.0"
+version = "0.3.0"
 description = "Slidr desktop presentation editor"
 edition.workspace = true
 rust-version.workspace = true
