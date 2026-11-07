@@ -23,6 +23,16 @@ const adjustOf = (page: Page, id: string) =>
     throw new Error(`no shape ${elementId}`);
   }, id);
 
+/** How thick a shape's outline is, as the deck holds it. */
+const strokeWidthOf = (page: Page, id: string) =>
+  page.evaluate((elementId) => {
+    for (const s of window.slidr!.bus.deck.slides) {
+      const e = s.elements.find((x) => x.id === elementId);
+      if (e?.type === 'shape') return e.stroke?.width;
+    }
+    throw new Error(`no shape ${elementId}`);
+  }, id);
+
 /** The zoom of the Stage, and the ways between slide pixels and the screen. */
 async function stage(page: Page) {
   const frame = (await page.getByTestId('stage-frame').boundingBox())!;
@@ -131,6 +141,37 @@ test.describe('on the Stage', () => {
     expect(thickness).toBeCloseTo(120 / 360, 2);
   });
 
+  test("an outline has a handle on its inner edge, and dragging it sets the outline's thickness", async ({
+    page,
+  }) => {
+    const { at, from } = await stage(page);
+    // On the outline of the circle (860..1160 by 640..940), on its left.
+    const press = at({ x: 866, y: 790 });
+    await page.mouse.click(press.x, press.y);
+    await expect(surface(page).locator('[data-adjust-handle]')).toHaveCount(1);
+
+    const before = await undoSteps(page);
+    // In from the right side, and off the handle's row: it follows along its way only, and the
+    // thickness shows beside the shape while it is dragged. The handle of an outline 16 thick is
+    // drawn a little in from the resize handle beside it; the drag counts from where it really is.
+    const start = await centerOf(page, 0);
+    const real = at({ x: 1160 - 16, y: 790 });
+    const target = at({ x: 1100, y: 750 });
+    const end = { x: start.x + target.x - real.x, y: start.y + target.y - real.y };
+    await drag(page, start, end, () =>
+      expect(surface(page).locator('[data-stage-label]')).toHaveText('60 px'),
+    );
+    expect(await strokeWidthOf(page, 'e_outlined')).toBe(60);
+    expect(await undoSteps(page)).toBe(before + 1);
+    const moved = from(await centerOf(page, 0));
+    expect(moved.x).toBeCloseTo(1100, -1);
+    expect(moved.y).toBeCloseTo(790, -1);
+
+    // Past the middle it stops where the outline fills the circle.
+    await drag(page, await centerOf(page, 0), at({ x: 700, y: 790 }));
+    expect(await strokeWidthOf(page, 'e_outlined')).toBe(150);
+  });
+
   test('Escape during a drag leaves the shape as it was', async ({ page }) => {
     const { at } = await stage(page);
     const press = at({ x: 230, y: 380 });
@@ -141,6 +182,63 @@ test.describe('on the Stage', () => {
     );
     expect(await adjustOf(page, 'e_ring')).toBeUndefined();
     expect(await undoSteps(page)).toBe(before);
+  });
+});
+
+test.describe('in the app, the outline of a shape', () => {
+  test.beforeEach(async ({ page }) => {
+    await openApp(page, { lang: 'en' });
+    await page.evaluate(() => {
+      const editor = window.slidr!;
+      const slideId = editor.selection.getState().currentSlideId!;
+      editor.bus.batch(
+        [
+          {
+            type: 'element.add' as const,
+            slideId,
+            element: {
+              id: 'e_circle',
+              type: 'shape' as const,
+              frame: { x: 400, y: 200, w: 360, h: 360 },
+              rotation: 0,
+              opacity: 1,
+              geometry: { kind: 'preset' as const, preset: 'ellipse' },
+              fill: { kind: 'none' as const },
+              stroke: { color: { token: 'primary' as const }, width: 16, dash: 'dashed' as const },
+            },
+          },
+        ],
+        { label: 'Add' },
+      );
+    });
+    await select(page, ['e_circle']);
+  });
+
+  test('is made thicker by its handle, and the outline popover leaves the width to it', async ({
+    page,
+  }) => {
+    await expect(adjustHandle(page, 0)).toHaveCount(1);
+    await page
+      .getByTestId('top-tools-b')
+      .getByRole('button', { name: 'Outline', exact: true })
+      .click();
+    await expect(page.getByRole('radio', { name: 'Dashed' })).toBeVisible();
+    await expect(page.getByRole('slider', { name: 'Width' })).toHaveCount(0);
+    await page.keyboard.press('Escape');
+
+    // From the menu, as the handles of a ring: the arrows make it thicker one pixel at a time.
+    const circle = page.getByTestId('stage-frame').locator('[data-element-id="e_circle"]');
+    const box = (await circle.boundingBox())!;
+    // On the outline, up and to the left, clear of the resize handles.
+    const on = 0.5 - (172 / 360) * Math.SQRT1_2;
+    await circle.click({ button: 'right', position: { x: box.width * on, y: box.height * on } });
+    const menu = page.getByTestId('stage-menu');
+    await menu.getByRole('menuitem').filter({ hasText: 'Adjust shape' }).click();
+    const status = page.getByTestId('stage-keyboard');
+    await expect(status).toHaveText('Outline thickness handle: 16 px. The arrows move it.');
+    for (const key of ['ArrowLeft', 'ArrowLeft', 'Shift+ArrowLeft']) await page.keyboard.press(key);
+    expect(await strokeWidthOf(page, 'e_circle')).toBe(28);
+    await expect(status).toHaveText('Outline thickness handle: 28 px. The arrows move it.');
   });
 });
 

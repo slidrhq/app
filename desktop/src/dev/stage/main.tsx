@@ -372,6 +372,14 @@ function stageDeck(): Deck {
         frame: { x: 200, y: 700, w: 480, h: 240 },
         fill: solid('surface'),
       }),
+      // A circle drawn by its outline alone: a handle sets how thick the outline is (ADR-137).
+      createElement.shape({
+        id: 'e_outlined',
+        frame: { x: 860, y: 640, w: 300, h: 300 },
+        geometry: preset('ellipse'),
+        fill: { kind: 'none' },
+        stroke: { color: { token: 'accent' }, width: 16, dash: 'dashed' },
+      }),
     ],
   });
 

@@ -62,6 +62,8 @@ export interface StrokeEditorProps {
   defaultJoin: Join;
   /** What "on" starts from when there was no outline. */
   defaultStroke: Stroke;
+  /** Offers the thickness: not where a handle on the Stage sets it (ADR-137). */
+  width?: boolean;
 }
 
 /** Outline of a shape, stroke of a line, border of an image (SHP-03, SHP-05, IMG-08). */
@@ -74,6 +76,7 @@ export function StrokeEditor({
   capAndJoin,
   defaultJoin,
   defaultStroke,
+  width = true,
 }: StrokeEditorProps) {
   const { t } = useTranslation('objects');
   /** The outline that was switched off, so switching it back on restores it. */
@@ -125,15 +128,17 @@ export function StrokeEditor({
             onChange={(color) => change(set({ color }))}
             onGestureEnd={onGestureEnd}
           />
-          <SliderField
-            label={t('stroke.width')}
-            value={isMixed('width') ? null : value.width}
-            min={1}
-            max={MAX_STROKE}
-            unit="px"
-            onChange={(width) => change(set({ width }))}
-            onCommit={onGestureEnd}
-          />
+          {width && (
+            <SliderField
+              label={t('stroke.width')}
+              value={isMixed('width') ? null : value.width}
+              min={1}
+              max={MAX_STROKE}
+              unit="px"
+              onChange={(next) => change(set({ width: next }))}
+              onCommit={onGestureEnd}
+            />
+          )}
           {capAndJoin && (
             <>
               <Field label={t('stroke.cap')}>

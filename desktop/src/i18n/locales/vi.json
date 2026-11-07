@@ -3043,6 +3043,7 @@
     "at": {
       "point": "Điểm {{n}}/{{total}}. Dùng phím mũi tên để di chuyển.",
       "adjust": "Tay điều chỉnh {{n}}/{{total}}. Dùng phím mũi tên để di chuyển.",
+      "outline": "Tay chỉnh độ dày đường viền: {{width}} px. Dùng phím mũi tên để di chuyển.",
       "picture": "Cắt xén: phím mũi tên di chuyển ảnh. Ctrl+mũi tên lên hoặc xuống thay đổi kích thước ảnh. Tab chuyển đến các tay cắt xén.",
       "handle": "Tay cắt xén: {{where}}. Dùng phím mũi tên để di chuyển.",
       "walkSelected": "{{what}}: nằm trong vùng chọn",

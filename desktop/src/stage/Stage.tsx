@@ -19,15 +19,7 @@ import {
   type Slide,
   type TextElement,
 } from '@slidr/model';
-import {
-  adjustDefaults,
-  adjustHandles,
-  adjustTo,
-  SlideRenderer,
-  type AssetResolver,
-  type HtmlSlot,
-  type TextSlot,
-} from '@slidr/renderer';
+import { SlideRenderer, type AssetResolver, type HtmlSlot, type TextSlot } from '@slidr/renderer';
 import { keyboardInUse, useKeyboardInUse } from '@slidr/ui';
 import { freshFrame, freshTextBackground } from '../elements/frames';
 import { cardGround } from '../objects/card';
@@ -127,6 +119,7 @@ import {
   type StageView,
 } from './overlays';
 import { PlaceholderHint } from './PlaceholderHint';
+import { outlineHandleIndex, shapeHandlePatch, shapeHandles } from './shapeHandles';
 import {
   apply,
   applyVector,
@@ -409,46 +402,26 @@ function sharedPath(items: readonly { path: GroupElement[] }[]): GroupElement[] 
 const isLine = (located: Located): located is Located & { element: LineElement } =>
   located.element.type === 'line';
 
-/** How many adjustment handles a shape has: one for each value its preset has (ADR-133). */
-function adjustCount(shape: ShapeElement): number {
-  const { geometry, frame } = shape;
-  return geometry.kind === 'preset'
-    ? adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust).length
-    : 0;
-}
+/**
+ * How many adjustment handles a shape has: one for each value its preset has (ADR-133), and one
+ * for the thickness of its outline (ADR-137).
+ */
+const adjustCount = (shape: ShapeElement): number => shapeHandles(shape).length;
 
 /** A shape with values to set by its handles. */
 const isAdjustable = (located: Located): located is Located & { element: ShapeElement } =>
   located.element.type === 'shape' && adjustCount(located.element) > 0;
 
 /** Where adjustment handle `index` of a shape is, in its own pixels. */
-function adjustPoint(shape: ShapeElement, index: number): Point | undefined {
-  const { geometry, frame } = shape;
-  return geometry.kind === 'preset'
-    ? adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust)[index]?.at
-    : undefined;
-}
+const adjustPoint = (shape: ShapeElement, index: number): Point | undefined =>
+  shapeHandles(shape)[index]?.at;
 
 /**
- * The shape with the values of handle `index` set so that the handle comes to `at`, in the
+ * The shape with the value of handle `index` set so that the handle comes to `at`, in the
  * shape's own pixels; undefined when the values stay what they were.
  */
-function adjustPatch(shape: ShapeElement, index: number, at: Point): Patch | undefined {
-  const geometry = shape.geometry;
-  if (geometry.kind !== 'preset') return undefined;
-  const adjust = adjustTo(
-    geometry.preset,
-    index,
-    shape.frame.w,
-    shape.frame.h,
-    geometry.adjust ?? [],
-    at,
-  );
-  // What it has now, its defaults filled in as the renderer draws it.
-  const now = adjustDefaults(geometry.preset)?.map((d, i) => geometry.adjust?.[i] ?? d);
-  if (!adjust || adjust.every((v, i) => v === now?.[i])) return undefined;
-  return { geometry: { ...geometry, adjust } };
-}
+const adjustPatch = (shape: ShapeElement, index: number, at: Point): Patch | undefined =>
+  shapeHandlePatch(shape, index, at);
 
 /**
  * The box crop mode works in: the image's own, or, in a drawn frame (`smartFrame`), the opening
@@ -1617,13 +1590,17 @@ export function Stage({
         const patch = adjustPatch(shape, g.index, to);
         // Back where it began, the shape has its own values again, if the drag had changed them.
         const live = liveIndex().get(shape.id)?.element;
-        const changed = live?.type === 'shape' && live.geometry !== shape.geometry;
+        const changed =
+          live?.type === 'shape' &&
+          (live.geometry !== shape.geometry || live.stroke !== shape.stroke);
         if (patch || changed) {
           commit(
             g.txId,
             'Adjust shape',
             g.located.path,
-            new Map([[shape.id, patch ?? { geometry: shape.geometry }]]),
+            new Map([
+              [shape.id, patch ?? { geometry: shape.geometry, stroke: shape.stroke ?? null }],
+            ]),
           );
         }
         return;
@@ -2492,6 +2469,14 @@ export function Stage({
   if (sized && (active === 'resize' || active === 'crop-resize')) {
     label = `${Math.round(sized.element.frame.w)} × ${Math.round(sized.element.frame.h)}`;
   } else if (single && active === 'rotate') label = `${Math.round(single.element.rotation)}°`;
+  // The outline's thickness, which its handle sets (ADR-137).
+  else if (
+    single?.element.type === 'shape' &&
+    active === 'adjust' &&
+    single.element.stroke &&
+    held?.handle === `adjust-${outlineHandleIndex(single.element)}`
+  )
+    label = `${Math.round(single.element.stroke.width)} px`;
   // Several elements show how far they turned, to either side.
   else if (turn && active === 'rotate-together')
     label = `${Math.round(turn.angle > 180 ? turn.angle - 360 : turn.angle)}°`;

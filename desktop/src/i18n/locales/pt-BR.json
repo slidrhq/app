@@ -3055,6 +3055,7 @@
     "at": {
       "point": "Ponto {{n}} de {{total}}. As setas o movem.",
       "adjust": "Alça de ajuste {{n}} de {{total}}. As setas a movem.",
+      "outline": "Alça da espessura do contorno: {{width}} px. As setas a movem.",
       "picture": "Corte: as setas movem a imagem. Ctrl+Seta para cima ou para baixo altera a escala. Tab vai para as alças.",
       "handle": "Alça de corte: {{where}}. As setas a movem.",
       "walkSelected": "{{what}}: na seleção",

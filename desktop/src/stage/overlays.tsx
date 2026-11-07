@@ -1,5 +1,5 @@
 import type { Frame, LineElement, Point, ShapeElement } from '@slidr/model';
-import { adjustHandles, linePath } from '@slidr/renderer';
+import { linePath } from '@slidr/renderer';
 import {
   useEffect,
   useLayoutEffect,
@@ -12,6 +12,7 @@ import {
 import type { CropView } from './crop';
 import { HANDLES, type Handle } from './geometry';
 import type { HandleName } from './keyboardSession';
+import { shapeHandles } from './shapeHandles';
 import {
   apply,
   applyVector,
@@ -463,9 +464,8 @@ export function adjustHandleSpots(
   view: StageView,
 ): { at: Point; along?: Point }[] {
   const shape = located.element;
-  if (shape.geometry.kind !== 'preset') return [];
   const { w, h } = shape.frame;
-  const handles = adjustHandles(shape.geometry.preset, w, h, shape.geometry.adjust);
+  const handles = shapeHandles(shape);
   if (!handles.length) return [];
   const own = elementMatrix(located, true);
   const box = elementMatrix(located);

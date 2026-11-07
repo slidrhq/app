@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { findElement, findSlide, type Element, type Slide } from '@slidr/model';
-import { adjustHandles } from '@slidr/renderer';
 import {
   ContextMenuItem,
   ContextMenuSeparator,
@@ -60,6 +59,7 @@ import { useDeck, useEditor, useSelection, type ContextToolProps, type Editor } 
 import { enterTable } from '../table/session';
 import { stageCommand } from './keyboardSession';
 import { ORDER_MOVES } from './SelectionToolbar';
+import { shapeHandles } from './shapeHandles';
 
 /*
  * The Stage's right-click menu (STG-06), part by part. The Stage has already made what was
@@ -202,11 +202,9 @@ export function EditItems(_: ContextToolProps) {
       return edit(t('stage:menu.editText'), TextCursorInput, startEditing);
     case 'shape': {
       const hasText = single.content?.paragraphs.some((p) => p.runs.some((r) => r.text !== ''));
-      const { geometry, frame } = single;
-      // Its adjustment handles: Tab goes from one to the next, and the arrows move it (ADR-133).
-      const adjustable =
-        geometry.kind === 'preset' &&
-        adjustHandles(geometry.preset, frame.w, frame.h, geometry.adjust).length > 0;
+      // Its adjustment handles: Tab goes from one to the next, and the arrows move it (ADR-133),
+      // the outline's among them (ADR-137).
+      const adjustable = shapeHandles(single).length > 0;
       return (
         <>
           {edit(

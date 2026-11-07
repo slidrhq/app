@@ -3055,6 +3055,7 @@
     "at": {
       "point": "Point {{n}} sur {{total}}. Les flèches le déplacent.",
       "adjust": "Poignée d’ajustement {{n}} sur {{total}}. Les flèches la déplacent.",
+      "outline": "Poignée d’épaisseur du contour : {{width}} px. Les flèches la déplacent.",
       "picture": "Rognage : les flèches déplacent l’image. Ctrl+Flèche haut ou bas la redimensionne. Tab passe aux poignées.",
       "handle": "Poignée de rognage : {{where}}. Les flèches la déplacent.",
       "walkSelected": "{{what}} : dans la sélection",

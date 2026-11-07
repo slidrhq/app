@@ -44,6 +44,7 @@ export const he = {
   at: {
     point: 'נקודה {{n}} מתוך {{total}}. החיצים מזיזים אותה.',
     adjust: 'ידית התאמה {{n}} מתוך {{total}}. החיצים מזיזים אותה.',
+    outline: 'ידית עובי הקו: {{width}} פיקסלים. החיצים מזיזים אותה.',
     picture:
       'חיתוך: החיצים מזיזים את התמונה. Ctrl עם חץ למעלה או למטה משנה את גודלה. Tab עובר לידיות.',
     handle: 'ידית החיתוך: {{where}}. החיצים מזיזים אותה.',
@@ -115,6 +116,7 @@ export const en = {
   at: {
     point: 'Point {{n}} of {{total}}. The arrows move it.',
     adjust: 'Adjustment handle {{n}} of {{total}}. The arrows move it.',
+    outline: 'Outline thickness handle: {{width}} px. The arrows move it.',
     picture:
       'Crop: the arrows move the picture. Ctrl+Up or Down scales it. Tab goes to the handles.',
     handle: 'Crop handle: {{where}}. The arrows move it.',

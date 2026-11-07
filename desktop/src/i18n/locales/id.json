@@ -3043,6 +3043,7 @@
     "at": {
       "point": "Titik {{n}} dari {{total}}. Tombol panah memindahkannya.",
       "adjust": "Gagang penyesuaian {{n}} dari {{total}}. Tombol panah memindahkannya.",
+      "outline": "Gagang ketebalan garis tepi: {{width}} px. Tombol panah memindahkannya.",
       "picture": "Pangkas: tombol panah memindahkan gambar. Ctrl+Up atau Down mengubah skalanya. Tab berpindah ke gagang.",
       "handle": "Gagang pangkas: {{where}}. Tombol panah memindahkannya.",
       "walkSelected": "{{what}}: dalam pilihan",

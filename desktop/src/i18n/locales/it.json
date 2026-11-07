@@ -3055,6 +3055,7 @@
     "at": {
       "point": "Punto {{n}} di {{total}}. Spostalo con le frecce.",
       "adjust": "Quadratino di regolazione {{n}} di {{total}}. Spostalo con le frecce.",
+      "outline": "Quadratino dello spessore del contorno: {{width}} px. Spostalo con le frecce.",
       "picture": "Ritaglio: sposta l'immagine con le frecce. Ctrl+freccia su o giù la ridimensiona. Tab passa ai quadratini.",
       "handle": "Quadratino di ritaglio: {{where}}. Spostalo con le frecce.",
       "walkSelected": "{{what}}: nella selezione",

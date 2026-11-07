@@ -3049,6 +3049,7 @@
     "at": {
       "point": "Nokta {{n}} / {{total}}. Ok tuşları noktayı taşır.",
       "adjust": "Ayar tutamacı {{n}} / {{total}}. Ok tuşları tutamacı taşır.",
+      "outline": "Ana hat kalınlığı tutamacı: {{width}} px. Ok tuşları tutamacı taşır.",
       "picture": "Kırpma: ok tuşları görseli taşır. Ctrl+Yukarı ok veya Ctrl+Aşağı ok görseli ölçeklendirir. Tab tutamaçlara geçer.",
       "handle": "Kırpma tutamacı: {{where}}. Ok tuşları tutamacı taşır.",
       "walkSelected": "{{what}}: seçimde",

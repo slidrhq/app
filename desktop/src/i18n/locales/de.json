@@ -3049,6 +3049,7 @@
     "at": {
       "point": "Punkt {{n}} von {{total}}. Mit den Pfeiltasten verschieben.",
       "adjust": "Anpassungsgriff {{n}} von {{total}}. Mit den Pfeiltasten verschieben.",
+      "outline": "Griff der Konturstärke: {{width}} px. Mit den Pfeiltasten verschieben.",
       "picture": "Zuschneiden: Die Pfeiltasten verschieben das Bild. Ctrl+Pfeil nach oben oder unten ändert die Größe. Tab wechselt zu den Griffen.",
       "handle": "Zuschneidegriff: {{where}}. Mit den Pfeiltasten verschieben.",
       "walkSelected": "{{what}}: ausgewählt",

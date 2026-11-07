@@ -3055,6 +3055,7 @@
     "at": {
       "point": "Punto {{n}} de {{total}}. Las flechas lo mueven.",
       "adjust": "Controlador de ajuste {{n}} de {{total}}. Las flechas lo mueven.",
+      "outline": "Controlador del grosor del contorno: {{width}} px. Las flechas lo mueven.",
       "picture": "Recorte: las flechas mueven la imagen. Ctrl+Flecha arriba o abajo cambia su tamaño. Tab va a los controladores.",
       "handle": "Controlador de recorte: {{where}}. Las flechas lo mueven.",
       "walkSelected": "{{what}}: en la selección",

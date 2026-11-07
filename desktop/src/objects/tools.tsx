@@ -42,6 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { colorToHex, useGestureTx } from '../controls';
 import { UpscaleTool } from '../images/UpscaleTool';
 import { useDeck, useEditor, useSelection } from '../shell';
+import { hasOutlineHandle } from '../stage/shapeHandles';
 import { takesAccent } from './accent';
 import { AccentEditor } from './AccentEditor';
 import { OpacityEditor, RadiusEditor, ShadowEditor, StrokeEditor } from './editors';
@@ -182,6 +183,9 @@ function StrokeTool({
   const { elements } = targets;
   const { value, mixed } = sharedFields(elements.map(strokeOf));
   const lines = elements.filter((element) => element.type === 'line').length;
+  // One shape's outline is made thicker by its handle on the Stage, not here (ADR-137).
+  const [one] = elements;
+  const onStage = elements.length === 1 && one?.type === 'shape' && hasOutlineHandle(one);
   return (
     <PopoverTool
       label={label}
@@ -196,6 +200,7 @@ function StrokeTool({
         capAndJoin={elements.every(strokeHasCapAndJoin)}
         defaultJoin={lines === elements.length ? 'round' : 'miter'}
         defaultStroke={NEW_STROKE}
+        width={!onStage}
         onChange={(_, next) => change((element) => strokePatch(element, next(strokeOf(element))))}
         onGestureEnd={end}
       />
