@@ -292,6 +292,12 @@ export const he = {
     noSlide: 'אין שקף',
     step: 'הערות דובר',
   },
+  crash: {
+    title: 'משהו השתבש',
+    body: 'ב־Slidr אירעה שגיאה לא צפויה. טענו מחדש את החלון כדי להמשיך.',
+    reload: 'טעינה מחדש',
+    details: 'פרטים',
+  },
 } as const;
 
 /** The shape of a string table: the same keys, any text. */

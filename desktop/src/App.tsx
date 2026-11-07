@@ -1,34 +1,22 @@
 import { useEffect } from 'react';
-import { isTauri } from '@tauri-apps/api/core';
-import { getCurrentWindow } from '@tauri-apps/api/window';
+import { useStore } from 'zustand';
+import { languageOf, loadLanguage } from './i18n';
 import { EditorProvider, type Editor } from './shell/editor';
+import { showMainWindow } from './shell/mainWindow';
 import { Shell } from './shell/Shell';
 
 export function App({ editor }: { editor: Editor }) {
+  // The main window starts hidden so Windows never displays an empty WebView2 surface.
+  // A passive effect runs after React has committed the full shell to the DOM.
+  useEffect(() => showMainWindow(), []);
+
+  // Some words are said in the language of the open deck and not of the UI (the hint of an empty
+  // placeholder, the names of a template's layouts): its strings are loaded when the deck is.
+  const deckLang = useStore(editor.deck, (state) => state.deck.meta.lang);
   useEffect(() => {
-    // The main window starts hidden so Windows never displays an empty WebView2 surface.
-    // A passive effect runs after React has committed the full shell to the DOM.
-    if (!isTauri()) return;
-    const appWindow = getCurrentWindow();
-    // Resolve the theme token to RGBA: Tauri accepts byte tuples and hex strings, while CSS
-    // computes light-dark() to rgb(). A pixel also handles future CSS colour spaces.
-    const pixel = document.createElement('canvas');
-    pixel.width = pixel.height = 1;
-    const context = pixel.getContext('2d')!;
-    context.fillStyle = getComputedStyle(document.body).backgroundColor;
-    context.fillRect(0, 0, 1, 1);
-    const chrome = Array.from(context.getImageData(0, 0, 1, 1).data) as [
-      number,
-      number,
-      number,
-      number,
-    ];
-    void appWindow
-      .setBackgroundColor(chrome)
-      .catch((error: unknown) => console.error('Could not set the window background', error))
-      .then(() => appWindow.show())
-      .catch((error: unknown) => console.error('Could not show the main window', error));
-  }, []);
+    const language = languageOf(deckLang);
+    if (language) void loadLanguage(language);
+  }, [deckLang]);
 
   return (
     <EditorProvider editor={editor}>

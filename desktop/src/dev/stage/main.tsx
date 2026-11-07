@@ -487,7 +487,7 @@ function App() {
   );
 }
 
-registerBuiltinFonts();
+void registerBuiltinFonts();
 const root = document.getElementById('root');
 if (!root) throw new Error('#root is missing');
 createRoot(root).render(

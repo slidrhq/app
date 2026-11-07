@@ -64,22 +64,28 @@ async function deckFile(page: Page, count: number, pictures = false): Promise<st
   return file;
 }
 
+/**
+ * What the status bar says of the first slide of `total`. The app starts in the language of the
+ * system, so its words are Hebrew or English, as the machine that runs the tests has it.
+ */
+const firstOf = (total: number) => new RegExp(`^(שקף 1 מתוך|Slide 1 of) ${total}$`);
+
 /** Opens a file whatever is open now: unsaved changes of the measurement before are let go. */
 async function open(page: Page, file: string, slides: number): Promise<void> {
-  const question = page.getByRole('dialog').filter({ hasText: 'לשמור את השינויים' });
+  const question = page.getByRole('dialog').filter({ hasText: /לשמור את השינויים|Save changes/ });
   const name = page.getByTestId('document-name');
+  const status = page.getByTestId('status-slide');
   // A new deck first, so that the file is opened over a document with nothing to ask about.
   await page.getByTestId('stage-surface').focus();
   await page.keyboard.press('Control+n');
-  await expect(question.or(name.filter({ hasText: 'מצגת ללא שם' })).first()).toBeVisible();
+  await expect(question.or(status.filter({ hasText: firstOf(1) })).first()).toBeVisible();
   if (await question.isVisible()) {
-    await question.getByRole('button', { name: 'בלי לשמור' }).click();
+    await question.getByRole('button', { name: /^(בלי לשמור|Don’t save)$/ }).click();
   }
-  await expect(name).toHaveText('מצגת ללא שם');
-  await expect(page.getByTestId('status-slide')).toHaveText('שקף 1 מתוך 1');
+  await expect(status).toHaveText(firstOf(1));
   await openDeckFile(page, file);
   await expect(name).toHaveText(basename(file, '.slidr'));
-  await expect(page.getByTestId('status-slide')).toHaveText(`שקף 1 מתוך ${slides}`);
+  await expect(status).toHaveText(firstOf(slides));
 }
 
 test.describe.configure({ mode: 'serial' });
@@ -268,11 +274,11 @@ test.describe('with a deck open', () => {
       const runs = [];
       for (let i = 0; i < 3; i++) {
         runs.push(await timedOpen(page, file, count));
-        await expect(page.getByTestId('status-slide')).toHaveText(`שקף 1 מתוך ${count}`);
+        await expect(page.getByTestId('status-slide')).toHaveText(firstOf(count));
         // Back to a deck of one slide, so every open starts from the same place.
         await page.getByTestId('stage-surface').focus();
         await page.keyboard.press('Control+n');
-        await expect(page.getByTestId('status-slide')).toHaveText('שקף 1 מתוך 1');
+        await expect(page.getByTestId('status-slide')).toHaveText(firstOf(1));
       }
       const details = {
         fileMB: round(statSync(file).size / 1e6),
@@ -393,7 +399,7 @@ test.describe('with a deck open', () => {
     await open(page, await deckFile(page, 200), 200);
     // A change to undo: a slide is added. Then it is undone and redone, by the keys.
     await page.getByTestId('new-slide').click();
-    await expect(page.getByTestId('status-slide')).toHaveText(/מתוך 201$/);
+    await expect(page.getByTestId('status-slide')).toHaveText(/(מתוך|of) 201$/);
     await page.getByTestId('stage-surface').focus();
     const times = await page.evaluate(async () => {
       const status = document.querySelector('[data-testid="status-slide"]')!;
@@ -691,9 +697,13 @@ test.describe('with a deck open', () => {
       let size = 0;
       for (let i = 0; i < 3; i++) {
         const written = join(FILES, `export-${i}.html`);
+        // The export card (ADR-123): an HTML page, the format it starts with, then its choices.
         await page.getByTestId('file-menu-trigger').click();
-        await page.getByRole('menuitem', { name: 'ייצוא HTML…', exact: true }).click();
-        await expect(page.getByTestId('export-dialog')).toBeVisible();
+        await page.getByTestId('file-export').click();
+        const card = page.getByTestId('export-card');
+        await expect(card).toBeVisible();
+        await expect(card).toHaveAttribute('data-format', 'html');
+        await card.getByTestId('export-continue').click();
         await answerDialog(page, 'save', written);
         const started = Date.now();
         await page.getByTestId('export-run').click();
@@ -701,7 +711,7 @@ test.describe('with a deck open', () => {
         runs.push(Date.now() - started);
         size = statSync(written).size;
         await page.keyboard.press('Escape');
-        await expect(page.getByTestId('export-dialog')).toHaveCount(0);
+        await expect(card).toBeHidden();
       }
       // The first run fetches the font tools; the later ones have them.
       const details = { fileMB: round(size / 1e6) };

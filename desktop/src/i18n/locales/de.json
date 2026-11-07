@@ -2999,6 +2999,12 @@
       "hint": "Notizen werden mit der Präsentation gespeichert und nicht auf der Folie angezeigt.",
       "noSlide": "Keine Folie",
       "step": "Sprechernotizen"
+    },
+    "crash": {
+      "title": "Etwas ist schiefgelaufen",
+      "body": "In Slidr ist ein unerwarteter Fehler aufgetreten. Laden Sie das Fenster neu, um fortzufahren.",
+      "reload": "Neu laden",
+      "details": "Details"
     }
   },
   "stage": {

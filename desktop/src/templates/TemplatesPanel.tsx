@@ -9,6 +9,7 @@ import { useLanguage } from '../i18n';
 import { ask, useDeck, useEditor } from '../shell';
 import { renameTemplate, updateTemplate } from './actions';
 import { library } from './app';
+import { useLibraryEntries } from './useLibrary';
 import { coverAsset, libraryCover } from './covers';
 import type { LibraryEntry } from './library';
 import { templateName, templateTagline } from './names';
@@ -272,17 +273,13 @@ function TemplateCard({
 
 function Library() {
   const { t } = useTranslation('templates');
-  const { personal, loaded } = useStore(library.state);
+  const loaded = useStore(library.state, (s) => s.loaded);
   const themeId = useDeck((s) => s.deck.theme.id);
   /** The template whose slides are spread over the Stage, by id. */
   const open = useStore(templateSlides, (s) => s.id);
   // The slides are opened from here: they do not stay when the panel is gone.
   useEffect(() => () => showTemplateSlides(null), []);
-  const all = useMemo(
-    () => library.entries(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [personal],
-  );
+  const all = useLibraryEntries();
   // Only the templates written in the UI language. The slides of one the language was switched
   // away from, spread as it was switched, are closed.
   const { entries, pending } = useTemplatesIn(all, useLanguage());

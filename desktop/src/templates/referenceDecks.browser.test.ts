@@ -55,7 +55,7 @@ function countTypes(slide: Slide): Record<string, number> {
 
 beforeAll(async () => {
   await page.viewport(1920, 1080);
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
 });
 
 afterAll(async () => {

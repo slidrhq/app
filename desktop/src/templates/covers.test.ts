@@ -2,6 +2,10 @@
 import { builtInAvailable, builtInSamples, builtInTemplates } from '@slidr/templates/builtin';
 import { describe, expect, it } from 'vitest';
 import { coverPicture, coverUrl } from './covers';
+import { mediaFiles } from '@slidr/media-library';
+
+// The manifest, which says which photographs the library has.
+await mediaFiles();
 
 describe.skipIf(!builtInAvailable)('the covers of the built-in templates', () => {
   it.each(builtInTemplates().map((template) => [template.theme.id, template] as const))(

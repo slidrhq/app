@@ -40,6 +40,10 @@ import {
 } from './options';
 import { chartSession, closeData, moveTo, openData } from './session';
 import { chartTarget, type ChartEditor } from './target';
+import { loadLanguage } from '../i18n';
+
+// The French strings, as the app loads them for a deck in French.
+await loadLanguage('fr');
 
 /*
  * Every action of the chart area on a real bus that validates the deck after each change: it is

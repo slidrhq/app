@@ -3005,6 +3005,12 @@
       "hint": "Le note vengono salvate con la presentazione e non sono visibili nella diapositiva.",
       "noSlide": "Nessuna diapositiva",
       "step": "Note del relatore"
+    },
+    "crash": {
+      "title": "Si è verificato un problema",
+      "body": "Slidr ha riscontrato un errore imprevisto. Ricarica la finestra per continuare.",
+      "reload": "Ricarica",
+      "details": "Dettagli"
     }
   },
   "stage": {

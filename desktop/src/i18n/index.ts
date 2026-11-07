@@ -120,24 +120,138 @@ function applyToDocument(language: string): void {
   document.documentElement.dir = i18n.dir(language);
 }
 
-/** The translated languages, every namespace of each in one file: `locales/fr.json`. */
-const translated = import.meta.glob<Resource[string]>('./locales/*.json', {
-  eager: true,
-  import: 'default',
-});
-
-const resources: Resource = { he: { shell: he }, en: { shell: en } };
-for (const [path, namespaces] of Object.entries(translated)) {
+/**
+ * The translated languages, every namespace of each in one file: `locales/fr.json`. Each is a
+ * chunk of its own, loaded when the language is shown (`loadLanguage`), so the app does not
+ * carry the strings of fourteen languages to start in one.
+ */
+const translated = new Map<string, () => Promise<Resource[string]>>();
+for (const [path, load] of Object.entries(
+  import.meta.glob<Resource[string]>('./locales/*.json', { import: 'default' }),
+)) {
   const language = /\/([^/]+)\.json$/.exec(path)?.[1];
-  if (language) resources[language] = namespaces;
+  if (language) translated.set(language, load);
 }
 
+/** The loads of translated languages, started or done, by language. */
+const loads = new Map<string, Promise<void>>();
+
+/**
+ * Loads the strings of a UI language, once: a file of the app, not of the network. Hebrew and
+ * English are always there. A load that fails is said to the console and tried again next time;
+ * meanwhile the language shows its English strings.
+ */
+export function loadLanguage(language: string): Promise<void> {
+  const load = translated.get(language);
+  if (!load) return Promise.resolve();
+  let loaded = loads.get(language);
+  if (!loaded) {
+    loaded = load().then(
+      (namespaces) => {
+        for (const [namespace, strings] of Object.entries(namespaces)) {
+          i18n.addResourceBundle(language, namespace, strings, true, true);
+        }
+      },
+      (error: unknown) => {
+        loads.delete(language);
+        console.error(`The ${language} strings could not be loaded`, error);
+      },
+    );
+    loads.set(language, loaded);
+  }
+  return loaded;
+}
+
+/** Loads every translated language: for the tests that read them all. */
+export async function loadAllLanguages(): Promise<void> {
+  await Promise.all(languages.map(loadLanguage));
+}
+
+/** Where the organization's last offer of languages is remembered (ADR-117). */
+const OFFER_KEY = 'slidr.languageOffer';
+
+/** What the organization offered: its languages, and the one it starts in. */
+interface Offer {
+  offered: readonly Language[];
+  preferred?: Language;
+}
+
+/** The languages `allowed` names, in the picker's order: every one when it names none. */
+function offerOf(allowed: readonly string[] | undefined, preferred: string | undefined): Offer {
+  const named = allowed?.filter(isLanguage) ?? [];
+  return {
+    offered:
+      named.length > 0 ? languages.filter((language) => named.includes(language)) : languages,
+    ...(isLanguage(preferred) ? { preferred } : {}),
+  };
+}
+
+/**
+ * The organization's offer as the last start was told it, so this start shows the language it
+ * will be told before its settings have come, and the UI does not change language before the
+ * user's eyes. Every language when nothing is remembered.
+ */
+function rememberedOffer(): Offer {
+  try {
+    const stored = JSON.parse(localStorage.getItem(OFFER_KEY) ?? 'null') as {
+      offered?: unknown;
+      preferred?: unknown;
+    } | null;
+    if (stored && Array.isArray(stored.offered)) {
+      return offerOf(
+        stored.offered.filter((language): language is string => typeof language === 'string'),
+        typeof stored.preferred === 'string' ? stored.preferred : undefined,
+      );
+    }
+  } catch {
+    // Storage can be unavailable, or hold something else: every language is offered.
+  }
+  return offerOf(undefined, undefined);
+}
+
+/** Remembers the organization's offer for the next start; forgets it when there is none. */
+function rememberOffer(
+  allowed: readonly string[] | undefined,
+  preferred: string | undefined,
+): void {
+  try {
+    if (allowed?.some(isLanguage) || isLanguage(preferred)) {
+      localStorage.setItem(OFFER_KEY, JSON.stringify({ offered: allowed ?? [], preferred }));
+    } else {
+      localStorage.removeItem(OFFER_KEY);
+    }
+  } catch {
+    // Not remembered: the next start shows the UI in its language once its settings have come.
+  }
+}
+
+/**
+ * The language to show under an offer: the user's own choice while it is offered; else the
+ * organization's preferred one; else the system's, when it is offered; else the first offered.
+ */
+function shownUnder({ offered, preferred }: Offer): Language {
+  const has = (language: string | undefined): language is Language =>
+    isLanguage(language) && offered.includes(language);
+  const own = storedLanguage();
+  const system = systemLanguage();
+  return has(own) ? own : has(preferred) ? preferred : has(system) ? system : (offered[0] ?? 'en');
+}
+
+const startOffer = rememberedOffer();
+
+/**
+ * The UI languages the organization offers (ADR-117): every one until its settings say, or as
+ * the last start was told.
+ */
+let offered: readonly Language[] = startOffer.offered;
+
 void i18n.use(initReactI18next).init({
-  resources,
-  lng: storedLanguage() ?? systemLanguage(),
+  resources: { he: { shell: he }, en: { shell: en } },
+  lng: shownUnder(startOffer),
   // Hebrew and English have every string (the compiler sees to it), and a key missing in both
   // is a bug that is reported below. A translated language that lacks a string newer than its
-  // translation shows the English one (the tests list what is missing).
+  // translation shows the English one (the tests list what is missing), and so does one whose
+  // file has not loaded yet.
   fallbackLng: (code) => (code === 'he' || code === 'en' ? [] : ['en']),
   ns: ['shell'],
   defaultNS: 'shell',
@@ -147,9 +261,18 @@ void i18n.use(initReactI18next).init({
   missingKeyHandler: (lngs, ns, key) => {
     console.error(`Missing ${lngs.join('/')} string: ${ns}:${key}`);
   },
+  // A language's strings that come after the first render (a deck in another language than the
+  // UI's) draw again every component that reads strings.
+  react: { bindI18nStore: 'added' },
 });
 applyToDocument(i18n.language);
 i18n.on('languageChanged', applyToDocument);
+
+/**
+ * The strings of the language the UI starts in. The app draws once they are there, so the first
+ * render is in its language: at once for Hebrew and English, else a file of the app.
+ */
+export const languageReady: Promise<void> = loadLanguage(i18n.language);
 
 export function currentLanguage(): Language {
   return isLanguage(i18n.language) ? i18n.language : 'en';
@@ -165,9 +288,6 @@ export function useLanguage(): Language {
   return isLanguage(current.language) ? current.language : 'en';
 }
 
-/** The UI languages the organization offers (ADR-117): every one, until its settings say. */
-let offered: readonly Language[] = languages;
-
 /** The languages the picker offers, in its order. */
 export const offeredLanguages = (): readonly Language[] => offered;
 
@@ -175,20 +295,21 @@ export const offeredLanguages = (): readonly Language[] => offered;
  * Offers only `allowed` of the UI languages, as the organization's settings say (ADR-117), and
  * shows the UI in one of them: the user's own choice while it is offered; else the organization's
  * `preferred`; else the system's, when it is offered; else the first offered. A choice that is not
- * offered is kept, and comes back if the organization offers it again.
+ * offered is kept, and comes back if the organization offers it again. The offer is remembered,
+ * so the next start shows the same language from its first render.
  */
 export async function offerLanguages(
   allowed?: readonly string[],
   preferred?: string,
 ): Promise<void> {
-  const named = allowed?.filter(isLanguage) ?? [];
-  offered = named.length > 0 ? languages.filter((language) => named.includes(language)) : languages;
-  const has = (language: string | undefined): language is Language =>
-    isLanguage(language) && offered.includes(language);
-  const own = storedLanguage();
-  const system = systemLanguage();
-  const shown = has(own) ? own : has(preferred) ? preferred : has(system) ? system : offered[0];
-  if (shown && i18n.language !== shown) await i18n.changeLanguage(shown);
+  const offer = offerOf(allowed, preferred);
+  offered = offer.offered;
+  rememberOffer(allowed, preferred);
+  const shown = shownUnder(offer);
+  if (i18n.language !== shown) {
+    await loadLanguage(shown);
+    await i18n.changeLanguage(shown);
+  }
 }
 
 /** Switches the UI language live and remembers it. */
@@ -198,6 +319,7 @@ export async function setLanguage(language: Language): Promise<void> {
   } catch {
     // Not remembered, but still switched.
   }
+  await loadLanguage(language);
   await i18n.changeLanguage(language);
 }
 

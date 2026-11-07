@@ -11,8 +11,7 @@ import { createImportPage, type ConversionHost } from '@slidr/html-import';
 import type { AssetMeta } from '@slidr/model';
 import { invoke } from '@tauri-apps/api/core';
 import type { ImportedAsset } from '../../document/storage';
-import { registerBuiltinFonts } from '../../fonts';
-import { builtinFaces } from '../../fonts/builtinFonts.generated';
+import { absoluteBuiltinFaces, registerBuiltinFonts } from '../../fonts';
 import { runImportJob, type ImportJob } from '../protocol';
 
 declare global {
@@ -22,7 +21,7 @@ declare global {
 }
 
 // The fonts of the app's library: the converted slide is drawn with them here as in the editor.
-registerBuiltinFonts();
+void registerBuiltinFonts();
 
 /** A file name that tells the asset store the type, for content that does not say it itself. */
 function assetFileName(info: { mime: string; name?: string }): string {
@@ -56,7 +55,7 @@ const page = createImportPage({
   source: () => invoke<ArrayBuffer>('import_source'),
   host,
   // The frame's document has no address of its own to resolve these against.
-  appFonts: builtinFaces.map((face) => ({ ...face, url: new URL(face.url, location.href).href })),
+  appFonts: absoluteBuiltinFaces(),
 });
 
 /** What went wrong, in words: a command of the app fails with `{ kind, message }`, not an Error. */

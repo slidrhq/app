@@ -91,7 +91,7 @@ const rule = (finding: LintFinding) => finding.rule;
 
 beforeAll(async () => {
   await page.viewport(1920, 1080);
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
 });
 
 afterAll(async () => {

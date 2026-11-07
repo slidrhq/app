@@ -105,7 +105,7 @@ const hooks = window as unknown as {
 };
 
 function main() {
-  registerBuiltinFonts();
+  void registerBuiltinFonts();
   let drawn = load();
   hooks.__ids = drawn.map(({ id }) => id);
 

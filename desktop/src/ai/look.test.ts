@@ -10,7 +10,7 @@ import { deckFromTemplate, masterState, type Template } from '@slidr/templates';
 import { builtInAvailable, builtInTemplates } from '@slidr/templates/builtin';
 import { nightTemplate, paperTemplate } from '@slidr/templates/fixtures';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { builtinFaces, builtinFamilies } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
 import type { Editor } from '../shell';
 import { showPreview, stagePreview } from '../stage/preview';
 import { logoAsset, saveAsTemplate, setFooter, setLogo, showNumber } from '../templates/actions';
@@ -30,6 +30,13 @@ import {
   type Look,
 } from './look';
 import { en, he } from './messages';
+import { builtInTemplates as libraryTemplates } from '../templates/builtIn';
+
+// The built-in templates of the app's library, read as the app reads them once it has started.
+await libraryTemplates.load();
+
+// The library's fonts, as the app has them once the catalog has come.
+const { families: builtinFamilies, faces: builtinFaces } = await builtinFonts.load();
 
 /*
  * The look of the deck without a panel: what the deck tool offers, what trying a look puts on

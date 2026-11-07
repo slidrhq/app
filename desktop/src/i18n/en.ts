@@ -297,4 +297,10 @@ export const en: Messages<typeof he> = {
     noSlide: 'No slide',
     step: 'Speaker notes',
   },
+  crash: {
+    title: 'Something went wrong',
+    body: 'Slidr ran into an unexpected error. Reload the window to continue.',
+    reload: 'Reload',
+    details: 'Details',
+  },
 };

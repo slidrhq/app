@@ -10,7 +10,10 @@ import { createDeck, type AssetMeta, type Slide } from '@slidr/model';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { registerBuiltinFonts } from '../fonts';
-import { builtinFaces } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
+
+// The library's fonts, as the app has them once the catalog has come.
+const { faces: builtinFaces } = await builtinFonts.load();
 
 beforeAll(async () => {
   await page.viewport(1920, 1080);
@@ -407,7 +410,7 @@ describe("a file that carries a cut of one of the app's own fonts", () => {
   it("is drawn with the app's font, and the deck keeps no copy of the cut", async () => {
     // What a deck exported from the app carries (`embedFonts`): Rubik cut down to the letters
     // of the heading, and of the variable font one static font, for the weight in use.
-    registerBuiltinFonts();
+    await registerBuiltinFonts();
     const drawn = document.createElement('div');
     drawn.style.cssText = 'position:fixed;left:0;top:0';
     drawn.innerHTML = `<h2 dir="rtl" style="${LOOK}">${HEADING}</h2>`;

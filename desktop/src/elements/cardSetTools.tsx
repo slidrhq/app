@@ -6,8 +6,10 @@ import { SquareMinus, SquarePlus } from '@slidr/ui/icons';
 import { currentLanguage, useLanguage } from '../i18n';
 import { useCurrentSlide } from '../objects/target';
 import { focusStage, useEditor, useElementSize, useSelection, type Editor } from '../shell';
+import { useMediaCatalog } from '../shell/useMedia';
 import {
   cardKinds,
+  cardSetCatalog,
   cardSetOf,
   cardsOf,
   mostCards,
@@ -42,16 +44,18 @@ function useCardSet(): Selected | undefined {
   const slide = useCurrentSlide();
   const ids = useSelection((s) => s.selectedElementIds);
   const elementId = ids.length === 1 ? ids[0] : undefined;
+  // A set on the slide is a set once the catalog that names it has come.
+  const known = useMediaCatalog(cardSetCatalog).ids;
   return useMemo(() => {
     const found = slide && elementId ? locateElement(slide.elements, elementId) : undefined;
     if (!slide || found?.element.type !== 'group') return undefined;
-    const own = cardSetOf(found.element);
+    const own = cardSetOf(found.element, known);
     if (own) return { slideId: slide.id, id: own, set: found.element };
-    const around = cardSetOf(found.parent);
+    const around = cardSetOf(found.parent, known);
     return around && found.parent
       ? { slideId: slide.id, id: around, set: found.parent, card: found.element }
       : undefined;
-  }, [slide, elementId]);
+  }, [slide, elementId, known]);
 }
 
 /**

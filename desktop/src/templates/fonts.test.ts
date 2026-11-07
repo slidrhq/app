@@ -1,7 +1,10 @@
 import { familyOfLanguage } from '@slidr/model';
 import { TEMPLATE_FONTS } from '@slidr/prompts';
 import { describe, expect, it } from 'vitest';
-import { builtinFamilies } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
+
+// The library's fonts, as the app has them once the catalog has come.
+const { families: builtinFamilies } = await builtinFonts.load();
 
 /**
  * A slide is drawn without the network, so a template can name only fonts the app carries. The

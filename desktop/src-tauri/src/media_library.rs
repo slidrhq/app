@@ -15,7 +15,13 @@
 //! `pnpm media:publish` from a library on an author's machine (docs/media-library.md).
 //!
 //! - The manifest is read from the web when the app starts, and kept. Without the network the
-//!   last one read stands; never read, the library is empty.
+//!   last one read stands; never read, the library is empty. It is asked for with what the site
+//!   said of the one kept (its `ETag` or `Last-Modified`), so a site whose manifest has not
+//!   changed answers that it has not, and sends nothing.
+//! - Nothing waits for that read when a manifest from before is kept: the pages are answered by
+//!   the kept one at once, and when this start's turns out to be another, they are told
+//!   ([`CHANGED_EVENT`]) and read the library again. Only a first start, with nothing kept, waits
+//!   for the manifest.
 //! - A file is fetched only when a page asks for it, never ahead: the library is not copied to
 //!   this machine. A file the manifest names is answered from the cache when the cache holds the
 //!   very bytes the manifest names, and otherwise fetched, checked against the manifest and kept,
@@ -67,6 +73,13 @@ const ADDRESS_FILE: &str = "media-library.json";
 /// The file that lists the library.
 const MANIFEST: &str = "manifest.json";
 
+/// What the site said of the kept manifest, kept beside it ([`KeptValidator`]).
+const VALIDATOR: &str = "manifest.validator.json";
+
+/// The event the pages are sent when this start's manifest replaced the one they were answered
+/// with: they read the library again.
+pub const CHANGED_EVENT: &str = "media-library-changed";
+
 /// How long the manifest may take to come.
 const MANIFEST_TIMEOUT: Duration = Duration::from_secs(8);
 
@@ -76,10 +89,6 @@ const FILE_TIMEOUT: Duration = Duration::from_secs(60);
 /// How long a large file may take to come ([`MediaLibrary::fetch_fresh`]): an agent's package is
 /// up to 95 MiB, and the network of an organization may be slow.
 const LARGE_FILE_TIMEOUT: Duration = Duration::from_secs(15 * 60);
-
-/// How long a request waits for the manifest of this start when one from before is at hand.
-/// Online the new one is there well before; offline the old one is answered without delay.
-const WAIT_WITH_MANIFEST: Duration = Duration::from_millis(1500);
 
 /// Redirects followed within the site: Pages sends `x.html` to `x`.
 const REDIRECTS: usize = 3;
@@ -118,6 +127,59 @@ impl Manifest {
 struct Current {
     manifest: Manifest,
     text: Vec<u8>,
+    /// What the site said of this manifest, when it said anything.
+    validator: Option<Validator>,
+}
+
+/// What a site said of a file it sent: its `ETag`, its `Last-Modified`. Sent back with the next
+/// read of the manifest, so a site that still has the same one answers 304 and sends nothing.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+struct Validator {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    etag: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    last_modified: Option<String>,
+}
+
+impl Validator {
+    /// What the headers of an answer say of its file; None when they say nothing.
+    fn of(headers: &reqwest::header::HeaderMap) -> Option<Self> {
+        let text = |name| {
+            headers
+                .get(name)
+                .and_then(|value| value.to_str().ok())
+                .map(str::to_owned)
+        };
+        let validator = Self {
+            etag: text(reqwest::header::ETAG),
+            last_modified: text(reqwest::header::LAST_MODIFIED),
+        };
+        (validator.etag.is_some() || validator.last_modified.is_some()).then_some(validator)
+    }
+}
+
+/// The validator as it is kept, with the SHA-256 of the manifest it is of: one that was left
+/// beside another manifest (a write cut short) is not used.
+#[derive(Serialize, Deserialize)]
+struct KeptValidator {
+    sha256: String,
+    #[serde(flatten)]
+    validator: Validator,
+}
+
+/// The validator kept in `dir` for the manifest `text`, when it is of that very manifest.
+fn kept_validator(dir: &Path, text: &[u8]) -> Option<Validator> {
+    let bytes = std::fs::read(dir.join(VALIDATOR)).ok()?;
+    let kept: KeptValidator = serde_json::from_slice(&bytes).ok()?;
+    (kept.sha256 == format!("{:x}", Sha256::digest(text))).then_some(kept.validator)
+}
+
+/// What the site answered to a read of a file.
+enum Got {
+    /// The file, and what the site said of it.
+    Body(Vec<u8>, Option<Validator>),
+    /// The file is still the one the validator sent is of: not sent again.
+    NotModified,
 }
 
 /// What reading the manifest from the web came to.
@@ -291,6 +353,7 @@ impl MediaLibrary {
             .and_then(|text| {
                 Some(Current {
                     manifest: Manifest::parse(&text)?,
+                    validator: kept_validator(&dir, &text),
                     text,
                 })
             })
@@ -306,11 +369,16 @@ impl MediaLibrary {
     }
 
     /// Reads the manifest from the web, in the background. Nothing else is fetched until a page
-    /// asks for it.
-    pub fn start(self: &Arc<Self>) {
+    /// asks for it. `changed` is called when the manifest read replaced one kept from before,
+    /// which the pages were answered with meanwhile: they read the library again. A first start,
+    /// with nothing kept, has its pages wait for the manifest, so they have this one already.
+    pub fn start(self: &Arc<Self>, changed: impl FnOnce() + Send + 'static) {
         let library = Arc::clone(self);
+        let kept = self.current().is_some();
         tauri::async_runtime::spawn(async move {
-            library.refresh().await;
+            if library.refresh().await == Refresh::Changed && kept {
+                changed();
+            }
         });
     }
 
@@ -345,33 +413,57 @@ impl MediaLibrary {
     }
 
     async fn read_manifest(&self) -> Refresh {
-        let text = match self.download(MANIFEST, MANIFEST_TIMEOUT).await {
-            Ok(text) => text,
+        let kept = self.current();
+        let asked = kept.as_ref().and_then(|current| current.validator.as_ref());
+        let (text, validator) = match self.request(MANIFEST, MANIFEST_TIMEOUT, asked).await {
+            Ok(Got::Body(text, validator)) => (text, validator),
+            Ok(Got::NotModified) => return Refresh::Same,
             Err(Miss::NotFound) => return Refresh::Missing,
             Err(Miss::Unavailable) => return Refresh::Offline,
         };
         let Some(manifest) = Manifest::parse(&text) else {
             return Refresh::Missing;
         };
-        if self.current().is_some_and(|current| current.text == text) {
+        if let Some(current) = kept.filter(|current| current.text == text) {
+            // The same manifest, sent whole: what the site says of it now is kept for the next
+            // start, which may then be told it has not changed.
+            if current.validator != validator {
+                self.keep_validator(&text, validator.as_ref()).await;
+            }
             return Refresh::Same;
         }
         // Kept for the next start; a failure to write only means it is read from the web again.
         let _ = write_atomic(&self.dir, MANIFEST, &text).await;
-        *self.current.write().unwrap_or_else(PoisonError::into_inner) =
-            Some(Arc::new(Current { manifest, text }));
+        self.keep_validator(&text, validator.as_ref()).await;
+        *self.current.write().unwrap_or_else(PoisonError::into_inner) = Some(Arc::new(Current {
+            manifest,
+            text,
+            validator,
+        }));
         Refresh::Changed
     }
 
-    /// Waits for the manifest of this start, briefly when one from before is at hand.
-    async fn wait_for_manifest(&self) {
-        let wait = if self.current().is_some() {
-            WAIT_WITH_MANIFEST
-        } else {
-            // The manifest's own timeout bounds it; a little more for the answer to arrive.
-            MANIFEST_TIMEOUT + Duration::from_secs(1)
+    /// Keeps what the site said of the manifest `text` beside it, or nothing when it said nothing.
+    async fn keep_validator(&self, text: &[u8], validator: Option<&Validator>) {
+        let Some(validator) = validator else {
+            let _ = tokio::fs::remove_file(self.dir.join(VALIDATOR)).await;
+            return;
         };
+        let kept = KeptValidator {
+            sha256: format!("{:x}", Sha256::digest(text)),
+            validator: validator.clone(),
+        };
+        if let Ok(json) = serde_json::to_vec(&kept) {
+            // A failure to keep it only means the next start reads the whole manifest.
+            let _ = write_atomic(&self.dir, VALIDATOR, &json).await;
+        }
+    }
+
+    /// Waits for the manifest of this start, for a request that has no manifest to go by: the
+    /// manifest's own timeout bounds it, with a little more for the answer to arrive.
+    async fn wait_for_manifest(&self) {
         let mut refreshed = self.refreshed.subscribe();
+        let wait = MANIFEST_TIMEOUT + Duration::from_secs(1);
         let _ = tokio::time::timeout(wait, refreshed.wait_for(|done| *done)).await;
     }
 
@@ -431,7 +523,11 @@ impl MediaLibrary {
         let Some(path) = relative_path(request.uri().path()) else {
             return refusal(StatusCode::NOT_FOUND);
         };
-        self.wait_for_manifest().await;
+        // A manifest kept from before answers at once, while this start's is read; only a start
+        // with nothing kept waits for it.
+        if self.current().is_none() {
+            self.wait_for_manifest().await;
+        }
         let Some(current) = self.current() else {
             return refusal(StatusCode::NOT_FOUND);
         };
@@ -480,16 +576,47 @@ impl MediaLibrary {
 
     /// A file of the site, from the web.
     async fn download(&self, path: &str, timeout: Duration) -> Result<Vec<u8>, Miss> {
+        match self.request(path, timeout, None).await? {
+            Got::Body(bytes, _) => Ok(bytes),
+            // Never asked for conditionally, so never said; a site that says it is not answering.
+            Got::NotModified => Err(Miss::Unavailable),
+        }
+    }
+
+    /// A file of the site, from the web; when `kept` is what the site said of the copy at hand,
+    /// it is sent only if it is no longer that one.
+    async fn request(
+        &self,
+        path: &str,
+        timeout: Duration,
+        kept: Option<&Validator>,
+    ) -> Result<Got, Miss> {
         let mut url = self.url_of(path).ok_or(Miss::NotFound)?;
         for _ in 0..=REDIRECTS {
-            let response = self
-                .client
-                .get(url.clone())
-                .timeout(timeout)
-                .send()
-                .await
-                .map_err(|_| Miss::Unavailable)?;
+            let mut request = self.client.get(url.clone()).timeout(timeout);
+            if let Some(kept) = kept {
+                // A value that cannot be a header is left out: the file is then sent whole.
+                let header = |value: &Option<String>| {
+                    value
+                        .as_deref()
+                        .and_then(|value| reqwest::header::HeaderValue::from_str(value).ok())
+                };
+                if let Some(etag) = header(&kept.etag) {
+                    request = request.header(reqwest::header::IF_NONE_MATCH, etag);
+                }
+                if let Some(date) = header(&kept.last_modified) {
+                    request = request.header(reqwest::header::IF_MODIFIED_SINCE, date);
+                }
+            }
+            let response = request.send().await.map_err(|_| Miss::Unavailable)?;
             let status = response.status();
+            if status.as_u16() == 304 {
+                return if kept.is_some() {
+                    Ok(Got::NotModified)
+                } else {
+                    Err(Miss::Unavailable)
+                };
+            }
             if status.is_redirection() {
                 // Within the site only: a library on one host is never read from another.
                 let next = response
@@ -507,10 +634,11 @@ impl MediaLibrary {
             if !status.is_success() {
                 return Err(Miss::Unavailable);
             }
+            let validator = Validator::of(response.headers());
             return response
                 .bytes()
                 .await
-                .map(|bytes| bytes.to_vec())
+                .map(|bytes| Got::Body(bytes.to_vec(), validator))
                 .map_err(|_| Miss::Unavailable);
         }
         Err(Miss::Unavailable)
@@ -626,7 +754,10 @@ pub fn unavailable() -> Response<Vec<u8>> {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Mutex;
+    use std::sync::{
+        Mutex,
+        atomic::{AtomicUsize, Ordering},
+    };
 
     use super::*;
     use crate::net::testing::{Reply, Seen, Server, serve};
@@ -981,7 +1112,7 @@ mod tests {
         let site = Site::new(&[("a.json", b"a"), ("b/c.json", b"c"), ("b/d.webp", b"d")]).await?;
         let dir = tempfile::tempdir()?;
         let library = MediaLibrary::new(site.base(), dir.path().to_path_buf());
-        library.start();
+        library.start(|| {});
         get(&library, "http://media.localhost/b/c.json").await;
         // Time for anything the start might fetch on its own.
         tokio::time::sleep(Duration::from_millis(300)).await;
@@ -991,6 +1122,119 @@ mod tests {
         assert!(kept(dir.path(), b"c"));
         assert!(!kept(dir.path(), b"a"));
         assert!(!kept(dir.path(), b"d"));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn a_kept_manifest_answers_at_once_while_the_site_is_slow() -> std::io::Result<()> {
+        let site = Site::new(&[("icons/hebrew.json", b"{}")]).await?;
+        let dir = tempfile::tempdir()?;
+        let online = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        online.refresh().await;
+        get(&online, "http://media.localhost/icons/hebrew.json").await;
+
+        // The next start, behind a proxy that takes the request and never answers.
+        let stalled = serve(|_: &Seen| Reply::after(Duration::from_secs(60))).await?;
+        let library = MediaLibrary::new(url(&stalled.base), dir.path().to_path_buf());
+        library.start(|| {});
+        let started = std::time::Instant::now();
+        let manifest = get(&library, "http://media.localhost/manifest.json").await;
+        let words = get(&library, "http://media.localhost/icons/hebrew.json").await;
+        let missing = get(&library, "http://media.localhost/icons/nothing.json").await;
+        let took = started.elapsed();
+        assert!(took < Duration::from_millis(500), "took {took:?}");
+        assert_eq!(manifest.status(), StatusCode::OK);
+        assert_eq!(words.body(), b"{}");
+        assert_eq!(missing.status(), StatusCode::NOT_FOUND);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn a_manifest_the_site_still_has_is_not_sent_again() -> std::io::Result<()> {
+        let published = |bytes: &[u8]| {
+            let files = BTreeMap::from([("icons/hebrew.json".to_owned(), bytes.to_vec())]);
+            manifest_of(files.iter())
+        };
+        // A site that says what its manifest is, and answers 304 to a read of the one it has.
+        let now = Arc::new(Mutex::new(("\"one\"".to_owned(), published(b"{}"))));
+        let sent = Arc::new(AtomicUsize::new(0));
+        let server = {
+            let (now, sent) = (Arc::clone(&now), Arc::clone(&sent));
+            serve(move |seen: &Seen| {
+                let (etag, manifest) = now.lock().unwrap_or_else(PoisonError::into_inner).clone();
+                if seen.header("if-none-match").as_deref() == Some(etag.as_str()) {
+                    return Reply::bytes(304, "application/json", Vec::new());
+                }
+                sent.fetch_add(1, Ordering::SeqCst);
+                Reply::json(200, manifest).header("etag", etag)
+            })
+            .await?
+        };
+        let dir = tempfile::tempdir()?;
+        let first = MediaLibrary::new(url(&server.base), dir.path().to_path_buf());
+        assert_eq!(first.refresh().await, Refresh::Changed);
+        assert_eq!(sent.load(Ordering::SeqCst), 1);
+
+        // The next start asks with what the site said, and is told the manifest is the same.
+        let second = MediaLibrary::new(url(&server.base), dir.path().to_path_buf());
+        assert_eq!(second.refresh().await, Refresh::Same);
+        assert_eq!(sent.load(Ordering::SeqCst), 1);
+        let asked = server
+            .seen()
+            .last()
+            .and_then(|seen| seen.header("if-none-match"));
+        assert_eq!(asked.as_deref(), Some("\"one\""));
+        let manifest = get(&second, "http://media.localhost/manifest.json").await;
+        assert_eq!(manifest.body(), &published(b"{}"));
+
+        // Published again: the new manifest is sent, and replaces the one kept.
+        *now.lock().unwrap_or_else(PoisonError::into_inner) =
+            ("\"two\"".to_owned(), published(b"[]"));
+        let third = MediaLibrary::new(url(&server.base), dir.path().to_path_buf());
+        assert_eq!(third.refresh().await, Refresh::Changed);
+        assert_eq!(sent.load(Ordering::SeqCst), 2);
+        let manifest = get(&third, "http://media.localhost/manifest.json").await;
+        assert_eq!(manifest.body(), &published(b"[]"));
+
+        // What the site said is not sent with another manifest than the one it was said of.
+        std::fs::write(dir.path().join(MANIFEST), published(b"{}"))?;
+        let fourth = MediaLibrary::new(url(&server.base), dir.path().to_path_buf());
+        assert_eq!(fourth.refresh().await, Refresh::Changed);
+        let asked = server
+            .seen()
+            .last()
+            .and_then(|seen| seen.header("if-none-match"));
+        assert_eq!(asked, None);
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn the_pages_are_told_when_a_new_manifest_replaces_the_kept_one() -> std::io::Result<()> {
+        let site = Site::new(&[("icons/hebrew.json", b"old")]).await?;
+        let dir = tempfile::tempdir()?;
+        // Whether a start told the pages; once it is over, the sender is gone if it did not.
+        let told = |library: &Arc<MediaLibrary>| {
+            let (sender, told) = tokio::sync::oneshot::channel();
+            library.start(move || {
+                let _ = sender.send(());
+            });
+            async move {
+                matches!(
+                    tokio::time::timeout(Duration::from_secs(10), told).await,
+                    Ok(Ok(()))
+                )
+            }
+        };
+        // A first start: its pages waited for the manifest, and have it already.
+        let first = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        assert!(!told(&first).await);
+        // The same publication again: nothing to tell.
+        let same = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        assert!(!told(&same).await);
+        // A new one, read while the pages were answered by the one kept.
+        site.set("icons/hebrew.json", Some(b"new"));
+        let next = MediaLibrary::new(site.base(), dir.path().to_path_buf());
+        assert!(told(&next).await);
         Ok(())
     }
 

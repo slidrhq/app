@@ -2993,6 +2993,12 @@
       "hint": "Catatan disimpan bersama presentasi, dan tidak ditampilkan di slide.",
       "noSlide": "Tidak ada slide",
       "step": "Catatan pembicara"
+    },
+    "crash": {
+      "title": "Terjadi kesalahan",
+      "body": "Slidr mengalami kesalahan yang tidak terduga. Muat ulang jendela untuk melanjutkan.",
+      "reload": "Muat ulang",
+      "details": "Detail"
     }
   },
   "stage": {

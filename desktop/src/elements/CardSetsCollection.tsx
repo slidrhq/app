@@ -6,8 +6,10 @@ import { useLanguage } from '../i18n';
 import { searchTags } from '../media/icons/library';
 import { searchIcons, withTags, wordsOf, type SearchWords } from '../media/icons/search';
 import { tell, useDeck, useEditor, useElementSize } from '../shell';
+import { useMediaCatalog } from '../shell/useMedia';
 import {
   cardPicture,
+  cardSetCatalog,
   cardSetsIn,
   newCardSet,
   readingIn,
@@ -76,9 +78,10 @@ export function useCardSetIndex(): readonly FoundCardSet[] | undefined {
   const { t } = useTranslation('elements');
   const lang = useLanguage();
   const tags = useLoaded(cardTags);
+  const { ids } = useMediaCatalog(cardSetCatalog);
   return useMemo(() => {
     if (tags === undefined) return undefined;
-    return cardSetsIn(lang).map((id) => {
+    return cardSetsIn(lang, ids).map((id) => {
       const nameHebrew = wordsOf(t(`cards.name.${id}`, { lng: 'he' }));
       const words: FoundCardSet = {
         id,
@@ -92,7 +95,7 @@ export function useCardSetIndex(): readonly FoundCardSet[] | undefined {
       };
       return withTags(words, tags === 'failed' ? undefined : tags[id]);
     });
-  }, [tags, t, lang]);
+  }, [tags, t, lang, ids]);
 }
 
 /** The card sets that match every word of a query, best first. */
@@ -109,9 +112,12 @@ export function searchCardSets(index: readonly FoundCardSet[], query: string) {
 export function CardSetsCollection() {
   const { t } = useTranslation('elements');
   const lang = useLanguage();
-  const ids = cardSetsIn(lang);
+  const ids = cardSetsIn(lang, useMediaCatalog(cardSetCatalog).ids);
 
   if (ids.length === 0) {
+    // On its way from the library: shown the moment it comes.
+    if (!cardSetCatalog.ready)
+      return <div className="py-8" data-testid="elements-cards" aria-busy />;
     // The cards are read from the media library: without it there are none to offer.
     return (
       <p className="py-8 text-center text-sm text-ui-fg-muted" data-testid="elements-cards">

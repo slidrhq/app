@@ -27,7 +27,7 @@ const deck = {
 } as unknown as Deck;
 
 beforeAll(async () => {
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
   await setSystemFontSource(() =>
     Promise.resolve([
       { family: 'Calibri', hebrew: false, symbol: false, weights: [300, 400, 700] },

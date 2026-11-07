@@ -39,6 +39,10 @@ import {
 } from './actions';
 import { TemplateLibrary } from './library';
 import { memoryTemplateStore } from './store';
+import { builtInTemplates as libraryTemplates } from './builtIn';
+
+// The built-in templates of the app's library, read as the app reads them once it has started.
+await libraryTemplates.load();
 
 const box = (x: number, y: number, w: number, h: number) => ({ x, y, w, h });
 

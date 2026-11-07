@@ -4,11 +4,16 @@ import {
   lazyMediaJson,
   MEDIA_LIBRARY_URL,
   mediaBase,
+  mediaCatalog,
+  mediaEpoch,
   mediaFiles,
+  mediaFilesNow,
   mediaUrl,
   readMediaJson,
   readMediaText,
+  refreshMediaLibrary,
   requireMediaJson,
+  subscribeMedia,
 } from './index';
 
 /**
@@ -109,5 +114,73 @@ describe('the files of the media library', () => {
     forgetMediaManifest();
     site({ 'manifest.json': '<html>not a manifest</html>' });
     expect((await mediaFiles()).size).toBe(0);
+  });
+});
+
+describe('a catalog of the media library', () => {
+  it('stands in with its empty value, reads in the background, and says when it came', async () => {
+    const asked = site({ 'fonts/catalog.json': '{"families":["Heebo"]}' });
+    const catalog = mediaCatalog(
+      async () =>
+        (await readMediaJson<{ families: string[] }>('fonts/catalog.json'))?.families ?? [],
+      [] as string[],
+    );
+    // Nothing is read until it is wanted.
+    expect(catalog.peek()).toEqual([]);
+    expect(asked).toEqual([]);
+    const heard = vi.fn();
+    catalog.subscribe(heard);
+    // Asked for, it answers at once with what stands in, and reads.
+    expect(catalog.get()).toEqual([]);
+    expect(catalog.ready).toBe(false);
+    await expect(catalog.load()).resolves.toEqual(['Heebo']);
+    expect(catalog.get()).toEqual(['Heebo']);
+    expect(catalog.ready).toBe(true);
+    expect(heard).toHaveBeenCalledTimes(1);
+    // Read once.
+    await catalog.load();
+    expect(asked.filter((url) => url.endsWith('fonts/catalog.json'))).toHaveLength(1);
+  });
+
+  it('is its empty value when the library cannot be read, and never fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.reject(new Error('offline'))),
+    );
+    const failing = mediaCatalog<string[]>(() => Promise.reject(new Error('broken')), []);
+    // What it says of the failure goes nowhere here.
+    vi.stubGlobal('console', { error: vi.fn() });
+    await expect(failing.load()).resolves.toEqual([]);
+    expect(failing.ready).toBe(true);
+  });
+
+  it('is read again, and its readers told, when the library changed', async () => {
+    site({ 'a.json': '1' });
+    const catalog = mediaCatalog(async () => (await readMediaJson<number>('a.json')) ?? 0, 0);
+    await catalog.load();
+    expect(catalog.get()).toBe(1);
+    site({ 'a.json': '2' });
+    const heard = new Promise<void>((resolve) => catalog.subscribe(resolve));
+    refreshMediaLibrary();
+    await heard;
+    expect(catalog.get()).toBe(2);
+  });
+});
+
+describe('the files of the media library, without waiting', () => {
+  it('are none until the manifest came, and the pages are told when it does', async () => {
+    site({ 'icons/hebrew.json': '{}' });
+    const before = mediaEpoch();
+    const told = new Promise<void>((resolve) => {
+      const stop = subscribeMedia(() => {
+        stop();
+        resolve();
+      });
+    });
+    expect(mediaFilesNow().size).toBe(0);
+    await told;
+    expect(mediaEpoch()).toBeGreaterThan(before);
+    expect(mediaFilesNow().has('icons/hebrew.json')).toBe(true);
+    await expect(mediaFiles()).resolves.toEqual(mediaFilesNow());
   });
 });

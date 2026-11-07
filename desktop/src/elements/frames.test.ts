@@ -17,7 +17,7 @@ import {
 } from '@slidr/model';
 import { presetPath } from '@slidr/renderer';
 import { describe, expect, it } from 'vitest';
-import { builtinFaces, builtinFamilies } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
 import { familyIn, fontShelf } from './designFonts';
 import {
   featuredFrames,
@@ -45,6 +45,9 @@ import {
   type FramesCatalog,
   type PhotoFrame,
 } from './frames';
+
+// The library's fonts, as the app has them once the catalog has come.
+const { families: builtinFamilies, faces: builtinFaces } = await builtinFonts.load();
 
 /*
  * The catalogue of photo frames as the media library holds it, and what a frame becomes on a

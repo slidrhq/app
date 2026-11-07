@@ -70,7 +70,7 @@ afterAll(async () => {
 });
 
 test('a slide is measured and judged in under 100ms', async () => {
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
   const first = summary(await pass());
   const times = await pass();
   const warm = summary(times);

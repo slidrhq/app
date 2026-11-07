@@ -10,7 +10,7 @@ const q = new URLSearchParams(location.search);
 const lang = q.get('lang') ?? 'he';
 const width = Number(q.get('w') ?? 320);
 const from = Number(q.get('from') ?? 0);
-registerBuiltinFonts();
+void registerBuiltinFonts();
 const frames = await loadFrames();
 const theme = createDeck().theme;
 (window as unknown as { __count: number }).__count = frames.length;

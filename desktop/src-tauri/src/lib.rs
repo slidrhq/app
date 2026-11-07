@@ -27,9 +27,14 @@ mod updates;
 #[path = "mcp_bridge/mod.rs"]
 mod tool_bridge;
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
-use tauri::Manager;
+use tauri::{Emitter, Manager};
+
+/// How long the main window may stay hidden. It is made hidden, and the page shows it once it has
+/// drawn, so the user never sees an empty frame; a page that failed before it drew, or is stuck,
+/// would leave the app running with no window at all. After this, the window is shown anyway.
+const SHOW_WINDOW_AFTER: Duration = Duration::from_secs(4);
 
 /// Starts the Tauri application. Blocks until the last window closes.
 ///
@@ -105,6 +110,7 @@ pub fn run() {
                 image_process::places(app)?,
             )));
             updates::start(app.handle());
+            show_window_anyway(app.handle());
             Ok(())
         })
         .on_window_event(capture::on_window_event)
@@ -207,6 +213,19 @@ pub fn run() {
         });
 }
 
+/// Shows the main window after [`SHOW_WINDOW_AFTER`] if the page has not shown it by then.
+fn show_window_anyway(app: &tauri::AppHandle) {
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        tokio::time::sleep(SHOW_WINDOW_AFTER).await;
+        if let Some(window) = app.get_webview_window("main")
+            && !window.is_visible().unwrap_or(true)
+        {
+            let _ = window.show();
+        }
+    });
+}
+
 /// The media library at `base`, read from the web into a cache of this machine's own: not of the
 /// roaming profile, since all of it is to be had again. None without a library.
 fn manage_library(
@@ -218,7 +237,12 @@ fn manage_library(
     };
     let dir = app.path().app_local_data_dir()?.join("media");
     let library = media_library::MediaLibrary::new(base, dir);
-    library.start();
+    // The pages are answered from the manifest kept from before while this start's is read; when
+    // it is another, they are told, and read the library again.
+    let handle = app.handle().clone();
+    library.start(move || {
+        let _ = handle.emit(media_library::CHANGED_EVENT, ());
+    });
     app.manage(Arc::clone(&library));
     Ok(Some(library))
 }

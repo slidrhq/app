@@ -33,7 +33,13 @@ import {
   type MagnetSet,
   type PhotoFrame,
 } from './frames';
-import { frameThumb, prepareFrameThumbs, type FrameThumbPicture } from './frameThumbs';
+import { useMediaCatalog } from '../shell/useMedia';
+import {
+  frameThumb,
+  frameThumbIndex,
+  prepareFrameThumbs,
+  type FrameThumbPicture,
+} from './frameThumbs';
 import { framePicture, insertFrame } from './insert';
 import { useColumns, useNear } from './StickerGrid';
 import { FRAME_PHOTO, FRAME_PHOTO_URL, FrameThumbDefs } from './tiles';
@@ -57,6 +63,8 @@ const PREVIEW_ROWS = 2;
  * picture is drawn by the renderer too, once it comes near the visible part of the panel.
  */
 export function FrameThumb({ frame }: { frame: PhotoFrame }) {
+  // The picture made ahead, once the index that names it has come.
+  useMediaCatalog(frameThumbIndex);
   const picture = frameThumb(frame, useLanguage());
   if (picture) return <PictureThumb picture={picture} />;
   if (!drawnWhole(frame)) return <OutlineThumb frame={frame} />;

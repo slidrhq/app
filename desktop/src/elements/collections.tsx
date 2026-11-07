@@ -46,7 +46,8 @@ import {
   type TagsOf,
 } from '../media/icons/search';
 import { insertCard, insertLine, insertShape } from '../objects/insert';
-import { LINE_KINDS, shapeLibrary, type LineKind } from '../objects/shapes';
+import { lineKinds, shapeCatalog, shapeLibrary, type LineKind } from '../objects/shapes';
+import { useMediaCatalog } from '../shell/useMedia';
 import { scrollerOf, tell, useDeck, useEditor } from '../shell';
 import { insertTable } from '../table/insert';
 import { TableInsert } from '../table/TableInsert';
@@ -608,6 +609,7 @@ export function useShapeIndex(): readonly FoundShape[] | undefined {
   const { t: own } = useTranslation('elements');
   const nameOf = useShapeNames();
   const tags = useLoaded(shapeTags);
+  const catalog = useMediaCatalog(shapeCatalog);
   return useMemo(() => {
     if (tags === undefined) return undefined;
     const tagged: TagsOf = tags === 'failed' ? {} : tags;
@@ -627,7 +629,7 @@ export function useShapeIndex(): readonly FoundShape[] | undefined {
       return withTags(withTags(words, { en: [group('en')], he: [group('he')] }), tagged[id]);
     };
     return [
-      ...shapeLibrary().flatMap(({ group, presets }) =>
+      ...shapeLibrary(undefined, catalog).flatMap(({ group, presets }) =>
         presets.map((preset) =>
           piece(
             `shape:${preset}`,
@@ -636,7 +638,7 @@ export function useShapeIndex(): readonly FoundShape[] | undefined {
           ),
         ),
       ),
-      ...LINE_KINDS.map((kind) =>
+      ...lineKinds(catalog).map((kind) =>
         piece(
           `line:${kind}`,
           (lng) => t(`line.${kind}`, { lng }),
@@ -649,7 +651,7 @@ export function useShapeIndex(): readonly FoundShape[] | undefined {
         (lng) => t('library.cards', { lng }),
       ),
     ];
-  }, [tags, t, own, i18n.language, nameOf]);
+  }, [tags, t, own, i18n.language, nameOf, catalog]);
 }
 
 const shapeTags = () => searchTags('shapes');
@@ -701,7 +703,9 @@ export function ShapesCollection() {
   const editor = useEditor();
   const { t } = useTranslation('objects');
   const { t: own } = useTranslation('elements');
-  const groups = useMemo(() => shapeLibrary(), []);
+  // The library's catalog, as it comes: the built-in one until then.
+  useMediaCatalog(shapeCatalog);
+  const groups = shapeLibrary();
   // A new line and the words of a new card run in the deck's reading direction, and so do
   // their pictures.
   const rtl = useDeck((s) => s.deck.meta.dir === 'rtl');
@@ -728,8 +732,8 @@ export function ShapesCollection() {
           ))}
         </ShapeTiles>
       ))}
-      <ShapeTiles title={own('lines')} tiles={LINE_KINDS.length}>
-        {LINE_KINDS.map((kind) => (
+      <ShapeTiles title={own('lines')} tiles={lineKinds().length}>
+        {lineKinds().map((kind) => (
           <Tooltip key={kind} content={t(`line.${kind}`)}>
             <button
               type="button"

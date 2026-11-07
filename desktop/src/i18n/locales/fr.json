@@ -3005,6 +3005,12 @@
       "hint": "Les notes sont enregistrées avec la présentation et ne s’affichent pas sur la diapositive.",
       "noSlide": "Aucune diapositive",
       "step": "Notes du présentateur"
+    },
+    "crash": {
+      "title": "Un problème est survenu",
+      "body": "Slidr a rencontré une erreur inattendue. Rechargez la fenêtre pour continuer.",
+      "reload": "Recharger",
+      "details": "Détails"
     }
   },
   "stage": {

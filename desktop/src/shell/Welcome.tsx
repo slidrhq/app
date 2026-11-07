@@ -25,6 +25,7 @@ import {
 import type { RecentFile } from '../document/storage';
 import { currentLanguage } from '../i18n';
 import { library } from '../templates/app';
+import { useLibraryEntries } from '../templates/useLibrary';
 import { useOpening } from '../templates/openings';
 import type { LibraryEntry } from '../templates/library';
 import { templateName, templateTagline } from '../templates/names';
@@ -230,11 +231,9 @@ export function Welcome() {
   const busy = useFile((s) => s.busy);
   const hasStorage = editor.document !== null;
   const importers = useImporters();
-  // Built-in templates first, then the user's own; drawn again when the personal ones are read.
-  const personal = useStore(library.state, (s) => s.personal);
+  // Built-in templates first, then the user's own; drawn again when either comes.
+  const all = useLibraryEntries();
   const defaultId = useStore(library.state, (s) => s.defaultId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const all = useMemo(() => library.entries(), [personal]);
   // The deck a new one will be like: in the language of the UI, whatever document is behind.
   const lang = currentLanguage();
   // Only the templates written in that language.

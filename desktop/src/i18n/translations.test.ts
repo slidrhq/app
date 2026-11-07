@@ -1,8 +1,15 @@
 // @vitest-environment happy-dom
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { en } from './en';
 import { he } from './he';
-import { i18n, languageOf, languages, setLanguage, systemLanguage } from './index';
+import {
+  i18n,
+  languageOf,
+  languages,
+  loadAllLanguages,
+  setLanguage,
+  systemLanguage,
+} from './index';
 
 /**
  * The translated languages (UI-05): every string of the Hebrew and English tables, translated
@@ -29,6 +36,9 @@ const translations = Object.fromEntries(
   Object.entries(files).map(([path, table]) => [/([^/]+)\.json$/.exec(path)?.[1] ?? path, table]),
 );
 const translated = languages.filter((lng) => lng !== 'he' && lng !== 'en');
+
+// Each language's file is loaded when it is shown; these tests read them all.
+beforeAll(loadAllLanguages);
 
 const SUFFIX = /_(zero|one|two|few|many|other)$/;
 

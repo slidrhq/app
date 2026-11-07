@@ -2993,6 +2993,12 @@
       "hint": "Ghi chú được lưu cùng bản trình bày và không hiển thị trên trang chiếu.",
       "noSlide": "Không có trang chiếu",
       "step": "Ghi chú diễn giả"
+    },
+    "crash": {
+      "title": "Đã xảy ra sự cố",
+      "body": "Slidr gặp lỗi không mong muốn. Hãy tải lại cửa sổ để tiếp tục.",
+      "reload": "Tải lại",
+      "details": "Chi tiết"
     }
   },
   "stage": {

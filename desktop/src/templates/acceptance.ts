@@ -79,7 +79,7 @@ export const errors = (findings: LintFinding[]) => findings.filter((f) => f.seve
 /** Before the first test of a file: the viewport of a slide, and the fonts the templates name. */
 export async function prepare(): Promise<void> {
   await page.viewport(1920, 1080);
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
 }
 
 /** The static markup of a slide, for a page that shows it without the app. */

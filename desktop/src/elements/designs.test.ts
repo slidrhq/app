@@ -13,9 +13,12 @@ import { describe, expect, it } from 'vitest';
 import next33Source from '../../scripts/design-locales/next-33/source.json';
 import next50Source from '../../scripts/design-locales/next-50/source.json';
 import next50bSource from '../../scripts/design-locales/next-50b/source.json';
-import { builtinFaces, builtinFamilies } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
 import { familyIn, fontShelf } from './designFonts';
 import { loadAllDesigns, loadDesigns } from './designs';
+
+// The library's fonts, as the app has them once the catalog has come.
+const { families: builtinFamilies, faces: builtinFaces } = await builtinFonts.load();
 
 const {
   groups: DESIGN_GROUPS,

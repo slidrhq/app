@@ -14,7 +14,8 @@ import {
 import { pickFiles } from '../objects/insert';
 import { SettingsCard, SettingsGroup } from '../settings';
 import { useDeck } from '../shell';
-import { builtinFamilies } from './builtinFonts.generated';
+import { useMediaCatalog } from '../shell/useMedia';
+import { builtinFonts } from './builtinFonts.generated';
 import { useSystemFonts } from './systemFonts';
 import {
   addUserFont,
@@ -155,9 +156,10 @@ export function FontsSection() {
     [assets],
   );
   // As the font picker offers them to the open deck: its language's and English's.
+  const { families } = useMediaCatalog(builtinFonts);
   const library = useMemo(
-    () => builtinFamilies.filter((entry) => familyForDeck(entry, lang)).map(({ family }) => family),
-    [lang],
+    () => families.filter((entry) => familyForDeck(entry, lang)).map(({ family }) => family),
+    [families, lang],
   );
   const system = useMemo(() => installed.map(({ family }) => family), [installed]);
   const toggle = (source: Elsewhere) => () => setOpen((now) => (now === source ? null : source));

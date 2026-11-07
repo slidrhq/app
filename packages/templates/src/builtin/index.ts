@@ -3,7 +3,7 @@ import { languagesOf, type Localized, type Theme } from '@slidr/model';
 import type { Template } from '../template';
 import { withoutTitleLayout } from '../standardLayouts';
 import { sampleDeck, type SampleSlide } from './kit';
-import { pictures } from './pictures.generated';
+import { templatePictures } from './pictures.generated';
 
 interface Catalog {
   templates: Template[];
@@ -17,7 +17,10 @@ interface Catalog {
  * (`templates/catalog.json`), read as this module is imported. Without it (no network, no
  * library, an empty one) there are no built-in templates, and `builtInAvailable` says so.
  */
-const read = await readMediaJson<Partial<Catalog>>('templates/catalog.json');
+const [read, pictures] = await Promise.all([
+  readMediaJson<Partial<Catalog>>('templates/catalog.json'),
+  templatePictures.load(),
+]);
 const catalog: Catalog = {
   templates: Array.isArray(read?.templates) ? read.templates : [],
   samples: read?.samples ?? {},

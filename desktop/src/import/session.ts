@@ -13,7 +13,7 @@ import { createImportPage, type ImportPage } from '@slidr/html-import';
 import { allElementIds, createDeck, type Deck } from '@slidr/model';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { createStore } from 'zustand/vanilla';
-import { builtinFaces } from '../fonts/builtinFonts.generated';
+import { absoluteBuiltinFaces } from '../fonts';
 import type { Editor } from '../shell';
 import { runImportJob, type ImportJob } from './protocol';
 import {
@@ -246,7 +246,7 @@ function pageInBrowser(editor: Editor): ImportPage {
         ),
       resolveAsset: (asset) => editor.assets.url(asset),
     },
-    appFonts: builtinFaces.map((face) => ({ ...face, url: new URL(face.url, location.href).href })),
+    appFonts: absoluteBuiltinFaces(),
     parent: holder,
   });
   browserPage = {

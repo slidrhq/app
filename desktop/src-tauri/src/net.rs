@@ -126,6 +126,8 @@ pub mod testing {
         content_type: &'static str,
         /// The `Content-Encoding` of the body, when it is compressed.
         encoding: Option<&'static str>,
+        /// More headers of the answer: an `ETag`, a `Last-Modified`.
+        headers: Vec<(&'static str, String)>,
         body: Vec<u8>,
         delay: Duration,
     }
@@ -142,9 +144,16 @@ pub mod testing {
                 status,
                 content_type,
                 encoding: None,
+                headers: Vec::new(),
                 body: body.into(),
                 delay: Duration::ZERO,
             }
+        }
+
+        /// The same answer with one more header.
+        pub fn header(mut self, name: &'static str, value: impl Into<String>) -> Self {
+            self.headers.push((name, value.into()));
+            self
         }
 
         /// The same answer, its body compressed as `encoding` says (`gzip`, `br`).
@@ -233,6 +242,11 @@ pub mod testing {
                     }
                     if let Some(Ok(value)) = reply.encoding.map(str::parse) {
                         response.headers_mut().insert(CONTENT_ENCODING, value);
+                    }
+                    for (name, value) in reply.headers {
+                        if let Ok(value) = value.parse() {
+                            response.headers_mut().insert(name, value);
+                        }
                     }
                     response
                 }

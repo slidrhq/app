@@ -1,7 +1,7 @@
 import type { AssetMeta } from '@slidr/model';
-import { importPptx, PptxReadError, type ImportWarning } from '@slidr/pptx';
+import type { ImportWarning } from '@slidr/pptx';
 import { invoke, isTauri } from '@tauri-apps/api/core';
-import { builtinFamilies, loadSystemFonts } from '../fonts';
+import { builtinFonts, loadSystemFonts } from '../fonts';
 import { userFonts } from '../fonts/userFonts';
 import { currentLanguage, i18n } from '../i18n';
 import type { Editor } from '../shell';
@@ -46,7 +46,7 @@ async function missingFonts(families: readonly string[]): Promise<string[]> {
   // In a plain browser nobody can list the installed fonts: nothing is said of them.
   if (!isTauri()) return [];
   const known = new Set<string>();
-  for (const entry of builtinFamilies) known.add(entry.family.toLowerCase());
+  for (const entry of (await builtinFonts.load()).families) known.add(entry.family.toLowerCase());
   for (const font of await loadSystemFonts()) known.add(font.family.toLowerCase());
   for (const font of userFonts()) known.add(font.family.toLowerCase());
   return families.filter((family) => !known.has(family.toLowerCase()));
@@ -61,6 +61,8 @@ export async function importPptxBytes(
   let warnings: ImportWarning[] = [];
   let slides = 0;
   let created: boolean;
+  // The reader of PowerPoint files is loaded the first time a file is opened, not with the app.
+  const { importPptx, PptxReadError } = await import('@slidr/pptx');
   try {
     created = await newDocumentFrom(editor, async (store) => {
       const result = await importPptx(bytes, {

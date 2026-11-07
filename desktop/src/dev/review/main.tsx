@@ -241,7 +241,7 @@ const hooks = window as unknown as {
 };
 
 async function main() {
-  registerBuiltinFonts();
+  await registerBuiltinFonts();
   if (query.get('fallback') === 'system') setFontCounterparts(() => undefined);
   const drawn = await load();
 

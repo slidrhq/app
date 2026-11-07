@@ -3005,6 +3005,12 @@
       "hint": "As anotações são salvas com a apresentação e não aparecem no slide.",
       "noSlide": "Nenhum slide",
       "step": "Anotações do orador"
+    },
+    "crash": {
+      "title": "Algo deu errado",
+      "body": "O Slidr encontrou um erro inesperado. Recarregue a janela para continuar.",
+      "reload": "Recarregar",
+      "details": "Detalhes"
     }
   },
   "stage": {

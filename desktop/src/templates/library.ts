@@ -3,15 +3,15 @@
  * the ones the user saved, and which of them a new deck opens with.
  *
  * Built-in templates are code, which a packaged app reads as files of its media library (see
- * `./builtIn`). Personal ones are files (see `./store`), read once at startup.
- * The choice of the default is a preference of this machine, kept where the shell keeps its
- * own (`localStorage`), with a copy of the template itself beside it: a new deck is made before
- * the store has answered, and must not wait for it.
+ * `./builtIn`), after it has started: `loadBuiltIn`. Personal ones are files (see `./store`), read
+ * once at startup. The choice of the default is a preference of this machine, kept where the
+ * shell keeps its own (`localStorage`), with a copy of the template itself beside it: a new deck
+ * is made before the store or the media library has answered, and must not wait for either.
  */
 import type { AssetMeta, Layout } from '@slidr/model';
 import { Template, withStandardLayouts } from '@slidr/templates';
 import { createStore, type StoreApi } from 'zustand';
-import { builtIn } from './builtIn';
+import { builtInTemplates } from './builtIn';
 import type { TemplateFile, TemplateStore } from './store';
 
 const PREFS_KEY = 'slidr.templates';
@@ -19,8 +19,10 @@ const PREFS_KEY = 'slidr.templates';
 interface Prefs {
   /** The id of the template new decks open with; null for the plain deck. */
   defaultId: string | null;
-  /** The default template itself, when it is a personal one. */
+  /** The default template itself, as a deck takes it. */
   template?: unknown;
+  /** The default is a built-in template: its layouts are named in the language of the deck. */
+  builtIn?: boolean;
 }
 
 export interface LibraryEntry {
@@ -29,6 +31,8 @@ export interface LibraryEntry {
 }
 
 export interface LibraryState {
+  /** The built-in templates as decks take them: none until they have been read (`loadBuiltIn`). */
+  builtIn: readonly Template[];
   personal: readonly Template[];
   defaultId: string | null;
   /** The personal templates were read from the store. */
@@ -42,8 +46,12 @@ function readPrefs(storage: PrefsStorage | undefined): Prefs {
   try {
     const stored: unknown = JSON.parse(storage?.getItem(PREFS_KEY) ?? 'null');
     if (typeof stored === 'object' && stored !== null && 'defaultId' in stored) {
-      const { defaultId, template } = stored as Prefs;
-      return { defaultId: typeof defaultId === 'string' ? defaultId : null, template };
+      const { defaultId, template, builtIn } = stored as Prefs;
+      return {
+        defaultId: typeof defaultId === 'string' ? defaultId : null,
+        template,
+        builtIn: builtIn === true,
+      };
     }
   } catch {
     // Unreadable preferences are no preferences.
@@ -60,6 +68,10 @@ function forDecks(template: Template): Template {
   return rest;
 }
 
+/** The built-in templates as decks take them. */
+const prepare = (templates: readonly Template[]): readonly Template[] =>
+  templates.map((template) => forDecks(withStandardLayouts(template)));
+
 /** What a layout of an archetype is called in a language: "Timeline" or its translation. */
 export type LayoutNamer = (archetype: Layout['archetype'], lang: string) => string;
 
@@ -75,12 +87,15 @@ function named(template: Template, lang: string, nameOf: LayoutNamer): Template 
 
 export class TemplateLibrary {
   readonly state: StoreApi<LibraryState>;
-  readonly #builtIn: readonly Template[];
+  /** The built-in templates a test gave, in place of the media library's. */
+  readonly #given: readonly Template[] | undefined;
   readonly #store: TemplateStore;
   readonly #storage: PrefsStorage | undefined;
   readonly #nameOf: LayoutNamer | undefined;
   /** The default template as the preferences hold it, until the store has been read. */
   #cached: Template | undefined;
+  /** Whether that copy is of a built-in template. */
+  #cachedBuiltIn = false;
   /** Object URLs of the asset files of personal templates, by asset id. */
   readonly #urls = new Map<string, string>();
 
@@ -96,18 +111,39 @@ export class TemplateLibrary {
     this.#store = store;
     this.#storage = options.storage;
     this.#nameOf = options.layoutName;
-    this.#builtIn = (options.builtIn ?? builtIn).map((template) =>
-      forDecks(withStandardLayouts(template)),
-    );
+    this.#given = options.builtIn;
     const prefs = readPrefs(this.#storage);
     const cached = Template.safeParse(prefs.template);
-    if (cached.success && cached.data.theme.id === prefs.defaultId)
+    if (cached.success && cached.data.theme.id === prefs.defaultId) {
       this.#cached = withStandardLayouts(cached.data);
+      this.#cachedBuiltIn = prefs.builtIn === true;
+    }
     this.state = createStore<LibraryState>(() => ({
+      builtIn: prepare(options.builtIn ?? builtInTemplates.peek()),
       personal: [],
       defaultId: prefs.defaultId,
       loaded: false,
     }));
+    if (!options.builtIn) {
+      builtInTemplates.subscribe(() => {
+        this.state.setState({ builtIn: prepare(builtInTemplates.peek()) });
+        // The default is judged again, and its copy kept as the library now has it.
+        this.#checkDefault();
+      });
+    }
+  }
+
+  /** Whether the built-in templates have been read, whatever the library had. */
+  get builtInReady(): boolean {
+    return this.#given !== undefined || builtInTemplates.ready;
+  }
+
+  /**
+   * Reads the built-in templates from the media library, if they were not: the panels that show
+   * them ask when they open, and the app once it is idle. Resolves once they are in the library.
+   */
+  async loadBuiltIn(): Promise<void> {
+    if (!this.#given) await builtInTemplates.load();
   }
 
   /** Reads the personal templates from the store. A file that is not a template is skipped. */
@@ -123,10 +159,22 @@ export class TemplateLibrary {
     }
     this.state.setState({ personal, loaded: true });
     await Promise.all(personal.map((template) => this.#loadUrls(template)));
-    // A default that is gone (its folder was deleted) is no default.
-    const { defaultId } = this.state.getState();
-    if (defaultId && !this.find(defaultId)) this.setDefault(null);
-    else this.#writePrefs();
+    this.#checkDefault();
+  }
+
+  /**
+   * A default that is gone (its folder was deleted) is no default. Whether one is gone is known
+   * once the personal templates and the built-in ones have both been read; until then the
+   * preferences stay as they are.
+   */
+  #checkDefault(): void {
+    const { defaultId, loaded } = this.state.getState();
+    if (!loaded) return;
+    if (defaultId && !this.find(defaultId)) {
+      if (this.builtInReady) this.setDefault(null);
+      return;
+    }
+    this.#writePrefs();
   }
 
   async #loadUrls(template: Template): Promise<void> {
@@ -145,7 +193,7 @@ export class TemplateLibrary {
   /** Built-in templates first, then the personal ones. */
   entries(): LibraryEntry[] {
     return [
-      ...this.#builtIn.map((template) => ({ template, personal: false })),
+      ...this.state.getState().builtIn.map((template) => ({ template, personal: false })),
       ...this.state.getState().personal.map((template) => ({ template, personal: true })),
     ];
   }
@@ -166,7 +214,12 @@ export class TemplateLibrary {
   defaultTemplate(lang: string): Template | undefined {
     const { defaultId } = this.state.getState();
     if (!defaultId) return undefined;
-    return this.forDeck(defaultId, lang) ?? this.#cached;
+    const known = this.forDeck(defaultId, lang);
+    if (known || !this.#cached) return known;
+    // The copy kept of a built-in default, until the library has been read.
+    return this.#cachedBuiltIn && this.#nameOf
+      ? named(this.#cached, lang, this.#nameOf)
+      : this.#cached;
   }
 
   setDefault(id: string | null): void {
@@ -177,13 +230,17 @@ export class TemplateLibrary {
   #writePrefs(): void {
     const { defaultId } = this.state.getState();
     const entry = defaultId ? this.find(defaultId) : undefined;
-    // Not yet read from the store: what the preferences hold stays as it is.
-    if (defaultId && !entry && !this.state.getState().loaded) return;
+    // Not yet read from the store, or a built-in default before the built-in templates have
+    // been read: what the preferences hold stays as it is.
+    if (defaultId && !entry && (!this.state.getState().loaded || !this.builtInReady)) return;
+    // A copy of the default is kept, so a new deck opens on it before anything has been read.
     const prefs: Prefs = {
       defaultId: entry ? defaultId : null,
-      ...(entry?.personal ? { template: entry.template } : {}),
+      ...(entry ? { template: entry.template } : {}),
+      ...(entry && !entry.personal ? { builtIn: true } : {}),
     };
-    this.#cached = entry?.personal ? entry.template : undefined;
+    this.#cached = entry?.template;
+    this.#cachedBuiltIn = entry !== undefined && !entry.personal;
     try {
       this.#storage?.setItem(PREFS_KEY, JSON.stringify(prefs));
     } catch {
@@ -195,7 +252,8 @@ export class TemplateLibrary {
   async save(template: Template, files: readonly TemplateFile[]): Promise<void> {
     const parsed = withStandardLayouts(Template.parse(template));
     const id = parsed.theme.id;
-    if (this.#builtIn.some((builtIn) => builtIn.theme.id === id)) {
+    await this.loadBuiltIn();
+    if (this.state.getState().builtIn.some((builtIn) => builtIn.theme.id === id)) {
       throw new Error(`"${id}" is a built-in template.`);
     }
     await this.#store.save(id, JSON.stringify(parsed), files);

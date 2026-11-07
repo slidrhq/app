@@ -1,6 +1,6 @@
 import { contentLanguageOf, LANGUAGE_SCRIPT, type AssetMeta, type Deck } from '@slidr/model';
-import { exportPptx, type ExportWarning, type PptxExportResult } from '@slidr/pptx';
-import { builtinFamilies } from '../fonts';
+import type { ExportWarning, PptxExportResult } from '@slidr/pptx';
+import { builtinFamilies, builtinFonts } from '../fonts';
 import { i18n } from '../i18n';
 import {
   planExport,
@@ -20,15 +20,13 @@ import { elementPictures, toPng, videoFrame } from './pictures';
 export const PPTX_MIME =
   'application/vnd.openxmlformats-officedocument.presentationml.presentation';
 
-/** The library's families by their name, whatever its case. */
-const families = new Map(builtinFamilies.map((entry) => [entry.family.toLowerCase(), entry]));
-
 /**
  * The family of the font library that draws a language's letters for text set in `family`,
  * where `family` has none of them (ADR-105). Undefined where it has them, or is not known.
  */
 export function counterpart(family: string, lang: string): string | undefined {
-  const entry = families.get(family.toLowerCase());
+  const name = family.toLowerCase();
+  const entry = builtinFamilies().find((known) => known.family.toLowerCase() === name);
   if (!entry) return undefined;
   const language = contentLanguageOf(lang);
   const script = language === 'he' ? 'he' : language ? LANGUAGE_SCRIPT[language] : undefined;
@@ -45,12 +43,15 @@ async function assetBlob(editor: Editor, asset: AssetMeta): Promise<Blob | undef
 }
 
 /** The deck as a `.pptx`, the slides and animations as the dialog chose. */
-export function exportDeckPptx(
+export async function exportDeckPptx(
   editor: Editor,
   deck: Deck,
   choices: Pick<ExportChoices, 'range' | 'animations'>,
 ): Promise<PptxExportResult> {
   const resolveAsset = (asset: AssetMeta) => editor.assets.url(asset);
+  // The counterparts of the fonts come from the library's catalog. The writer of PowerPoint
+  // files is loaded the first time a deck is exported, not with the app.
+  const [{ exportPptx }] = await Promise.all([import('@slidr/pptx'), builtinFonts.load()]);
   return exportPptx(deck, {
     loadAsset: (asset) => assetBlob(editor, asset),
     slideIds: planExport(deck, choices.range).slideIds,

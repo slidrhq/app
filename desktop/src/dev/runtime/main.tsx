@@ -192,7 +192,7 @@ function App({ deck, name, bare }: { deck: Deck; name: string; bare: boolean }) 
   );
 }
 
-registerBuiltinFonts();
+void registerBuiltinFonts();
 const params = new URLSearchParams(location.search);
 const name = params.get('deck') ?? 'reference';
 const deck = deckByName(name);

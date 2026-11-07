@@ -17,11 +17,13 @@ import {
   familyOfLanguage,
   LANGUAGE_SCRIPT,
   type ContentLanguage,
+  type FontFamilyEntry,
 } from '@slidr/model';
 import { ChevronDown } from '@slidr/ui/icons';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { builtinFamilies, useSystemFonts, useUserFonts } from '../fonts';
+import { builtinFonts, useSystemFonts, useUserFonts } from '../fonts';
+import { useMediaCatalog } from '../shell/useMedia';
 import { useDeck } from '../shell';
 import { drawnWeight, familyWeights } from './fontWeights';
 import { rememberFont, useRecent } from './recent';
@@ -73,18 +75,15 @@ const SAMPLES: Partial<Record<ContentLanguage, string>> = {
 /** CSS finds a family whatever the case of its name, so one name in two cases is one font. */
 const nameOf = (family: string) => family.toLowerCase();
 
-/** Every family of the library, listed or not: one installed under the same name is the library's. */
-const libraryNames = new Set(builtinFamilies.map(({ family }) => nameOf(family)));
-
 /**
  * The library's fonts for a deck in `lang`: its language's own first, then English's
  * (`familyForDeck`); a family made for other letters is not offered. Each is marked when it has
  * the letters of the deck's language.
  */
-function libraryFor(lang: string): FontOption[] {
+function libraryFor(families: readonly FontFamilyEntry[], lang: string): FontOption[] {
   const own = contentLanguageOf(lang);
   const script = own && LANGUAGE_SCRIPT[own];
-  const offered = builtinFamilies.filter((entry) => familyForDeck(entry, lang));
+  const offered = families.filter((entry) => familyForDeck(entry, lang));
   const first = own ? offered.filter((entry) => familyOfLanguage(entry, own)) : offered;
   return [...new Set([...first, ...offered])].map(({ family, scripts }) => ({
     family,
@@ -110,11 +109,14 @@ function useFontGroups(labels: {
   const lang = useDeck((s) => s.deck.meta.lang);
   const own = useUserFonts();
   const installed = useSystemFonts();
+  // The library's fonts, as they come: none until the catalog has been read.
+  const { families } = useMediaCatalog(builtinFonts);
   const { deck, mine, library, system } = labels;
   return useMemo(() => {
-    const builtin = libraryFor(lang);
+    const builtin = libraryFor(families, lang);
     const hebrew = contentLanguageOf(lang) === 'he';
-    const known = new Set(libraryNames);
+    // Every family of the library, listed or not: one installed under the same name is the library's.
+    const known = new Set(families.map(({ family }) => nameOf(family)));
     const carried: FontOption[] = [];
     for (const asset of Object.values(assets)) {
       const family = asset.kind === 'font' ? asset.font?.family : undefined;
@@ -145,7 +147,7 @@ function useFontGroups(labels: {
       { label: library, fonts: builtin },
       { label: system, fonts: lettersFirst(onComputer) },
     ].filter((group) => group.fonts.length > 0);
-  }, [assets, lang, own, installed, deck, mine, library, system]);
+  }, [assets, lang, own, installed, families, deck, mine, library, system]);
 }
 
 /** A family nothing is known of draws every weight, as far as the list can tell. */

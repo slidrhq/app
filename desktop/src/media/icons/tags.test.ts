@@ -1,11 +1,11 @@
 import { readMediaJson } from '@slidr/media-library';
 import { describe, expect, it } from 'vitest';
-import { CARD_SETS } from '../../elements/cardSets';
+import { cardSetCatalog } from '../../elements/cardSets';
 import { designWords, searchDesigns } from '../../elements/designCatalog';
 import { loadAllDesigns } from '../../elements/designs';
 import { he as elementsHe, en as elementsEn } from '../../elements/messages';
 import { loadEmoji, loadGraphics, searchStickers } from '../../elements/stickers';
-import { LINE_KINDS, shapeLibrary } from '../../objects/shapes';
+import { lineKinds, shapeCatalog, shapeLibrary } from '../../objects/shapes';
 import { TAG_KINDS, tagsOf, type TagKind } from './library';
 import { searchIcons, withTags, type SearchWords, type TagsOf } from './search';
 
@@ -163,12 +163,14 @@ async function keysOf(kind: TagKind): Promise<string[]> {
     }
     case 'shapes':
       return [
-        ...shapeLibrary().flatMap(({ presets }) => presets.map((preset) => `shape:${preset}`)),
-        ...LINE_KINDS.map((line) => `line:${line}`),
+        ...shapeLibrary(undefined, await shapeCatalog.load()).flatMap(({ presets }) =>
+          presets.map((preset) => `shape:${preset}`),
+        ),
+        ...lineKinds().map((line) => `line:${line}`),
         'card',
       ];
     case 'cards':
-      return [...CARD_SETS];
+      return [...(await cardSetCatalog.load()).ids];
     case 'designs':
       return DESIGN_GROUPS.flatMap(designsOf);
   }

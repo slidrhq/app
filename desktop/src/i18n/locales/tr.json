@@ -2999,6 +2999,12 @@
       "hint": "Notlar sunuyla birlikte kaydedilir ve slaytta gösterilmez.",
       "noSlide": "Slayt yok",
       "step": "Konuşmacı notları"
+    },
+    "crash": {
+      "title": "Bir sorun oluştu",
+      "body": "Slidr beklenmeyen bir hatayla karşılaştı. Devam etmek için pencereyi yeniden yükleyin.",
+      "reload": "Yeniden yükle",
+      "details": "Ayrıntılar"
     }
   },
   "stage": {

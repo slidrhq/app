@@ -91,6 +91,8 @@ whenEditor((editor) => {
     // then the samples the slides of a built-in template are made from, before one is pressed.
     .then(() =>
       whenIdle(async () => {
+        // The built-in templates, read now that the app has started and is idle.
+        await library.loadBuiltIn();
         await preloadTemplateFonts(library.entries().map((e) => e.template));
         await readSamplesAhead();
       }),

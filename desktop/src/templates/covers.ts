@@ -9,40 +9,50 @@
  * photograph in it, the cover is the template's opening layout without a picture.
  */
 import type { AssetMeta, Deck, Slide } from '@slidr/model';
-import { mediaFiles, mediaUrl } from '@slidr/media-library';
+import { mediaFilesNow, mediaUrl } from '@slidr/media-library';
 import { templateCover, type Template } from '@slidr/templates';
 // The pictures alone: the templates' own code is not part of a packaged app (see `./builtIn`).
-import { pictures } from '@slidr/templates/builtin/pictures';
+import { templatePictures } from '@slidr/templates/builtin/pictures';
 import { library } from './app';
 import { templateName } from './names';
 
-const files = await mediaFiles();
-
+/**
+ * Where a photograph of the library loads from, once the manifest says the library has it. The
+ * covers are of built-in templates, which come after the manifest, so it is known by then.
+ */
 const urlOf = (picture: AssetMeta): string | undefined => {
   const path = `images/templates/${picture.name}`;
-  return files.has(path) ? mediaUrl(path) : undefined;
+  return mediaFilesNow().has(path) ? mediaUrl(path) : undefined;
 };
 
-/** The cover photograph of each built-in template that opens with one, by template id. */
-const covers: Record<string, AssetMeta | undefined> = {
-  shvil: pictures.shvilRidge,
-  tzuk: pictures.tzukWarehouse,
-  lavan: pictures.lavanChair1,
-  nof: pictures.nofView2,
-  defus: pictures.defusStreet1,
-  shidur: pictures.migdalTeam2,
-  mifgash: pictures.mifgashCall,
+/**
+ * The cover photograph of each built-in template that opens with one, by template id: the name of
+ * a picture of the samples (`templatePictures`, read with the built-in templates).
+ */
+const covers: Record<string, string> = {
+  shvil: 'shvilRidge',
+  tzuk: 'tzukWarehouse',
+  lavan: 'lavanChair1',
+  nof: 'nofView2',
+  defus: 'defusStreet1',
+  shidur: 'migdalTeam2',
+  mifgash: 'mifgashCall',
+};
+
+const coverOfTemplate = (templateId: string): AssetMeta | undefined => {
+  const name = covers[templateId];
+  return name === undefined ? undefined : templatePictures.peek()[name];
 };
 
 /** The photograph of a template's cover; undefined when the template opens without one. */
 export function coverPicture(templateId: string): AssetMeta | undefined {
-  const picture = covers[templateId];
+  const picture = coverOfTemplate(templateId);
   return picture && urlOf(picture) ? picture : undefined;
 }
 
 /** Where a cover photograph loads from; undefined for any other asset. */
 export function coverUrl(asset: AssetMeta): string | undefined {
-  return Object.values(covers).some((picture) => picture?.id === asset.id)
+  return Object.keys(covers).some((id) => coverOfTemplate(id)?.id === asset.id)
     ? urlOf(asset)
     : undefined;
 }

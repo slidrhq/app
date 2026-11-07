@@ -23,7 +23,8 @@ import {
   useShapeIndex,
   type OpenGroup,
 } from './collections';
-import { CARD_SETS, cardSetsIn } from './cardSets';
+import { useMediaCatalog } from '../shell/useMedia';
+import { cardSetCatalog, cardSetsIn, type CardSetId } from './cardSets';
 import { framesIn, loadFrames, searchFrames } from './frames';
 import { FrameGrid, FramesCollection } from './FramesCollection';
 import {
@@ -57,7 +58,9 @@ export function ElementsPanel() {
   const [chosen, setCollection] = useState<CollectionId | 'recent' | null>(null);
   // A collection the language was switched away from, open as it was switched, is closed.
   const lang = useLanguage();
-  const collection = chosen === 'recent' || (chosen && offered(chosen, lang)) ? chosen : null;
+  const cards = useMediaCatalog(cardSetCatalog).ids;
+  const offered = (id: CollectionId) => offers(id, lang, cards);
+  const collection = chosen === 'recent' || (chosen && offered(chosen)) ? chosen : null;
   return (
     <div className="@container flex flex-col" data-testid="elements-panel">
       <Drill screen={collection ?? 'home'} depth={collection ? 1 : 0} className="flex flex-col">
@@ -80,8 +83,8 @@ export function ElementsPanel() {
  * other languages. Shapes, graphics, emoji, icons and tables have no language, and the frames
  * have some that have none. Without the media library a collection is offered, and says so.
  */
-function offered(id: CollectionId, lang: Language): boolean {
-  if (id === 'cards') return CARD_SETS.length === 0 || cardSetsIn(lang).length > 0;
+function offers(id: CollectionId, lang: Language, cards: readonly CardSetId[]): boolean {
+  if (id === 'cards') return cards.length === 0 || cardSetsIn(lang, cards).length > 0;
   return true;
 }
 
@@ -91,6 +94,7 @@ const PAUSE_MS = 150;
 function Home({ onOpen }: { onOpen: (id: CollectionId | 'recent') => void }) {
   const { t } = useTranslation('elements');
   const lang = useLanguage();
+  const cards = useMediaCatalog(cardSetCatalog).ids;
   const [text, setText] = useState('');
   const [query, setQuery] = useState('');
   useEffect(() => {
@@ -115,7 +119,7 @@ function Home({ onOpen }: { onOpen: (id: CollectionId | 'recent') => void }) {
           <Recent onShowAll={() => onOpen('recent')} />
           <Section title={t('browse')}>
             <div className="grid grid-cols-4 gap-x-1 gap-y-2" data-testid="element-collections">
-              {COLLECTIONS.filter((id) => offered(id, lang)).map((id) => (
+              {COLLECTIONS.filter((id) => offers(id, lang, cards)).map((id) => (
                 <button
                   key={id}
                   type="button"

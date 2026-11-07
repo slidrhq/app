@@ -1,5 +1,5 @@
 import type { Deck, Element, Slide } from '@slidr/model';
-import { memo, useMemo, type CSSProperties } from 'react';
+import { memo, useMemo, useSyncExternalStore, type CSSProperties } from 'react';
 import {
   RenderContextValue,
   type AssetResolver,
@@ -17,7 +17,13 @@ import { BackgroundLayers } from './fill';
 import { frameScriptNonce, resolveAssetUrls } from './markup';
 import { STILL_ATTRIBUTE, STILL_CSS } from './still';
 import { opensAddress } from './text';
-import { colorCss, deckFontFaces, themeVariables } from './theme';
+import {
+  colorCss,
+  deckFontFaces,
+  fontCounterpartsVersion,
+  subscribeFontCounterparts,
+  themeVariables,
+} from './theme';
 
 export interface SlideRendererProps {
   /** The deck the slide belongs to: its theme, layouts, assets and direction. */
@@ -185,7 +191,17 @@ function SlideRendererView({
       decoding,
     ],
   );
-  const vars = useMemo(() => themeVariables(theme, meta.lang), [theme, meta.lang]);
+  // The fonts' counterparts may be told after the slide was drawn, once the host's library came.
+  const counterparts = useSyncExternalStore(
+    subscribeFontCounterparts,
+    fontCounterpartsVersion,
+    fontCounterpartsVersion,
+  );
+  const vars = useMemo(
+    () => themeVariables(theme, meta.lang),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- drawn again when they are told
+    [theme, meta.lang, counterparts],
+  );
   const fontFaces = useMemo(
     () => (resolveAsset ? deckFontFaces(assets, resolveAsset) : ''),
     [assets, resolveAsset],

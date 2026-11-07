@@ -813,9 +813,10 @@ function ColorDemo({ c }: { c: Copy }) {
 }
 
 /** The library's fonts as a Hebrew deck is offered them. */
-const galleryFonts = builtinFamilies
-  .filter((entry) => familyForDeck(entry, 'he'))
-  .map(({ family, scripts }) => ({ family, sample: scripts.includes('he') }));
+const galleryFonts = () =>
+  builtinFamilies()
+    .filter((entry) => familyForDeck(entry, 'he'))
+    .map(({ family, scripts }) => ({ family, sample: scripts.includes('he') }));
 
 /** A few of the fonts Windows ships, as the app would list the installed ones. */
 const installedFonts = [
@@ -834,7 +835,7 @@ function FontDemo({ c }: { c: Copy }) {
     <Card title={c.fontPicker}>
       <FontPicker
         groups={[
-          { label: c.font.library, fonts: galleryFonts },
+          { label: c.font.library, fonts: galleryFonts() },
           { label: c.font.system, fonts: installedFonts },
         ]}
         sample={c.fontSample}

@@ -3005,6 +3005,12 @@
       "hint": "Las notas se guardan con la presentación y no se muestran en la diapositiva.",
       "noSlide": "No hay diapositiva",
       "step": "Notas del orador"
+    },
+    "crash": {
+      "title": "Algo salió mal",
+      "body": "Slidr encontró un error inesperado. Vuelve a cargar la ventana para continuar.",
+      "reload": "Volver a cargar",
+      "details": "Detalles"
     }
   },
   "stage": {

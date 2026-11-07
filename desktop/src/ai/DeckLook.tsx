@@ -1,6 +1,5 @@
 import { memo, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStore } from 'zustand';
 import type { FontPair } from '@slidr/model';
 import { FittedSlide } from '@slidr/renderer';
 import { Check } from '@slidr/ui/icons';
@@ -9,6 +8,7 @@ import { useLanguage } from '../i18n';
 import { useDeck, useEditor, useElementSize } from '../shell';
 import { showPreview } from '../stage/preview';
 import { library } from '../templates/app';
+import { useLibraryEntries } from '../templates/useLibrary';
 import { coverAsset, libraryCover } from '../templates/covers';
 import type { LibraryEntry } from '../templates/library';
 import { templateName } from '../templates/names';
@@ -198,15 +198,10 @@ function TemplateCard({ entry, trying }: { entry: LibraryEntry; trying: Trying }
 
 function Templates({ trying }: { trying: Trying }) {
   const { t } = useTranslation('ai');
-  const { personal } = useStore(library.state);
   const grid = useRef<HTMLDivElement>(null);
   const { width } = useElementSize(grid);
   const columns = columnsFor(TEMPLATE_COLUMNS, width);
-  const all = useMemo(
-    () => library.entries(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [personal],
-  );
+  const all = useLibraryEntries();
   // Only the templates written in the UI language, the language their covers are drawn in.
   const { entries } = useTemplatesIn(all, useLanguage());
   return (
@@ -278,13 +273,13 @@ function PaletteCard({ palette, trying }: { palette: Palette; trying: Trying }) 
 
 function Palettes({ trying }: { trying: Trying }) {
   const { t } = useTranslation('ai');
-  const { personal } = useStore(library.state);
+  const entries = useLibraryEntries();
   const grid = useRef<HTMLDivElement>(null);
   const { width } = useElementSize(grid);
   const list = useMemo(
     () => palettes(library),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [personal],
+    [entries],
   );
   return (
     <Section title={t('look.palette.title')} name="palette">
@@ -351,11 +346,11 @@ function FontCard({ choice, trying }: { choice: FontChoice; trying: Trying }) {
 
 function Fonts({ trying }: { trying: Trying }) {
   const { t } = useTranslation('ai');
-  const { personal } = useStore(library.state);
+  const entries = useLibraryEntries();
   const list = useMemo(
     () => fontChoices(library),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [personal],
+    [entries],
   );
   return (
     <Section title={t('look.fonts.title')} name="fonts">

@@ -81,7 +81,7 @@ function Overview() {
   );
 }
 
-registerBuiltinFonts();
+void registerBuiltinFonts();
 const params = new URLSearchParams(location.search);
 const deckName = params.get('deck');
 const root = document.getElementById('root');

@@ -11,10 +11,10 @@ import {
   type TextElement,
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
-import { builtinFamilies } from '../fonts/builtinFonts.generated';
+import { builtinFonts } from '../fonts/builtinFonts.generated';
 import { cardBox } from '../objects/card';
 import {
-  CARD_SETS,
+  cardSetCatalog,
   cardKinds,
   cardPicture,
   cardSetOf,
@@ -33,6 +33,11 @@ import {
   type CardSetId,
   type Reading,
 } from './cardSets';
+
+// The library's fonts, as the app has them once the catalog has come.
+const { families: builtinFamilies } = await builtinFonts.load();
+// The card sets, once their catalog has come.
+const CARD_SETS = (await cardSetCatalog.load()).ids;
 
 const SLIDE = { w: 1920, h: 1080 };
 /** The slide between its top and bottom margins, with nothing else on it. */

@@ -4,7 +4,8 @@ import { useDeck, useEditor, type ActionPopoverProps } from '../shell';
 import { CARD_GLYPH } from './card';
 import { insertCard, insertLine, insertShape } from './insert';
 import { Hint } from './parts';
-import { GLYPH_BOX, LINE_GLYPHS, LINE_KINDS, shapeGlyph, shapeLibrary } from './shapes';
+import { useMediaCatalog } from '../shell/useMedia';
+import { GLYPH_BOX, lineGlyphs, lineKinds, shapeCatalog, shapeGlyph, shapeLibrary } from './shapes';
 
 /* What the Shape and Line buttons of row A open (SHP-01, SHP-05). */
 
@@ -65,7 +66,8 @@ const entry =
 export function ShapeLibrary({ close }: ActionPopoverProps) {
   const { t, i18n } = useTranslation('objects');
   const editor = useEditor();
-  const groups = useMemo(() => shapeLibrary(), []);
+  const catalog = useMediaCatalog(shapeCatalog);
+  const groups = useMemo(() => shapeLibrary(undefined, catalog), [catalog]);
   // A preset the renderer gained before it was named here still shows, under its own name.
   const nameOf = (preset: string) =>
     i18n.exists(`objects:shape.${preset}`) ? t(`shape.${preset}`) : preset;
@@ -133,6 +135,7 @@ export function ShapeLibrary({ close }: ActionPopoverProps) {
 export function LineLibrary({ close }: ActionPopoverProps) {
   const { t } = useTranslation('objects');
   const editor = useEditor();
+  useMediaCatalog(shapeCatalog);
   // A new line runs in the deck's reading direction (see `newLine`), and so does its glyph.
   const rtl = useDeck((s) => s.deck.meta.dir === 'rtl');
   return (
@@ -142,7 +145,7 @@ export function LineLibrary({ close }: ActionPopoverProps) {
       aria-label={t('insert.line')}
       className="-m-2 flex flex-col gap-0.5"
     >
-      {LINE_KINDS.map((kind) => (
+      {lineKinds().map((kind) => (
         <button
           key={kind}
           type="button"
@@ -159,7 +162,7 @@ export function LineLibrary({ close }: ActionPopoverProps) {
             className="size-6 shrink-0 text-ui-fg-muted"
           >
             <path
-              d={LINE_GLYPHS[kind]}
+              d={lineGlyphs()[kind]}
               transform={rtl ? `translate(${GLYPH_BOX} 0) scale(-1 1)` : undefined}
               fill="none"
               stroke="currentColor"

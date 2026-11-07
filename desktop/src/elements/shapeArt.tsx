@@ -2,7 +2,7 @@ import { Fragment, useMemo } from 'react';
 import { ambientAnimation, presetPath } from '@slidr/renderer';
 import { cx } from '@slidr/ui';
 import { CARD_GLYPH } from '../objects/card';
-import { GLYPH_BOX, LINE_GLYPHS, shapeGlyph, type LineKind } from '../objects/shapes';
+import { GLYPH_BOX, lineGlyphs, shapeGlyph, type LineKind } from '../objects/shapes';
 import { motionShapePreset, type MotionShape } from './motionShapes';
 
 /* Shape and line previews use neutral black. The separate card preview keeps its accent ink. */
@@ -116,7 +116,7 @@ export function LineArt({
   return (
     <svg aria-hidden viewBox={box} className={cx(picture, className)}>
       <path
-        d={LINE_GLYPHS[kind]}
+        d={lineGlyphs()[kind]}
         transform={flip ? `translate(${GLYPH_BOX} 0) scale(-1 1)` : undefined}
         fill="none"
         stroke="#111111"

@@ -1,19 +1,24 @@
 import { CONTENT_LANGUAGES, elementSchemas } from '@slidr/model';
 import { extraShapes, presetPath, shapePresets } from '@slidr/renderer';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { en, he } from './messages';
 import {
   centredFrame,
   GLYPH_BOX,
   isOpenPreset,
-  LINE_GLYPHS,
-  LINE_KINDS,
+  lineGlyphs,
+  lineKinds,
   newLine,
   newShape,
-  SHAPE_GROUPS,
+  shapeCatalog,
   shapeGlyph,
+  shapeGroups,
   shapeLibrary,
+  type LineKind,
 } from './shapes';
+
+// The catalog of the media library, as the app has it once it has come.
+beforeAll(() => shapeCatalog.load());
 
 const slide = { w: 1920, h: 1080 };
 
@@ -55,13 +60,13 @@ describe('the shape library', () => {
         expect(en.shape, preset).toHaveProperty(preset);
       }
     }
-    for (const group of SHAPE_GROUPS) {
+    for (const group of shapeGroups()) {
       expect(he.library).toHaveProperty(group);
       expect(en.library).toHaveProperty(group);
     }
-    for (const kind of LINE_KINDS) {
+    for (const kind of lineKinds()) {
       expect(he.line).toHaveProperty(kind);
-      expect(LINE_GLYPHS).toHaveProperty(kind);
+      expect(lineGlyphs()).toHaveProperty(kind);
     }
   });
 
@@ -140,7 +145,7 @@ describe('centredFrame', () => {
 
 describe('newLine', () => {
   it('gives a valid line for every kind', () => {
-    for (const kind of LINE_KINDS) {
+    for (const kind of lineKinds()) {
       const line = newLine(kind, slide);
       expect(elementSchemas.line.safeParse(line).success, kind).toBe(true);
       expect(line.stroke).toEqual({ color: { token: 'text' }, width: 4 });
@@ -149,7 +154,7 @@ describe('newLine', () => {
   });
 
   it('sets heads and curve by kind', () => {
-    const of = (kind: (typeof LINE_KINDS)[number]) => {
+    const of = (kind: LineKind) => {
       const { startHead, endHead, curve } = newLine(kind, slide);
       return { startHead, endHead, curve };
     };

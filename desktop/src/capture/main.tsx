@@ -14,7 +14,8 @@ import { shareScriptNonce } from '../scriptNonce';
 import { SURFACE_WIDTH, type PageRequest } from './protocol';
 import { settle } from './settle';
 
-registerBuiltinFonts();
+// A capture waits for them: a slide drawn in a fallback font would be captured in it.
+const fontsRegistered = registerBuiltinFonts();
 // A slide is captured as the user sees it: with the scripts of its `html` objects run (ADR-066).
 shareScriptNonce();
 const host = document.getElementById('root');
@@ -37,6 +38,7 @@ async function draw(request: PageRequest): Promise<void> {
     ? (asset: AssetMeta) => convertFileSrc(`${assetsDir}/${asset.file}`)
     : undefined;
   renderError = null;
+  await fontsRegistered;
   flushSync(() => {
     root.render(
       <ScaledSlide
