@@ -1,7 +1,8 @@
 # A release of Slidr: pushing a tag `v<version>` builds the Windows installer, signs it, and
 # puts it in a draft GitHub release with the `latest.json` the app's updater reads
 # (desktop/src-tauri/src/updates.rs). The updater sees a release only once it is published,
-# so the draft is the last check.
+# so the draft is the last check. Publishing it points the homepage's download buttons at the
+# new installer (site.yml).
 #
 # Two signatures:
 # - Authenticode, with the project's certificate from Certum, so Windows trusts what it runs.

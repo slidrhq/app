@@ -1,0 +1,58 @@
+# When a release of Slidr is published, the download buttons of the homepage (slidrhq/site) point
+# at its installer: the job rewrites them with the site's set-download.mjs, commits and pushes, and
+# the push publishes the site (its deploy.yml). The Release workflow leaves a draft, so this runs
+# when the draft is published, not when the tag is pushed, and a pre-release leaves the buttons.
+# Run it by hand (Actions → Site) to point them at the latest release again.
+#
+# It pushes with SITE_DEPLOY_KEY, the private half of a deploy key of slidrhq/site with write
+# access: a push with the workflow's own token would not start the site's deploy.
+name: Site
+
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find the installer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          tag=${RELEASE_TAG:-$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)}
+          urls=$(gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets \
+            --jq '.assets[] | select(.name | endswith("_x64-setup.exe")) | .url')
+          if [ "$(printf '%s\n' "$urls" | grep -c .)" != 1 ]; then
+            echo "::error::The release $tag has no single installer: $urls"
+            exit 1
+          fi
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+          echo "URL=$urls" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v5
+        with:
+          repository: slidrhq/site
+          ssh-key: ${{ secrets.SITE_DEPLOY_KEY }}
+
+      - name: Point the buttons at the installer
+        run: |
+          node set-download.mjs "$URL"
+          if git diff --quiet; then
+            echo "The site downloads $TAG already"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -qam "Download Slidr ${TAG#v}"
+          git pull -q --rebase origin main
+          git push origin HEAD:main

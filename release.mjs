@@ -112,6 +112,7 @@ console.log(
   dryRun
     ? 'Nothing was changed.'
     : `Pushed ${tag}. The build waits for the runner on your machine: start it (run.cmd) and keep\n` +
-        'SimplySign Desktop logged in. Publish the draft release when it is ready:\n' +
+        'SimplySign Desktop logged in. Publish the draft release when it is ready; the homepage\n' +
+        'then downloads it (.github/workflows/site.yml):\n' +
         '  https://github.com/slidrhq/app/releases',
 );
