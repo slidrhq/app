@@ -13,6 +13,7 @@ import {
   IMAGE_ASPECTS,
   IMAGE_ERROR_KINDS,
   ImageError,
+  NOT_CHOSEN,
   chooseDefaultProvider,
   type EditJob,
   type EditSupport,
@@ -468,6 +469,7 @@ describe('createAppImages', () => {
     const images = createAppImages(null, assets);
     expect(images.client).not.toBe(tauriImages);
     expect(images.workspaceId()).toBe('memory');
+    // The page starts with its stand-in chosen, as it starts with its scripted agent.
     expect(await images.client.defaultProvider()).toBe('mock');
     expect(invoke).not.toHaveBeenCalled();
   });
@@ -500,6 +502,13 @@ describe('memoryImages', () => {
 
   it('paints a different placeholder of the requested shape for each image', async () => {
     const { images, painted } = client();
+    // None is the default until one is chosen (ADR-140): a job that names none is refused.
+    expect((await images.providers()).map((p) => p.id)).toEqual(['mock', 'mock-api']);
+    expect(await images.defaultProvider()).toBeNull();
+    await expect(
+      images.generate('job-0', 'none', { prompt: 'a barn', count: 1, aspect: '1:1' }),
+    ).rejects.toMatchObject({ kind: 'unknown_provider', message: NOT_CHOSEN });
+    await images.setDefaultProvider('mock');
     const events: ImageEvent[] = [];
     const job: GenerateJob = { prompt: 'a barn', count: 3, aspect: '9:16' };
     const result = await images.generate('job-1', 'none', job, (e) => events.push(e));
@@ -510,9 +519,6 @@ describe('memoryImages', () => {
     expect(painted.map((p) => [p.width, p.height])).toEqual(Array(3).fill([360, 640]));
     expect(events.filter((e) => e.type === 'started')).toHaveLength(3);
     expect(events.filter((e) => e.type === 'finished')).toHaveLength(3);
-    // The first provider is the default until another is chosen.
-    expect((await images.providers()).map((p) => p.id)).toEqual(['mock', 'mock-api']);
-    expect(await images.defaultProvider()).toBe('mock');
   });
 
   it('has a provider that needs a key, and makes images where the settings say', async () => {
@@ -541,7 +547,7 @@ describe('memoryImages', () => {
     // The choice is kept in the settings, next to what else the section holds, and a job that
     // names no provider goes where it says.
     await settings.write('images', { quality: 'high' });
-    expect((await run()).provider).toBe('mock');
+    await expect(run()).rejects.toMatchObject({ kind: 'unknown_provider' });
     await images.setDefaultProvider('mock-api');
     expect((await settings.read()).images).toEqual({
       quality: 'high',
@@ -561,6 +567,7 @@ describe('memoryImages', () => {
 
   it('fails as the prompt asks, and stops a job that is cancelled', async () => {
     const { images } = client();
+    await images.setDefaultProvider('mock');
     const kinds = (result: ImageJobResult) =>
       result.images.map((o) => (o.status === 'failed' ? o.error.kind : o.status));
     const run = (jobId: string, prompt: string, count: number) =>

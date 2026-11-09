@@ -32,7 +32,7 @@ pub async fn image_probe(images: Images<'_>, provider_id: String) -> Result<Prov
 }
 
 /// `image_default_provider()`: the id of the provider a job uses when it names none; `null`
-/// while neither the user nor the organization has chosen one (ADR-139).
+/// while neither the user nor the organization has chosen one (ADR-140).
 #[tauri::command]
 pub async fn image_default_provider(images: Images<'_>) -> Result<Option<String>> {
     Ok(images.default_provider())

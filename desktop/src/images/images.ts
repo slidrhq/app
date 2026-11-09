@@ -58,7 +58,7 @@ export interface ImageProviderStatus {
 
 /** Closed set of failure categories, for both rejected calls and failed images. */
 export const IMAGE_ERROR_KINDS = [
-  /** No provider with that id, or none is chosen (ADR-139). */
+  /** No provider with that id, or none is chosen (ADR-140). */
   'unknown_provider',
   /** The workspace is not open, or no document is. */
   'unknown_workspace',
@@ -157,7 +157,7 @@ export interface ImageClient {
   probe(providerId: string): Promise<ImageProviderStatus>;
   /**
    * The id of the provider a job uses when it names none: the user's choice, else the
-   * organization's. Null until one of them chooses: the app picks none itself (ADR-139).
+   * organization's. Null until one of them chooses: the app picks none itself (ADR-140).
    */
   defaultProvider(): Promise<string | null>;
   /** The user's choice of default, kept across runs. */

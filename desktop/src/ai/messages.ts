@@ -14,7 +14,7 @@ export const he = {
     harness: 'עם מי תרצו לעבוד?',
     model: 'באיזה מודל תרצו להשתמש?',
     effort: 'מה תהיה רמת המאמץ?',
-    // The last step (ADR-139): the image provider, the list of Settings → Media.
+    // The last step (ADR-140): the image provider, the list of Settings → Media.
     images: 'מי ייצור את התמונות?',
     imagesHint: 'בכלים של האפליקציה ובכלים של הסוכן. אפשר לשנות את זה אחר כך בהגדרות.',
     imagesTrouble: 'ספק התמונות לא הצליח ליצור תמונה. בחרו ספק, או השלימו את החיבור שלו.',

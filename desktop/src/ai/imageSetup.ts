@@ -1,5 +1,5 @@
 /**
- * The image step of the chat's setup (ADR-139): who makes the images is chosen in the chat,
+ * The image step of the chat's setup (ADR-140): who makes the images is chosen in the chat,
  * right after the agent. The chat asks when no provider is chosen, after the agent was set up in
  * it, and when an image job of the agent met a provider that could not run. This store holds what
  * the chat cannot read from the settings: that a job met such a provider, and that the user put

@@ -54,7 +54,7 @@ The product exposes one AI chat. Each user turn sends current slide, selected el
 
 The agent harness is event-based. Its production adapter runs a restricted Claude CLI process; scripted runs support browser tests. `packages/agent-tools` defines protocol-independent, validated Deck API tools. Every write passes the same scope/transaction guard. The local MCP bridge authenticates and transports calls to the webview; it does not own tool logic. User-generated prompt data and current context are separated so a resumed CLI process does not receive stale deck state. See [ADR-001](adr/ADR-001-claude-cli-harness.md), [ADR-010](adr/ADR-010-agent-harness.md), [ADR-011](adr/ADR-011-deck-api.md), and [ADR-022](adr/ADR-022-mcp-bridge.md).
 
-AI image jobs run provider calls with per-provider concurrency and cancellation. Returned bytes enter workspace assets. Credentials stay in the OS credential store and are absent from tool results and logs. See [ADR-025](adr/ADR-025-image-providers.md) and [ADR-051](adr/ADR-051-media-and-settings.md).
+AI image jobs run provider calls with per-provider concurrency and cancellation. The app chooses no provider by itself: the user chooses one in the last step of the chat's setup, right after the agent, or in Settings, and the chat asks again when none is chosen or a job of the agent meets one that cannot run; an organization's default stands for its people ([ADR-140](adr/ADR-140-the-image-provider-chosen-in-the-chat.md)). Returned bytes enter workspace assets. Credentials stay in the OS credential store and are absent from tool results and logs. See [ADR-025](adr/ADR-025-image-providers.md) and [ADR-051](adr/ADR-051-media-and-settings.md).
 
 ## 7. HTML import and conversion
 

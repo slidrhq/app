@@ -25,7 +25,7 @@ import { useEditor } from '../shell';
 import { finishImageSetup, putOffImageSetup } from './imageSetup';
 import { agentOf, aiOf } from './runtime';
 
-/** The steps of the setup, in order: the agent's three, then who makes the images (ADR-139). */
+/** The steps of the setup, in order: the agent's three, then who makes the images (ADR-140). */
 const STEPS = ['harness', 'model', 'effort', 'images'] as const;
 type Step = (typeof STEPS)[number];
 
@@ -67,7 +67,7 @@ export function useChatSetup(problem?: ChatProblem) {
         (connection.status.state !== 'ready' ||
           !!selectionIssue(connection.harness, settings.model, settings.effort))));
   const agentNeeded = !mock && (missingChoices || reselecting || repair);
-  // Who makes the images is the last step (ADR-139). It follows the agent's whenever the agent
+  // Who makes the images is the last step (ADR-140). It follows the agent's whenever the agent
   // was set up here, and is asked on its own while no provider is chosen (unless put off), and
   // when a job of the agent met a provider that could not run. The scripted agent asks nothing.
   const imageChoice = useSection('images').defaultProvider;
@@ -75,8 +75,13 @@ export function useChatSetup(problem?: ChatProblem) {
   const imageTrouble = useStore(imageSetup, (state) => state.trouble);
   const imagesLater = useStore(imageSetup, (state) => state.later);
   const [afterAgent, setAfterAgent] = useState(false);
-  const images =
+  const asked =
     !mock && !agentNeeded && (afterAgent || imageTrouble || (!imagesChosen && !imagesLater));
+  // Once asked, the step stays until it is finished or put off: a provider is chosen as it is
+  // clicked, and one that still needs a key or a sign-in is chosen but not ready.
+  const [imagesOpen, setImagesOpen] = useState(false);
+  if (asked && !imagesOpen) setImagesOpen(true);
+  const images = !mock && !agentNeeded && (asked || imagesOpen);
   const needed = agentNeeded || images;
   useEffect(() => {
     if (!agentNeeded) return;
@@ -136,10 +141,12 @@ export function useChatSetup(problem?: ChatProblem) {
     answered: () => setAfterAgent(true),
     finishImages: () => {
       setAfterAgent(false);
+      setImagesOpen(false);
       finishImageSetup(imageSetup);
     },
     putOffImages: () => {
       setAfterAgent(false);
+      setImagesOpen(false);
       putOffImageSetup(imageSetup);
     },
   };
@@ -413,13 +420,14 @@ function SetupHead({ step, title, intro }: { step: Step; title: string; intro: s
           <p className="mt-1 text-ui-fg-muted">{t(intro)}</p>
         </div>
       </div>
-      <ol aria-label={t('setup.steps')} className="flex items-center gap-2 text-xs">
+      {/* Each step as wide as its name: four in equal parts cut the longer names short. */}
+      <ol aria-label={t('setup.steps')} className="flex items-center justify-between gap-2 text-xs">
         {STEPS.map((item, index) => (
           <li
             key={item}
             aria-current={item === step ? 'step' : undefined}
             className={cx(
-              'flex min-w-0 flex-1 items-center gap-1.5',
+              'flex min-w-0 items-center gap-1.5',
               item === step ? 'font-medium text-ui-accent-fg' : 'text-ui-fg-muted',
             )}
           >
@@ -440,17 +448,11 @@ function SetupHead({ step, title, intro }: { step: Step; title: string; intro: s
 }
 
 /**
- * Who makes the images (ADR-139): the providers of Settings -> Media, with their install, sign-in
+ * Who makes the images (ADR-140): the providers of Settings -> Media, with their install, sign-in
  * and key. A provider is chosen as it is clicked, as in Settings; Continue waits until the one
  * chosen is ready. Not now leaves it, and the chat asks again when a job of the agent needs it.
  */
-function ImageStep({
-  setup,
-  back,
-}: {
-  setup: ReturnType<typeof useChatSetup>;
-  back: ReactNode;
-}) {
+function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; back: ReactNode }) {
   const { t } = useTranslation('ai');
   const [chosen, setChosen] = useState<ChosenProviderState>();
   return (
@@ -465,11 +467,7 @@ function ImageStep({
         <Button variant="ghost" onClick={setup.putOffImages}>
           {t('setup.notNow')}
         </Button>
-        <Button
-          variant="primary"
-          disabled={chosen?.state !== 'ready'}
-          onClick={setup.finishImages}
-        >
+        <Button variant="primary" disabled={chosen?.state !== 'ready'} onClick={setup.finishImages}>
           {t('setup.continue')}
         </Button>
       </div>

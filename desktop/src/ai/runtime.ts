@@ -113,7 +113,7 @@ export interface AiRuntime {
   images: AppImages;
   /**
    * What the chat's image step goes by besides the settings: a job of the agent met a provider
-   * that could not run, or the user put the step off (ADR-139).
+   * that could not run, or the user put the step off (ADR-140).
    */
   imageSetup: StoreApi<ImageSetup>;
   /** The chats the panels have open, and which of them are working. */

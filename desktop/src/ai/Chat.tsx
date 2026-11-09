@@ -975,7 +975,7 @@ export function Chat({
     !setup.choosingHarness &&
     setup.state?.connection?.status.state !== 'ready';
   // Who makes the images is asked once the turn is over: a job that met a provider that could
-  // not run must not take the Stop button away from the turn still running (ADR-139).
+  // not run must not take the Stop button away from the turn still running (ADR-140).
   const setupShown = setup.needed && !(setup.images && state.busy);
 
   let content: ReactNode;

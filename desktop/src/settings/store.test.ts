@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SettingsError } from './settings';
 import {
   loadSettings,
@@ -16,9 +16,16 @@ import {
 
 const sections = () => useSettings.getState().sections;
 
+/** Every section removed: the page starts with some of its own (`pageSettings`). */
+const clear = async () => {
+  for (const name of Object.keys(await pageSettings.read())) await replaceSection(name, null);
+};
+
+beforeEach(clear);
+
 afterEach(async () => {
   vi.restoreAllMocks();
-  for (const name of Object.keys(await pageSettings.read())) await replaceSection(name, null);
+  await clear();
 });
 
 describe('replacing a section', () => {

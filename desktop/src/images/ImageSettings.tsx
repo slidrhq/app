@@ -29,7 +29,7 @@ type Quality = (typeof QUALITIES)[number];
 
 /**
  * What a provider's state is called: the probe's answer, read with whether its key is stored.
- * `not_chosen` is the state of no provider: none is chosen yet (ADR-139).
+ * `not_chosen` is the state of no provider: none is chosen yet (ADR-140).
  */
 export type ProviderStateLabel =
   | 'not_chosen'
@@ -78,7 +78,7 @@ export interface ChosenProviderState {
  * The image providers in the settings screen (GEN-01, GEN-03): which one makes the images, the
  * key of one that needs a key, and the quality of one that takes it. The choice is what
  * `image_generate` uses when a job names no provider, the agent's jobs included. Until the user
- * (or the organization) chooses, none is marked (ADR-139). The chat's setup shows the same list
+ * (or the organization) chooses, none is marked (ADR-140). The chat's setup shows the same list
  * as its last step.
  */
 export function ImageSettings({

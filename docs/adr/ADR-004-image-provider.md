@@ -1,6 +1,6 @@
 # ADR-004 — Use Codex CLI as the default image provider
 
-Status: Adopted. This is the current English summary of the decision. The original implementation log remains available in Git history.
+Status: Adopted. This is the current English summary of the decision. The original implementation log remains available in Git history. Superseded in part by [ADR-140](ADR-140-the-image-provider-chosen-in-the-chat.md) on 2026-11-09: Codex CLI is listed first, but no provider is chosen by default; the user chooses in the chat's setup or in Settings.
 
 ## Decision and current interpretation
 

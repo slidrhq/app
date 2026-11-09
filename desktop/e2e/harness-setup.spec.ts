@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import type * as Runtime from '../src/ai/runtime';
 import type * as RequestHarness from './harness-request-page';
 import type * as Setup from '../src/agent/harnessSetup';
@@ -129,6 +129,40 @@ async function fixtures(page: Page, models?: ModelOption[]) {
   await expect(page.getByTestId('harness-connection')).toContainText(/Connected|מחובר/);
 }
 
+/**
+ * The last step of a setup in the chat: who makes the images (ADR-140). The page starts with its
+ * stand-in provider chosen, so the step shows it marked and ready, and Continue ends the setup.
+ */
+async function finishImages(setup: Locator) {
+  await expect(setup).toHaveAttribute('data-step', 'images');
+  await expect(setup.locator('[aria-current="step"]')).toContainText(/Images|תמונות/);
+  await expect(setup.locator('[data-provider="mock"]')).toHaveAttribute('aria-checked', 'true');
+  await expect(setup.locator('[data-provider="mock"]')).toHaveAttribute('data-state', 'ready');
+  await setup.getByRole('button', { name: /^(Continue|המשך)$/ }).click();
+}
+
+/** A job of the agent met a provider that could not run, as `watchImageSetup` reports it. */
+async function imageTrouble(page: Page) {
+  await page.evaluate(async () => {
+    const runtimePath =
+      performance
+        .getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .findLast((name) => /\/src\/ai\/runtime\.ts(?:\?|$)/.test(name)) ?? '/src/ai/runtime.ts';
+    const { aiOf } = (await import(/* @vite-ignore */ runtimePath)) as typeof Runtime;
+    aiOf(window.slidr!).imageSetup.setState({ trouble: true, later: false });
+  });
+}
+
+/** No image provider chosen, as after a clean install (ADR-140). */
+async function forgetImageProvider(page: Page) {
+  await page.evaluate(async () => {
+    const path = '/src/settings/index.ts';
+    const { replaceSection } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+    await replaceSection('images', null);
+  });
+}
+
 test('selection connects, installation needs approval, and sign-in loads models before choosing effort', async ({
   page,
 }) => {
@@ -196,6 +230,7 @@ test('the first-time setup, Settings and the chat picker offer only the newest o
   await setup.getByRole('button', { name: 'Continue', exact: true }).click();
   await setup.getByRole('radio', { name: 'High' }).check();
   await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await finishImages(setup);
   await expect(setup).toHaveCount(0);
 
   // The conversation's own picker.
@@ -384,6 +419,12 @@ test('chat handles installation, sign-in and a model without effort', async ({ p
   await setup.getByRole('button', { name: 'Sign in', exact: true }).click();
   await setup.getByRole('radio', { name: 'Simple model' }).check();
   await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  // The model has no effort: the images come right after it, and Back returns to it.
+  await expect(setup).toHaveAttribute('data-step', 'images');
+  await setup.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(setup.getByRole('radio', { name: 'Simple model' })).toBeChecked();
+  await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await finishImages(setup);
   await expect(setup).toHaveCount(0);
   await expect(page.getByTestId('model-picker')).toHaveAttribute(
     'data-model',
@@ -618,6 +659,7 @@ for (const lang of ['he', 'en'] as const) {
     await next();
     await setup.getByRole('radio').last().check();
     await next();
+    await finishImages(setup);
     await expect(setup).toHaveCount(0);
     await expect(input).toBeVisible();
     await expect(turn).toContainText('Connected on request.');
@@ -753,6 +795,18 @@ for (const lang of ['he', 'en'] as const) {
     await page.screenshot({ path: `test-results/chat-setup-effort-${lang}.png` });
     await setup.getByRole('radio').last().check();
     await next();
+    // Who makes the images comes last, in the welcome the setup began with.
+    await expect(setup).toHaveAttribute('data-step', 'images');
+    await expect(setup).toContainText(lang === 'he' ? 'ברוכים הבאים' : 'Welcome');
+    await expect(setup).toContainText(
+      lang === 'he' ? 'מי ייצור את התמונות?' : 'Who should make the images?',
+    );
+    await expect(page.getByTestId('chat-input')).toHaveCount(0);
+    await page.screenshot({ path: `test-results/chat-setup-images-${lang}.png` });
+    await back();
+    await expect(setup.getByRole('radio').last()).toBeChecked();
+    await next();
+    await finishImages(setup);
     await expect(setup).toHaveCount(0);
     await expect(page.getByTestId('model-picker')).toHaveAttribute(
       'data-model',
@@ -775,5 +829,120 @@ for (const lang of ['he', 'en'] as const) {
     const effort = page.getByRole('combobox', { name: /^(Effort|רמת מאמץ)$/ });
     await expect(effort).toBeVisible();
     await page.screenshot({ path: `test-results/harness-setup-${lang}.png` });
+  });
+}
+
+for (const lang of ['he', 'en'] as const) {
+  test(`with no image provider chosen, a configured chat asks for one, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await page.evaluate(async () => {
+      const path = '/src/settings/index.ts';
+      const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+      setAgentSettings({ model: 'claude-code-reasoning', effort: 'ultra' });
+    });
+    await forgetImageProvider(page);
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    const setup = page.getByTestId('chat-setup');
+    // Asked on its own: it finishes a setup, and nothing is chosen for the user.
+    await expect(setup).toHaveAttribute('data-step', 'images');
+    await expect(setup).toContainText(
+      lang === 'he' ? 'בואו נשלים את ההגדרות' : 'Let’s finish setting up',
+    );
+    await expect(setup.locator('[data-provider][aria-checked="true"]')).toHaveCount(0);
+    const go = setup.getByRole('button', { name: /^(Continue|המשך)$/ });
+    await expect(go).toBeDisabled();
+    await expect(page.getByTestId('chat-input')).toHaveCount(0);
+    await page.screenshot({ path: `test-results/chat-setup-images-none-${lang}.png` });
+    // A provider that needs a key is not ready without it.
+    await setup.locator('[data-provider="mock-api"]').click();
+    await expect(setup.locator('[data-provider="mock-api"]')).toHaveAttribute(
+      'data-state',
+      'needs_key',
+    );
+    await expect(go).toBeDisabled();
+    await setup.locator('[data-provider="mock"]').click();
+    await expect(go).toBeEnabled();
+    await go.click();
+    await expect(setup).toHaveCount(0);
+    await expect(page.getByTestId('chat-input')).toBeVisible();
+    // The choice is the app's, as if made in Settings.
+    const stored = await page.evaluate(async () => {
+      const path = '/src/settings/index.ts';
+      const { pageSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+      return (await pageSettings.read()).images;
+    });
+    expect(stored).toEqual({ defaultProvider: 'mock' });
+  });
+}
+
+test('Not now puts the image step off, and a job that needs a provider asks again', async ({
+  page,
+}) => {
+  await openApp(page, { lang: 'en' });
+  await fixtures(page);
+  await page.evaluate(async () => {
+    const path = '/src/settings/index.ts';
+    const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+    setAgentSettings({ model: 'claude-code-reasoning', effort: 'ultra' });
+  });
+  await forgetImageProvider(page);
+  const ai = page.getByTestId('activity-bar').locator('[data-panel="ai"]');
+  await ai.click();
+  const setup = page.getByTestId('chat-setup');
+  await setup.getByRole('button', { name: 'Not now', exact: true }).click();
+  await expect(setup).toHaveCount(0);
+  await expect(page.getByTestId('chat-input')).toBeVisible();
+  // Put off in this window: the chat opened again does not ask.
+  await page.getByTestId('activity-bar').locator('[data-panel="elements"]').click();
+  await ai.click();
+  await expect(page.getByTestId('chat-input')).toBeVisible();
+  await expect(setup).toHaveCount(0);
+  // A job of the agent that met no provider asks again, saying why.
+  await imageTrouble(page);
+  await expect(setup).toHaveAttribute('data-step', 'images');
+  await expect(setup).toContainText('The image provider couldn’t make an image.');
+  await setup.locator('[data-provider="mock"]').click();
+  await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(setup).toHaveCount(0);
+});
+
+for (const lang of ['he', 'en'] as const) {
+  test(`a job that met a provider that could not run asks once the turn is over, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await requestHarness(page, 'ready');
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    const input = page.getByTestId('chat-input');
+    await input.fill(lang === 'he' ? 'שקף פתיחה לרבעון' : 'An opening slide for the quarter');
+    await input.press('Enter');
+    // The turn is still running: the step waits, and the composer keeps its Stop button.
+    await imageTrouble(page);
+    const setup = page.getByTestId('chat-setup');
+    await expect(setup).toHaveCount(0);
+    await expect(input).toBeVisible();
+    await page.evaluate(() => document.dispatchEvent(new Event('release-harnesses')));
+    await page.evaluate(() => document.dispatchEvent(new Event('release-connection')));
+    const turn = page.getByTestId('chat-assistant');
+    await expect(turn).toHaveAttribute('data-outcome', 'completed');
+    await expect(setup).toHaveAttribute('data-step', 'images');
+    await expect(setup).toContainText(
+      lang === 'he'
+        ? 'ספק התמונות לא הצליח ליצור תמונה.'
+        : 'The image provider couldn’t make an image.',
+    );
+    await expect(input).toHaveCount(0);
+    await setup.scrollIntoViewIfNeeded();
+    await page
+      .getByTestId('chat')
+      .screenshot({ path: `test-results/chat-setup-images-trouble-${lang}.png` });
+    await finishImages(setup);
+    await expect(setup).toHaveCount(0);
+    await expect(input).toBeVisible();
+    await expect(turn).toContainText('Connected on request.');
   });
 }

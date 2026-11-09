@@ -150,7 +150,7 @@ impl ImageService {
     }
 
     /// The provider a job uses when it names none: the user's choice while it is offered, else
-    /// the organization's. None until one of them chooses: the app picks none itself (ADR-139).
+    /// the organization's. None until one of them chooses: the app picks none itself (ADR-140).
     pub fn default_provider(&self) -> Option<String> {
         self.chosen().map(|slot| slot.descriptor.id.clone())
     }
@@ -378,7 +378,7 @@ impl ImageService {
     }
 
     /// The user's choice, while it is offered; else the organization's. Never the first
-    /// provider by itself: until someone chooses, the chat asks (ADR-139).
+    /// provider by itself: until someone chooses, the chat asks (ADR-140).
     fn chosen(&self) -> Option<&Slot> {
         self.settings
             .read::<Choice>(SECTION)
@@ -969,7 +969,7 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["redrawing", "mock"]
         );
-        // None until chosen: the app does not pick the first by itself (ADR-139).
+        // None until chosen: the app does not pick the first by itself (ADR-140).
         assert_eq!(first.default_provider(), None);
         assert_eq!(
             first.slot(None).err().map(|e| (e.kind, e.message)),

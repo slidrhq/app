@@ -102,6 +102,6 @@ export const customAgent = (id: string, policy = systemPolicy()): CustomAgent | 
 /** The agent a first setup starts from: the organization's default. */
 export const defaultAgent = (policy = systemPolicy()): string | undefined => policy?.agents.default;
 
-/** The image provider the organization starts its people on: a choice made for them (ADR-139). */
+/** The image provider the organization starts its people on: a choice made for them (ADR-140). */
 export const defaultImageProvider = (policy = systemPolicy()): string | undefined =>
   policy?.images.default;

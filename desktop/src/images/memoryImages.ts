@@ -115,7 +115,7 @@ export function memoryImages(assets: AssetService, options: MemoryImagesOptions 
   const hasKey = (provider: ImageProviderDescriptor) =>
     !provider.key || (settings?.hasSecret(provider.key) ?? false);
 
-  /** The choice, as the core reads it: none until one is made (ADR-139). */
+  /** The choice, as the core reads it: none until one is made (ADR-140). */
   async function defaultProvider(): Promise<string | null> {
     const stored = settings ? (await settings.read()).images : undefined;
     const id =

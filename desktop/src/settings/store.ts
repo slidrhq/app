@@ -8,7 +8,7 @@ import { tauriSettings } from './tauriSettings';
  * The settings of a plain browser page (the Vite page, Playwright): kept in memory, like the
  * page's assets. The stand-ins of the services that need a key ask it whether one is stored.
  * The page starts with its stand-in image provider chosen, as it starts with its scripted agent:
- * neither asks for a setup (ADR-139).
+ * neither asks for a setup (ADR-140).
  */
 export const pageSettings: MemorySettings = memorySettings({
   images: { defaultProvider: 'mock' },
