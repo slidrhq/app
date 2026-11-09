@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, cx, SegmentedControl, Skeleton } from '@slidr/ui';
 import { useStore } from 'zustand';
+import { signsInWithoutWindow } from '../agent/harnessLook';
+import { CancelSignIn } from '../ai/CancelSignIn';
 import { agentOf } from '../ai/runtime';
 import {
   InstallDialog,
@@ -303,6 +305,11 @@ export function ImageSettings() {
                     )}
                   </span>
                 </button>
+                {busy === 'signingIn' && signsInWithoutWindow(provider.harness) && (
+                  <div className="flex flex-wrap gap-2 ps-10 pe-3 pb-3">
+                    <CancelSignIn harness={provider.harness} size="sm" />
+                  </div>
+                )}
                 {action && (
                   // Beside the radio, not in it: a button cannot hold another one.
                   <div className="flex flex-wrap gap-2 ps-10 pe-3 pb-3">

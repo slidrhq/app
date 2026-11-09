@@ -143,6 +143,7 @@ pub fn run() {
             harness::ipc::agent_connect,
             harness::ipc::agent_install,
             harness::ipc::agent_login,
+            harness::ipc::agent_cancel_login,
             harness::ipc::agent_start,
             harness::ipc::agent_send,
             harness::ipc::agent_interrupt,

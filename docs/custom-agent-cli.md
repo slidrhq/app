@@ -186,7 +186,7 @@ Explicit models only: no `auto` (the app leaves it out for Copilot and Gemini to
 
 ### 5.4 `slidr login`
 
-Settings → Sign in opens a visible terminal on this subcommand (as `setup::login` does for `codex login`). It is interactive — browser, device code, whatever the CLI uses — and exits with `0` once signed in. The app runs `status` again when it ends, and waits at most 10 minutes.
+Settings → Sign in opens a visible terminal on this subcommand (as `setup::login` does for `copilot login`; `codex login` and `claude auth login`, which need nothing of a terminal, run without a window, ADR-141). It is interactive — browser, device code, whatever the CLI uses — and exits with `0` once signed in. The app runs `status` again when it ends, and waits at most 10 minutes.
 
 ## 6. An agent turn: `slidr turn`
 

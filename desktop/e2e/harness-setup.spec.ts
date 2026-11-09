@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import type * as Runtime from '../src/ai/runtime';
+import type * as AppImages from '../src/images/appImages';
 import type * as RequestHarness from './harness-request-page';
 import type * as Setup from '../src/agent/harnessSetup';
 import type * as Settings from '../src/settings';
@@ -115,8 +116,23 @@ async function fixtures(page: Page, models?: ModelOption[]) {
         return Promise.resolve();
       },
       login: (id: string) => {
+        // A sign-in held, as a browser sign-in waits for the user, until the app calls it off.
+        if (document.body.dataset.holdSignIn === id) {
+          return new Promise<void>((_, reject) =>
+            document.addEventListener(
+              'cancel-sign-in',
+              () => reject(new Error('Sign-in was cancelled.')),
+              { once: true },
+            ),
+          );
+        }
         document.body.dataset.loggedInHarness = id;
         states[id] = 'ready';
+        return Promise.resolve();
+      },
+      cancelLogin: (id: string) => {
+        document.body.dataset.cancelledSignIn = id;
+        document.dispatchEvent(new Event('cancel-sign-in'));
         return Promise.resolve();
       },
     } as AgentClient;
@@ -848,11 +864,11 @@ for (const lang of ['he', 'en'] as const) {
     await forgetImageProvider(page);
     await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
     const setup = page.getByTestId('chat-setup');
-    // Asked on its own: it finishes a setup, with no line about the agent, and nothing is chosen
-    // for the user.
+    // Asked on its own: it finishes the setup of the images, with no line about the agent, and
+    // nothing is chosen for the user.
     await expect(setup).toHaveAttribute('data-step', 'images');
     await expect(setup).toContainText(
-      lang === 'he' ? 'בואו נשלים את ההגדרות' : 'Let’s finish setting up',
+      lang === 'he' ? 'בואו נשלים את הגדרת התמונות' : 'Let’s finish setting up images',
     );
     await expect(setup.getByTestId('chat-setup-agent')).toHaveCount(0);
     await expect(setup.getByRole('radio', { checked: true })).toHaveCount(0);
@@ -917,6 +933,189 @@ test('Not now puts the image step off, and a job that needs a provider asks agai
   await expect(setup).toContainText('The image provider couldn’t make an image.');
   await setup.getByRole('radio', { name: 'Mock images', exact: true }).check();
   await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(setup).toHaveCount(0);
+});
+
+/**
+ * The provider chosen runs on an agent's CLI that is not installed: the page's stand-in client
+ * lists one more provider, chosen, which is installed and signed in through the agent's setup.
+ */
+async function missingCliProvider(page: Page) {
+  await page.evaluate(async () => {
+    const imagesPath =
+      performance
+        .getEntriesByType('resource')
+        .map((entry) => entry.name)
+        .findLast((name) => /\/src\/images\/appImages\.ts(?:\?|$)/.test(name)) ??
+      '/src/images/appImages.ts';
+    const { imagesOf } = (await import(/* @vite-ignore */ imagesPath)) as typeof AppImages;
+    const client = imagesOf(window.slidr!).client;
+    const listed = await client.providers();
+    const cli = {
+      id: 'codex-images',
+      name: 'Codex CLI',
+      capabilities: listed[0]!.capabilities,
+      harness: 'codex-cli',
+    };
+    const probe = client.probe.bind(client);
+    const { dataset } = document.body;
+    Object.assign(client, {
+      providers: () => Promise.resolve([cli, ...listed]),
+      defaultProvider: () => Promise.resolve(cli.id),
+      probe: (id: string) =>
+        id === cli.id
+          ? Promise.resolve({
+              state:
+                dataset.loggedInHarness === cli.harness
+                  ? 'ready'
+                  : dataset.installedHarness === cli.harness
+                    ? 'not_logged_in'
+                    : 'not_installed',
+              version: null,
+              account: null,
+              detail: null,
+            })
+          : probe(id),
+    });
+  });
+}
+
+for (const lang of ['he', 'en'] as const) {
+  test(`a provider chosen whose CLI is not installed is set up in the chat, in ${lang}`, async ({
+    page,
+  }) => {
+    await openApp(page, { lang });
+    await fixtures(page);
+    await page.evaluate(async () => {
+      const path = '/src/settings/index.ts';
+      const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+      setAgentSettings({ model: 'claude-code-reasoning', effort: 'ultra' });
+    });
+    await missingCliProvider(page);
+    await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+    const setup = page.getByTestId('chat-setup');
+    // As an agent that is not installed: what it needs, without the list, and the action. It
+    // says it is the image provider, so Codex here is not taken for the agent.
+    await expect(setup).toHaveAttribute('data-step', 'images');
+    await expect(setup).toContainText(
+      lang === 'he' ? 'בואו נשלים את הגדרת התמונות' : 'Let’s finish setting up images',
+    );
+    await expect(setup).toContainText(
+      lang === 'he'
+        ? 'ספק התמונות שנבחר עדיין לא מוכן ליצירת תמונות.'
+        : 'The image provider you chose isn’t ready to make images yet.',
+    );
+    // Nothing more than the agent's setup shows: no row of the provider over its words.
+    await expect(setup.getByRole('radio')).toHaveCount(0);
+    await expect(setup.getByTestId('chat-setup-images').getByText('Codex CLI')).toHaveCount(1);
+    await expect(setup).toContainText(
+      lang === 'he' ? 'Codex CLI אינו מותקן במחשב' : 'Codex CLI is not installed',
+    );
+    const install = setup.getByRole('button', { name: /^(Approve and install|אישור והתקנה)$/ });
+    await expect(install).toBeVisible();
+    await expect(page.getByTestId('chat-input')).toHaveCount(0);
+    await page.screenshot({ path: `test-results/chat-setup-images-missing-${lang}.png` });
+    await install.click();
+    await expect(page.locator('body')).toHaveAttribute('data-installed-harness', 'codex-cli');
+    await setup.getByRole('button', { name: /^(Sign in|התחברות לחשבון)$/ }).click();
+    // The setup ends once the provider is ready.
+    await expect(setup).toHaveCount(0);
+    await expect(page.getByTestId('chat-input')).toBeVisible();
+  });
+}
+
+test('after the steps of the agent, the head says nothing of a provider chosen that is not ready', async ({
+  page,
+}) => {
+  await openApp(page, { lang: 'en' });
+  await fixtures(page);
+  await page.evaluate(async () => {
+    const path = '/src/settings/index.ts';
+    const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+    setAgentSettings({ model: 'claude-code-reasoning', effort: undefined });
+  });
+  await missingCliProvider(page);
+  await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+  const setup = page.getByTestId('chat-setup');
+  await expect(setup).toHaveAttribute('data-step', 'effort');
+  await setup.getByRole('radio').last().check();
+  await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  // The agent's head (here the welcome), then the line that sums the agent up, then the images:
+  // in that order, and the images' own words only under their question.
+  await expect(setup).toHaveAttribute('data-step', 'images');
+  await expect(setup.getByTestId('chat-setup-agent')).toBeVisible();
+  await expect(setup).not.toContainText('The image provider you chose isn’t ready');
+  await expect(setup.getByRole('radio', { name: 'Codex CLI', exact: true })).toBeChecked();
+  await page
+    .getByTestId('chat')
+    .screenshot({ path: 'test-results/chat-setup-images-after-agent.png' });
+  // Continue leads to what the provider needs, under the same head.
+  await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(setup.getByRole('button', { name: 'Approve and install' })).toBeVisible();
+  await expect(setup).not.toContainText('The image provider you chose isn’t ready');
+  await page
+    .getByTestId('chat')
+    .screenshot({ path: 'test-results/chat-setup-images-after-agent-install.png' });
+});
+
+test('a sign-in without a window is called off from the chat, as a terminal is closed', async ({
+  page,
+}) => {
+  await openApp(page, { lang: 'en' });
+  await fixtures(page);
+  await page.evaluate(async () => {
+    const path = '/src/settings/index.ts';
+    const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+    setAgentSettings({ model: 'claude-code-reasoning', effort: 'ultra' });
+    document.body.dataset.holdSignIn = 'codex-cli';
+  });
+  await missingCliProvider(page);
+  await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
+  const setup = page.getByTestId('chat-setup');
+  await setup.getByRole('button', { name: 'Approve and install' }).click();
+  const signIn = setup.getByRole('button', { name: 'Sign in', exact: true });
+  await signIn.click();
+  // Codex signs in in the browser, with no terminal to close: Cancel stands for it.
+  const cancel = setup.getByRole('button', { name: 'Cancel sign-in', exact: true });
+  await expect(cancel).toBeVisible();
+  await expect(signIn).toHaveCount(0);
+  await page
+    .getByTestId('chat')
+    .screenshot({ path: 'test-results/chat-setup-images-signing-in.png' });
+  await cancel.click();
+  await expect(page.locator('body')).toHaveAttribute('data-cancelled-sign-in', 'codex-cli');
+  // As it was before, with nothing said about a failure: Sign in again.
+  await expect(signIn).toBeVisible();
+  await expect(cancel).toHaveCount(0);
+  await expect(setup.getByRole('alert')).toHaveCount(0);
+});
+
+test('a provider chosen whose CLI is not installed can be put off from its setup', async ({
+  page,
+}) => {
+  await openApp(page, { lang: 'en' });
+  await fixtures(page);
+  await page.evaluate(async () => {
+    const path = '/src/settings/index.ts';
+    const { setAgentSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+    setAgentSettings({ model: 'claude-code-reasoning', effort: 'ultra' });
+  });
+  await missingCliProvider(page);
+  const ai = page.getByTestId('activity-bar').locator('[data-panel="ai"]');
+  await ai.click();
+  const setup = page.getByTestId('chat-setup');
+  await expect(setup.getByRole('button', { name: 'Approve and install' })).toBeVisible();
+  // Back leads to the list, the provider chosen marked.
+  await setup.getByRole('button', { name: 'Back', exact: true }).click();
+  await expect(setup.getByRole('radio', { name: 'Codex CLI', exact: true })).toBeChecked();
+  await setup.getByRole('button', { name: 'Continue', exact: true }).click();
+  await setup.getByRole('button', { name: 'Not now', exact: true }).click();
+  await expect(setup).toHaveCount(0);
+  await expect(page.getByTestId('chat-input')).toBeVisible();
+  // Put off in this window: the chat opened again does not ask.
+  await page.getByTestId('activity-bar').locator('[data-panel="elements"]').click();
+  await ai.click();
+  await expect(page.getByTestId('chat-input')).toBeVisible();
   await expect(setup).toHaveCount(0);
 });
 

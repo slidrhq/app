@@ -11,7 +11,9 @@ import {
   harnessName,
   installedByOrganization,
   installDescription,
+  signsInWithoutWindow,
 } from '../agent/harnessLook';
+import { imagesOf } from '../images/appImages';
 import type { ImageProviderDescriptor } from '../images/images';
 import { useImageProviders } from '../images/ImageSettings';
 import {
@@ -24,7 +26,8 @@ import {
 } from '../settings';
 import { defaultAgent, defaultImageProvider } from '../settings/systemSettings';
 import { useEditor } from '../shell';
-import { finishImageSetup, putOffImageSetup } from './imageSetup';
+import { chosenProviderMissing, finishImageSetup, putOffImageSetup } from './imageSetup';
+import { CancelSignIn } from './CancelSignIn';
 import { agentOf, aiOf } from './runtime';
 
 /**
@@ -73,15 +76,33 @@ export function useChatSetup(problem?: ChatProblem) {
           !!selectionIssue(connection.harness, settings.model, settings.effort))));
   const agentNeeded = !mock && (missingChoices || reselecting || repair);
   // Who makes the images is the last step (ADR-140). It follows the agent's whenever the agent
-  // was set up here, and is asked on its own while no provider is chosen (unless put off), and
-  // when a job of the agent met a provider that could not run. The scripted agent asks nothing.
+  // was set up here, and is asked on its own while no provider is chosen, or while the one chosen
+  // runs on an agent's CLI that is not installed or not signed in (unless put off), and when a
+  // job of the agent met a provider that could not run. The scripted agent asks nothing.
+  const imageClient = imagesOf(editor).client;
   const imageChoice = useSection('images').defaultProvider;
   const imagesChosen = typeof imageChoice === 'string' || !!defaultImageProvider();
   const imageTrouble = useStore(imageSetup, (state) => state.trouble);
   const imagesLater = useStore(imageSetup, (state) => state.later);
+  const imagesMissing = useStore(imageSetup, (state) => state.missing);
+  // The provider chosen is asked whether it can run, as the media panel asks it, whenever the
+  // chat opens and whenever another is chosen; what it said is kept for the window.
+  useEffect(() => {
+    if (mock) return;
+    let current = true;
+    chosenProviderMissing(imageClient).then(
+      (missing) => current && imageSetup.setState({ missing }),
+      () => undefined,
+    );
+    return () => {
+      current = false;
+    };
+  }, [imageClient, imageSetup, mock, imageChoice]);
   const [afterAgent, setAfterAgent] = useState(false);
   const asked =
-    !mock && !agentNeeded && (afterAgent || imageTrouble || (!imagesChosen && !imagesLater));
+    !mock &&
+    !agentNeeded &&
+    (afterAgent || imageTrouble || (!imagesLater && (!imagesChosen || imagesMissing)));
   // Once asked, the step stays until it is finished or put off: a provider is chosen as it is
   // clicked, and one that still needs a key or a sign-in is chosen but not ready.
   const [imagesOpen, setImagesOpen] = useState(false);
@@ -130,6 +151,8 @@ export function useChatSetup(problem?: ChatProblem) {
     images,
     /** A job of the agent met an image provider that could not run. */
     imageTrouble,
+    /** The provider chosen runs on an agent's CLI that is not installed or not signed in. */
+    imagesMissing,
     /** The agent was set up here, so the image step follows it. */
     afterAgent,
     failed,
@@ -247,9 +270,13 @@ export function ChatSetup({
       : undefined;
   const actions = (!showForm && back) || canRetry || action;
   if (step === 'images') {
-    // The same head as the agent's steps: the welcome goes on only from them; asked on its own,
-    // it finishes a setup, and says why when a job of the agent could not make its images.
+    // After the agent's steps, the head stays theirs, the welcome or the finish, and says nothing
+    // of the images: the line that sums up the agent comes under it, and the images after that.
+    // Asked on its own, it is the images' own, with their mark, so a provider named as an agent
+    // is (Codex) is not taken for the agent; and it says why when the provider chosen is not
+    // ready, or a job of the agent could not make its images.
     const greeting = welcome && setup.afterAgent;
+    const alone = !setup.afterAgent;
     const effort =
       settings.effort && efforts.includes(settings.effort)
         ? t(`picker.efforts.${settings.effort}`, { defaultValue: settings.effort })
@@ -257,13 +284,16 @@ export function ChatSetup({
     return (
       <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup" data-step={step}>
         <SetupHead
-          title={greeting ? 'setup.welcome' : 'setup.finish'}
+          icon={alone ? ImageIcon : Ai}
+          title={greeting ? 'setup.welcome' : alone ? 'setup.imagesFinish' : 'setup.finish'}
           intro={
             greeting
               ? 'setup.intro'
-              : setup.imageTrouble
+              : alone && setup.imageTrouble
                 ? 'setup.imagesTrouble'
-                : 'setup.finishIntro'
+                : alone && setup.imagesMissing
+                  ? 'setup.imagesMissing'
+                  : 'setup.finishIntro'
           }
         />
         {/* In place of the agent's steps, once they were answered here: their answers in a line. */}
@@ -366,6 +396,11 @@ export function ChatSetup({
           {descriptor && ofAgent && (
             <>
               {state?.busy && <p>{t(`setup.${state.busy}`)}</p>}
+              {state?.busy === 'signingIn' && signsInWithoutWindow(descriptor.id) && (
+                <div className="flex justify-end gap-2">
+                  <CancelSignIn harness={descriptor.id} />
+                </div>
+              )}
               {action === 'install' && (
                 <p>
                   {t(`setup.${installDescription(descriptor.id)}`, {
@@ -406,12 +441,21 @@ export function ChatSetup({
 }
 
 /** The welcome or the finish, the same over the agent's steps and the images. */
-function SetupHead({ title, intro }: { title: string; intro: string }) {
+function SetupHead({
+  icon = Ai,
+  title,
+  intro,
+}: {
+  /** The agent's mark, or the images' when they are asked for on their own. */
+  icon?: typeof Ai;
+  title: string;
+  intro: string;
+}) {
   const { t } = useTranslation('ai');
   return (
     <div className="flex flex-col items-start gap-3">
       <span className="flex size-10 items-center justify-center rounded-control bg-ui-accent-soft text-ui-accent-fg">
-        <Icon icon={Ai} />
+        <Icon icon={icon} />
       </span>
       <div className="text-sm leading-6">
         <p className="font-semibold text-ui-fg">{t(title)}</p>
@@ -519,8 +563,10 @@ function AgentSummary({
  * Who makes the images (ADR-140), asked as the agent's steps ask: one list of the providers, a
  * row each with its mark, and Continue. Continue chooses the provider marked, as in Settings; one
  * that is ready ends the setup, and one that is not leads, as an agent does, to what it needs:
- * its CLI installed or signed in, or its key. The setup ends once it is ready. Not now leaves it,
- * and the chat asks again when a job of the agent needs it. Its quality stays in Settings.
+ * its CLI installed or signed in, or its key. The setup ends once it is ready. Asked on its own
+ * because the provider chosen lacks its CLI or its sign-in, it opens at what that provider needs,
+ * as the agent's setup does. Not now leaves it, and the chat asks again when a job of the agent
+ * needs it. Its quality stays in Settings.
  */
 function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; back: ReactNode }) {
   const { t } = useTranslation('ai');
@@ -531,8 +577,9 @@ function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; ba
   // The row marked: the provider chosen before, until another is clicked.
   const [choice, setChoice] = useState<string>();
   const value = choice ?? images.chosen ?? '';
-  // Continue chose a provider that still needs something before it can make images.
-  const [settingUp, setSettingUp] = useState(false);
+  // Continue chose a provider that still needs something before it can make images, or the one
+  // chosen before was found to need it.
+  const [settingUp, setSettingUp] = useState(() => setup.imagesMissing && !setup.afterAgent);
   const state = selected ? images.stateOf(selected) : 'not_chosen';
   const { finishImages } = setup;
   // As the agent's steps go on once it is set up, the setup ends once its provider is ready.
@@ -544,7 +591,9 @@ function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; ba
     const busy = images.busyOf(selected);
     const action = images.actionOf(selected);
     const setupError = images.setupErrorOf(selected);
-    const name = harnessName({ id: selected.harness ?? selected.id, name: selected.name });
+    // The provider's own name, as its row in the list has it: not the agent's, which may be the
+    // same CLI under a shorter name.
+    const name = selected.name;
     const detail =
       state === 'unavailable' || state === 'key_rejected'
         ? (images.statuses[selected.id]?.detail ?? ti(`state.${state}`))
@@ -553,6 +602,11 @@ function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; ba
       <div className="flex flex-col gap-4 text-sm" data-testid="chat-setup-images">
         <div className="flex flex-col gap-4" aria-live="polite">
           {busy && <p>{t(`setup.${busy}`)}</p>}
+          {busy === 'signingIn' && signsInWithoutWindow(selected.harness) && (
+            <div className="flex justify-end gap-2">
+              <CancelSignIn harness={selected.harness} />
+            </div>
+          )}
           {action === 'install' && (
             <p>{t(`setup.${installDescription(selected.harness)}`, { name })}</p>
           )}
@@ -577,6 +631,10 @@ function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; ba
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setSettingUp(false)}>
               {t('setup.back')}
+            </Button>
+            {/* The step may have come without being asked for: it can be put off from here too. */}
+            <Button variant="ghost" onClick={setup.putOffImages}>
+              {t('setup.notNow')}
             </Button>
             {state === 'unavailable' && (
               <Button variant="ghost" onClick={images.recheck}>

@@ -27,6 +27,8 @@ export class HarnessSetup {
   readonly store: StoreApi<Record<string, ConnectionState>>;
   #pending = new Map<string, Promise<HarnessConnection>>();
   #actions = new Map<string, Promise<void>>();
+  /** The harnesses whose sign-in the user called off while it ran. */
+  #cancelled = new Set<string>();
   /** The harnesses whose connection came from the cache and was not checked in this run. */
   #unchecked: Set<string>;
 
@@ -94,8 +96,19 @@ export class HarnessSetup {
     }
   }
 
+  /**
+   * Calls off the sign-in of `id` while it runs, one that runs without a window: the harness is
+   * left as it was before, with nothing to say about it, as when a terminal is closed.
+   */
+  async cancelLogin(id: string): Promise<void> {
+    if (this.store.getState()[id]?.busy !== 'signingIn' || !this.client.cancelLogin) return;
+    this.#cancelled.add(id);
+    await this.client.cancelLogin(id);
+  }
+
   async #run(id: string, action: 'install' | 'login'): Promise<void> {
     const before = this.store.getState()[id];
+    this.#cancelled.delete(id);
     this.#set(id, {
       ...before,
       error: undefined,
@@ -107,7 +120,13 @@ export class HarnessSetup {
       await operation(id);
       await this.#connect(id, true);
     } catch (error) {
-      this.#set(id, { ...before, error: error instanceof Error ? error.message : String(error) });
+      const message = error instanceof Error ? error.message : String(error);
+      this.#set(
+        id,
+        this.#cancelled.has(id) ? { ...before, error: undefined } : { ...before, error: message },
+      );
+    } finally {
+      this.#cancelled.delete(id);
     }
   }
 

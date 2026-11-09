@@ -71,8 +71,9 @@ import { MarkdownView } from './MarkdownView';
 import { he } from './messages';
 import { ModelPicker } from './ModelPicker';
 import { ChatSetup, useChatSetup } from './ChatSetup';
-import { harnessName, installDescription } from '../agent/harnessLook';
+import { harnessName, installDescription, signsInWithoutWindow } from '../agent/harnessLook';
 import { OutlineAnswer, OutlineCard } from './Outline';
+import { CancelSignIn } from './CancelSignIn';
 import { aiOf, navigateTo, setFollow, useAiPreferences } from './runtime';
 import { DECK } from './sessions';
 import { activityLabel, targetSlideNumber, toolIcon, toolLabel } from './toolLabels';
@@ -427,6 +428,11 @@ function ProblemCard({
             <Spinner />
             {t(`setup.${busy}`)}
           </p>
+        )}
+        {descriptor && busy === 'signingIn' && signsInWithoutWindow(descriptor.id) && (
+          <div className="flex pt-1.5">
+            <CancelSignIn harness={descriptor.id} size="sm" />
+          </div>
         )}
         {descriptor && setup && !busy && !fixed && !setup.choosingHarness && (
           <div className="flex flex-wrap gap-1.5 pt-1.5">

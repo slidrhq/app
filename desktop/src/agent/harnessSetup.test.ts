@@ -92,6 +92,34 @@ describe('harness setup', () => {
     expect(connect).toHaveBeenCalledTimes(3);
   });
 
+  it('calls off a sign-in while it runs, and leaves the harness as it was, with no error', async () => {
+    const { client } = createScriptedAgent({});
+    const signedOut = { harness, status: { ...ready, state: 'not_logged_in' as const } };
+    client.connect = vi.fn(() => Promise.resolve(signedOut));
+    let fail: (error: Error) => void = () => undefined;
+    client.login = vi.fn(() => new Promise<void>((_, reject) => (fail = reject)));
+    // The CLI answers the call-off by ending its sign-in, which the app hears as a failure.
+    const cancelLogin = (client.cancelLogin = vi.fn(() => {
+      fail(new Error('Sign-in was cancelled.'));
+      return Promise.resolve();
+    }));
+    const setup = new HarnessSetup(client, () => Promise.resolve(harness));
+    await setup.connect(harness.id);
+    // Nothing to call off before it runs.
+    await setup.cancelLogin(harness.id);
+    expect(cancelLogin).not.toHaveBeenCalled();
+    const signingIn = setup.run(harness.id, 'login');
+    expect(setup.store.getState()[harness.id]?.busy).toBe('signingIn');
+    await setup.cancelLogin(harness.id);
+    await signingIn;
+    expect(cancelLogin).toHaveBeenCalledWith(harness.id);
+    expect(setup.store.getState()[harness.id]).toEqual({ connection: signedOut });
+    // A sign-in that fails on its own still says why.
+    client.login = vi.fn(() => Promise.reject(new Error('no account')));
+    await setup.run(harness.id, 'login');
+    expect(setup.store.getState()[harness.id]?.error).toBe('no account');
+  });
+
   it('surfaces errors and permits retry without installing anything', async () => {
     const { client } = createScriptedAgent({});
     client.connect = vi

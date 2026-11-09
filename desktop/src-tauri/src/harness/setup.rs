@@ -1,10 +1,20 @@
 //! Connection and setup use the CLIs' own metadata protocols, without submitting a prompt.
-use std::{collections::BTreeMap, path::PathBuf, process::Stdio, time::Duration};
+use std::{
+    collections::{BTreeMap, HashMap},
+    path::PathBuf,
+    process::Stdio,
+    sync::{
+        LazyLock, Mutex, PoisonError,
+        atomic::{AtomicU64, Ordering},
+    },
+    time::Duration,
+};
 
 use serde_json::{Value, json};
 use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
     process::{Child, ChildStdin, ChildStdout, Command},
+    sync::oneshot,
     time::timeout,
 };
 
@@ -694,12 +704,22 @@ async fn run_installer(cmd: &mut Command) -> Result<()> {
     Ok(())
 }
 
-/// The user's Sign in action opens a visible terminal for interactive browser/device login.
+/// The user's Sign in action. A CLI that signs in in the browser alone runs without a window;
+/// the others open a visible terminal for their interactive browser or device login.
 pub async fn login(id: &str) -> Result<()> {
     let launch = program(id)?;
+    // Codex and Claude Code open the sign-in page themselves and wait on a local server for its
+    // answer: nothing in a terminal is the user's to read or type, and a console window over the
+    // app was only in the way. (Claude Code's prompt to paste a code is for a browser that cannot
+    // reach that server; on the user's own computer it can.) The app's own Cancel stands for
+    // closing the window (`cancel_login`).
+    match id {
+        "codex-cli" => return browser_login(id, &launch, &["login"]).await,
+        "claude-code" => return browser_login(id, &launch, &["auth", "login"]).await,
+        _ => {}
+    }
     let args = match id {
-        "claude-code" => "auth login",
-        "codex-cli" | "copilot-cli" | "grok-cli" => "login",
+        "copilot-cli" | "grok-cli" => "login",
         // Gemini CLI has no sign-in command: its interactive start offers the sign-in.
         "gemini-cli" => "",
         _ => return Err(AgentError::invalid_input("unknown login command")),
@@ -717,6 +737,106 @@ pub async fn login(id: &str) -> Result<()> {
         ""
     };
     terminal(id, &start, args, hint, &BTreeMap::new()).await
+}
+
+/// How long a sign-in may wait for the user.
+const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(600);
+
+/// The sign-ins that run without a window, by CLI: each with its turn number, so that one that
+/// ends takes only itself off the list, and the sender that calls it off.
+type SignIns = HashMap<String, (u64, oneshot::Sender<()>)>;
+static SIGN_INS: LazyLock<Mutex<SignIns>> = LazyLock::new(Default::default);
+static SIGN_IN_TURNS: AtomicU64 = AtomicU64::new(0);
+
+fn sign_ins() -> std::sync::MutexGuard<'static, SignIns> {
+    SIGN_INS.lock().unwrap_or_else(PoisonError::into_inner)
+}
+
+/// Calls off the sign-in of `id` that runs without a window, as closing its terminal would. One
+/// in a terminal is the user's to close there; with none running, nothing happens.
+pub fn cancel_login(id: &str) {
+    if let Some((_, cancel)) = sign_ins().remove(id) {
+        let _ = cancel.send(());
+    }
+}
+
+/// Runs the CLI's browser sign-in without a window, until it ends, is called off or times out.
+async fn browser_login(id: &str, launch: &Launch, args: &[&str]) -> Result<()> {
+    let mut command = cli(id, launch);
+    command
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let mut child = command
+        .spawn()
+        .map_err(|error| AgentError::io("start the sign-in", &error))?;
+    let turn = SIGN_IN_TURNS.fetch_add(1, Ordering::SeqCst);
+    let (cancel, cancelled) = oneshot::channel();
+    sign_ins().insert(id.to_owned(), (turn, cancel));
+    // Read as it runs, so a CLI that says much never waits on a full pipe.
+    let stdout = read_all(child.stdout.take());
+    let stderr = read_all(child.stderr.take());
+    let ended = tokio::select! {
+        status = child.wait() => Some(status),
+        _ = cancelled => None,
+        () = tokio::time::sleep(SIGN_IN_TIMEOUT) => {
+            let _ = child.kill().await;
+            sign_ins().retain(|_, (owner, _)| *owner != turn);
+            return Err(AgentError::new(
+                AgentErrorKind::ProcessExited,
+                "Sign-in timed out. Try again.",
+            ));
+        }
+    };
+    sign_ins().retain(|_, (owner, _)| *owner != turn);
+    let Some(status) = ended else {
+        let _ = child.kill().await;
+        return Err(AgentError::new(
+            AgentErrorKind::NotLoggedIn,
+            "Sign-in was cancelled.",
+        ));
+    };
+    let status = status.map_err(|error| AgentError::io("wait for the sign-in", &error))?;
+    if status.success() {
+        return Ok(());
+    }
+    // What the CLI said, for the line under the action: its errors, else its output.
+    let (stdout, stderr) = (
+        stdout.await.unwrap_or_default(),
+        stderr.await.unwrap_or_default(),
+    );
+    let said = if stderr.trim_ascii().is_empty() {
+        stdout
+    } else {
+        stderr
+    };
+    let said: String = String::from_utf8_lossy(&said)
+        .trim()
+        .chars()
+        .take(1000)
+        .collect();
+    Err(AgentError::new(
+        AgentErrorKind::NotLoggedIn,
+        if said.is_empty() {
+            "Sign-in failed. Try again.".to_owned()
+        } else {
+            format!("Sign-in failed. {said}")
+        },
+    ))
+}
+
+/// Everything `pipe` gives until it closes.
+fn read_all(
+    pipe: Option<impl AsyncReadExt + Unpin + Send + 'static>,
+) -> tokio::task::JoinHandle<Vec<u8>> {
+    tokio::spawn(async move {
+        let mut text = Vec::new();
+        if let Some(mut pipe) = pipe {
+            let _ = pipe.read_to_end(&mut text).await;
+        }
+        text
+    })
 }
 
 /// Opens a terminal on the sign-in of a CLI of the organization's own (ADR-117): `start`, the
@@ -853,6 +973,49 @@ mod tests {
         assert_eq!(models[2].label, "Grok Code Fast 1");
         assert_eq!(models[0].effort_levels, Some(Vec::new()));
         assert!(parse_grok_models("You are not authenticated.\n").is_empty());
+    }
+    /// A stand-in CLI: PowerShell running `script` as its sign-in.
+    #[cfg(windows)]
+    async fn sign_in_with(id: &str, script: &str) -> Result<()> {
+        let launch = Launch::new("powershell.exe".into());
+        browser_login(id, &launch, &["-NoProfile", "-Command", script]).await
+    }
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn a_browser_sign_in_ends_with_its_cli() {
+        sign_in_with("test-signs-in", "exit 0")
+            .await
+            .expect("a sign-in that exits with 0 succeeds");
+        let failed = sign_in_with(
+            "test-fails",
+            "[Console]::Error.WriteLine('no account'); exit 3",
+        )
+        .await
+        .expect_err("a sign-in that exits with an error fails");
+        assert_eq!(failed.kind, AgentErrorKind::NotLoggedIn);
+        assert!(failed.message.contains("no account"), "{}", failed.message);
+        // Each took itself off the list once it ended.
+        assert!(!sign_ins().contains_key("test-signs-in"));
+        assert!(!sign_ins().contains_key("test-fails"));
+    }
+    #[cfg(windows)]
+    #[tokio::test]
+    async fn a_browser_sign_in_is_called_off_from_the_app() {
+        let waiting = tokio::spawn(sign_in_with("test-waits", "Start-Sleep -Seconds 60"));
+        // Once it runs, the app calls it off, as closing a terminal would.
+        while !sign_ins().contains_key("test-waits") {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        cancel_login("test-waits");
+        let ended = timeout(Duration::from_secs(10), waiting)
+            .await
+            .expect("it ends at once, not when its CLI would")
+            .expect("the task ran");
+        let error = ended.expect_err("a sign-in called off is not signed in");
+        assert_eq!(error.message, "Sign-in was cancelled.");
+        assert!(!sign_ins().contains_key("test-waits"));
+        // Calling off one that is not running does nothing.
+        cancel_login("test-waits");
     }
     #[tokio::test]
     #[ignore = "reads the installed CLIs and account metadata; does not generate a response"]

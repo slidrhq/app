@@ -177,6 +177,8 @@ export interface AgentClient {
   connect?(harnessId: string): Promise<HarnessConnection>;
   install?(harnessId: string): Promise<void>;
   login?(harnessId: string): Promise<void>;
+  /** Calls off a sign-in that runs without a window; `login` then rejects. */
+  cancelLogin?(harnessId: string): Promise<void>;
   /**
    * Starts a session and returns its id. `thread` names the conversation, `<deckId>/<threadId>`
    * (letters, digits, `-`, `_`): the same thread gets the same folder, which resume needs.

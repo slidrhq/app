@@ -1,12 +1,14 @@
 /**
  * The image step of the chat's setup (ADR-140): who makes the images is chosen in the chat,
  * right after the agent. The chat asks when no provider is chosen, after the agent was set up in
- * it, and when an image job of the agent met a provider that could not run. This store holds what
- * the chat cannot read from the settings: that a job met such a provider, and that the user put
- * the step off. One per editing window, like the agent.
+ * it, when the provider chosen runs on an agent's CLI that is not installed or not signed in, and
+ * when an image job of the agent met a provider that could not run. This store holds what the
+ * chat cannot read from the settings: what the provider chosen said when it was last asked, that
+ * a job met such a provider, and that the user put the step off. One per editing window, like
+ * the agent.
  */
 import { createStore, type StoreApi } from 'zustand/vanilla';
-import { ImageError, type ImageErrorKind } from '../images/images';
+import { ImageError, type ImageClient, type ImageErrorKind } from '../images/images';
 import type { AgentImageService } from '../images/imageService';
 
 export interface ImageSetup {
@@ -14,6 +16,8 @@ export interface ImageSetup {
   trouble: boolean;
   /** The user put the step off ("Not now"): with no provider chosen, it waits for a job. */
   later: boolean;
+  /** The provider chosen runs on an agent's CLI that, when last asked, was missing or signed out. */
+  missing: boolean;
 }
 
 /** The failures that choosing a provider, or finishing its connection, puts right. */
@@ -26,7 +30,23 @@ const SETUP_KINDS: readonly ImageErrorKind[] = [
 ];
 
 export function createImageSetup(): StoreApi<ImageSetup> {
-  return createStore<ImageSetup>(() => ({ trouble: false, later: false }));
+  return createStore<ImageSetup>(() => ({ trouble: false, later: false, missing: false }));
+}
+
+/**
+ * Whether the provider chosen runs on an agent's CLI that is not installed, or not signed in:
+ * what the chat sets up as it sets up the agent's own. One with a key, or none chosen, is not
+ * asked; the step has its own reasons for those.
+ */
+export async function chosenProviderMissing(
+  client: Pick<ImageClient, 'defaultProvider' | 'providers' | 'probe'>,
+): Promise<boolean> {
+  const id = await client.defaultProvider();
+  if (id === null) return false;
+  const provider = (await client.providers()).find((item) => item.id === id);
+  if (!provider?.harness) return false;
+  const { state } = await client.probe(provider.id);
+  return state === 'not_installed' || state === 'not_logged_in';
 }
 
 /** Whether `error` is one the image step puts right. */
@@ -56,8 +76,8 @@ export function watchImageSetup(
 
 /** The step is done: a provider is chosen and ready. */
 export const finishImageSetup = (setup: StoreApi<ImageSetup>) =>
-  setup.setState({ trouble: false, later: false });
+  setup.setState({ trouble: false, later: false, missing: false });
 
 /** The step is put off until a job meets the provider again. */
 export const putOffImageSetup = (setup: StoreApi<ImageSetup>) =>
-  setup.setState({ trouble: false, later: true });
+  setup.setState({ trouble: false, later: true, missing: false });

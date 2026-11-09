@@ -4,9 +4,15 @@ import { RefreshCw, Terminal } from '@slidr/ui/icons';
 import { Button, cx, Field, Icon, Select, Skeleton, Switch } from '@slidr/ui';
 import { useStore } from 'zustand';
 import { availableChoice, latestModels, modelEfforts } from '../agent/harnessSetup';
-import { harnessLook, installDescription, installedByOrganization } from '../agent/harnessLook';
+import {
+  harnessLook,
+  installDescription,
+  installedByOrganization,
+  signsInWithoutWindow,
+} from '../agent/harnessLook';
 import type { HarnessDescriptor, HarnessState } from '../agent/agent';
 import { DEFAULT_OUTLINE } from '../agent/agentService';
+import { CancelSignIn } from '../ai/CancelSignIn';
 import { agentOf } from '../ai/runtime';
 import { useEditor } from '../shell';
 import { setAgentHarness, setAgentSettings, useAgentSettings } from './agentSettings';
@@ -188,6 +194,11 @@ export function AgentSection() {
             )}
           </div>
           {/* A ready harness is checked again on its own each time the section opens. */}
+          {busy === 'signingIn' && signsInWithoutWindow(selectedId) && (
+            <div className="flex flex-wrap items-center gap-2">
+              <CancelSignIn harness={selectedId} size="sm" />
+            </div>
+          )}
           {!busy && status?.state !== 'ready' && (
             <div className="flex flex-wrap items-center gap-2">
               {action === 'install' && (

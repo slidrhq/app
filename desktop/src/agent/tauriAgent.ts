@@ -46,6 +46,7 @@ export function tauriAgentFor(workspaceId: () => string | null): AgentClient {
     connect: (harnessId) => call<HarnessConnection>('agent_connect', { harnessId }),
     install: (harnessId) => call('agent_install', { harnessId }),
     login: (harnessId) => call('agent_login', { harnessId }),
+    cancelLogin: (harnessId) => call('agent_cancel_login', { harnessId }),
     // One channel per session: ordered, typed, and only this webview receives it.
     start: (harnessId, thread, config, onEvent) => {
       const id = workspaceId();

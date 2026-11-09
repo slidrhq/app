@@ -20,6 +20,12 @@ export interface HarnessLook {
    * else (ADR-130). `organization`: the organization installs it; the app does not.
    */
   installer: 'winget' | 'npm' | 'library' | 'organization';
+  /**
+   * `browser`: the CLI signs in in the browser alone, without a window of its own, and the app
+   * offers to call the sign-in off while it waits (`setup.rs`, `browser_login`). Without it, Sign
+   * in opens a terminal, which the user closes to call it off.
+   */
+  signIn?: 'browser';
 }
 
 /** The tints an agent of the organization's may take, each its classes, written out whole. */
@@ -39,12 +45,14 @@ const LOOKS: Record<string, HarnessLook> = {
     glyph: '✳',
     tone: 'bg-ui-tool-orange text-ui-tool-orange-fg',
     installer: 'winget',
+    signIn: 'browser',
   },
   'codex-cli': {
     name: 'Codex',
     glyph: '>_',
     tone: 'bg-ui-tool-green text-ui-tool-green-fg',
     installer: 'winget',
+    signIn: 'browser',
   },
   'copilot-cli': {
     name: 'GitHub Copilot',
@@ -93,6 +101,11 @@ export function harnessName(harness: { id: string; name: string }): string {
 /** Whether the CLI of a harness is installed with npm rather than Windows App Installer alone. */
 export function installsWithNpm(id: string | undefined): boolean {
   return !!id && harnessLook(id)?.installer === 'npm';
+}
+
+/** Whether the CLI of a harness signs in without a window, so the app offers to call it off. */
+export function signsInWithoutWindow(id: string | undefined): boolean {
+  return !!id && harnessLook(id)?.signIn === 'browser';
 }
 
 /** Whether the organization installs the CLI of a harness, and the app offers no installation. */

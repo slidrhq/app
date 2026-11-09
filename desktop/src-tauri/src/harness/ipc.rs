@@ -55,6 +55,12 @@ pub async fn agent_login(manager: Manager<'_>, harness_id: String) -> Result<()>
     manager.login(&harness_id).await
 }
 
+/// Calls off a sign-in that runs without a window; `agent_login` then answers that it was.
+#[tauri::command]
+pub fn agent_cancel_login(harness_id: String) {
+    super::setup::cancel_login(&harness_id);
+}
+
 /// `agent_start({ harnessId, thread, workspaceId?, config, onEvent })`: restores this chat's
 /// attachments from the open document and starts a session; returns its id.
 #[tauri::command]
