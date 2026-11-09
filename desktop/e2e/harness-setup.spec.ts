@@ -130,14 +130,14 @@ async function fixtures(page: Page, models?: ModelOption[]) {
 }
 
 /**
- * The last step of a setup in the chat: who makes the images (ADR-140). The page starts with its
- * stand-in provider chosen, so the step shows it marked and ready, and Continue ends the setup.
+ * Who makes the images, set up apart from the agent's steps (ADR-140). The page starts with its
+ * stand-in provider chosen, so the list shows it marked and ready, and Continue ends the setup.
  */
 async function finishImages(setup: Locator) {
   await expect(setup).toHaveAttribute('data-step', 'images');
-  await expect(setup.locator('[aria-current="step"]')).toContainText(/Images|תמונות/);
-  await expect(setup.locator('[data-provider="mock"]')).toHaveAttribute('aria-checked', 'true');
-  await expect(setup.locator('[data-provider="mock"]')).toHaveAttribute('data-state', 'ready');
+  // Not a step of the agent's: none of their steps is shown.
+  await expect(setup.locator('[aria-current="step"]')).toHaveCount(0);
+  await expect(setup.getByRole('radio', { name: 'Mock images', exact: true })).toBeChecked();
   await setup.getByRole('button', { name: /^(Continue|המשך)$/ }).click();
 }
 
@@ -795,9 +795,11 @@ for (const lang of ['he', 'en'] as const) {
     await page.screenshot({ path: `test-results/chat-setup-effort-${lang}.png` });
     await setup.getByRole('radio').last().check();
     await next();
-    // Who makes the images comes last, in the welcome the setup began with.
+    // Who makes the images comes next, under the same welcome: the agent's three answers in one
+    // line in place of its steps.
     await expect(setup).toHaveAttribute('data-step', 'images');
     await expect(setup).toContainText(lang === 'he' ? 'ברוכים הבאים' : 'Welcome');
+    await expect(setup.getByTestId('chat-setup-agent')).toContainText('Codex · Reasoning model · ');
     await expect(setup).toContainText(
       lang === 'he' ? 'מי ייצור את התמונות?' : 'Who should make the images?',
     );
@@ -846,26 +848,35 @@ for (const lang of ['he', 'en'] as const) {
     await forgetImageProvider(page);
     await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
     const setup = page.getByTestId('chat-setup');
-    // Asked on its own: it finishes a setup, and nothing is chosen for the user.
+    // Asked on its own: it finishes a setup, with no line about the agent, and nothing is chosen
+    // for the user.
     await expect(setup).toHaveAttribute('data-step', 'images');
     await expect(setup).toContainText(
       lang === 'he' ? 'בואו נשלים את ההגדרות' : 'Let’s finish setting up',
     );
-    await expect(setup.locator('[data-provider][aria-checked="true"]')).toHaveCount(0);
+    await expect(setup.getByTestId('chat-setup-agent')).toHaveCount(0);
+    await expect(setup.getByRole('radio', { checked: true })).toHaveCount(0);
     const go = setup.getByRole('button', { name: /^(Continue|המשך)$/ });
     await expect(go).toBeDisabled();
     await expect(page.getByTestId('chat-input')).toHaveCount(0);
     await page.screenshot({ path: `test-results/chat-setup-images-none-${lang}.png` });
-    // A provider that needs a key is not ready without it.
-    await setup.locator('[data-provider="mock-api"]').click();
-    await expect(setup.locator('[data-provider="mock-api"]')).toHaveAttribute(
-      'data-state',
-      'needs_key',
-    );
-    await expect(go).toBeDisabled();
-    await setup.locator('[data-provider="mock"]').click();
-    await expect(go).toBeEnabled();
+    // The list says nothing of what a provider needs, as the agents' does not: Continue leads to
+    // it, here the key, without the list and without the line about where keys are kept.
+    await expect(setup).not.toContainText(lang === 'he' ? 'דרוש מפתח' : 'Needs a key');
+    const api = setup.getByRole('radio', { name: 'Mock API', exact: true });
+    await api.check();
     await go.click();
+    const key = setup.getByTestId('key-openai-api');
+    await expect(key).toBeVisible();
+    await expect(setup.getByRole('radio')).toHaveCount(0);
+    await page.screenshot({ path: `test-results/chat-setup-images-key-${lang}.png` });
+    // Back returns to the list with the provider still marked.
+    await setup.getByRole('button', { name: /^(Back|חזרה)$/ }).click();
+    await expect(api).toBeChecked();
+    await go.click();
+    // The setup ends once the provider is ready: here as soon as its key is saved.
+    await key.locator('input').fill('sk-test-e2e-0123456789abcdefghij');
+    await key.getByRole('button', { name: /^(Save|שמירה)$/ }).click();
     await expect(setup).toHaveCount(0);
     await expect(page.getByTestId('chat-input')).toBeVisible();
     // The choice is the app's, as if made in Settings.
@@ -874,7 +885,7 @@ for (const lang of ['he', 'en'] as const) {
       const { pageSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
       return (await pageSettings.read()).images;
     });
-    expect(stored).toEqual({ defaultProvider: 'mock' });
+    expect(stored).toEqual({ defaultProvider: 'mock-api' });
   });
 }
 
@@ -904,7 +915,7 @@ test('Not now puts the image step off, and a job that needs a provider asks agai
   await imageTrouble(page);
   await expect(setup).toHaveAttribute('data-step', 'images');
   await expect(setup).toContainText('The image provider couldn’t make an image.');
-  await setup.locator('[data-provider="mock"]').click();
+  await setup.getByRole('radio', { name: 'Mock images', exact: true }).check();
   await setup.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(setup).toHaveCount(0);
 });

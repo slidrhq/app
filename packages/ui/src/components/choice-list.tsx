@@ -23,6 +23,8 @@ export interface ChoiceListProps<T extends string> {
   /** Names the list for screen readers: this, or the id of what names it. */
   'aria-label'?: string;
   'aria-labelledby'?: string;
+  /** The id of a line that says more about the question. */
+  'aria-describedby'?: string;
   /** The way the rows read, where it is not the page's: names of products read left to right. */
   dir?: 'ltr' | 'rtl';
   className?: string;

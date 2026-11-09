@@ -67,41 +67,22 @@ const stateTone: Record<ProviderStateLabel, StatusTone> = {
   unavailable: 'danger',
 };
 
-/** What the provider chosen can do now, for a screen that goes on once it is ready. */
-export interface ChosenProviderState {
-  /** Null while none is chosen. */
-  chosen: string | null;
-  state: ProviderStateLabel;
-}
-
 /**
- * The image providers in the settings screen (GEN-01, GEN-03): which one makes the images, the
- * key of one that needs a key, and the quality of one that takes it. The choice is what
- * `image_generate` uses when a job names no provider, the agent's jobs included. Until the user
- * (or the organization) chooses, none is marked (ADR-140). The chat's setup shows the same list
- * as its last step.
+ * The image providers, which one is chosen and what each can do now, and how to choose one and
+ * set up the CLI of one that runs on an agent's. Settings -> Media and the chat's image step
+ * (ADR-140) show the same state.
  */
-export function ImageSettings({
-  hint = true,
-  onState,
-}: {
-  /** The line that says what the choice is for. The chat's step asks its own question. */
-  hint?: boolean;
-  /** Told what the provider chosen can do, whenever that changes. */
-  onState?: (state: ChosenProviderState) => void;
-} = {}) {
+export function useImageProviders() {
   const { t } = useTranslation('images');
   const { client } = imagesOf(useEditor());
   const keys = useSettings((state) => state.keys);
   const revision = useSettings((state) => state.revision);
-  const quality = useSection('images').quality;
   const [providers, setProviders] = useState<ImageProviderDescriptor[] | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Record<string, ImageProviderStatus>>({});
   const [error, setError] = useState<string | null>(null);
   const agent = agentOf(useEditor());
   const setups = useStore(agent.setup.store);
-  const [confirmInstall, setConfirmInstall] = useState<ImageProviderDescriptor>();
   // What went wrong in the last install or sign-in of a provider's CLI, by provider.
   const [setupErrors, setSetupErrors] = useState<Record<string, string | undefined>>({});
   const [probes, setProbes] = useState(0);
@@ -136,6 +117,27 @@ export function ImageSettings({
     };
   }, [client, providers, revision, probes]);
 
+  /** The provider's state, read with whether its key is stored. */
+  const stateOf = (provider: ImageProviderDescriptor) =>
+    providerStateLabel(
+      provider,
+      statuses[provider.id],
+      provider.key ? !!keys[provider.key] : false,
+    );
+
+  /** The install or sign-in of the provider's CLI, while it runs. */
+  const busyOf = (provider: ImageProviderDescriptor) => {
+    const setup = provider.harness ? setups[provider.harness] : undefined;
+    return setup?.busy === 'installing' || setup?.busy === 'signingIn' ? setup.busy : undefined;
+  };
+
+  /** What the app can do for the provider: install its CLI, or sign it in. */
+  const actionOf = (provider: ImageProviderDescriptor): 'install' | 'login' | undefined => {
+    if (!provider.harness || busyOf(provider)) return undefined;
+    const label = stateOf(provider);
+    return label === 'not_installed' ? 'install' : label === 'not_logged_in' ? 'login' : undefined;
+  };
+
   // A provider that runs on an agent CLI is installed and signed in through that harness's setup,
   // the one the agent settings use; then it is asked again.
   const setUp = async (provider: ImageProviderDescriptor, action: 'install' | 'login') => {
@@ -148,16 +150,51 @@ export function ImageSettings({
     setProbes((count) => count + 1);
   };
 
+  /** Whether the provider is the one chosen now. */
   const choose = async (id: string) => {
-    if (id === chosen) return;
+    if (id === chosen) return true;
     const before = chosen;
     setChosen(id);
     setError(null);
-    if (await chooseDefaultProvider(client, id, refreshSettings)) return;
+    if (await chooseDefaultProvider(client, id, refreshSettings)) return true;
     // Only a choice the core did not take is taken back, and not over one made since.
     setChosen((now) => (now === id ? before : now));
     setError(t('settings.chooseFailed'));
+    return false;
   };
+
+  return {
+    providers,
+    chosen,
+    selected: providers?.find((provider) => provider.id === chosen),
+    statuses,
+    error,
+    /** What went wrong in the last install or sign-in of the provider's CLI, unless it runs now. */
+    setupErrorOf: (provider: ImageProviderDescriptor) =>
+      busyOf(provider) ? undefined : setupErrors[provider.id],
+    stateOf,
+    busyOf,
+    actionOf,
+    setUp,
+    choose,
+    /** Asks every provider again what it can do. */
+    recheck: () => setProbes((count) => count + 1),
+  };
+}
+
+/**
+ * The image providers in the settings screen (GEN-01, GEN-03): which one makes the images, the
+ * key of one that needs a key, and the quality of one that takes it. The choice is what
+ * `image_generate` uses when a job names no provider, the agent's jobs included. Until the user
+ * (or the organization) chooses, none is marked (ADR-140). The chat's setup asks the same
+ * question in a list of its own (`ChatSetup`).
+ */
+export function ImageSettings() {
+  const { t } = useTranslation('images');
+  const quality = useSection('images').quality;
+  const images = useImageProviders();
+  const { providers, chosen, statuses, error, selected } = images;
+  const [confirmInstall, setConfirmInstall] = useState<ImageProviderDescriptor>();
 
   if (!providers) {
     return error ? (
@@ -169,26 +206,9 @@ export function ImageSettings({
     );
   }
 
-  const selected = providers.find((provider) => provider.id === chosen);
-
   return (
     <div className="flex flex-col gap-4">
-      {onState && (
-        <ReportState
-          onState={onState}
-          chosen={selected?.id ?? null}
-          state={
-            selected
-              ? providerStateLabel(
-                  selected,
-                  statuses[selected.id],
-                  selected.key ? keys[selected.key] : false,
-                )
-              : 'not_chosen'
-          }
-        />
-      )}
-      {hint && <p className="text-xs text-ui-fg-muted">{t('settings.hint')}</p>}
+      <p className="text-xs text-ui-fg-muted">{t('settings.hint')}</p>
       <SettingsGroup title={t('settings.providers')}>
         <div
           role="radiogroup"
@@ -198,22 +218,12 @@ export function ImageSettings({
         >
           {providers.map((provider) => {
             const active = provider.id === chosen;
-            const stored = provider.key ? keys[provider.key] : false;
             const status = statuses[provider.id];
-            const label = providerStateLabel(provider, status, stored);
-            const setup = provider.harness ? setups[provider.harness] : undefined;
-            const busy =
-              setup?.busy === 'installing' || setup?.busy === 'signingIn' ? setup.busy : undefined;
+            const label = images.stateOf(provider);
+            const busy = images.busyOf(provider);
             // The app can install the CLI of a provider that runs on one, and sign it in.
-            const action =
-              provider.harness && !busy
-                ? label === 'not_installed'
-                  ? 'install'
-                  : label === 'not_logged_in'
-                    ? 'login'
-                    : undefined
-                : undefined;
-            const setupError = busy ? undefined : setupErrors[provider.id];
+            const action = images.actionOf(provider);
+            const setupError = images.setupErrorOf(provider);
             return (
               <div
                 key={provider.id}
@@ -228,7 +238,7 @@ export function ImageSettings({
                   aria-checked={active}
                   data-provider={provider.id}
                   data-state={label}
-                  onClick={() => void choose(provider.id)}
+                  onClick={() => void images.choose(provider.id)}
                   className={cx(
                     'flex cursor-default items-start gap-3 px-3 py-3 text-start transition-colors focus-visible:-outline-offset-2',
                     !active && 'active:bg-ui-pressed',
@@ -302,7 +312,7 @@ export function ImageSettings({
                       onClick={() =>
                         action === 'install'
                           ? setConfirmInstall(provider)
-                          : void setUp(provider, 'login')
+                          : void images.setUp(provider, 'login')
                       }
                     >
                       {t(action === 'install' ? 'setup.install' : 'setup.signIn')}
@@ -323,7 +333,7 @@ export function ImageSettings({
         name={confirmInstall?.name}
         open={!!confirmInstall}
         onClose={() => setConfirmInstall(undefined)}
-        onApprove={() => confirmInstall && void setUp(confirmInstall, 'install')}
+        onApprove={() => confirmInstall && void images.setUp(confirmInstall, 'install')}
       />
       {selected?.key && (
         <SettingsGroup title={t('settings.forProvider', { name: selected.name })}>
@@ -349,14 +359,4 @@ export function ImageSettings({
       )}
     </div>
   );
-}
-
-/** Tells `onState` what the provider chosen can do, once for each change. */
-function ReportState({
-  onState,
-  chosen,
-  state,
-}: ChosenProviderState & { onState: (state: ChosenProviderState) => void }) {
-  useEffect(() => onState({ chosen, state }), [onState, chosen, state]);
-  return null;
 }

@@ -2,7 +2,7 @@
 import { useStore } from 'zustand';
 import { useTranslation } from 'react-i18next';
 import { Button, ChoiceList, Icon, Skeleton, cx } from '@slidr/ui';
-import { Ai, Terminal } from '@slidr/ui/icons';
+import { Ai, Check, Image as ImageIcon, KeyRound, Terminal } from '@slidr/ui/icons';
 import type { HarnessDescriptor } from '../agent/agent';
 import type { ChatProblem } from '../agent/transcript';
 import { latestModels, modelEfforts, selectionIssue } from '../agent/harnessSetup';
@@ -12,10 +12,12 @@ import {
   installedByOrganization,
   installDescription,
 } from '../agent/harnessLook';
-import { ImageSettings, type ChosenProviderState } from '../images/ImageSettings';
+import type { ImageProviderDescriptor } from '../images/images';
+import { useImageProviders } from '../images/ImageSettings';
 import {
   chooseHarness,
   chosenHarness,
+  KeyField,
   setAgentSettings,
   useAgentSettings,
   useSection,
@@ -25,9 +27,12 @@ import { useEditor } from '../shell';
 import { finishImageSetup, putOffImageSetup } from './imageSetup';
 import { agentOf, aiOf } from './runtime';
 
-/** The steps of the setup, in order: the agent's three, then who makes the images (ADR-140). */
-const STEPS = ['harness', 'model', 'effort', 'images'] as const;
-type Step = (typeof STEPS)[number];
+/**
+ * The agent's steps, in order. Who makes the images is set up apart from them (ADR-140): after
+ * them, under one line that sums up the agent chosen, or on its own.
+ */
+const STEPS = ['harness', 'model', 'effort'] as const;
+type Step = (typeof STEPS)[number] | 'images';
 
 export function useChatSetup(problem?: ChatProblem) {
   const editor = useEditor();
@@ -242,13 +247,16 @@ export function ChatSetup({
       : undefined;
   const actions = (!showForm && back) || canRetry || action;
   if (step === 'images') {
-    // The welcome goes on only from the agent's questions; asked on its own, the step finishes
-    // a setup, and says why when a job of the agent could not make its images.
+    // The same head as the agent's steps: the welcome goes on only from them; asked on its own,
+    // it finishes a setup, and says why when a job of the agent could not make its images.
     const greeting = welcome && setup.afterAgent;
+    const effort =
+      settings.effort && efforts.includes(settings.effort)
+        ? t(`picker.efforts.${settings.effort}`, { defaultValue: settings.effort })
+        : undefined;
     return (
       <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup" data-step={step}>
         <SetupHead
-          step={step}
           title={greeting ? 'setup.welcome' : 'setup.finish'}
           intro={
             greeting
@@ -258,6 +266,13 @@ export function ChatSetup({
                 : 'setup.finishIntro'
           }
         />
+        {/* In place of the agent's steps, once they were answered here: their answers in a line. */}
+        {setup.afterAgent && descriptor && (
+          <AgentSummary
+            harness={descriptor}
+            parts={[harnessName(descriptor), model?.label ?? settings.model, effort]}
+          />
+        )}
         <ImageStep
           setup={setup}
           back={
@@ -287,10 +302,10 @@ export function ChatSetup({
   return (
     <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup" data-step={step}>
       <SetupHead
-        step={step}
         title={welcome ? 'setup.welcome' : 'setup.finish'}
         intro={welcome ? 'setup.intro' : 'setup.finishIntro'}
       />
+      <Steps step={step} />
       {!harnesses && !failed && <Skeleton className="h-24 w-full" />}
       {listFailed && <p role="alert">{t('setup.unavailable')}</p>}
       {showForm && (
@@ -325,23 +340,7 @@ export function ChatSetup({
               options={options.map((option) => ({
                 value: option.id,
                 label: option.label,
-                ...(step === 'harness'
-                  ? {
-                      start: (
-                        <span
-                          className={cx(
-                            'flex size-6 shrink-0 items-center justify-center rounded-small font-mono text-2xs font-semibold',
-                            harnessLook(option.id)?.tone ??
-                              'bg-ui-tool-violet text-ui-tool-violet-fg',
-                          )}
-                        >
-                          {harnessLook(option.id)?.glyph ?? (
-                            <Icon icon={Terminal} className="size-3.5" />
-                          )}
-                        </span>
-                      ),
-                    }
-                  : {}),
+                ...(step === 'harness' ? { start: <HarnessMark id={option.id} /> } : {}),
               }))}
             />
           </fieldset>
@@ -406,71 +405,253 @@ export function ChatSetup({
   );
 }
 
-/** The welcome or the finish, and where the setup is among its steps. */
-function SetupHead({ step, title, intro }: { step: Step; title: string; intro: string }) {
+/** The welcome or the finish, the same over the agent's steps and the images. */
+function SetupHead({ title, intro }: { title: string; intro: string }) {
   const { t } = useTranslation('ai');
   return (
-    <>
-      <div className="flex flex-col items-start gap-3">
-        <span className="flex size-10 items-center justify-center rounded-control bg-ui-accent-soft text-ui-accent-fg">
-          <Icon icon={Ai} />
-        </span>
-        <div className="text-sm leading-6">
-          <p className="font-semibold text-ui-fg">{t(title)}</p>
-          <p className="mt-1 text-ui-fg-muted">{t(intro)}</p>
-        </div>
+    <div className="flex flex-col items-start gap-3">
+      <span className="flex size-10 items-center justify-center rounded-control bg-ui-accent-soft text-ui-accent-fg">
+        <Icon icon={Ai} />
+      </span>
+      <div className="text-sm leading-6">
+        <p className="font-semibold text-ui-fg">{t(title)}</p>
+        <p className="mt-1 text-ui-fg-muted">{t(intro)}</p>
       </div>
-      {/* Each step as wide as its name: four in equal parts cut the longer names short. */}
-      <ol aria-label={t('setup.steps')} className="flex items-center justify-between gap-2 text-xs">
-        {STEPS.map((item, index) => (
-          <li
-            key={item}
-            aria-current={item === step ? 'step' : undefined}
+    </div>
+  );
+}
+
+/** Where the setup of the agent is among its steps. */
+function Steps({ step }: { step: Step }) {
+  const { t } = useTranslation('ai');
+  return (
+    // Each step as wide as its name: in equal parts the longer names were cut short.
+    <ol aria-label={t('setup.steps')} className="flex items-center justify-between gap-2 text-xs">
+      {STEPS.map((item, index) => (
+        <li
+          key={item}
+          aria-current={item === step ? 'step' : undefined}
+          className={cx(
+            'flex min-w-0 items-center gap-1.5',
+            item === step ? 'font-medium text-ui-accent-fg' : 'text-ui-fg-muted',
+          )}
+        >
+          <span
             className={cx(
-              'flex min-w-0 items-center gap-1.5',
-              item === step ? 'font-medium text-ui-accent-fg' : 'text-ui-fg-muted',
+              'flex size-5 shrink-0 items-center justify-center rounded-full text-2xs',
+              item === step ? 'bg-ui-accent text-ui-on-accent' : 'bg-ui-field',
             )}
           >
-            <span
-              className={cx(
-                'flex size-5 shrink-0 items-center justify-center rounded-full text-2xs',
-                item === step ? 'bg-ui-accent text-ui-on-accent' : 'bg-ui-field',
-              )}
-            >
-              {index + 1}
-            </span>
-            <span className="truncate">{t(`setup.steps_${item}`)}</span>
-          </li>
-        ))}
-      </ol>
-    </>
+            {index + 1}
+          </span>
+          <span className="truncate">{t(`setup.steps_${item}`)}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** The mark of an agent, as in the list of the agents. */
+function HarnessMark({ id }: { id: string }) {
+  const look = harnessLook(id);
+  return (
+    <span
+      className={cx(
+        'flex size-6 shrink-0 items-center justify-center rounded-small font-mono text-2xs font-semibold',
+        look?.tone ?? 'bg-ui-tool-violet text-ui-tool-violet-fg',
+      )}
+    >
+      {look?.glyph ?? <Icon icon={Terminal} className="size-3.5" />}
+    </span>
   );
 }
 
 /**
- * Who makes the images (ADR-140): the providers of Settings -> Media, with their install, sign-in
- * and key. A provider is chosen as it is clicked, as in Settings; Continue waits until the one
- * chosen is ready. Not now leaves it, and the chat asks again when a job of the agent needs it.
+ * The mark of an image provider: its agent's, for one that runs on an agent's CLI; a key, for
+ * one that calls a service with the user's key; a picture, for any other.
+ */
+function ProviderMark({ provider }: { provider: ImageProviderDescriptor }) {
+  if (provider.harness) return <HarnessMark id={provider.harness} />;
+  return (
+    <span className="flex size-6 shrink-0 items-center justify-center rounded-small bg-ui-field text-ui-fg-muted">
+      <Icon icon={provider.key ? KeyRound : ImageIcon} className="size-3.5" />
+    </span>
+  );
+}
+
+/**
+ * The agent set up in the steps before, in one line, as its row was in their lists: its mark, and
+ * its name, model and effort, product names that read left to right.
+ */
+function AgentSummary({
+  harness,
+  parts,
+}: {
+  harness: HarnessDescriptor;
+  parts: (string | undefined)[];
+}) {
+  const { t } = useTranslation('ai');
+  return (
+    <div
+      dir="ltr"
+      className="flex min-h-10 items-center gap-2.5 rounded-control bg-ui-field px-2.5 py-1.5 text-sm text-ui-fg"
+      data-testid="chat-setup-agent"
+    >
+      <HarnessMark id={harness.id} />
+      {/* Wrapped, not cut short: a word of the page cut at its start reads as another word. */}
+      <p className="min-w-0 flex-1 break-words">
+        <span className="sr-only">{t('setup.agentChosen')} </span>
+        {parts
+          .filter((part): part is string => !!part)
+          .map((part, index) => (
+            <span key={index}>
+              {index > 0 && <span className="text-ui-fg-muted"> · </span>}
+              <bdi>{part}</bdi>
+            </span>
+          ))}
+      </p>
+      <Icon icon={Check} className="shrink-0 text-ui-success-fg" />
+    </div>
+  );
+}
+
+/**
+ * Who makes the images (ADR-140), asked as the agent's steps ask: one list of the providers, a
+ * row each with its mark, and Continue. Continue chooses the provider marked, as in Settings; one
+ * that is ready ends the setup, and one that is not leads, as an agent does, to what it needs:
+ * its CLI installed or signed in, or its key. The setup ends once it is ready. Not now leaves it,
+ * and the chat asks again when a job of the agent needs it. Its quality stays in Settings.
  */
 function ImageStep({ setup, back }: { setup: ReturnType<typeof useChatSetup>; back: ReactNode }) {
   const { t } = useTranslation('ai');
-  const [chosen, setChosen] = useState<ChosenProviderState>();
-  return (
-    <div className="flex flex-col gap-4" data-testid="chat-setup-images">
-      <div className="text-sm">
-        <p className="font-medium">{t('setup.images')}</p>
-        <p className="mt-1 text-xs text-ui-fg-muted">{t('setup.imagesHint')}</p>
+  const { t: ti } = useTranslation('images');
+  const formId = useId();
+  const images = useImageProviders();
+  const { providers, selected, error } = images;
+  // The row marked: the provider chosen before, until another is clicked.
+  const [choice, setChoice] = useState<string>();
+  const value = choice ?? images.chosen ?? '';
+  // Continue chose a provider that still needs something before it can make images.
+  const [settingUp, setSettingUp] = useState(false);
+  const state = selected ? images.stateOf(selected) : 'not_chosen';
+  const { finishImages } = setup;
+  // As the agent's steps go on once it is set up, the setup ends once its provider is ready.
+  useEffect(() => {
+    if (settingUp && state === 'ready') finishImages();
+  }, [settingUp, state, finishImages]);
+
+  if (settingUp && selected) {
+    const busy = images.busyOf(selected);
+    const action = images.actionOf(selected);
+    const setupError = images.setupErrorOf(selected);
+    const name = harnessName({ id: selected.harness ?? selected.id, name: selected.name });
+    const detail =
+      state === 'unavailable' || state === 'key_rejected'
+        ? (images.statuses[selected.id]?.detail ?? ti(`state.${state}`))
+        : undefined;
+    return (
+      <div className="flex flex-col gap-4 text-sm" data-testid="chat-setup-images">
+        <div className="flex flex-col gap-4" aria-live="polite">
+          {busy && <p>{t(`setup.${busy}`)}</p>}
+          {action === 'install' && (
+            <p>{t(`setup.${installDescription(selected.harness)}`, { name })}</p>
+          )}
+          {action === 'login' && <p>{t('setup.imagesSignIn', { name })}</p>}
+          {state === 'checking' && <p>{ti('state.checking')}</p>}
+          {detail && (
+            <p role="alert">
+              <bdi>{detail}</bdi>
+            </p>
+          )}
+          {setupError && (
+            <p role="alert" dir="auto" className="break-words text-ui-danger-fg">
+              {setupError}
+            </p>
+          )}
+        </div>
+        {selected.key && (state === 'needs_key' || state === 'key_rejected') && (
+          <KeyField name={selected.key} quiet />
+        )}
+        {/* One row, as under the agent's: Back first, the step's own action last. */}
+        {!busy && (
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setSettingUp(false)}>
+              {t('setup.back')}
+            </Button>
+            {state === 'unavailable' && (
+              <Button variant="ghost" onClick={images.recheck}>
+                {t('setup.retry')}
+              </Button>
+            )}
+            {action && (
+              <Button variant="primary" onClick={() => void images.setUp(selected, action)}>
+                {t(action === 'install' ? 'setup.install' : 'setup.signIn')}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
-      <ImageSettings hint={false} onState={setChosen} />
+    );
+  }
+
+  return (
+    <form
+      className="flex flex-col gap-4"
+      data-testid="chat-setup-images"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const provider = providers?.find((item) => item.id === value);
+        if (!provider) return;
+        void images.choose(provider.id).then((chosen) => {
+          if (!chosen) return;
+          if (images.stateOf(provider) === 'ready') finishImages();
+          else setSettingUp(true);
+        });
+      }}
+    >
+      <fieldset className="min-w-0">
+        <legend id={`${formId}-legend`} className="text-sm font-medium">
+          {t('setup.images')}
+        </legend>
+        <p id={`${formId}-hint`} className="mt-1 mb-2 text-xs text-ui-fg-muted">
+          {t('setup.imagesHint')}
+        </p>
+        {providers ? (
+          <ChoiceList
+            aria-labelledby={`${formId}-legend`}
+            aria-describedby={`${formId}-hint`}
+            // The providers are English names of products, as the agents are.
+            dir="ltr"
+            value={value}
+            onValueChange={setChoice}
+            options={providers.map((provider) => ({
+              value: provider.id,
+              label: provider.name,
+              start: <ProviderMark provider={provider} />,
+            }))}
+          />
+        ) : (
+          !error && <Skeleton className="h-24 w-full" />
+        )}
+      </fieldset>
+      {error && (
+        <p role="alert" className="text-sm text-ui-danger-fg">
+          {error}
+        </p>
+      )}
       <div className="flex justify-end gap-2">
         {back}
         <Button variant="ghost" onClick={setup.putOffImages}>
           {t('setup.notNow')}
         </Button>
-        <Button variant="primary" disabled={chosen?.state !== 'ready'} onClick={setup.finishImages}>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={!providers?.some((provider) => provider.id === value)}
+        >
           {t('setup.continue')}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }
