@@ -6,29 +6,31 @@ import {
   draft,
   draftColours,
   draftHeights,
+  input,
   LOGO,
   messages,
   openApp,
   say,
-  tab,
+  showChat,
   turnEnds,
   undoDepth,
 } from './aifinish-helpers';
 
 /*
- * A template made by the agent (WG7-T11a, THM-06), against the scripted mock: the form of the
- * deck tool gathers a description and a logo, the agent drafts, the chat shows the draft with
- * every layout drawn, and only saving puts it in the library, where a new deck opens on it.
+ * A template made by the agent (WG7-T11a, THM-06), against the scripted mock: the user asks for
+ * one in the chat, with a logo attached, the agent drafts, the chat shows the draft with every
+ * layout drawn, and only saving puts it in the library, where a new deck opens on it.
  */
 
-/** Sends the form of "Make a template with AI" with a description and the logo. */
-async function askForTemplate(page: Parameters<typeof tab>[0]) {
-  await tab(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  await page.getByTestId('template-description').fill('חם ונקי, לחברת קרמיקה קטנה');
-  await choose(page, () => page.getByTestId('template-logo').click(), LOGO.path);
-  await expect(page.locator('[data-testid="template-file"][data-use="logo"]')).toHaveCount(1);
-  await page.getByTestId('template-create').click();
+const TEMPLATE_REQUEST = 'הכן תבנית חמה ונקייה לחברת קרמיקה קטנה, עם הלוגו המצורף';
+
+/** Asks the chat for a template, with a description and the logo attached. */
+async function askForTemplate(page: Parameters<typeof showChat>[0], request = TEMPLATE_REQUEST) {
+  await showChat(page);
+  await input(page).fill(request);
+  await choose(page, () => page.getByTestId('chat-attach').click(), LOGO.path);
+  await expect(page.getByTestId('composer-files').getByTestId('attachment')).toHaveCount(1);
+  await input(page).press('Enter');
 }
 
 test('a template from a description and a logo is previewed, saved, and a new deck opens on it', async ({
@@ -39,9 +41,9 @@ test('a template from a description and a logo is previewed, saved, and a new de
   const before = await deck(page);
 
   await askForTemplate(page);
-  // The request is in the chat as the action it was, with the file that went with it.
+  // The request is in the chat, with the file that went with it.
   const sent = messages(page).first();
-  await expect(sent).toHaveAttribute('data-action', 'template.create');
+  await expect(sent).toContainText(TEMPLATE_REQUEST);
   await expect(sent.getByTestId('attachment')).toHaveAttribute('data-kind', 'image');
   await turnEnds(page, 1);
 
@@ -70,7 +72,7 @@ test('a template from a description and a logo is previewed, saved, and a new de
     page.getByTestId('template-library').locator('[data-template^="personal_"]'),
   ).toHaveCount(0);
   await page.getByTestId('activity-bar').locator('[data-panel="ai"]').click();
-  await tab(page, 'chat');
+  await showChat(page);
 
   // Saving, as the default for new decks.
   await draft(page).getByRole('checkbox', { name: 'לקבוע כברירת מחדל למצגות חדשות' }).click();
@@ -152,20 +154,11 @@ test('a draft is improved in the chat, and saved when the user asks for it in wo
   expect((await deck(page)).theme).toEqual(before.theme);
 });
 
-test('the draft can be closed, and the form asks for a source', async ({ page }) => {
+test('the draft can be closed', async ({ page }) => {
   await openApp(page, { script: 'template-create', lang: 'en' });
   const errors = collectErrors(page);
-  await tab(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  // Nothing to make a template from yet.
-  await expect(page.getByTestId('template-create')).toBeDisabled();
-  await expect(page.getByTestId('template-form')).toContainText('Give at least one source');
-  await page.getByTestId('template-url').fill('https://example.com');
-  await page.getByTestId('template-from-deck').click();
-  await expect(page.getByTestId('template-create')).toBeEnabled();
-  await page.getByTestId('template-create').click();
+  await askForTemplate(page, 'Make a warm, clean template for a small ceramics studio');
   await turnEnds(page, 1);
-  await expect(messages(page).first()).toContainText('Make a template with AI');
   await expect(draft(page)).toContainText('Template draft');
   // The three layouts the agent made, and the text layout every template offers.
   await expect(draft(page)).toContainText('4 layouts');

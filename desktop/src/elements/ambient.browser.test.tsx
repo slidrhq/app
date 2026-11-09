@@ -4,8 +4,11 @@ import { flushSync } from 'react-dom';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 import { motionElement, pieceMarkup } from './motion';
-import { motionPictures } from './motionPieces';
-import { MOTION_SHAPES, motionShapeElement } from './motionShapes';
+import { animationCatalog, motionPictures, motionShapes } from './motionPieces';
+import { motionShapeElement } from './motionShapes';
+
+// The animations and the animated shapes are the media library's (ADR-138).
+await animationCatalog.load();
 
 /*
  * ADR-128 in Edge: an animated shape moves on a slide by its motion, and an animation of
@@ -49,7 +52,7 @@ function lookAt(box: HTMLElement, ms: number): string {
 }
 
 describe('an animated shape drawn on a slide', () => {
-  it.each(MOTION_SHAPES.map((shape) => [shape.id, shape] as const))(
+  it.each(motionShapes().map((shape) => [shape.id, shape] as const))(
     '%s moves by its motion',
     (_id, shape) => {
       const deck = createDeck({ lang: 'en' });

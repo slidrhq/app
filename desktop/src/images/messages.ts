@@ -24,6 +24,7 @@ export const he = {
     auto: 'אוטומטית',
   },
   state: {
+    not_chosen: 'לא נבחר',
     checking: 'בודק…',
     ready: 'מוכן',
     not_installed: 'לא מותקן',
@@ -51,20 +52,6 @@ export const he = {
     signingIn: 'השלימו את ההתחברות בחלון שנפתח.',
     install: 'התקנה…',
     signIn: 'התחברות לחשבון',
-  },
-  mask: {
-    title: 'סימון האזור לשינוי',
-    description: 'צבעו על התמונה את החלק שה-AI רשאי לשנות. כל מה שלא נצבע יישאר בדיוק כמו שהוא.',
-    canvas: 'התמונה, לצביעת האזור',
-    tool: 'הכלי',
-    paint: 'צביעה',
-    erase: 'מחיקה',
-    brush: 'גודל המברשת',
-    clear: 'ניקוי',
-    empty: 'עוד לא נצבע אזור.',
-    done: 'אישור',
-    cancel: 'ביטול',
-    failed: 'הסימון לא נשמר',
   },
   // Upscaling (AIO-04): the button of row B, its choices, and what it says while it works.
   upscale: {
@@ -99,6 +86,7 @@ export const en: Messages<typeof he> = {
     auto: 'Automatic',
   },
   state: {
+    not_chosen: 'Not chosen',
     checking: 'Checking…',
     ready: 'Ready',
     not_installed: 'Not installed',
@@ -125,21 +113,6 @@ export const en: Messages<typeof he> = {
     signingIn: 'Complete sign-in in the window that opened.',
     install: 'Install…',
     signIn: 'Sign in',
-  },
-  mask: {
-    title: 'Mark the area to change',
-    description:
-      'Paint over the part of the image the AI may change. Whatever is not painted stays exactly as it is.',
-    canvas: 'The image, to paint the area on',
-    tool: 'Tool',
-    paint: 'Paint',
-    erase: 'Erase',
-    brush: 'Brush size',
-    clear: 'Clear',
-    empty: 'No area is painted yet.',
-    done: 'Done',
-    cancel: 'Cancel',
-    failed: 'The mark was not saved',
   },
   upscale: {
     title: 'Upscale',

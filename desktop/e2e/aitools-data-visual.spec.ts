@@ -10,12 +10,12 @@ import {
   cards,
   openApp,
   openTool,
-  runAction,
+  say,
 } from './aitools-helpers';
 
 /*
  * Screenshots for the design gate (PLAN 1.2) of what the `m8-finish` round added to the AI tools:
- * the actions of a chart, a table, a shape and an icon with their cards (AIO-06 to AIO-08), and
+ * the cards the chat offers for a chart, a table, a shape and an icon (AIO-06 to AIO-08), and
  * the outline while it is edited in its card (AID-03). Both themes and both directions; written to
  * test-results/ai/ to be looked at, and nothing is compared.
  */
@@ -38,25 +38,22 @@ async function settle(page: Page) {
 
 for (const { theme, lang, all } of looks) {
   const name = `${theme}-${lang}`;
+  /** Asks the chat, in the language of the window. */
+  const ask = (page: Page, he: string, en: string) => say(page, lang === 'he' ? he : en);
 
   test(`the types offered for a chart ${name}`, async ({ page }) => {
     await openApp(page, { script: 'chart-actions', lang, theme });
     await addTitle(page, 'ההכנסות שלנו');
     await addChart(page);
-    await openTool(page, 'actions');
-    if (all) {
-      await settle(page);
-      await page.screenshot({ path: out(`chart-actions-${name}`) });
-    }
-    await runAction(page, 'chart.type');
+    await openTool(page);
+    await ask(page, 'הצע שלושה סוגי גרף', 'Suggest three chart types');
     await expect(cards(page)).toHaveCount(3);
     await cards(page).nth(0).hover();
     await expect(page.getByTestId('stage-preview')).toBeVisible();
     await settle(page);
     await page.screenshot({ path: out(`chart-types-${name}`) });
     if (!all) return;
-    await openTool(page, 'actions');
-    await runAction(page, 'chart.title');
+    await ask(page, 'הצע ארבע כותרות לגרף', 'Suggest four titles for the chart');
     await expect(cards(page)).toHaveCount(4);
     await cards(page).nth(1).hover();
     await settle(page);
@@ -64,15 +61,12 @@ for (const { theme, lang, all } of looks) {
   });
 
   if (all) {
-    test(`the actions and the looks of a table ${name}`, async ({ page }) => {
+    test(`the looks offered for a table ${name}`, async ({ page }) => {
       await openApp(page, { script: 'table-actions', lang, theme });
       await addTitle(page, 'הלקוחות שלנו');
       await addTable(page);
-      await openTool(page, 'actions');
-      await page.getByTestId('fill-source').fill('צפון 340 (+12%), מרכז 520 (+8%), דרום 210');
-      await settle(page);
-      await page.screenshot({ path: out(`table-actions-${name}`) });
-      await runAction(page, 'table.style');
+      await openTool(page);
+      await ask(page, 'הצע שלושה עיצובים לטבלה', 'Suggest three looks for the table');
       await expect(cards(page)).toHaveCount(3);
       await cards(page).nth(1).hover();
       await expect(page.getByTestId('stage-preview')).toBeVisible();
@@ -82,16 +76,13 @@ for (const { theme, lang, all } of looks) {
   }
 
   if (all) {
-    test(`the actions and the cards of a shape and of an icon ${name}`, async ({ page }) => {
+    test(`the cards of a shape ${name}`, async ({ page }) => {
       await openApp(page, { script: 'shape-actions', lang, theme });
       await addTitle(page, 'שלבי העבודה');
       await addShape(page);
-      await openTool(page, 'actions');
-      await runAction(page, 'shape.suggest');
-      await openTool(page, 'actions');
-      await settle(page);
-      await page.screenshot({ path: out(`shape-actions-${name}`) });
-      await runAction(page, 'shape.colour');
+      await openTool(page);
+      await ask(page, 'הצע צורות אחרות', 'Suggest other shapes');
+      await ask(page, 'צבע אותה לפי התבנית', 'Colour it by the template');
       await expect(cards(page)).toHaveCount(3);
       await cards(page).nth(0).hover();
       await expect(page.getByTestId('stage-preview')).toBeVisible();
@@ -103,8 +94,8 @@ for (const { theme, lang, all } of looks) {
       await openApp(page, { script: 'icon-actions', lang, theme });
       await addTitle(page, 'היעד שלנו');
       await addIcon(page);
-      await openTool(page, 'actions');
-      await runAction(page, 'icon.replace');
+      await openTool(page);
+      await ask(page, 'הצע אייקונים מתאימים יותר', 'Suggest more fitting icons');
       await expect(cards(page)).toHaveCount(3);
       await cards(page).nth(1).hover();
       await expect(page.getByTestId('stage-preview')).toBeVisible();

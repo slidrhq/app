@@ -58,7 +58,7 @@ export interface ImageProviderStatus {
 
 /** Closed set of failure categories, for both rejected calls and failed images. */
 export const IMAGE_ERROR_KINDS = [
-  /** No provider with that id. */
+  /** No provider with that id, or none is chosen (ADR-139). */
   'unknown_provider',
   /** The workspace is not open, or no document is. */
   'unknown_workspace',
@@ -101,6 +101,13 @@ export class ImageError extends Error {
     this.kind = kind;
   }
 }
+
+/**
+ * What a job that names no provider is told while none is chosen; the agent reads it. The same
+ * words as the core's (`NOT_CHOSEN` in `image_providers/service.rs`).
+ */
+export const NOT_CHOSEN =
+  'No image provider is chosen yet, so no image can be made. Tell the user to choose one: the chat asks for it when this turn ends, and Settings has it under Media.';
 
 /** `count` images from one prompt. */
 export interface GenerateJob {
@@ -148,8 +155,11 @@ export interface ImageClient {
   providers(): Promise<ImageProviderDescriptor[]>;
   /** Installed? Which version? Signed in? */
   probe(providerId: string): Promise<ImageProviderStatus>;
-  /** The id of the provider a job uses when it names none. */
-  defaultProvider(): Promise<string>;
+  /**
+   * The id of the provider a job uses when it names none: the user's choice, else the
+   * organization's. Null until one of them chooses: the app picks none itself (ADR-139).
+   */
+  defaultProvider(): Promise<string | null>;
   /** The user's choice of default, kept across runs. */
   setDefaultProvider(providerId: string): Promise<void>;
   /**

@@ -1,6 +1,6 @@
 # ADR-128 — Motion that repeats, and animated shapes
 
-Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It follows [ADR-127](ADR-127-animations-and-backgrounds-in-elements.md) and answers its open question about speed.
+Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It follows [ADR-127](ADR-127-animations-and-backgrounds-in-elements.md) and answers its open question about speed. Superseded in part by [ADR-138](ADR-138-animations-and-backgrounds-from-the-library.md) on 2026-11-09: the animated shapes are listed, and named, by the media library.
 
 ## Request
 

@@ -4,8 +4,11 @@ import { flushSync } from 'react-dom';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 import { backgroundCommands, motionElement } from './motion';
-import { motionBackgrounds } from './motionBackgrounds';
-import { motionPictures, motionPieces, type LinePiece } from './motionPieces';
+import { backgroundCatalog, motionBackgrounds } from './motionBackgrounds';
+import { animationCatalog, motionPictures, motionPieces, type LinePiece } from './motionPieces';
+
+// The animations and the backgrounds are the media library's (ADR-138).
+await Promise.all([animationCatalog.load(), backgroundCatalog.load()]);
 
 /*
  * The animations and the backgrounds of Elements (ADR-127) as the renderer draws them, in Edge:

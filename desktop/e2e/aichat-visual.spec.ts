@@ -1,14 +1,14 @@
-import { closeSync, ftruncateSync, mkdirSync, openSync, readFileSync, rmSync } from 'node:fs';
+import { closeSync, ftruncateSync, mkdirSync, openSync, rmSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import type * as Runtime from '../src/ai/runtime';
-import { choose, input, LOGO, openApp, say, settle, tab } from './aifinish-helpers';
+import { choose, input, LOGO, openApp, say, settle } from './aifinish-helpers';
 import { addIcon, openTool } from './aitools-helpers';
 
 /*
  * Screenshots for the design gate (PLAN 1.2) of what the fixes of the chat put on screen: the
- * words under the composer and under the template form for a file that was not taken, the list
+ * words under the composer for a file that was not taken, the list
  * of conversations when it is longer than the window, and the chat's focus chip for an icon.
  * In both themes and both directions, at the smallest supported screen. They are written to
  * test-results/fix-aiui/ to be looked at; nothing is compared.
@@ -45,21 +45,6 @@ for (const theme of themes) {
         await expect(page.getByTestId('chat').getByTestId('files-refused')).toBeVisible();
         await settle(page);
         await page.screenshot({ path: out(`refused-composer-${name}`) });
-
-        // The template form: as many files as it takes, and one more.
-        const logo = readFileSync(LOGO.path);
-        const picture = (file: string) => ({ name: file, mimeType: 'image/png', buffer: logo });
-        await tab(page, 'actions');
-        await page.locator('[data-action="template.create"]').click();
-        const chooser = page.waitForEvent('filechooser');
-        await page.getByTestId('template-files').click();
-        await (
-          await chooser
-        ).setFiles(Array.from({ length: 11 }, (_, i) => picture(`example-${i + 1}.png`)));
-        await expect(page.getByTestId('template-form').getByTestId('files-refused')).toBeVisible();
-        await page.getByTestId('template-form').getByTestId('files-refused').scrollIntoViewIfNeeded();
-        await settle(page);
-        await page.screenshot({ path: out(`refused-template-${name}`) });
       } finally {
         rmSync(big, { force: true });
       }

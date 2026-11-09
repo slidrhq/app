@@ -1,6 +1,6 @@
 # ADR-131 — Animations that are lines
 
-Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It follows [ADR-127](ADR-127-animations-and-backgrounds-in-elements.md) and [ADR-128](ADR-128-motion-that-repeats-and-animated-shapes.md).
+Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It follows [ADR-127](ADR-127-animations-and-backgrounds-in-elements.md) and [ADR-128](ADR-128-motion-that-repeats-and-animated-shapes.md). Superseded in part by [ADR-138](ADR-138-animations-and-backgrounds-from-the-library.md) on 2026-11-09: the two lines are items of the media library's catalog of animations.
 
 ## Request
 

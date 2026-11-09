@@ -7,7 +7,6 @@ import {
   cards,
   openApp,
   openTool,
-  runAction,
   say,
   type OpenOptions,
 } from './aitools-helpers';
@@ -65,27 +64,12 @@ for (const theme of themes) {
         await page.setViewportSize(viewport);
         await open(page, { script: 'slide-redesign', lang, theme });
         await addTitle(page, 'שלושת היעדים של 2027');
-        await openTool(page, 'actions');
-        await runAction(page, 'slide.redesign');
+        await openTool(page);
+        await say(page, 'תן לי שלושה עיצובים אחרים לשקף');
         await expect(cards(page)).toHaveCount(3);
         await cards(page).nth(1).hover();
         await settle(page);
         await page.screenshot({ path: out(`designs-${name}`) });
-      });
-
-      test(`the actions of the slide, of a text and of an image ${name}`, async ({ page }) => {
-        await page.setViewportSize(viewport);
-        await open(page, { script: 'text-variations', lang, theme });
-        await openTool(page, 'actions');
-        await settle(page);
-        await page.screenshot({ path: out(`actions-slide-${name}`) });
-        await addTitle(page);
-        await openTool(page, 'actions');
-        await settle(page);
-        await page.screenshot({ path: out(`actions-text-${name}`) });
-        await addImage(page);
-        await settle(page);
-        await page.screenshot({ path: out(`actions-image-${name}`) });
       });
     }
   }
@@ -96,8 +80,10 @@ test.describe('states', () => {
     await openApp(page, { script: 'image-alternatives', speed: 0.2 });
     await addTitle(page);
     await addImage(page);
-    await openTool(page, 'actions');
-    await page.locator('[data-action="image.alternatives"]').click();
+    await openTool(page);
+    // Sent without waiting for the turn: the images are looked at while they arrive.
+    await page.getByTestId('chat-input').fill('תן לי ארבע חלופות לתמונה');
+    await page.getByTestId('chat-input').press('Enter');
     await expect(cards(page).first()).toHaveAttribute('data-state', 'ready', { timeout: 15_000 });
     await settle(page);
     await page.screenshot({ path: out('state-images-arriving') });

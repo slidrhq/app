@@ -1,7 +1,13 @@
 import type { ImageOperation, ImageService, PngImage, StoredImage } from '@slidr/agent-tools';
 import type { AssetMeta } from '@slidr/model';
 import type { ImportedAsset } from '../document/storage';
-import { ImageError, type ImageClient, type ImageEvent, type ImageJobResult } from './images';
+import {
+  ImageError,
+  NOT_CHOSEN,
+  type ImageClient,
+  type ImageEvent,
+  type ImageJobResult,
+} from './images';
 import { BLANK_PREVIEW } from './preview';
 import type { ImageProcessClient, ProcessOperation } from './process';
 
@@ -224,6 +230,7 @@ export function createImageService(options: ImageServiceOptions): AgentImageServ
     // What a call goes to now: read every time, since the user can change it between calls.
     describe: async () => {
       const [id, providers] = await Promise.all([client.defaultProvider(), client.providers()]);
+      if (id === null) throw new ImageError('unknown_provider', NOT_CHOSEN);
       const provider = providers.find((p) => p.id === id);
       if (!provider) throw new ImageError('unknown_provider', `unknown image provider: ${id}`);
       const { edit, mask } = provider.capabilities;

@@ -10,7 +10,6 @@ import {
   messages,
   openApp,
   say,
-  tab,
   turns,
 } from './aifinish-helpers';
 
@@ -158,8 +157,5 @@ test('an empty chat offers openings, and one puts its words in the composer', as
   await page.getByTestId('conversations').click();
   await expect(page.getByRole('menu')).toContainText('Conversations');
   await page.keyboard.press('Escape');
-  await tab(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  await expect(page.getByTestId('template-form')).toContainText('Make a draft');
   expect(errors).toEqual([]);
 });

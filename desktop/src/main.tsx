@@ -12,6 +12,8 @@ import { tauriStorage } from './document/tauriStorage';
 import { cardSetCatalog } from './elements/cardSets';
 import { designPictures } from './elements/designAssets';
 import { frameThumbIndex } from './elements/frameThumbs';
+import { backgroundCatalog } from './elements/motionBackgrounds';
+import { animationCatalog } from './elements/motionPieces';
 import { shapeCatalog } from './objects/shapes';
 import { registerBuiltinFonts } from './fonts';
 import { currentLanguage, languageReady, offerLanguages } from './i18n';
@@ -51,7 +53,14 @@ void loadSystemSettings().then((policy) =>
 // first. The core answers from what it kept, and says when the library changed meanwhile.
 // The fonts first: every slide is drawn in them, and on a slow network the rest would hold them up.
 void fontsRegistered.then(() =>
-  prefetchWhenIdle([shapeCatalog, cardSetCatalog, designPictures, frameThumbIndex]),
+  prefetchWhenIdle([
+    shapeCatalog,
+    animationCatalog,
+    cardSetCatalog,
+    designPictures,
+    frameThumbIndex,
+    backgroundCatalog,
+  ]),
 );
 if (isTauri()) void listen('media-library-changed', refreshMediaLibrary);
 

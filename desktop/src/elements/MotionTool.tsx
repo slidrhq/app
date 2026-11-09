@@ -29,7 +29,8 @@ import { useGestureTx } from '../controls';
 import { ColorRow, PopoverTool, SliderField } from '../objects/parts';
 import { isTarget, useTarget, type Target } from '../objects/target';
 import { pieceMarkup, pieceOf, pieceSpeed, PIECE_SPEEDS } from './motion';
-import type { PicturePiece } from './motionPieces';
+import { useMediaCatalog } from '../shell/useMedia';
+import { animationCatalog, type PicturePiece } from './motionPieces';
 
 /*
  * Row B's Motion tool (ADR-128): the motion an element repeats while it is shown, any element,
@@ -445,6 +446,8 @@ function MotionPopover({ target }: { target: Target }) {
   const { t } = useTranslation('elements');
   const { once, end } = useMotionUpdate(target);
   const motion = target.element.ambient;
+  // The animation a picture is comes from the library's catalog: drawn again when it comes.
+  useMediaCatalog(animationCatalog);
   const piece = isTarget(target, 'svg') ? pieceOf(target.element) : undefined;
   return (
     <PopoverTool

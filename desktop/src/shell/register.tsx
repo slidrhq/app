@@ -8,7 +8,6 @@ import {
   NotebookPen,
   PaintBucket,
   Settings,
-  Zap,
   type LucideIcon,
 } from '@slidr/ui/icons';
 import { Button, Tooltip } from '@slidr/ui';
@@ -53,17 +52,6 @@ function ChatPlaceholder() {
   );
 }
 
-function ActionsPlaceholder() {
-  const { t } = useTranslation();
-  return (
-    <PanelEmpty
-      icon={Zap}
-      title={t('panels.actionsEmptyTitle')}
-      description={t('panels.actionsEmptyBody')}
-    />
-  );
-}
-
 /** The one AI chat: about the deck and about whatever the user has selected in it. */
 const ai = { id: PanelId.ai, title: 'panels.ai', icon: Ai, shortcut: 'Ctrl+1' } as const;
 
@@ -74,17 +62,6 @@ registerPanel({
   placeholder: true,
   fill: true,
   content: ChatPlaceholder,
-});
-
-/** The AI actions: ready-made requests that are sent to that chat. */
-registerPanel({
-  id: PanelId.actions,
-  title: 'panels.actions',
-  icon: Zap,
-  slot: 'ai',
-  order: 1,
-  placeholder: true,
-  content: ActionsPlaceholder,
 });
 
 /* ---------------------------------------------------------------- other panels */

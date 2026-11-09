@@ -1,4 +1,4 @@
-import type { AmbientMotion, ColorToken, Deck, Frame, ShapeElement } from '@slidr/model';
+import type { AmbientMotion, ColorToken, Deck, Frame, Localized, ShapeElement } from '@slidr/model';
 import { centredFrame, newShape } from '../objects/shapes';
 
 /*
@@ -6,13 +6,21 @@ import { centredFrame, newShape } from '../objects/shapes';
  * own, a turning hexagon, a beating heart, a floating circle. Unlike the animations of ADR-127,
  * which are pictures, each is a plain shape: its fill, its outline, its size and its text are
  * edited as any shape's, and its motion (`ambient`) is edited in row B, as anything's can be.
+ * The media library names them, beside the animations (`animationCatalog`, ADR-138); here is how
+ * one becomes a shape of a slide.
  */
 
 /** How a shape is painted: filled, or drawn as an outline, whole or in dashes. */
-export type MotionShapeLook = 'fill' | 'outline' | 'dashed';
+export const MOTION_SHAPE_LOOKS = ['fill', 'outline', 'dashed'] as const;
+export type MotionShapeLook = (typeof MOTION_SHAPE_LOOKS)[number];
+
+/** The colours of the theme an animated shape is painted in. */
+export const MOTION_SHAPE_INKS = ['primary', 'secondary', 'accent'] as const;
 
 export interface MotionShape {
   id: string;
+  /** Its name in each language the library writes it in, Hebrew and English at least. */
+  name: Localized<string>;
   /** The shape of the library it is. One that `reads` points toward the end of a line. */
   preset: string;
   /** Its longest side on the slide, in slide pixels. */
@@ -20,7 +28,7 @@ export interface MotionShape {
   /** Proportions of its own, in place of those the library gives the shape. */
   aspect?: number;
   look: MotionShapeLook;
-  ink: Extract<ColorToken, 'primary' | 'secondary' | 'accent'>;
+  ink: Extract<ColorToken, (typeof MOTION_SHAPE_INKS)[number]>;
   ambient: AmbientMotion;
   /**
    * Whether it points the way a line runs, as an arrow does: to the right in a deck that reads
@@ -31,96 +39,6 @@ export interface MotionShape {
 
 /** The outline of an outlined shape: thick enough to turn visibly, in whole pixels. */
 const OUTLINE = 16;
-
-/**
- * In the order the collections show them: what turns, then what beats, floats, swings and
- * blinks. Every shape that turns is symmetric about the middle of its box, which it turns around:
- * one with an odd number of corners would wobble as it went.
- */
-export const MOTION_SHAPES: readonly MotionShape[] = [
-  {
-    id: 'ring',
-    preset: 'ellipse',
-    side: 260,
-    look: 'dashed',
-    ink: 'primary',
-    ambient: { kind: 'spin', duration: 8000 },
-  },
-  {
-    id: 'hexagon',
-    preset: 'hexagon',
-    side: 260,
-    look: 'fill',
-    ink: 'primary',
-    ambient: { kind: 'spin', duration: 6000 },
-  },
-  {
-    id: 'star',
-    preset: 'star6',
-    side: 260,
-    look: 'fill',
-    ink: 'accent',
-    ambient: { kind: 'spin', duration: 9000 },
-  },
-  {
-    id: 'octagon',
-    preset: 'octagon',
-    side: 260,
-    look: 'outline',
-    ink: 'secondary',
-    ambient: { kind: 'spin', duration: 10000, reverse: true },
-  },
-  {
-    id: 'square',
-    preset: 'roundRect',
-    side: 200,
-    aspect: 1,
-    look: 'outline',
-    ink: 'primary',
-    ambient: { kind: 'spin', duration: 3200, rhythm: 'pause' },
-  },
-  {
-    id: 'pulse',
-    preset: 'ellipse',
-    side: 220,
-    look: 'fill',
-    ink: 'primary',
-    ambient: { kind: 'pulse', duration: 2000 },
-  },
-  {
-    id: 'heart',
-    preset: 'heart',
-    side: 220,
-    look: 'fill',
-    ink: 'accent',
-    ambient: { kind: 'pulse', duration: 1400, rhythm: 'pause', amount: 0.16 },
-  },
-  {
-    id: 'float',
-    preset: 'ellipse',
-    side: 200,
-    look: 'fill',
-    ink: 'secondary',
-    ambient: { kind: 'float', duration: 3000, amount: 20 },
-  },
-  {
-    id: 'arrow',
-    preset: 'arrowRight',
-    side: 260,
-    look: 'fill',
-    ink: 'primary',
-    ambient: { kind: 'swing', duration: 2400, rhythm: 'pause', amount: 10 },
-    reads: true,
-  },
-  {
-    id: 'blink',
-    preset: 'ellipse',
-    side: 120,
-    look: 'fill',
-    ink: 'accent',
-    ambient: { kind: 'blink', duration: 1600 },
-  },
-];
 
 /** The preset a shape is drawn with in a deck that reads `dir`. */
 export function motionShapePreset(shape: MotionShape, dir: 'ltr' | 'rtl'): string {

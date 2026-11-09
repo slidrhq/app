@@ -13,26 +13,23 @@ import {
   currentSlide,
   element,
   gallery,
-  lastSent,
   openApp,
   openTool,
   panel,
   REGIONS,
   REVENUE,
-  runAction,
+  say,
   select,
   turns,
   undoDepth,
 } from './aitools-helpers';
 
 /*
- * The AI actions of a chart and of a table (WG11-T12; AIO-07, AIO-08), against the scripted mock
- * agent: what is a choice is offered as cards that are tried on the Stage and applied as one undo
- * step, and what is an edit is the agent's turn in the one AI chat (ADR-072).
+ * What the AI chat does for a chart and for a table (WG11-T12; AIO-07, AIO-08), against the
+ * scripted mock agent: what is a choice is offered as cards that are tried on the Stage and
+ * applied as one undo step, and what is an edit is the agent's turn in the one AI chat (ADR-072).
  */
 
-const actions = (page: Page) => page.getByTestId('ai-actions');
-const action = (page: Page, id: string) => page.locator(`[data-action="${id}"]`);
 const undo = (page: Page) => page.evaluate(() => window.slidr!.bus.undo());
 const chart = (page: Page) => element<ChartElement>(page, 'e_chart');
 const table = (page: Page) => element<TableElement>(page, 'e_table');
@@ -44,20 +41,8 @@ test('a chart: types are offered as pictures, tried on the Stage, and a pick is 
   await openApp(page, { script: 'chart-actions' });
   await addTitle(page, 'ההכנסות שלנו');
   await addChart(page);
-  await openTool(page, 'actions');
-
-  // A chart has its own actions, and none of a text or an image.
-  await expect(action(page, 'chart.type')).toBeEnabled();
-  await expect(action(page, 'chart.title')).toBeEnabled();
-  // There is nothing to fill from until a text is pasted.
-  await expect(action(page, 'chart.fill')).toBeDisabled();
-  await expect(actions(page).locator('[data-action^="text."]')).toHaveCount(0);
-  await expect(actions(page)).not.toContainText('אין עדיין פעולות מוכנות לסוג הזה');
-
-  await runAction(page, 'chart.type');
-  await expect(page.getByTestId('chat-user')).toHaveAttribute('data-action', 'chart.type');
-  await expect(page.getByTestId('chat-user')).toHaveText('הצעת 3 סוגי גרף');
-  expect(await lastSent(page)).toContain('ui_present_options, kind "chart"');
+  await openTool(page);
+  await say(page, 'הצע שלושה סוגי גרף שמתאימים לנתונים');
 
   // Three cards, each the chart as the option would leave it, side by side.
   await expect(gallery(page)).toHaveAttribute('data-kind', 'chart');
@@ -110,14 +95,11 @@ test('a chart: titles are offered as words, and a pasted text fills the data in 
   await openApp(page, { script: 'chart-actions' });
   await addTitle(page, 'ההכנסות שלנו');
   await addChart(page);
-  await openTool(page, 'actions');
-  await runAction(page, 'chart.type');
+  await openTool(page);
+  await say(page, 'הצע שלושה סוגי גרף שמתאימים לנתונים');
 
   // The second turn of the script offers titles: cards of words, one under another.
-  await openTool(page, 'actions');
-  await actions(page).getByRole('radio', { name: '4' }).click();
-  await runAction(page, 'chart.title');
-  await expect(page.getByTestId('chat-user').nth(1)).toHaveText('4 כותרות לגרף');
+  await say(page, 'הצע ארבע כותרות לגרף, עם התובנה');
   await expect(cards(page)).toHaveCount(4);
   await expect(cards(page).nth(0)).toContainText('ההכנסות הוכפלו בתוך שנתיים');
   await expect(cards(page).nth(0)).toContainText('המגמה');
@@ -141,14 +123,9 @@ test('a chart: titles are offered as words, and a pasted text fills the data in 
   expect(await chart(page)).toMatchObject({ chartType: 'column', data: REVENUE });
   expect(await undoDepth(page)).toBe(depth + 1);
 
-  // Filling from a text: the text rides with the action, and the turn is one undo step.
-  await openTool(page, 'actions');
-  const pasted = 'לקוחות לפי אזור: צפון 340, מרכז 520, דרום 210, ירושלים 180.\nבשנה הבאה נצמח.';
-  await page.getByTestId('fill-source').fill(pasted);
-  await expect(action(page, 'chart.fill')).toBeEnabled();
-  const turn = await runAction(page, 'chart.fill');
-  await expect(page.getByTestId('chat-user').nth(2)).toHaveText('מילוי הגרף מטקסט');
-  expect(await lastSent(page)).toContain(`description: ${JSON.stringify(pasted)}`);
+  // Filling from a text pasted in the chat: the turn is one undo step.
+  const pasted = 'לקוחות לפי אזור: צפון 340, מרכז 520, דרום 210, ירושלים 180. בשנה הבאה נצמח.';
+  const turn = await say(page, `מלא את הגרף מהטקסט הזה: ${pasted}`);
   await expect(chips(page).filter({ hasText: 'עדכון גרף' })).toHaveCount(1);
   expect((await chart(page)).data).toEqual({
     categories: ['צפון', 'מרכז', 'דרום', 'ירושלים'],
@@ -169,14 +146,9 @@ test('a table: looks are offered as pictures, and a pasted text fills the cells'
   await openApp(page, { script: 'table-actions' });
   await addTitle(page, 'הלקוחות שלנו');
   await addTable(page);
-  await openTool(page, 'actions');
-  for (const id of ['table.style', 'table.insight', 'table.chart']) {
-    await expect(action(page, id)).toBeEnabled();
-  }
-  await expect(action(page, 'table.fill')).toBeDisabled();
+  await openTool(page);
 
-  await runAction(page, 'table.style');
-  await expect(page.getByTestId('chat-user')).toHaveText('3 עיצובים לטבלה');
+  await say(page, 'הצע שלושה עיצובים לטבלה');
   await expect(gallery(page)).toHaveAttribute('data-kind', 'table');
   await expect(cards(page)).toHaveCount(3);
   await expect(cards(page).nth(0)).toContainText('קווים: נקי וקל');
@@ -201,12 +173,12 @@ test('a table: looks are offered as pictures, and a pasted text fills the cells'
   await undo(page);
   expect((await table(page)).style).toEqual(before.style);
 
-  // Filling from a text is the agent's turn: the table grows a column, as one undo step.
-  await openTool(page, 'actions');
-  await page.getByTestId('fill-source').fill('צפון 340 (+12%), מרכז 520 (+8%), דרום 210 (+21%)');
-  const turn = await runAction(page, 'table.fill');
-  await expect(page.getByTestId('chat-user').nth(1)).toHaveText('מילוי הטבלה מטקסט');
-  expect(await lastSent(page)).toContain('description: "צפון 340 (+12%), מרכז 520');
+  // Filling from a text pasted in the chat is the agent's turn: the table grows a column, as one
+  // undo step.
+  const turn = await say(
+    page,
+    'מלא את הטבלה מהטקסט הזה: צפון 340 (+12%), מרכז 520 (+8%), דרום 210 (+21%)',
+  );
   expect(await cellTexts(page)).toEqual([
     ['אזור', 'לקוחות', 'שינוי'],
     ['צפון', '340', '+12%'],
@@ -226,18 +198,13 @@ test('a table: its insight and its chart change the slide, as turns of the AI ch
   await openApp(page, { script: 'table-on-slide' });
   await addTitle(page, 'הלקוחות שלנו');
   await addTable(page);
-  await openTool(page, 'actions');
+  await openTool(page);
 
-  // The insight: the panel turns to the chat, where the action is a message.
+  // The insight.
   const depth = await undoDepth(page);
-  await action(page, 'table.insight').click();
+  await say(page, 'סכם את הטבלה בתובנה');
   await expect(panel(page)).toBeVisible();
   await expect(chat(page)).toHaveAttribute('data-scope', 'deck');
-  await expect(page.getByTestId('chat-user')).toHaveAttribute('data-action', 'table.insight');
-  await expect(page.getByTestId('chat-user')).toHaveText('סיכום הטבלה לתובנה');
-  await expect(turns(page).first()).toHaveAttribute('data-outcome', /.+/, { timeout: 30_000 });
-  // The agent is told which table, and on which slide: the action names them.
-  expect(await lastSent(page)).toContain('elementId: "e_table"');
   const insight = (await currentSlide(page)).elements.find((e) => e.id === 'e_insight1');
   expect(insight?.type).toBe('text');
   expect((await currentSlide(page)).elements.map((e) => e.id)).toContain('e_table');
@@ -246,12 +213,7 @@ test('a table: its insight and its chart change the slide, as turns of the AI ch
 
   // Into a chart: the same way, and the chart takes the table's place.
   await select(page, ['e_table']);
-  await openTool(page, 'actions');
-  await action(page, 'table.chart').click();
-  await expect(panel(page)).toBeVisible();
-  await expect(page.getByTestId('chat-user').nth(1)).toHaveText('המרת הטבלה לגרף');
-  await expect(turns(page).nth(1)).toHaveAttribute('data-outcome', /.+/, { timeout: 30_000 });
-  await expect(page.getByTestId('chat-working')).toHaveCount(0);
+  await say(page, 'הפוך את הטבלה לגרף');
   const after = (await currentSlide(page)).elements;
   expect(after.map((e) => e.type)).toEqual(['text', 'text', 'chart']);
   expect(after.find((e) => e.type === 'chart')).toMatchObject({
@@ -272,22 +234,12 @@ test('a table: its insight and its chart change the slide, as turns of the AI ch
   expect(errors).toEqual([]);
 });
 
-test('the actions of a chart and of a table in English', async ({ page }) => {
+test('the options of a chart in English', async ({ page }) => {
+  const errors = collectErrors(page);
   await openApp(page, { script: 'chart-actions', lang: 'en' });
   await addChart(page);
-  await openTool(page, 'actions');
-  await expect(action(page, 'chart.type')).toHaveText('Suggest a chart type');
-  await expect(action(page, 'chart.title')).toHaveText('Title and insight');
-  await expect(action(page, 'chart.fill')).toHaveText('Fill the data from the text');
-  await runAction(page, 'chart.type');
-  await expect(page.getByTestId('chat-user')).toHaveText('Suggest 3 chart types');
-  expect(await lastSent(page)).toContain('reply_in: "English"');
+  await openTool(page);
+  await say(page, 'Suggest three chart types that fit the data');
   await expect(gallery(page)).toHaveAttribute('aria-label', 'Pick an option for the chart');
-
-  await addTable(page);
-  await openTool(page, 'actions');
-  await expect(action(page, 'table.fill')).toHaveText('Fill the table from the text');
-  await expect(action(page, 'table.style')).toHaveText('Suggest looks');
-  await expect(action(page, 'table.insight')).toHaveText('Sum up in an insight');
-  await expect(action(page, 'table.chart')).toHaveText('Turn into a chart');
+  expect(errors).toEqual([]);
 });

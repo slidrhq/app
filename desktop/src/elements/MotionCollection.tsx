@@ -1,33 +1,41 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  createSlide,
-  type Background,
-  type Deck,
-  type LineElement,
-  type Slide,
-} from '@slidr/model';
+import { createSlide, type Background, type Deck, type Slide } from '@slidr/model';
 import { FittedSlide, STILL_AT } from '@slidr/renderer';
 import { cx, Input, Tooltip } from '@slidr/ui';
 import { Play, Search } from '@slidr/ui/icons';
-import { searchIcons, withTags, wordsOf, type SearchWords } from '../media/icons/search';
+import { searchTags } from '../media/icons/library';
+import {
+  searchIcons,
+  withTags,
+  wordsOf,
+  type SearchWords,
+  type Tags,
+  type TagsOf,
+} from '../media/icons/search';
 import { tell, useDeck, useEditor, useSelection } from '../shell';
-import { NothingFound, Section } from './collections';
+import { useMediaCatalog } from '../shell/useMedia';
+import { NothingFound, Section, useLoaded } from './collections';
 import { applyMotionBackground, insertMotion, insertMotionShape } from './insert';
-import { backgroundDrawing, backgroundWith, motionElement, shownMotionBackground } from './motion';
-import { motionBackgrounds, type MotionBackground } from './motionBackgrounds';
-import { MOTION_GROUPS, motionPieces, type MotionPiece } from './motionPieces';
-import { MOTION_SHAPES, motionShapeElement, type MotionShape } from './motionShapes';
+import { backgroundSlide, pieceSlide, shapeSlide, shownMotionBackground } from './motion';
+import { backgroundCatalog, motionBackgrounds, type MotionBackground } from './motionBackgrounds';
+import {
+  animationCatalog,
+  MOTION_GROUPS,
+  motionName,
+  motionPieces,
+  motionShapes,
+  type MotionPiece,
+} from './motionPieces';
+import type { MotionShape } from './motionShapes';
 
 /*
- * The animations and the backgrounds of Elements (ADR-127). Each tile is a small slide drawn by
- * the renderer in the deck's own theme: the animation on the slide's ground, or the slide's
- * ground under the background's drawing, as a click would leave it. A tile is still, at a moment
- * that shows what it is, and moves while the pointer or the keyboard is on it.
+ * The animations and the backgrounds of Elements (ADR-127), as the media library has them
+ * (ADR-138). Each tile is a small slide drawn by the renderer in the deck's own theme: the
+ * animation on the slide's ground, or the slide's ground under the background's drawing, as a
+ * click would leave it. A tile is still, at a moment that shows what it is, and moves while the
+ * pointer or the keyboard is on it.
  */
-
-/** The longest side of an animation on its tile's slide, as a share of the slide's height. */
-const PIECE_HEIGHT = 0.84;
 
 /** The filter a background's tile draws its picture through (`strengthen`). */
 const STRONGER = 'slidr-tile-stronger';
@@ -197,48 +205,8 @@ function TileGrid({ label, children }: { label: string; children: ReactNode }) {
 
 /* ---------------------------------------------------------------- animations */
 
-/**
- * A line of an animation (ADR-131) drawn `scale` times as large: its points, its width and the
- * pace of what runs along it, so that it looks and moves on its tile as on a slide of its size.
- */
-function scaledLine(line: LineElement, scale: number): LineElement {
-  const { flow } = line;
-  return {
-    ...line,
-    points: line.points.map((p) => ({ x: p.x * scale, y: p.y * scale })),
-    stroke: { ...line.stroke, width: line.stroke.width * scale },
-    ...(flow
-      ? {
-          flow: {
-            ...flow,
-            speed: flow.speed * scale,
-            ...(flow.size === undefined ? {} : { size: flow.size * scale }),
-          },
-        }
-      : {}),
-  };
-}
-
-/** The slide an animation's tile draws: the piece, large, in the middle of the theme's ground. */
-function pieceSlide(piece: MotionPiece, deck: Deck): Slide {
-  const element = motionElement(piece, deck);
-  const scale = (deck.size.h * PIECE_HEIGHT) / Math.max(piece.size.h, piece.size.w * 0.56);
-  const [w, h] = [piece.size.w * scale, piece.size.h * scale];
-  const frame = { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h };
-  const id = `motion_${piece.id}`;
-  return createSlide({
-    id: `s_motion_${piece.id}`,
-    background: { fill: { kind: 'solid', color: { token: 'bg' } } },
-    elements: [
-      element.type === 'line'
-        ? { ...scaledLine(element, scale), id, frame }
-        : { ...element, id, frame },
-    ],
-  });
-}
-
 export function MotionGrid({ pieces }: { pieces: readonly MotionPiece[] }) {
-  const { t } = useTranslation('elements');
+  const { t, i18n } = useTranslation('elements');
   const editor = useEditor();
   const tileDeck = useTileDeck();
   const tiles = useMemo(() => {
@@ -253,7 +221,7 @@ export function MotionGrid({ pieces }: { pieces: readonly MotionPiece[] }) {
       {tiles.map(({ piece, slide, deck }) => (
         <MotionTile
           key={piece.id}
-          label={t(`animations.name.${piece.id}`)}
+          label={motionName(piece, i18n.language)}
           deck={deck}
           slide={slide}
           data={{ 'data-animation': piece.id }}
@@ -266,40 +234,8 @@ export function MotionGrid({ pieces }: { pieces: readonly MotionPiece[] }) {
   );
 }
 
-/** The longest side of an animated shape on its tile's slide, as a share of the slide's height. */
-const SHAPE_HEIGHT = 0.6;
-
-/** The slide an animated shape's tile draws: the shape, large, in the middle of the theme's ground. */
-function shapeSlide(shape: MotionShape, deck: Deck): Slide {
-  const element = motionShapeElement(shape, deck);
-  const { w: ew, h: eh } = element.frame;
-  // Room around it for what it does: a float rises, a beat grows, a swing leans.
-  const scale = (deck.size.h * SHAPE_HEIGHT) / Math.max(eh, ew * 0.56);
-  const [w, h] = [ew * scale, eh * scale];
-  const ambient =
-    shape.ambient.kind === 'float'
-      ? { ...shape.ambient, amount: (shape.ambient.amount ?? 16) * scale }
-      : shape.ambient;
-  return createSlide({
-    id: `s_motion_shape_${shape.id}`,
-    background: { fill: { kind: 'solid', color: { token: 'bg' } } },
-    elements: [
-      {
-        ...element,
-        id: `motion_shape_${shape.id}`,
-        frame: { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h },
-        ambient,
-        // Its outline as thick on the tile as on a slide of its own size.
-        ...(element.stroke
-          ? { stroke: { ...element.stroke, width: element.stroke.width * scale } }
-          : {}),
-      },
-    ],
-  });
-}
-
 export function MotionShapeGrid({ shapes }: { shapes: readonly MotionShape[] }) {
-  const { t } = useTranslation('elements');
+  const { t, i18n } = useTranslation('elements');
   const editor = useEditor();
   const tileDeck = useTileDeck();
   const tiles = useMemo(() => {
@@ -314,7 +250,7 @@ export function MotionShapeGrid({ shapes }: { shapes: readonly MotionShape[] }) 
       {tiles.map(({ shape, slide, deck }) => (
         <MotionTile
           key={shape.id}
-          label={t(`animatedShapes.name.${shape.id}`)}
+          label={motionName(shape, i18n.language)}
           deck={deck}
           slide={slide}
           data={{ 'data-motion-shape': shape.id }}
@@ -327,21 +263,39 @@ export function MotionShapeGrid({ shapes }: { shapes: readonly MotionShape[] }) 
   );
 }
 
+/**
+ * What a collection of the library's shows while its catalog is on its way, and when the library
+ * gave none: the catalog is read from the media library, and without it there is nothing to offer.
+ */
+function NotFromLibrary({ ready, testId }: { ready: boolean; testId: string }) {
+  const { t } = useTranslation('elements');
+  // On its way from the library: shown the moment it comes.
+  if (!ready) return <div className="py-8" data-testid={testId} aria-busy />;
+  return (
+    <p className="py-8 text-center text-sm text-ui-fg-muted" data-testid={testId}>
+      {t('loadFailed')}
+    </p>
+  );
+}
+
 /** Every animation by how it moves, and a search over their names. */
 export function AnimationsCollection() {
   const { t } = useTranslation('elements');
   const [query, setQuery] = useState('');
   const index = useMotionIndex();
-  const pieces = motionPieces();
+  const { pieces, shapes } = useMediaCatalog(animationCatalog);
   const found = useMemo(() => {
     if (!query.trim()) return undefined;
-    const { pieces: foundPieces, shapes } = foundMotions(
-      searchMotion(index, query, pieces.length + MOTION_SHAPES.length).filter(
+    const { pieces: foundPieces, shapes: foundShapes } = foundMotions(
+      searchMotion(index, query, pieces.length + shapes.length).filter(
         (entry) => entry.kind !== 'background',
       ),
     );
-    return { pieces: foundPieces, shapes };
-  }, [index, pieces, query]);
+    return { pieces: foundPieces, shapes: foundShapes };
+  }, [index, pieces, shapes, query]);
+  if (pieces.length + shapes.length === 0) {
+    return <NotFromLibrary ready={animationCatalog.ready} testId="elements-animations" />;
+  }
   return (
     <>
       <Input
@@ -364,15 +318,22 @@ export function AnimationsCollection() {
         )
       ) : (
         <>
-          <Section title={t('animations.group.basic')} data-group="basic">
-            <p className="text-xs text-ui-fg-muted">{t('animatedShapes.hint')}</p>
-            <MotionShapeGrid shapes={MOTION_SHAPES} />
-          </Section>
-          {MOTION_GROUPS.map((group) => (
-            <Section key={group} title={t(`animations.group.${group}`)} data-group={group}>
-              <MotionGrid pieces={pieces.filter((piece) => piece.group === group)} />
+          {shapes.length > 0 && (
+            <Section title={t('animations.group.basic')} data-group="basic">
+              <p className="text-xs text-ui-fg-muted">{t('animatedShapes.hint')}</p>
+              <MotionShapeGrid shapes={shapes} />
             </Section>
-          ))}
+          )}
+          {MOTION_GROUPS.map((group) => {
+            const inGroup = pieces.filter((piece) => piece.group === group);
+            return (
+              inGroup.length > 0 && (
+                <Section key={group} title={t(`animations.group.${group}`)} data-group={group}>
+                  <MotionGrid pieces={inGroup} />
+                </Section>
+              )
+            );
+          })}
         </>
       )}
     </>
@@ -393,7 +354,7 @@ function useShownGround(): Background {
 }
 
 export function BackgroundGrid({ backgrounds }: { backgrounds: readonly MotionBackground[] }) {
-  const { t } = useTranslation('elements');
+  const { t, i18n } = useTranslation('elements');
   const editor = useEditor();
   const tileDeck = useTileDeck();
   const ground = useShownGround();
@@ -405,13 +366,7 @@ export function BackgroundGrid({ backgrounds }: { backgrounds: readonly MotionBa
   const tiles = useMemo(() => {
     const deck = tileDeck(createSlide());
     return backgrounds.map((background) => {
-      const slide = createSlide({
-        id: `s_background_${background.id}`,
-        background: backgroundWith(ground, {
-          ...backgroundDrawing(background, deck),
-          id: `background_${background.id}`,
-        }),
-      });
+      const slide = backgroundSlide(background, deck, ground);
       return { background, slide, deck: tileDeck(slide) };
     });
   }, [backgrounds, tileDeck, ground]);
@@ -420,7 +375,7 @@ export function BackgroundGrid({ backgrounds }: { backgrounds: readonly MotionBa
       {tiles.map(({ background, slide, deck }) => (
         <MotionTile
           key={background.id}
-          label={t(`backgrounds.name.${background.id}`)}
+          label={motionName(background, i18n.language)}
           deck={deck}
           slide={slide}
           animated={background.animated}
@@ -440,16 +395,25 @@ export function BackgroundGrid({ backgrounds }: { backgrounds: readonly MotionBa
 /** The backgrounds, those that move first. */
 export function BackgroundsCollection() {
   const { t } = useTranslation('elements');
-  const all = motionBackgrounds();
+  const all = useMediaCatalog(backgroundCatalog);
+  if (all.length === 0) {
+    return <NotFromLibrary ready={backgroundCatalog.ready} testId="elements-backgrounds" />;
+  }
+  const moving = all.filter((b) => b.animated);
+  const still = all.filter((b) => !b.animated);
   return (
     <>
       <p className="text-xs text-ui-fg-muted">{t('backgrounds.hint')}</p>
-      <Section title={t('backgrounds.animated')} data-group="animated">
-        <BackgroundGrid backgrounds={all.filter((b) => b.animated)} />
-      </Section>
-      <Section title={t('backgrounds.still')} data-group="still">
-        <BackgroundGrid backgrounds={all.filter((b) => !b.animated)} />
-      </Section>
+      {moving.length > 0 && (
+        <Section title={t('backgrounds.animated')} data-group="animated">
+          <BackgroundGrid backgrounds={moving} />
+        </Section>
+      )}
+      {still.length > 0 && (
+        <Section title={t('backgrounds.still')} data-group="still">
+          <BackgroundGrid backgrounds={still} />
+        </Section>
+      )}
     </>
   );
 }
@@ -464,24 +428,34 @@ export interface FoundMotion extends SearchWords {
   name: string;
 }
 
+/** The library's search tags of the animations and of the backgrounds (ADR-108). */
+const motionTags = () => Promise.all([searchTags('animations'), searchTags('backgrounds')]);
+
 /**
  * Every animation and background with the words they are found by: their names in the language
- * of the interface, in Hebrew and in English, and the names of their group and kind.
+ * of the interface, in Hebrew and in English, the names of their group and kind, and the search
+ * tags the library gives them, an animated shape's under `shape:<id>`. Until the tags have come,
+ * and without them, by the rest.
  */
 export function useMotionIndex(): readonly FoundMotion[] {
   const { t, i18n } = useTranslation('elements');
+  const { pieces, shapes } = useMediaCatalog(animationCatalog);
+  const backgrounds = useMediaCatalog(backgroundCatalog);
+  const loaded = useLoaded(motionTags);
   return useMemo(() => {
+    const none: TagsOf = {};
+    const [animationTags, backgroundTags] = loaded === 'failed' || !loaded ? [none, none] : loaded;
     const entry = (
       kind: FoundMotion['kind'],
-      id: string,
-      key: string,
+      item: MotionPiece | MotionShape | MotionBackground,
       also: (lng: string) => string[],
+      tags: Tags | undefined,
     ): FoundMotion => {
-      const name = (lng: string) => t(key, { lng });
+      const name = (lng: string) => motionName(item, lng);
       const hebrew = wordsOf(name('he'));
       const words: FoundMotion = {
         kind,
-        id,
+        id: item.id,
         name: name(i18n.language),
         filled: false,
         nameWords: [...new Set([...wordsOf(name('en')), ...wordsOf(name(i18n.language))])],
@@ -491,33 +465,46 @@ export function useMotionIndex(): readonly FoundMotion[] {
         tagTerms: [],
         tagHebrew: [],
       };
-      return withTags(words, { en: also('en'), he: also('he') });
+      const own = withTags(words, tags);
+      return withTags(own, { en: also('en'), he: also('he') });
     };
     const kindOf = (kind: 'animations' | 'backgrounds', lng: string) =>
       t(`collection.${kind}`, { lng });
     return [
-      ...MOTION_SHAPES.map((shape) =>
-        entry('shape', shape.id, `animatedShapes.name.${shape.id}`, (lng) => [
-          kindOf('animations', lng),
-          t('animatedShapes.title', { lng }),
-          t('collection.shapes', { lng }),
-          t(`motion.kind.${shape.ambient.kind}`, { lng }),
-        ]),
+      ...shapes.map((shape) =>
+        entry(
+          'shape',
+          shape,
+          (lng) => [
+            kindOf('animations', lng),
+            t('animatedShapes.title', { lng }),
+            t('collection.shapes', { lng }),
+            t(`motion.kind.${shape.ambient.kind}`, { lng }),
+          ],
+          animationTags[`shape:${shape.id}`],
+        ),
       ),
-      ...motionPieces().map((piece) =>
-        entry('animation', piece.id, `animations.name.${piece.id}`, (lng) => [
-          kindOf('animations', lng),
-          t(`animations.group.${piece.group}`, { lng }),
-        ]),
+      ...pieces.map((piece) =>
+        entry(
+          'animation',
+          piece,
+          (lng) => [kindOf('animations', lng), t(`animations.group.${piece.group}`, { lng })],
+          animationTags[piece.id],
+        ),
       ),
-      ...motionBackgrounds().map((background) =>
-        entry('background', background.id, `backgrounds.name.${background.id}`, (lng) => [
-          kindOf('backgrounds', lng),
-          ...(background.animated ? [t('backgrounds.animated', { lng })] : []),
-        ]),
+      ...backgrounds.map((background) =>
+        entry(
+          'background',
+          background,
+          (lng) => [
+            kindOf('backgrounds', lng),
+            ...(background.animated ? [t('backgrounds.animated', { lng })] : []),
+          ],
+          backgroundTags[background.id],
+        ),
       ),
     ];
-  }, [t, i18n.language]);
+  }, [t, i18n.language, pieces, shapes, backgrounds, loaded]);
 }
 
 /** The animations and backgrounds that match every word of a query, best first. */
@@ -529,7 +516,7 @@ export function searchMotion(index: readonly FoundMotion[], query: string, count
 export function foundMotions(found: readonly FoundMotion[]) {
   const ids = new Set(found.map((entry) => `${entry.kind}:${entry.id}`));
   return {
-    shapes: MOTION_SHAPES.filter((shape) => ids.has(`shape:${shape.id}`)),
+    shapes: motionShapes().filter((shape) => ids.has(`shape:${shape.id}`)),
     pieces: motionPieces().filter((piece) => ids.has(`animation:${piece.id}`)),
     backgrounds: motionBackgrounds().filter((b) => ids.has(`background:${b.id}`)),
   };

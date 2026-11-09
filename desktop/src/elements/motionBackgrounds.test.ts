@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { motionBackgrounds } from './motionBackgrounds';
+import { backgroundCatalog, motionBackgrounds } from './motionBackgrounds';
 
 /*
  * A background of Elements that is a field, of lines or of dots, covers the slide from one edge
  * to the other (ADR-129). The reference deck draws its traces and its waves on the half of the
- * slide beside its text; as a background they stopped two thirds of the way across.
+ * slide beside its text; as a background they stopped two thirds of the way across. The
+ * backgrounds are the media library's (ADR-138): these are its, as it is published.
  */
+
+await backgroundCatalog.load();
 
 const W = 1920;
 const H = 1080;

@@ -1,6 +1,6 @@
 # ADR-127 — Animations and backgrounds in Elements
 
-Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It builds stages 3 and 4 of [ADR-125](ADR-125-a-drawing-in-the-background.md), backgrounds in Elements and backgrounds that move, without the model change that record expected for stage 4.
+Status: Implemented on 2026-11-05 in the working tree; **not committed** at the time of this record. It builds stages 3 and 4 of [ADR-125](ADR-125-a-drawing-in-the-background.md), backgrounds in Elements and backgrounds that move, without the model change that record expected for stage 4. Superseded in part by [ADR-138](ADR-138-animations-and-backgrounds-from-the-library.md) on 2026-11-09: the animations and the backgrounds are catalogs of the media library, with their names, and the app no longer draws them.
 
 ## Request
 

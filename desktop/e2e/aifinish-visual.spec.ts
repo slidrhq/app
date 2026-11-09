@@ -10,7 +10,6 @@ import {
   outlineAnswer,
   say,
   settle,
-  tab,
   turnEnds,
 } from './aifinish-helpers';
 
@@ -41,25 +40,20 @@ const words = {
     first: 'בנה שקף פתיחה למצגת על תוכנית העבודה',
     second: 'ועכשיו שקף על היעדים של הרבעון',
     subject: 'מצגת על תוכנית העבודה שלנו לשנת 2027',
-    template: 'חם ונקי, לחברת קרמיקה קטנה',
+    template: 'הכן תבנית חמה ונקייה לחברת קרמיקה קטנה',
   },
   en: {
     first: 'Build an opening slide for a deck about our work plan',
     second: 'And now a slide about the goals of the quarter',
     subject: 'A deck about our work plan for 2027',
-    template: 'Warm and clean, for a small ceramics company',
+    template: 'Make a warm, clean template for a small ceramics company',
   },
 } as const;
 
-/** Fills the form of "Make a template with AI" as a user would, without sending it. */
-async function fillTemplateForm(page: Page, lang: 'he' | 'en') {
-  await tab(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  await page.getByTestId('template-description').fill(words[lang].template);
-  await page.getByTestId('template-url').fill('https://example.com/');
-  await choose(page, () => page.getByTestId('template-logo').click(), LOGO.path);
-  await expect(page.locator('[data-testid="template-file"][data-use="logo"]')).toHaveCount(1);
-  await page.getByTestId('template-form').scrollIntoViewIfNeeded();
+/** Asks the chat for a template as a user would, with the logo attached, and waits for the draft. */
+async function askForTemplate(page: Page, lang: 'he' | 'en') {
+  await choose(page, () => page.getByTestId('chat-attach').click(), LOGO.path);
+  await say(page, words[lang].template);
 }
 
 for (const theme of themes) {
@@ -108,12 +102,7 @@ for (const theme of themes) {
       test(`a template made by the agent ${name}`, async ({ page }) => {
         await page.setViewportSize(viewport);
         await openApp(page, { script: 'template-create', lang, theme });
-        await fillTemplateForm(page, lang);
-        await settle(page);
-        await page.screenshot({ path: out(`template-${name}-form`) });
-
-        await page.getByTestId('template-create').click();
-        await turnEnds(page, 1);
+        await askForTemplate(page, lang);
         // The three layouts the agent made, and the text layout every template offers.
         await expect(draft(page).getByTestId('draft-layout')).toHaveCount(4);
         await draft(page).scrollIntoViewIfNeeded();
@@ -144,9 +133,7 @@ test.describe('states', () => {
 
   test('a draft that was saved, tried on the open deck from its card', async ({ page }) => {
     await openApp(page, { script: 'template-create', theme: 'dark' });
-    await fillTemplateForm(page, 'he');
-    await page.getByTestId('template-create').click();
-    await turnEnds(page, 1);
+    await askForTemplate(page, 'he');
     await draft(page).getByTestId('draft-save').click();
     await expect(draft(page)).toHaveAttribute('data-saved', /^personal_/);
     await settle(page);

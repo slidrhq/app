@@ -27,8 +27,12 @@ import {
 const QUALITIES = ['low', 'medium', 'high', 'auto'] as const;
 type Quality = (typeof QUALITIES)[number];
 
-/** What a provider's state is called: the probe's answer, read with whether its key is stored. */
+/**
+ * What a provider's state is called: the probe's answer, read with whether its key is stored.
+ * `not_chosen` is the state of no provider: none is chosen yet (ADR-139).
+ */
 export type ProviderStateLabel =
+  | 'not_chosen'
   | 'checking'
   | 'ready'
   | 'not_installed'
@@ -53,6 +57,7 @@ export function providerStateLabel(
 }
 
 const stateTone: Record<ProviderStateLabel, StatusTone> = {
+  not_chosen: 'warning',
   checking: 'neutral',
   ready: 'success',
   not_installed: 'warning',
@@ -62,12 +67,29 @@ const stateTone: Record<ProviderStateLabel, StatusTone> = {
   unavailable: 'danger',
 };
 
+/** What the provider chosen can do now, for a screen that goes on once it is ready. */
+export interface ChosenProviderState {
+  /** Null while none is chosen. */
+  chosen: string | null;
+  state: ProviderStateLabel;
+}
+
 /**
  * The image providers in the settings screen (GEN-01, GEN-03): which one makes the images, the
  * key of one that needs a key, and the quality of one that takes it. The choice is what
- * `image_generate` uses when a job names no provider, the agent's jobs included.
+ * `image_generate` uses when a job names no provider, the agent's jobs included. Until the user
+ * (or the organization) chooses, none is marked (ADR-139). The chat's setup shows the same list
+ * as its last step.
  */
-export function ImageSettings() {
+export function ImageSettings({
+  hint = true,
+  onState,
+}: {
+  /** The line that says what the choice is for. The chat's step asks its own question. */
+  hint?: boolean;
+  /** Told what the provider chosen can do, whenever that changes. */
+  onState?: (state: ChosenProviderState) => void;
+} = {}) {
   const { t } = useTranslation('images');
   const { client } = imagesOf(useEditor());
   const keys = useSettings((state) => state.keys);
@@ -151,7 +173,22 @@ export function ImageSettings() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-ui-fg-muted">{t('settings.hint')}</p>
+      {onState && (
+        <ReportState
+          onState={onState}
+          chosen={selected?.id ?? null}
+          state={
+            selected
+              ? providerStateLabel(
+                  selected,
+                  statuses[selected.id],
+                  selected.key ? keys[selected.key] : false,
+                )
+              : 'not_chosen'
+          }
+        />
+      )}
+      {hint && <p className="text-xs text-ui-fg-muted">{t('settings.hint')}</p>}
       <SettingsGroup title={t('settings.providers')}>
         <div
           role="radiogroup"
@@ -312,4 +349,14 @@ export function ImageSettings() {
       )}
     </div>
   );
+}
+
+/** Tells `onState` what the provider chosen can do, once for each change. */
+function ReportState({
+  onState,
+  chosen,
+  state,
+}: ChosenProviderState & { onState: (state: ChosenProviderState) => void }) {
+  useEffect(() => onState({ chosen, state }), [onState, chosen, state]);
+  return null;
 }

@@ -5,6 +5,8 @@ import { designWords, searchDesigns } from '../../elements/designCatalog';
 import { loadAllDesigns } from '../../elements/designs';
 import { he as elementsHe, en as elementsEn } from '../../elements/messages';
 import { loadEmoji, loadGraphics, searchStickers } from '../../elements/stickers';
+import { backgroundCatalog } from '../../elements/motionBackgrounds';
+import { animationCatalog } from '../../elements/motionPieces';
 import { lineKinds, shapeCatalog, shapeLibrary } from '../../objects/shapes';
 import { TAG_KINDS, tagsOf, type TagKind } from './library';
 import { searchIcons, withTags, type SearchWords, type TagsOf } from './search';
@@ -173,6 +175,12 @@ async function keysOf(kind: TagKind): Promise<string[]> {
       return [...(await cardSetCatalog.load()).ids];
     case 'designs':
       return DESIGN_GROUPS.flatMap(designsOf);
+    case 'animations': {
+      const { pieces, shapes } = await animationCatalog.load();
+      return [...pieces.map(({ id }) => id), ...shapes.map(({ id }) => `shape:${id}`)];
+    }
+    case 'backgrounds':
+      return (await backgroundCatalog.load()).map(({ id }) => id);
   }
 }
 

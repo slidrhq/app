@@ -2,13 +2,13 @@
 import {
   AMBIENT_DEFAULTS,
   AmbientMotion,
+  CONTENT_LANGUAGES,
   createDeck,
   createElement,
   elementSchemas,
   type SvgElement,
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
-import { en, he } from './messages';
 import {
   markupAtSpeed,
   motionElement,
@@ -18,19 +18,24 @@ import {
   PIECE_SPEEDS,
 } from './motion';
 import { atSpeed } from './motionKit';
-import { motionPictures } from './motionPieces';
-import { MOTION_SHAPES, motionShapeElement } from './motionShapes';
+import { animationCatalog, motionPictures, motionShapes } from './motionPieces';
+import { motionShapeElement } from './motionShapes';
 import { newAmbient } from './MotionTool';
 
 /*
  * What ADR-128 adds to the animations of Elements: the motion any element repeats (`ambient`),
  * the animated shapes made of it, and the speed of an animation of ADR-127. That the renderer
  * moves an element by its motion is `ambient.test.tsx` of the renderer; that it moves in a real
- * browser, `motion.browser.test.tsx`.
+ * browser, `motion.browser.test.tsx`. The animations and the animated shapes are the media
+ * library's (ADR-138): these are its, as it is published.
  */
+
+await animationCatalog.load();
 
 /** The animations that are pictures: a line's pace is its flow's (ADR-131). */
 const pieces = motionPictures();
+/** The animated shapes of the library. */
+const shapes = motionShapes();
 
 /** Every time written in a picture, in seconds, in order. */
 function times(markup: string): number[] {
@@ -80,38 +85,37 @@ describe('an ambient motion', () => {
 describe('the animated shapes', () => {
   it('are plain shapes of the library, each with its motion and its names', () => {
     const deck = createDeck({ lang: 'en' });
-    expect(new Set(MOTION_SHAPES.map((s) => s.id)).size).toBe(MOTION_SHAPES.length);
-    for (const shape of MOTION_SHAPES) {
+    expect(new Set(shapes.map((s) => s.id)).size).toBe(shapes.length);
+    for (const shape of shapes) {
       const element = motionShapeElement(shape, deck);
       expect(elementSchemas.shape.safeParse(element).success).toBe(true);
       expect(element.ambient).toEqual(shape.ambient);
       expect(Math.max(element.frame.w, element.frame.h)).toBe(shape.side);
-      expect(he.animatedShapes.name).toHaveProperty(shape.id);
-      expect(en.animatedShapes.name).toHaveProperty(shape.id);
+      expect(Object.keys(shape.name)).toEqual([...CONTENT_LANGUAGES]);
       // In the theme's colours, so they follow the template.
       const paint = shape.look === 'fill' ? element.fill : element.stroke;
       expect(JSON.stringify(paint)).toContain(`"token":"${shape.ink}"`);
     }
-    expect(Object.keys(en.animatedShapes.name)).toHaveLength(MOTION_SHAPES.length);
+    expect(shapes.length).toBeGreaterThan(0);
   });
 
   it('includes a circle and polygons that turn, and every kind of motion', () => {
-    const turning = MOTION_SHAPES.filter((s) => s.ambient.kind === 'spin').map((s) => s.preset);
+    const turning = shapes.filter((s) => s.ambient.kind === 'spin').map((s) => s.preset);
     expect(turning).toEqual(expect.arrayContaining(['ellipse', 'hexagon', 'octagon']));
-    const kinds = new Set(MOTION_SHAPES.map((s) => s.ambient.kind));
+    const kinds = new Set(shapes.map((s) => s.ambient.kind));
     expect([...kinds].sort()).toEqual(Object.keys(AMBIENT_DEFAULTS).sort());
   });
 
   it('draws an outline as an outline, dashed when it is', () => {
     const deck = createDeck({ lang: 'en' });
     const ring = motionShapeElement(
-      MOTION_SHAPES.find((s) => s.id === 'ring')!,
+      shapes.find((s) => s.id === 'ring')!,
       deck,
     );
     expect(ring.fill).toEqual({ kind: 'none' });
     expect(ring.stroke).toMatchObject({ color: { token: 'primary' }, dash: 'dashed' });
     const hexagon = motionShapeElement(
-      MOTION_SHAPES.find((s) => s.id === 'hexagon')!,
+      shapes.find((s) => s.id === 'hexagon')!,
       deck,
     );
     expect(hexagon.fill).toEqual({ kind: 'solid', color: { token: 'primary' } });
@@ -119,7 +123,7 @@ describe('the animated shapes', () => {
   });
 
   it('points the way the deck reads, and steps aside from what is in the middle', () => {
-    const arrow = MOTION_SHAPES.find((s) => s.id === 'arrow')!;
+    const arrow = shapes.find((s) => s.id === 'arrow')!;
     const preset = (lang: string) => {
       const e = motionShapeElement(arrow, createDeck({ lang }));
       return e.geometry.kind === 'preset' ? e.geometry.preset : undefined;

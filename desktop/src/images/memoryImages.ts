@@ -2,6 +2,7 @@ import type { AssetService } from '../document/assets';
 import type { MemorySettings } from '../settings/memorySettings';
 import {
   ImageError,
+  NOT_CHOSEN,
   type ImageClient,
   type ImageErrorKind,
   type ImageEvent,
@@ -114,18 +115,20 @@ export function memoryImages(assets: AssetService, options: MemoryImagesOptions 
   const hasKey = (provider: ImageProviderDescriptor) =>
     !provider.key || (settings?.hasSecret(provider.key) ?? false);
 
-  async function defaultProvider(): Promise<string> {
+  /** The choice, as the core reads it: none until one is made (ADR-139). */
+  async function defaultProvider(): Promise<string | null> {
     const stored = settings ? (await settings.read()).images : undefined;
     const id =
       typeof stored === 'object' && stored !== null && 'defaultProvider' in stored
         ? stored.defaultProvider
         : chosen;
-    return typeof id === 'string' && known(id) ? id : DESCRIPTOR.id;
+    return typeof id === 'string' && known(id) ? id : null;
   }
 
   /** The provider a job names, or the default one. */
   async function providerOf(id: string | null | undefined): Promise<ImageProviderDescriptor> {
     const wanted = id ?? (await defaultProvider());
+    if (wanted === null) throw new ImageError('unknown_provider', NOT_CHOSEN);
     const provider = PROVIDERS.find((p) => p.id === wanted);
     if (!provider) throw new ImageError('unknown_provider', `unknown image provider: ${wanted}`);
     return provider;

@@ -14,7 +14,9 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ColorField, useGestureTx } from '../controls';
 import { PIECE_SPEEDS } from '../elements/motion';
+import { backgroundCatalog } from '../elements/motionBackgrounds';
 import { useDeck, useEditor } from '../shell';
+import { useMediaCatalog } from '../shell/useMedia';
 import {
   applyToAllCommands,
   drawingColour,
@@ -105,6 +107,8 @@ function DrawingFields({
     const drawn = drawingPictures({ elements }).flatMap((picture) => svgColors(picture.markup!));
     return [...new Set(drawn)].filter((c) => c !== 'currentcolor').slice(0, MAX_COLOURS);
   }, [elements]);
+  // Which background of Elements moves comes from the library's catalog: drawn again when it comes.
+  useMediaCatalog(backgroundCatalog);
   if (!elements?.length) return null;
   const speed = drawingSpeed(background);
   const opacity = drawingOpacity(background) ?? 1;

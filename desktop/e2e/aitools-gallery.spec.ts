@@ -10,10 +10,10 @@ import {
   deck,
   element,
   gallery,
+  input,
   onStage,
   openApp,
   openTool,
-  runAction,
   say,
   textOf,
   TITLE,
@@ -122,13 +122,11 @@ test('three designs of a slide: thumbnails, a hover on the Stage, a click as one
   const errors = collectErrors(page);
   await openApp(page, { script: 'slide-redesign' });
   await addTitle(page, 'שלושת היעדים של 2027');
-  await openTool(page, 'actions');
+  await openTool(page);
   const depth = await undoDepth(page);
   const before = await currentSlide(page);
 
-  await runAction(page, 'slide.redesign');
-  await expect(page.getByTestId('chat-user')).toHaveAttribute('data-action', 'slide.redesign');
-  await expect(page.getByTestId('chat-user')).toContainText('עיצוב שקף 1 מחדש · 3 חלופות');
+  await say(page, 'תן לי שלושה עיצובים אחרים לשקף');
   await expect(gallery(page)).toHaveAttribute('data-kind', 'layout');
   await expect(cards(page)).toHaveCount(3);
   for (const card of await cards(page).all()) {
@@ -169,11 +167,12 @@ test('image alternatives arrive one by one, and the pick keeps the frame and the
   // The mock provider takes about two seconds an image; the script plays at its own pace.
   await openApp(page, { script: 'image-alternatives', speed: 0.2 });
   const first = await addImage(page);
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('image-provider')).toHaveAttribute('data-state', 'ready');
+  await openTool(page);
   const depth = await undoDepth(page);
 
-  await page.locator('[data-action="image.alternatives"]').click();
+  // Sent without waiting for the turn: the cards are looked at while it runs.
+  await input(page).fill('תן לי ארבע חלופות לתמונה');
+  await input(page).press('Enter');
   // The cards are there before the images: four of them, waiting.
   await expect(cards(page)).toHaveCount(4);
   await expect(gallery(page)).toContainText(/יוצר תמונות · \d מתוך 4/);

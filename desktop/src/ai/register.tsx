@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useStore } from 'zustand';
-import { Ai, Zap } from '@slidr/ui/icons';
+import { Ai } from '@slidr/ui/icons';
 import type { ChatThread } from '../agent/agentService';
 import { registerMessages } from '../i18n';
 import { importOpening } from '../import/flow';
@@ -16,17 +16,16 @@ import {
   useDeck,
   useEditor,
 } from '../shell';
-import { AiActions } from './Actions';
 import { Chat } from './Chat';
 import { en, he } from './messages';
 import { aiOf } from './runtime';
 import { activityLabel, targetSlideNumber } from './toolLabels';
 
 /*
- * The AI panels (WG11, ADR-072): one chat, and the actions that are sent to it, each a panel of
- * its own under the shell's id for it, so it takes the place of the placeholder. The chat is a
- * deck session; what the user has selected (a slide, elements, words in a text) goes to the agent
- * with each message.
+ * The AI panel (WG11, ADR-072): one chat, under the shell's id for it, so it takes the place of
+ * the placeholder. The chat is a deck session; what the user has selected (a slide, elements,
+ * words in a text) goes to the agent with each message. It has no panel of ready-made actions
+ * beside it (ADR-139): the user asks for a change in words.
  */
 
 registerMessages('ai', { he, en });
@@ -53,15 +52,6 @@ registerPanel({
   icon: Ai,
   fill: true,
   content: AiChat,
-});
-
-registerPanel({
-  id: PanelId.actions,
-  slot: 'ai',
-  order: 1,
-  title: 'panels.actions',
-  icon: Zap,
-  content: AiActions,
 });
 
 /* ---------------------------------------------------------------- the status bar (UI-07) */

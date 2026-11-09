@@ -52,16 +52,21 @@
   "ai": {
     "setup": {
       "welcome": "Te damos la bienvenida al chat de Slidr",
-      "intro": "Elige tu servicio para empezar. Después elegiremos un modelo y un nivel de esfuerzo.",
+      "intro": "Elige tu servicio para empezar. Después elegiremos un modelo, un nivel de esfuerzo y quién genera las imágenes.",
       "finish": "Terminemos la configuración",
       "finishIntro": "Faltan algunas elecciones para que el agente pueda continuar.",
       "steps": "Pasos de configuración",
       "steps_harness": "Servicio",
       "steps_model": "Modelo",
       "steps_effort": "Esfuerzo",
+      "steps_images": "Imágenes",
       "harness": "¿Con quién quieres trabajar?",
       "model": "¿Qué modelo quieres usar?",
       "effort": "¿Qué nivel de esfuerzo prefieres?",
+      "images": "¿Quién debe generar las imágenes?",
+      "imagesHint": "Para las herramientas de la aplicación y para las del agente. Puedes cambiarlo más tarde en Configuración.",
+      "imagesTrouble": "El proveedor de imágenes no pudo generar una imagen. Elige un proveedor o termina de conectarlo.",
+      "notNow": "Ahora no",
       "continue": "Continuar",
       "back": "Atrás",
       "connecting": "Conectando y cargando los modelos disponibles…",
@@ -379,35 +384,6 @@
         "other": "No se generó esta opción"
       }
     },
-    "look": {
-      "hint": "Pasa el puntero para verlo en la diapositiva · haz clic para aplicarlo",
-      "current": "En uso en la presentación",
-      "template": {
-        "title": "Plantilla",
-        "builtIn": "Integrada",
-        "personal": "Personal",
-        "undo": "Cambiar de plantilla"
-      },
-      "palette": {
-        "title": "Paleta de colores",
-        "sample": "Aa",
-        "undo": "Cambiar la paleta de colores",
-        "names": {
-          "basic": "Básica",
-          "ocean": "Océano",
-          "sage": "Salvia",
-          "rose": "Rosa",
-          "graphite": "Grafito",
-          "forest": "Bosque",
-          "plum": "Ciruela"
-        }
-      },
-      "fonts": {
-        "title": "Pareja de fuentes",
-        "undo": "Cambiar la pareja de fuentes",
-        "pair": "Títulos: {{heading}} · Cuerpo: {{body}}"
-      }
-    },
     "action": {
       "other": "Acción",
       "deck": {
@@ -470,77 +446,6 @@
       }
     },
     "actions": {
-      "wording": "Redacción",
-      "edit": "Edición",
-      "content": "Contenido",
-      "design": "Diseño",
-      "slideSettings": "La diapositiva en sí",
-      "image": "Imagen",
-      "count": "Número de opciones",
-      "variations": "Redacciones alternativas",
-      "titles": "Títulos alternativos",
-      "shorten": "Acortar",
-      "expand": "Ampliar",
-      "fix": "Corregir errores",
-      "bullets": "Convertir en viñetas",
-      "tone": "Cambiar el tono",
-      "toneChoice": "Tono",
-      "translate": "Traducir",
-      "language": "Idioma de destino",
-      "redesign": "Rediseñar",
-      "shortenSlide": "Acortar el texto",
-      "split": "Dividir en dos diapositivas",
-      "visual": "Agregar un elemento visual",
-      "addImage": "Agregar una imagen",
-      "animate": "Animaciones",
-      "notes": "Notas del orador",
-      "fixFindings": "Corregir observaciones de diseño",
-      "shortenDeck": "Acortar el texto",
-      "improve": "Mejorar el diseño",
-      "alternatives": "Generar alternativas",
-      "imagePrompt": "¿Qué debería mostrar la imagen, o qué debería cambiar en ella?",
-      "imagePromptHint": "Opcional para las alternativas: sin una descripción, el agente decide según la diapositiva.",
-      "imageEdit": "Editar con IA",
-      "editImage": "Cambiar según la descripción",
-      "restyle": "Adaptar al estilo de la presentación",
-      "paintMask": "Marcar el área que se va a cambiar",
-      "maskSet": "Hay un área marcada: solo cambiará esa área",
-      "maskClear": "Borrar la marca",
-      "expandImage": "Extender la imagen",
-      "expandTo": "Forma después de extenderla",
-      "expandHint": "La imagen se queda donde está y la IA completa a su alrededor lo que le falta para la forma elegida.",
-      "expandFailed": "No se extendió la imagen",
-      "expandSame": "La imagen ya tiene esta forma.",
-      "expandLabel": "Extender imagen",
-      "imageLocal": "Sin IA",
-      "crop": "Recortar",
-      "chart": "Gráfico",
-      "chartType": "Sugerir un tipo de gráfico",
-      "chartTitle": "Título y conclusión",
-      "chartFill": "Rellenar los datos a partir del texto",
-      "chartSource": "Pega aquí un texto o una tabla con los números",
-      "tableFill": "Rellenar la tabla a partir del texto",
-      "tableSource": "Pega aquí el texto con el que se rellenará la tabla",
-      "tableStyle": "Sugerir estilos",
-      "tableInsight": "Resumir en una conclusión",
-      "tableChart": "Convertir en gráfico",
-      "fromText": "A partir de un texto",
-      "fromTextHint": "El agente toma solo lo que dice el texto y te indica lo que dejó fuera.",
-      "onSlide": "En la diapositiva",
-      "onSlideHint": "Estas dos acciones cambian la diapositiva, no solo la tabla.",
-      "shape": "Forma",
-      "shapeSuggest": "Sugerir una forma",
-      "icon": "Icono",
-      "iconReplace": "Un icono más adecuado",
-      "colourByTheme": "Colorear según la plantilla",
-      "editKind": {
-        "exact": "El proveedor de imágenes cambia solo lo que pides, y se le puede indicar un área.",
-        "regenerate": "El proveedor de imágenes vuelve a dibujar la imagen a partir del original: los detalles pequeños cambian y no se le puede indicar un área.",
-        "none": "Este proveedor de imágenes no edita imágenes."
-      },
-      "layout": "Diseño",
-      "layoutNone": "Esta diapositiva no tiene un diseño que se pueda cambiar.",
-      "layoutLabel": "Diseño de la diapositiva",
       "languages": {
         "Hebrew": "hebreo",
         "English": "inglés",
@@ -564,32 +469,6 @@
         "friendly": "cercano",
         "confident": "seguro",
         "plain": "sencillo"
-      },
-      "template": {
-        "title": "Una plantilla nueva",
-        "open": "Crear una plantilla con IA",
-        "description": "¿Cómo debería verse la plantilla?",
-        "url": "Un sitio web al que debería parecerse la plantilla",
-        "logo": "Logotipo",
-        "chooseLogo": "Elegir un logotipo",
-        "files": "Una imagen o un archivo HTML de referencia",
-        "addFile": "Agregar un archivo",
-        "fromDeck": "Según el diseño de esta presentación",
-        "create": "Crear un borrador",
-        "hint": "El agente lee las referencias, prepara un borrador y lo muestra en el chat. No se guarda nada hasta que tú lo guardes.",
-        "needSource": "Indica al menos una referencia: una descripción, una dirección, un logotipo, un archivo o esta presentación."
-      },
-      "busy": "El agente está en medio de un turno. Las acciones volverán cuando termine.",
-      "groupSelection": "Tu selección",
-      "groupSlide": "Diapositiva {{n}}",
-      "groupDeck": "Toda la presentación",
-      "noActions": "Tu selección no tiene acciones predefinidas. Pide cualquier cambio en el chat.",
-      "provider": {
-        "checking": "Comprobando el proveedor de imágenes…",
-        "ready": "Cada imagen tarda alrededor de un minuto, y van apareciendo una a una.",
-        "not_installed": "El proveedor de imágenes no está instalado en este equipo, así que no se pueden generar imágenes.",
-        "not_logged_in": "El proveedor de imágenes no tiene la sesión iniciada. Inicia sesión en él y vuelve aquí.",
-        "unavailable": "El proveedor de imágenes no está disponible en este momento."
       }
     }
   },
@@ -1491,62 +1370,17 @@
         "scale": "Crecer y latir",
         "lines": "Líneas y ondas",
         "particles": "Partículas y redes"
-      },
-      "name": {
-        "orbit": "Órbita",
-        "conveyor": "Cajas en un recorrido",
-        "trace": "Circuito",
-        "atom": "Átomo",
-        "shuttle": "Punto en una línea",
-        "hexagon": "Hexágonos que giran",
-        "rings": "Anillos que giran",
-        "radar": "Radar",
-        "ripple": "Ondas expansivas",
-        "breathe": "Forma que respira",
-        "bars": "Barras que suben",
-        "waves": "Ondas",
-        "draw": "Flecha dibujada",
-        "flowArrow": "Conector que fluye",
-        "heartbeat": "Latido",
-        "network": "Red",
-        "converge": "Partículas que se reúnen",
-        "float": "Burbujas que suben"
       }
     },
     "backgrounds": {
       "hint": "Haz clic en un fondo para aplicarlo a la diapositiva o a todas las que seleccionaste. Sus colores vienen de la plantilla, y la herramienta «Fondo» te devuelve al fondo de la plantilla.",
       "animated": "Fondos en movimiento",
-      "still": "Fondos tranquilos",
-      "name": {
-        "flow": "Flujo de circuito",
-        "waves": "Ondas",
-        "converge": "Convergencia",
-        "orbit": "Órbitas",
-        "radar": "Radar",
-        "network": "Red",
-        "drift": "Luz que deriva",
-        "particles": "Partículas que suben",
-        "dots": "Cuadrícula de puntos",
-        "contours": "Curvas de nivel",
-        "arcs": "Arcos en la esquina"
-      }
+      "still": "Fondos tranquilos"
     },
     "animatedShapes": {
       "title": "Formas animadas",
       "hint": "Formas normales que repiten un movimiento. Su color, contorno y tamaño se editan como en cualquier forma, y su movimiento con la herramienta Movimiento.",
-      "more": "Todas las animaciones",
-      "name": {
-        "ring": "Anillo que gira",
-        "hexagon": "Hexágono que gira",
-        "star": "Estrella que gira",
-        "octagon": "Octágono que gira",
-        "square": "Cuadrado que gira y descansa",
-        "pulse": "Círculo que late",
-        "heart": "Corazón que late",
-        "float": "Círculo flotante",
-        "arrow": "Flecha que se balancea",
-        "blink": "Punto parpadeante"
-      }
+      "more": "Todas las animaciones"
     },
     "motion": {
       "title": "Movimiento",
@@ -1769,6 +1603,7 @@
       "auto": "Automática"
     },
     "state": {
+      "not_chosen": "Sin elegir",
       "checking": "Comprobando…",
       "ready": "Listo",
       "not_installed": "No instalado",
@@ -1795,20 +1630,6 @@
       "signingIn": "Completa el inicio de sesión en la ventana que se abrió.",
       "install": "Instalar…",
       "signIn": "Iniciar sesión"
-    },
-    "mask": {
-      "title": "Marcar el área que se va a cambiar",
-      "description": "Pinta la parte de la imagen que la IA puede cambiar. Lo que no pintes quedará exactamente como está.",
-      "canvas": "La imagen, para pintar el área",
-      "tool": "Herramienta",
-      "paint": "Pintar",
-      "erase": "Borrar",
-      "brush": "Tamaño del pincel",
-      "clear": "Limpiar",
-      "empty": "Todavía no hay ningún área pintada.",
-      "done": "Listo",
-      "cancel": "Cancelar",
-      "failed": "No se guardó la marca"
     },
     "upscale": {
       "title": "Aumentar resolución",
@@ -2824,11 +2645,8 @@
       "tools": "Herramientas",
       "collapse": "Contraer el panel",
       "resize": "Cambiar el tamaño del panel",
-      "actions": "Acciones",
       "chatEmptyTitle": "El chat todavía no está conectado",
       "chatEmptyBody": "Aquí le pedirás cambios al agente y verás cómo se aplican en la diapositiva.",
-      "actionsEmptyTitle": "Todavía no hay acciones",
-      "actionsEmptyBody": "Aquí aparecerán acciones rápidas para esta herramienta.",
       "soonTitle": "Todavía no está disponible",
       "mediaBody": "Archivos subidos, fotos de stock, iconos e imágenes con IA.",
       "animationsBody": "Efectos de animación y la escala de tiempo de la diapositiva.",

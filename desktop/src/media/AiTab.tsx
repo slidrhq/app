@@ -156,6 +156,11 @@ function useProviderState(): ProviderStateLabel | null {
       .catch(() => undefined)
       .then(() => Promise.all([client.defaultProvider(), client.providers()]))
       .then(async ([id, providers]) => {
+        // None chosen yet (ADR-139): the banner leads to the settings, where one is.
+        if (id === null) {
+          if (current) setLabel('not_chosen');
+          return;
+        }
         const provider = providers.find((p) => p.id === id);
         if (!provider || !current) return;
         const stored = provider.key ? useSettings.getState().keys[provider.key] : false;

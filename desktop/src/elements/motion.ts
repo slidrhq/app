@@ -1,5 +1,6 @@
 import {
   createElement,
+  createSlide,
   findSlide,
   type Background,
   type Command,
@@ -18,10 +19,12 @@ import {
   type MotionPiece,
   type PicturePiece,
 } from './motionPieces';
+import { motionShapeElement, type MotionShape } from './motionShapes';
 
 /*
  * What the animations and the backgrounds of Elements put on a slide (ADR-127). Pure, so it is
- * tested without a DOM: the panel and the insert functions call it.
+ * tested without a DOM: the panel and the insert functions call it, and so does the page of
+ * Slidr Library, which draws their tiles as the panel does (ADR-138).
  */
 
 /**
@@ -182,4 +185,99 @@ export function backgroundCommands(
 export function shownMotionBackground(deck: Deck, slide: Slide): string | undefined {
   const name = shownBackground(deck, slide).elements?.[0]?.name;
   return name?.startsWith('background-') ? name.slice('background-'.length) : undefined;
+}
+
+/* ---------------------------------------------------------------- tiles */
+
+/** The longest side of an animation on its tile's slide, as a share of the slide's height. */
+const PIECE_HEIGHT = 0.84;
+
+/** The longest side of an animated shape on its tile's slide, as a share of the slide's height. */
+const SHAPE_HEIGHT = 0.6;
+
+/**
+ * A line of an animation (ADR-131) drawn `scale` times as large: its points, its width and the
+ * pace of what runs along it, so that it looks and moves on its tile as on a slide of its size.
+ */
+function scaledLine(line: LineElement, scale: number): LineElement {
+  const { flow } = line;
+  return {
+    ...line,
+    points: line.points.map((p) => ({ x: p.x * scale, y: p.y * scale })),
+    stroke: { ...line.stroke, width: line.stroke.width * scale },
+    ...(flow
+      ? {
+          flow: {
+            ...flow,
+            speed: flow.speed * scale,
+            ...(flow.size === undefined ? {} : { size: flow.size * scale }),
+          },
+        }
+      : {}),
+  };
+}
+
+/** The slide an animation's tile draws: the piece, large, in the middle of the theme's ground. */
+export function pieceSlide(piece: MotionPiece, deck: Deck): Slide {
+  const element = motionElement(piece, deck);
+  const scale = (deck.size.h * PIECE_HEIGHT) / Math.max(piece.size.h, piece.size.w * 0.56);
+  const [w, h] = [piece.size.w * scale, piece.size.h * scale];
+  const frame = { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h };
+  const id = `motion_${piece.id}`;
+  return createSlide({
+    id: `s_motion_${piece.id}`,
+    background: { fill: { kind: 'solid', color: { token: 'bg' } } },
+    elements: [
+      element.type === 'line'
+        ? { ...scaledLine(element, scale), id, frame }
+        : { ...element, id, frame },
+    ],
+  });
+}
+
+/** The slide an animated shape's tile draws: the shape, large, in the middle of the theme's ground. */
+export function shapeSlide(shape: MotionShape, deck: Deck): Slide {
+  const element = motionShapeElement(shape, deck);
+  const { w: ew, h: eh } = element.frame;
+  // Room around it for what it does: a float rises, a beat grows, a swing leans.
+  const scale = (deck.size.h * SHAPE_HEIGHT) / Math.max(eh, ew * 0.56);
+  const [w, h] = [ew * scale, eh * scale];
+  const ambient =
+    shape.ambient.kind === 'float'
+      ? { ...shape.ambient, amount: (shape.ambient.amount ?? 16) * scale }
+      : shape.ambient;
+  return createSlide({
+    id: `s_motion_shape_${shape.id}`,
+    background: { fill: { kind: 'solid', color: { token: 'bg' } } },
+    elements: [
+      {
+        ...element,
+        id: `motion_shape_${shape.id}`,
+        frame: { x: (deck.size.w - w) / 2, y: (deck.size.h - h) / 2, w, h },
+        ambient,
+        // Its outline as thick on the tile as on a slide of its own size.
+        ...(element.stroke
+          ? { stroke: { ...element.stroke, width: element.stroke.width * scale } }
+          : {}),
+      },
+    ],
+  });
+}
+
+/**
+ * The slide a background's tile draws: the ground it is put on (the slide's, in the panel; the
+ * theme's, in the library's page) under the background's drawing, as a click would leave it.
+ */
+export function backgroundSlide(
+  background: MotionBackground,
+  deck: Deck,
+  ground: Background,
+): Slide {
+  return createSlide({
+    id: `s_background_${background.id}`,
+    background: backgroundWith(ground, {
+      ...backgroundDrawing(background, deck),
+      id: `background_${background.id}`,
+    }),
+  });
 }

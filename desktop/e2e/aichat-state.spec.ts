@@ -1,4 +1,4 @@
-import { closeSync, ftruncateSync, mkdirSync, openSync, readFileSync, rmSync } from 'node:fs';
+import { closeSync, ftruncateSync, mkdirSync, openSync, rmSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import type * as Runtime from '../src/ai/runtime';
@@ -9,15 +9,15 @@ import {
   LOGO,
   openApp as openDeckChat,
   say as sayToDeck,
-  tab,
+  showChat,
   turnEnds,
   turns,
 } from './aifinish-helpers';
-import { addChart, addImage, chips, openApp, openTool, say } from './aitools-helpers';
+import { chips, openApp, openTool, say } from './aitools-helpers';
 
 /*
  * What a chat holds on to and what it lets go of, against the scripted mock agent: across a look
- * at another tab or panel, across a document that is opened in the same window, and across a
+ * at another panel, across a document that is opened in the same window, and across a
  * long history. Each test here was a defect the bug hunt of 2026-10-04 proved (`ai-ui.md`).
  */
 
@@ -72,9 +72,9 @@ test('what was typed and attached in a chat is there after a look elsewhere', as
   await choose(page, () => page.getByTestId('chat-attach').click(), LOGO.path);
   await expect(attached).toHaveCount(1);
 
-  // The Actions panel of the tool, where its template gallery is, and back (finding 3).
-  await tab(page, 'actions');
-  await tab(page, 'chat');
+  // The templates panel, and back (finding 3).
+  await page.getByTestId('activity-bar').locator('[data-panel="templates"]').click();
+  await showChat(page);
   await expect(input(page)).toHaveValue(request);
   await expect(attached).toHaveCount(1);
 
@@ -96,8 +96,8 @@ test('what was typed and attached in a chat is there after a look elsewhere', as
   await expect(attached).toHaveCount(1);
   await input(page).press('Enter');
   await turnEnds(page, 1);
-  await tab(page, 'actions');
-  await tab(page, 'chat');
+  await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
+  await showChat(page);
   await expect(input(page)).toHaveValue('');
   await expect(attached).toHaveCount(0);
 });
@@ -236,92 +236,4 @@ test('a file a message cannot take is refused in words, with the limit', async (
   } finally {
     rmSync(big, { force: true });
   }
-});
-
-test('the template form says which file it left out, and a new logo takes the place of the old', async ({
-  page,
-}) => {
-  const logo = readFileSync(LOGO.path);
-  const picture = (name: string) => ({ name, mimeType: 'image/png', buffer: logo });
-  /** Answers the file dialog a button of the form opens. */
-  const pick = async (button: string, files: ReturnType<typeof picture>[]) => {
-    const chooser = page.waitForEvent('filechooser');
-    await page.getByTestId(button).click();
-    await (await chooser).setFiles(files);
-  };
-  await openDeckChat(page, { script: 'template-create', lang: 'en' });
-  await tab(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  const rows = page.getByTestId('template-file');
-  const theLogo = page.locator('[data-testid="template-file"][data-use="logo"]');
-  const refused = page.getByTestId('files-refused');
-
-  // A logo and nine examples: as many files as a message takes.
-  await pick('template-logo', [picture('logo.png')]);
-  await pick(
-    'template-files',
-    Array.from({ length: 9 }, (_, i) => picture(`example-${i + 1}.png`)),
-  );
-  await expect(rows).toHaveCount(10);
-  await expect(refused).toHaveCount(0);
-
-  // One more example has no room, and the form says so, with the limit.
-  await pick('template-files', [picture('one-too-many.png')]);
-  await expect(refused).toHaveRole('alert');
-  await expect(refused).toContainText('up to 10 files');
-  await expect(rows).toHaveCount(10);
-
-  // A new logo takes the place of the old one, so it needs no room of its own. It used to
-  // remove the old logo and add nothing (finding 11).
-  await pick('template-logo', [picture('new-logo.png')]);
-  await expect(rows).toHaveCount(10);
-  await expect(theLogo).toHaveCount(1);
-  await expect(theLogo).toContainText('new-logo.png');
-  await expect(refused).toHaveCount(0);
-});
-
-test('what is filled in on the Actions panel is there after a look at the chat', async ({
-  page,
-}) => {
-  const logo = readFileSync(LOGO.path);
-  await openApp(page, { script: 'image-alternatives' });
-
-  // The form of a template: its sources are gathered over a while.
-  await openTool(page, 'actions');
-  await page.locator('[data-action="template.create"]').click();
-  await page.getByTestId('template-description').fill('נקי ורגוע, בכחול עמוק');
-  await page.getByTestId('template-url').fill('https://example.com');
-  const chooser = page.waitForEvent('filechooser');
-  await page.getByTestId('template-logo').click();
-  await (await chooser).setFiles({ name: 'logo.png', mimeType: 'image/png', buffer: logo });
-  await expect(page.getByTestId('template-file')).toHaveCount(1);
-  await openTool(page, 'chat');
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('template-description')).toHaveValue('נקי ורגוע, בכחול עמוק');
-  await expect(page.getByTestId('template-url')).toHaveValue('https://example.com');
-  await expect(page.getByTestId('template-file')).toContainText('logo.png');
-
-  // The prompt of a picture, among the actions of the selection: there after the chat, and
-  // after another panel.
-  await addImage(page);
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('image-provider')).toHaveAttribute('data-state', 'ready');
-  await page.getByTestId('image-prompt').fill('נמל דייגים קטן בזריחה');
-  await openTool(page, 'chat');
-  await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('image-prompt')).toHaveValue('נמל דייגים קטן בזריחה');
-  // Sent with an action, it has done its work: the form starts over.
-  await page.locator('[data-action="image.alternatives"]').click();
-  await expect(page.getByTestId('chat-user')).toBeVisible();
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('image-prompt')).toHaveValue('');
-
-  // The text a chart is filled from, likewise.
-  await addChart(page);
-  await openTool(page, 'actions');
-  await page.getByTestId('fill-source').fill('2024: 120, 2025: 180, 2026: 260');
-  await openTool(page, 'chat');
-  await openTool(page, 'actions');
-  await expect(page.getByTestId('fill-source')).toHaveValue('2024: 120, 2025: 180, 2026: 260');
 });

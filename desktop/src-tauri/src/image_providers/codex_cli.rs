@@ -1363,6 +1363,7 @@ mod tests {
             )),
             vec![Arc::new(CodexCli::new())],
         ));
+        service.set_default_provider("codex-cli")?;
         Ok(Real {
             assets: storage.assets_dir(&workspace)?,
             storage,

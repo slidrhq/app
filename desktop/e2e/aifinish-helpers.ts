@@ -50,12 +50,11 @@ export const outline = (page: Page): Locator => page.getByTestId('outline');
 /** The answers to the outline, at the end of its turn. */
 export const outlineAnswer = (page: Page): Locator => page.getByTestId('outline-answer');
 
-/** Shows the AI chat, or the panel of its actions, from the Activity Bar. */
-export async function tab(page: Page, name: 'chat' | 'actions'): Promise<void> {
-  const id = name === 'chat' ? 'ai' : 'actions';
-  const button = page.getByTestId('activity-bar').locator(`[data-panel="${id}"]`);
+/** Shows the AI chat from the Activity Bar, when another panel or none is shown. */
+export async function showChat(page: Page): Promise<void> {
+  const button = page.getByTestId('activity-bar').locator('[data-panel="ai"]');
   if ((await button.getAttribute('aria-pressed')) !== 'true') await button.click();
-  await expect(page.locator(`section[data-panel="${id}"]`)).toBeVisible();
+  await expect(page.locator('section[data-panel="ai"]')).toBeVisible();
 }
 
 /** Waits for the latest turn, with every round of the design check, to end. */

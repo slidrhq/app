@@ -362,12 +362,9 @@ export function select(page: Page, ids: string[]): Promise<void> {
   }, ids);
 }
 
-/**
- * The Tool Panel while it shows the AI chat or its actions (ADR-072): one of them at a time. The
- * one shown: a panel that is not is kept, hidden.
- */
+/** The Tool Panel while it shows the AI chat (ADR-072); hidden, it is kept but not shown. */
 export const panel = (page: Page): Locator =>
-  page.locator('section[data-panel="ai"], section[data-panel="actions"]').filter({ visible: true });
+  page.locator('section[data-panel="ai"]').filter({ visible: true });
 
 /** What the next message is about, beside the composer. */
 export const focusChip = (page: Page): Locator => page.getByTestId('focus-chip');

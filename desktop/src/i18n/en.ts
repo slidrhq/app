@@ -108,12 +108,9 @@ export const en: Messages<typeof he> = {
     tools: 'Tools',
     collapse: 'Collapse panel',
     resize: 'Resize panel',
-    actions: 'Actions',
     chatEmptyTitle: 'Chat isn’t connected yet',
     chatEmptyBody:
       'This is where you’ll ask the agent for changes and watch them happen on the slide.',
-    actionsEmptyTitle: 'No actions yet',
-    actionsEmptyBody: 'Quick actions for this tool will appear here.',
     soonTitle: 'Not available yet',
     mediaBody: 'Uploads, stock photos, icons and AI images.',
     animationsBody: 'Animation effects and the slide timeline.',

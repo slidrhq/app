@@ -52,7 +52,8 @@ import { scrollerOf, tell, useDeck, useEditor } from '../shell';
 import { insertTable } from '../table/insert';
 import { TableInsert } from '../table/TableInsert';
 import { insertMotionShape } from './insert';
-import { MOTION_SHAPES, type MotionShape } from './motionShapes';
+import { animationCatalog, motionName } from './motionPieces';
+import type { MotionShape } from './motionShapes';
 import { KIND_ICONS } from './MotionTool';
 import { CardArt, LineArt, MotionShapeArt, ShapeArt, ShapeInks } from './shapeArt';
 import { ListEnd, StickerGrid } from './StickerGrid';
@@ -508,10 +509,10 @@ export const OpenCollectionContext = createContext<(id: CollectionId) => void>((
 const lessMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function MotionShapeTile({ shape, rtl }: { shape: MotionShape; rtl: boolean }) {
-  const { t } = useTranslation('elements');
+  const { t, i18n } = useTranslation('elements');
   const editor = useEditor();
   const [playing, setPlaying] = useState(false);
-  const name = t(`animatedShapes.name.${shape.id}`);
+  const name = motionName(shape, i18n.language);
   const play = (on: boolean) => setPlaying(on && !lessMotion());
   return (
     <Tooltip content={name}>
@@ -540,18 +541,21 @@ function MotionShapeTile({ shape, rtl }: { shape: MotionShape; rtl: boolean }) {
 
 /**
  * The animated shapes of Elements (ADR-128) as a group of the Shapes collection: still, each
- * moving while the pointer or the keyboard is on it, and the way to every other animation.
+ * moving while the pointer or the keyboard is on it, and the way to every other animation. They
+ * are the media library's (ADR-138): none until its catalog has come, and then the group is drawn.
  */
 function MotionShapeTiles({ rtl }: { rtl: boolean }) {
   const { t } = useTranslation('elements');
   const open = useContext(OpenCollectionContext);
+  const { shapes } = useMediaCatalog(animationCatalog);
   const title = t('animatedShapes.title');
+  if (shapes.length === 0) return null;
   return (
     <section
       role="group"
       aria-label={title}
       className="shape-group"
-      data-tiles={MOTION_SHAPES.length}
+      data-tiles={shapes.length}
       data-testid="elements-motion-shapes"
     >
       <style>{AMBIENT_KEYFRAMES}</style>
@@ -566,7 +570,7 @@ function MotionShapeTiles({ rtl }: { rtl: boolean }) {
           {t('animatedShapes.more')}
         </Button>
       </div>
-      {MOTION_SHAPES.map((shape) => (
+      {shapes.map((shape) => (
         <MotionShapeTile key={shape.id} shape={shape} rtl={rtl} />
       ))}
     </section>

@@ -42,6 +42,7 @@ import { appTemplateService, library } from '../templates/app';
 import { editorFor } from '../text/activeEditor';
 import { textSelectionOf } from '../text/selectedText';
 import { createDrafts, type Drafts } from './drafts';
+import { createImageSetup, watchImageSetup, type ImageSetup } from './imageSetup';
 import { createGallery, type Gallery } from './variations';
 import { createSessions, type Sessions } from './sessions';
 import { createUndoneTurns, type UndoneTurns } from './undone';
@@ -110,6 +111,11 @@ export interface AiRuntime {
   gallery: Gallery;
   /** The image providers, for asking whether one can generate before offering it (ADR-025). */
   images: AppImages;
+  /**
+   * What the chat's image step goes by besides the settings: a job of the agent met a provider
+   * that could not run, or the user put the step off (ADR-139).
+   */
+  imageSetup: StoreApi<ImageSetup>;
   /** The chats the panels have open, and which of them are working. */
   sessions: Sessions;
   /** What is being written in each chat: it outlives the panel that shows the chat. */
@@ -134,6 +140,8 @@ function createAi(editor: Editor): AiRuntime {
     gallery.imageEvent,
     (id) => editor.bus.deck.assets[id],
   );
+  // A job that meets a provider that cannot run has the chat ask for one once the turn ends.
+  const imageSetup = createImageSetup();
   const lint = createLintService((asset) => editor.assets.url(asset));
   // What the user has selected, read when a turn starts and by `selection_get`: with the words
   // selected in the text being edited, which the text editor holds (ADR-072).
@@ -165,7 +173,7 @@ function createAi(editor: Editor): AiRuntime {
     layouts: createLayoutService(),
     // Drafting a template converts its layouts, lints them and takes their picture.
     templates: appTemplateService(editor, { conversion, lint, capture }),
-    images: images.service,
+    images: watchImageSetup(images.service, imageSetup),
     options: gallery.service,
     capture,
     conversion,
@@ -256,6 +264,7 @@ function createAi(editor: Editor): AiRuntime {
     agent,
     gallery,
     images,
+    imageSetup,
     // The conversation of the import the deck came from is one of the chat's (SPEC 13.3).
     sessions: createSessions(agent, editor.bus, () => {
       const { file, deckId } = importState.getState();

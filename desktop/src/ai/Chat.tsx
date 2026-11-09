@@ -974,6 +974,9 @@ export function Chat({
     !!setup.descriptor &&
     !setup.choosingHarness &&
     setup.state?.connection?.status.state !== 'ready';
+  // Who makes the images is asked once the turn is over: a job that met a provider that could
+  // not run must not take the Stop button away from the turn still running (ADR-139).
+  const setupShown = setup.needed && !(setup.images && state.busy);
 
   let content: ReactNode;
   if (exporting && state.entries.length === 0) {
@@ -986,7 +989,7 @@ export function Chat({
     );
   } else if (!state.ready || (state.entries.length === 0 && setup.checking)) {
     content = <Loading />;
-  } else if (state.entries.length === 0 && setup.needed) {
+  } else if (state.entries.length === 0 && setupShown) {
     content = <ChatSetup setup={setup} />;
   } else if (state.entries.length === 0) {
     content = (
@@ -1022,7 +1025,7 @@ export function Chat({
         )}
         {state.busy && <Working activity={state.activity} stopping={state.stopping} />}
         {afterMessages}
-        {setup.needed && !inCard && <ChatSetup setup={setup} midway />}
+        {setupShown && !inCard && <ChatSetup setup={setup} midway />}
         {exporting && <ExportCard />}
       </div>
     );
@@ -1051,7 +1054,7 @@ export function Chat({
       {deck && <Gallery />}
       {/* A template the agent drafted is shown before anything is saved (THM-06). */}
       {deck && <TemplateDraftCard />}
-      {!setup.needed && !setup.checking && (
+      {!setupShown && !setup.checking && (
         <Composer
           focus={deck ? focus : null}
           threadId={thread.id}

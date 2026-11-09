@@ -8,7 +8,7 @@ import {
   outline,
   outlineAnswer,
   say,
-  tab,
+  showChat,
   turnEnds,
   turns,
   undoDepth,
@@ -170,8 +170,8 @@ test('the outline is edited in its card, and approved as the user left it', asyn
 
   // What was edited is not lost when the panel shows something else for a moment: the panel is
   // kept, hidden, and the card is still being edited when it is shown again.
-  await tab(page, 'actions');
-  await tab(page, 'chat');
+  await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
+  await showChat(page);
   await expect(outline(page)).toHaveAttribute('data-edited', 'true');
   await expect(outline(page).getByTestId('outline-edit')).toHaveAttribute('aria-pressed', 'true');
   const edited = [PROPOSED[3], 'איפה אנחנו עומדים', PROPOSED[2], 'מה מבקשים מההנהלה'];

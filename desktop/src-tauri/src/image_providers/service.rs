@@ -37,6 +37,10 @@ const MAX_JOB_ID: usize = 64;
 const SECTION: &str = "images";
 /// The stand-in of the tests, offered whatever the organization's settings say.
 const MOCK: &str = "mock";
+/// What a job that names no provider is told while none is chosen. The agent reads it.
+const NOT_CHOSEN: &str = "No image provider is chosen yet, so no image can be made. Tell the \
+                          user to choose one: the chat asks for it when this turn ends, and \
+                          Settings has it under Media.";
 
 /// Owns the providers and the running jobs. Shared by the IPC commands; testable without Tauri.
 pub struct ImageService {
@@ -72,7 +76,8 @@ enum Work {
 type Deliver = Arc<dyn Fn(ImageEvent) + Send + Sync>;
 
 impl ImageService {
-    /// A service over `providers`; the first is the default until the user picks another.
+    /// A service over `providers`. None is the default until the user, or the organization,
+    /// chooses one.
     pub fn new(settings: Arc<Settings>, providers: Vec<Arc<dyn ImageProvider>>) -> Self {
         let providers = providers
             .into_iter()
@@ -144,10 +149,10 @@ impl ImageService {
         Ok(self.slot(Some(provider_id))?.provider.probe().await)
     }
 
-    /// The provider a job uses when it names none: the user's choice while it is still
-    /// registered, the first provider otherwise.
-    pub fn default_provider(&self) -> Result<String> {
-        Ok(self.slot(None)?.descriptor.id.clone())
+    /// The provider a job uses when it names none: the user's choice while it is offered, else
+    /// the organization's. None until one of them chooses: the app picks none itself (ADR-139).
+    pub fn default_provider(&self) -> Option<String> {
+        self.chosen().map(|slot| slot.descriptor.id.clone())
     }
 
     /// Makes `provider_id` the default and remembers it across runs.
@@ -351,36 +356,36 @@ impl ImageService {
 
     /// The provider `id` names, or the default one.
     fn slot(&self, id: Option<&str>) -> Result<&Slot> {
-        let offer = self.offer();
-        let offered =
-            |slot: &&Slot| slot.descriptor.id == MOCK || offer.allows(&slot.descriptor.id);
-        let find = |id: &str| {
-            self.providers
-                .iter()
-                .filter(offered)
-                .find(|slot| slot.descriptor.id == id)
-        };
-        // The user's choice, while it is offered; else the organization's; else the first.
-        let found = match id {
-            Some(id) => find(id),
+        match id {
+            Some(id) => self.offered(id).ok_or_else(|| {
+                ImageError::new(
+                    ImageErrorKind::UnknownProvider,
+                    format!("unknown image provider: {id}"),
+                )
+            }),
             None => self
-                .settings
-                .read::<Choice>(SECTION)
-                .default_provider
-                .as_deref()
-                .and_then(find)
-                .or_else(|| offer.chosen().and_then(find))
-                .or_else(|| self.providers.iter().find(offered)),
-        };
-        found.ok_or_else(|| {
-            ImageError::new(
-                ImageErrorKind::UnknownProvider,
-                match id {
-                    Some(id) => format!("unknown image provider: {id}"),
-                    None => "no image provider is registered".into(),
-                },
-            )
+                .chosen()
+                .ok_or_else(|| ImageError::new(ImageErrorKind::UnknownProvider, NOT_CHOSEN)),
+        }
+    }
+
+    /// The provider `id` names, when it is registered and offered.
+    fn offered(&self, id: &str) -> Option<&Slot> {
+        let offer = self.offer();
+        self.providers.iter().find(|slot| {
+            slot.descriptor.id == id && (id == MOCK || offer.allows(&slot.descriptor.id))
         })
+    }
+
+    /// The user's choice, while it is offered; else the organization's. Never the first
+    /// provider by itself: until someone chooses, the chat asks (ADR-139).
+    fn chosen(&self) -> Option<&Slot> {
+        self.settings
+            .read::<Choice>(SECTION)
+            .default_provider
+            .as_deref()
+            .and_then(|id| self.offered(id))
+            .or_else(|| self.offer().chosen().and_then(|id| self.offered(id)))
     }
 }
 
@@ -540,6 +545,7 @@ mod tests {
             Arc::new(Settings::open(root.path().join("settings.json"))),
             vec![Arc::new(mock)],
         ));
+        service.set_default_provider("mock")?;
         let (sender, events) = mpsc::unbounded_channel();
         Ok(Bench {
             assets: storage.assets_dir(&workspace.id)?,
@@ -848,6 +854,7 @@ mod tests {
             Arc::new(Settings::open(root.path().join("settings.json"))),
             vec![Arc::new(Redrawing(MockProvider::new(DELAY)))],
         );
+        service.set_default_provider("redrawing")?;
         let edit = |mask: Option<String>| EditJob {
             asset_id: source.id.clone(),
             instruction: "replace the sky".into(),
@@ -962,30 +969,57 @@ mod tests {
                 .collect::<Vec<_>>(),
             ["redrawing", "mock"]
         );
+        // None until chosen: the app does not pick the first by itself (ADR-139).
+        assert_eq!(first.default_provider(), None);
         assert_eq!(
-            first.default_provider()?,
-            "redrawing",
-            "the first, until chosen"
+            first.slot(None).err().map(|e| (e.kind, e.message)),
+            Some((ImageErrorKind::UnknownProvider, NOT_CHOSEN.into()))
         );
         assert_eq!(
             first.set_default_provider("nope").err().map(|e| e.kind),
             Some(ImageErrorKind::UnknownProvider)
         );
         first.set_default_provider("mock")?;
-        assert_eq!(first.default_provider()?, "mock");
+        assert_eq!(first.default_provider().as_deref(), Some("mock"));
 
         // The next run of the app reads the choice back.
-        assert_eq!(service(both()).default_provider()?, "mock");
-        // A choice that is no longer registered falls back to the first provider.
+        assert_eq!(service(both()).default_provider().as_deref(), Some("mock"));
+        // A choice that is no longer registered is no choice.
         let without = service(vec![Arc::new(Redrawing(MockProvider::new(DELAY)))]);
-        assert_eq!(without.default_provider()?, "redrawing");
-        assert_eq!(
-            service(Vec::new()).default_provider().err().map(|e| e.kind),
-            Some(ImageErrorKind::UnknownProvider)
-        );
+        assert_eq!(without.default_provider(), None);
+        assert_eq!(service(Vec::new()).default_provider(), None);
         // A damaged file is "no choice yet".
         fs::write(&file, b"{ not json")?;
-        assert_eq!(service(both()).default_provider()?, "redrawing");
+        assert_eq!(service(both()).default_provider(), None);
+        Ok(())
+    }
+
+    #[test]
+    fn the_organizations_default_stands_until_the_user_chooses() -> TestResult {
+        let root = tempfile::tempdir()?;
+        let service = |file: &str| {
+            ImageService::new(
+                Arc::new(Settings::open(root.path().join(file))),
+                vec![
+                    Arc::new(Redrawing(MockProvider::new(DELAY))),
+                    Arc::new(MockProvider::new(DELAY)),
+                ],
+            )
+        };
+        let offer = |default: &str| Offer {
+            offered: Some(vec!["redrawing".into()]),
+            default: Some(default.into()),
+        };
+        let first = service("first.json");
+        first.set_offer(offer("redrawing"));
+        assert_eq!(first.default_provider().as_deref(), Some("redrawing"));
+        // The user's own choice comes first, while it is offered; the mock always is.
+        first.set_default_provider("mock")?;
+        assert_eq!(first.default_provider().as_deref(), Some("mock"));
+        // A default the organization does not offer is none.
+        let other = service("other.json");
+        other.set_offer(offer("elsewhere"));
+        assert_eq!(other.default_provider(), None);
         Ok(())
     }
 
@@ -1004,7 +1038,7 @@ mod tests {
         let legacy = root.path().join("image-providers.json");
         fs::write(&legacy, br#"{ "defaultProvider": "mock" }"#)?;
         service.adopt_legacy_choice(&legacy);
-        assert_eq!(service.default_provider()?, "mock");
+        assert_eq!(service.default_provider().as_deref(), Some("mock"));
         assert!(!legacy.exists());
         assert_eq!(
             settings.all().get("images"),
@@ -1015,10 +1049,10 @@ mod tests {
         service.set_default_provider("redrawing")?;
         fs::write(&legacy, br#"{ "defaultProvider": "mock" }"#)?;
         service.adopt_legacy_choice(&legacy);
-        assert_eq!(service.default_provider()?, "redrawing");
+        assert_eq!(service.default_provider().as_deref(), Some("redrawing"));
         // The webview writes the same section; the service reads what is there now.
         settings.write("images", json!({ "defaultProvider": "mock" }))?;
-        assert_eq!(service.default_provider()?, "mock");
+        assert_eq!(service.default_provider().as_deref(), Some("mock"));
         Ok(())
     }
 }

@@ -35,7 +35,7 @@ async function call<T>(command: string, args?: InvokeArgs): Promise<T> {
 export const tauriImages: ImageClient = {
   providers: () => call<ImageProviderDescriptor[]>('image_providers'),
   probe: (providerId) => call<ImageProviderStatus>('image_probe', { providerId }),
-  defaultProvider: () => call<string>('image_default_provider'),
+  defaultProvider: () => call<string | null>('image_default_provider'),
   setDefaultProvider: async (providerId) => {
     await call('image_set_default_provider', { providerId });
   },

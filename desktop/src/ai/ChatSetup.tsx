@@ -1,4 +1,4 @@
-﻿import { useEffect, useId, useState } from 'react';
+﻿import { useEffect, useId, useState, type ReactNode } from 'react';
 import { useStore } from 'zustand';
 import { useTranslation } from 'react-i18next';
 import { Button, ChoiceList, Icon, Skeleton, cx } from '@slidr/ui';
@@ -12,13 +12,27 @@ import {
   installedByOrganization,
   installDescription,
 } from '../agent/harnessLook';
-import { chooseHarness, chosenHarness, setAgentSettings, useAgentSettings } from '../settings';
-import { defaultAgent } from '../settings/systemSettings';
+import { ImageSettings, type ChosenProviderState } from '../images/ImageSettings';
+import {
+  chooseHarness,
+  chosenHarness,
+  setAgentSettings,
+  useAgentSettings,
+  useSection,
+} from '../settings';
+import { defaultAgent, defaultImageProvider } from '../settings/systemSettings';
 import { useEditor } from '../shell';
-import { agentOf } from './runtime';
+import { finishImageSetup, putOffImageSetup } from './imageSetup';
+import { agentOf, aiOf } from './runtime';
+
+/** The steps of the setup, in order: the agent's three, then who makes the images (ADR-139). */
+const STEPS = ['harness', 'model', 'effort', 'images'] as const;
+type Step = (typeof STEPS)[number];
 
 export function useChatSetup(problem?: ChatProblem) {
-  const agent = agentOf(useEditor());
+  const editor = useEditor();
+  const agent = agentOf(editor);
+  const { imageSetup } = aiOf(editor);
   const settings = useAgentSettings();
   const [harnesses, setHarnesses] = useState<HarnessDescriptor[]>();
   const [failed, setFailed] = useState(false);
@@ -52,9 +66,20 @@ export function useChatSetup(problem?: ChatProblem) {
       (!!connection &&
         (connection.status.state !== 'ready' ||
           !!selectionIssue(connection.harness, settings.model, settings.effort))));
-  const needed = !mock && (missingChoices || reselecting || repair);
+  const agentNeeded = !mock && (missingChoices || reselecting || repair);
+  // Who makes the images is the last step (ADR-139). It follows the agent's whenever the agent
+  // was set up here, and is asked on its own while no provider is chosen (unless put off), and
+  // when a job of the agent met a provider that could not run. The scripted agent asks nothing.
+  const imageChoice = useSection('images').defaultProvider;
+  const imagesChosen = typeof imageChoice === 'string' || !!defaultImageProvider();
+  const imageTrouble = useStore(imageSetup, (state) => state.trouble);
+  const imagesLater = useStore(imageSetup, (state) => state.later);
+  const [afterAgent, setAfterAgent] = useState(false);
+  const images =
+    !mock && !agentNeeded && (afterAgent || imageTrouble || (!imagesChosen && !imagesLater));
+  const needed = agentNeeded || images;
   useEffect(() => {
-    if (!needed) return;
+    if (!agentNeeded) return;
     let current = true;
     agent.harnesses().then(
       (found) => {
@@ -70,7 +95,7 @@ export function useChatSetup(problem?: ChatProblem) {
     return () => {
       current = false;
     };
-  }, [agent, attempt, needed]);
+  }, [agent, attempt, agentNeeded]);
   // Chosen before this setup: in Settings, or in a setup of an earlier run.
   const chosenBefore =
     !!descriptor && confirmedHarness !== descriptor.id && chosenHarness() === descriptor.id;
@@ -79,10 +104,10 @@ export function useChatSetup(problem?: ChatProblem) {
   const choosingHarness = reselecting || !descriptor || (!settings.model && !chosen);
   useEffect(() => {
     // Going on from the model of an agent chosen is an explicit request to load its models.
-    if (needed && descriptor && !mock && !choosingHarness && chosen)
+    if (agentNeeded && descriptor && !mock && !choosingHarness && chosen)
       void agent.setup.connect(descriptor.id).catch(() => undefined);
-  }, [agent, needed, descriptor, mock, choosingHarness, chosen]);
-  const checking = needed && !harnesses && !failed && !descriptor;
+  }, [agent, agentNeeded, descriptor, mock, choosingHarness, chosen]);
+  const checking = agentNeeded && !harnesses && !failed && !descriptor;
   return {
     agent,
     settings,
@@ -91,6 +116,12 @@ export function useChatSetup(problem?: ChatProblem) {
     state,
     checking,
     needed,
+    /** Only the image step is left: the agent is set up. */
+    images,
+    /** A job of the agent met an image provider that could not run. */
+    imageTrouble,
+    /** The agent was set up here, so the image step follows it. */
+    afterAgent,
     failed,
     choosingHarness,
     chosenBefore,
@@ -101,6 +132,16 @@ export function useChatSetup(problem?: ChatProblem) {
       setReselecting(false);
     },
     retry: () => setAttempt((value) => value + 1),
+    /** A question of the agent's was answered here: the image step comes after them. */
+    answered: () => setAfterAgent(true),
+    finishImages: () => {
+      setAfterAgent(false);
+      finishImageSetup(imageSetup);
+    },
+    putOffImages: () => {
+      setAfterAgent(false);
+      putOffImageSetup(imageSetup);
+    },
   };
 }
 
@@ -129,7 +170,13 @@ export function ChatSetup({
   const harness = connection?.harness;
   const status = connection?.status.state;
   const model = harness?.models.find((item) => item.id === settings.model);
-  const step = setup.choosingHarness || editingHarness ? 'harness' : !model ? 'model' : 'effort';
+  const step: Step = setup.images
+    ? 'images'
+    : setup.choosingHarness || editingHarness
+      ? 'harness'
+      : !model
+        ? 'model'
+        : 'effort';
   const efforts = harness ? modelEfforts(harness, settings.model) : [];
   const options =
     step === 'harness'
@@ -138,7 +185,9 @@ export function ChatSetup({
           .map((h) => ({ id: h.id, label: harnessName(h) }))
       : step === 'model'
         ? latestModels(harness?.models ?? [])
-        : efforts.map((id) => ({ id, label: t(`picker.efforts.${id}`, { defaultValue: id }) }));
+        : step === 'effort'
+          ? efforts.map((id) => ({ id, label: t(`picker.efforts.${id}`, { defaultValue: id }) }))
+          : [];
   const showOptions = step === 'harness' || (status === 'ready' && !state?.busy && !state?.error);
   const showForm = showOptions && options.length > 0;
   // Back reopens the previous question with the earlier answer still marked.
@@ -185,43 +234,56 @@ export function ChatSetup({
           : undefined
       : undefined;
   const actions = (!showForm && back) || canRetry || action;
+  if (step === 'images') {
+    // The welcome goes on only from the agent's questions; asked on its own, the step finishes
+    // a setup, and says why when a job of the agent could not make its images.
+    const greeting = welcome && setup.afterAgent;
+    return (
+      <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup" data-step={step}>
+        <SetupHead
+          step={step}
+          title={greeting ? 'setup.welcome' : 'setup.finish'}
+          intro={
+            greeting
+              ? 'setup.intro'
+              : setup.imageTrouble
+                ? 'setup.imagesTrouble'
+                : 'setup.finishIntro'
+          }
+        />
+        <ImageStep
+          setup={setup}
+          back={
+            // Back to the agent's last question, when the agent was set up here.
+            setup.afterAgent &&
+            harness && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (efforts.length > 0) {
+                    setChoice(settings.effort ?? '');
+                    setAgentSettings({ effort: undefined });
+                  } else {
+                    setChoice(settings.model ?? '');
+                    setAgentSettings({ model: undefined, effort: undefined });
+                  }
+                }}
+              >
+                {t('setup.back')}
+              </Button>
+            )
+          }
+        />
+      </section>
+    );
+  }
   return (
-    <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup">
-      <div className="flex flex-col items-start gap-3">
-        <span className="flex size-10 items-center justify-center rounded-control bg-ui-accent-soft text-ui-accent-fg">
-          <Icon icon={Ai} />
-        </span>
-        <div className="text-sm leading-6">
-          <p className="font-semibold text-ui-fg">
-            {t(welcome ? 'setup.welcome' : 'setup.finish')}
-          </p>
-          <p className="mt-1 text-ui-fg-muted">
-            {t(welcome ? 'setup.intro' : 'setup.finishIntro')}
-          </p>
-        </div>
-      </div>
-      <ol aria-label={t('setup.steps')} className="flex items-center gap-2 text-xs">
-        {(['harness', 'model', 'effort'] as const).map((item, index) => (
-          <li
-            key={item}
-            aria-current={item === step ? 'step' : undefined}
-            className={cx(
-              'flex flex-1 items-center gap-1.5',
-              item === step ? 'font-medium text-ui-accent-fg' : 'text-ui-fg-muted',
-            )}
-          >
-            <span
-              className={cx(
-                'flex size-5 shrink-0 items-center justify-center rounded-full text-2xs',
-                item === step ? 'bg-ui-accent text-ui-on-accent' : 'bg-ui-field',
-              )}
-            >
-              {index + 1}
-            </span>
-            {t(`setup.steps_${item}`)}
-          </li>
-        ))}
-      </ol>
+    <section className="flex flex-col gap-5 px-4 py-5" data-testid="chat-setup" data-step={step}>
+      <SetupHead
+        step={step}
+        title={welcome ? 'setup.welcome' : 'setup.finish'}
+        intro={welcome ? 'setup.intro' : 'setup.finishIntro'}
+      />
       {!harnesses && !failed && <Skeleton className="h-24 w-full" />}
       {listFailed && <p role="alert">{t('setup.unavailable')}</p>}
       {showForm && (
@@ -230,6 +292,7 @@ export function ChatSetup({
           onSubmit={(event) => {
             event.preventDefault();
             if (!options.some((option) => option.id === choice)) return;
+            setup.answered();
             if (step === 'harness') {
               chooseHarness(choice);
               setup.confirmHarness(choice);
@@ -333,5 +396,83 @@ export function ChatSetup({
         </div>
       )}
     </section>
+  );
+}
+
+/** The welcome or the finish, and where the setup is among its steps. */
+function SetupHead({ step, title, intro }: { step: Step; title: string; intro: string }) {
+  const { t } = useTranslation('ai');
+  return (
+    <>
+      <div className="flex flex-col items-start gap-3">
+        <span className="flex size-10 items-center justify-center rounded-control bg-ui-accent-soft text-ui-accent-fg">
+          <Icon icon={Ai} />
+        </span>
+        <div className="text-sm leading-6">
+          <p className="font-semibold text-ui-fg">{t(title)}</p>
+          <p className="mt-1 text-ui-fg-muted">{t(intro)}</p>
+        </div>
+      </div>
+      <ol aria-label={t('setup.steps')} className="flex items-center gap-2 text-xs">
+        {STEPS.map((item, index) => (
+          <li
+            key={item}
+            aria-current={item === step ? 'step' : undefined}
+            className={cx(
+              'flex min-w-0 flex-1 items-center gap-1.5',
+              item === step ? 'font-medium text-ui-accent-fg' : 'text-ui-fg-muted',
+            )}
+          >
+            <span
+              className={cx(
+                'flex size-5 shrink-0 items-center justify-center rounded-full text-2xs',
+                item === step ? 'bg-ui-accent text-ui-on-accent' : 'bg-ui-field',
+              )}
+            >
+              {index + 1}
+            </span>
+            <span className="truncate">{t(`setup.steps_${item}`)}</span>
+          </li>
+        ))}
+      </ol>
+    </>
+  );
+}
+
+/**
+ * Who makes the images (ADR-139): the providers of Settings -> Media, with their install, sign-in
+ * and key. A provider is chosen as it is clicked, as in Settings; Continue waits until the one
+ * chosen is ready. Not now leaves it, and the chat asks again when a job of the agent needs it.
+ */
+function ImageStep({
+  setup,
+  back,
+}: {
+  setup: ReturnType<typeof useChatSetup>;
+  back: ReactNode;
+}) {
+  const { t } = useTranslation('ai');
+  const [chosen, setChosen] = useState<ChosenProviderState>();
+  return (
+    <div className="flex flex-col gap-4" data-testid="chat-setup-images">
+      <div className="text-sm">
+        <p className="font-medium">{t('setup.images')}</p>
+        <p className="mt-1 text-xs text-ui-fg-muted">{t('setup.imagesHint')}</p>
+      </div>
+      <ImageSettings hint={false} onState={setChosen} />
+      <div className="flex justify-end gap-2">
+        {back}
+        <Button variant="ghost" onClick={setup.putOffImages}>
+          {t('setup.notNow')}
+        </Button>
+        <Button
+          variant="primary"
+          disabled={chosen?.state !== 'ready'}
+          onClick={setup.finishImages}
+        >
+          {t('setup.continue')}
+        </Button>
+      </div>
+    </div>
   );
 }

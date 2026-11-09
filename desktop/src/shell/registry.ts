@@ -67,13 +67,9 @@ export interface PanelDefinition extends Registered {
   fill?: boolean;
 }
 
-/**
- * The panel ids the shell refers to: the AI chat of Ctrl+1 and Ctrl+L, the AI actions that are
- * sent to it (SPEC 4.3, ADR-072), and settings.
- */
+/** The panel ids the shell refers to: the AI chat of Ctrl+1 and Ctrl+L (ADR-072), and settings. */
 export const PanelId = {
   ai: 'ai',
-  actions: 'actions',
   settings: 'settings',
 } as const;
 

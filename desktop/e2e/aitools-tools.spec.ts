@@ -1,7 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
   addBody,
-  addImage,
   addTitle,
   cards,
   chat,
@@ -13,19 +12,16 @@ import {
   openApp,
   openTool,
   panel,
-  runAction,
   say,
   select,
-  textOf,
   TITLE,
-  undoDepth,
 } from './aitools-helpers';
 
 /*
  * The AI chat in the shell (WG11-T04, T06, T07, T10; ADR-072), against the scripted mock agent:
  * one AI tool with no duplicate chat buttons, one conversation whatever is selected, the chip
- * that says what the next message is about (words selected in a text among them), the actions of the
- * selection, the slide and the deck as messages of that chat, and the controls that are not AI.
+ * that says what the next message is about (words selected in a text among them), and the
+ * status bar while the agent works.
  */
 
 /** A Tool Panel that is not the AI chat, to leave it for. */
@@ -60,8 +56,9 @@ test('one AI tool, with no duplicate chat buttons in the editor', async ({ page 
   await select(page, []);
   const bar = page.getByTestId('activity-bar');
 
-  // The Activity Bar has one AI tool (SPEC 4.2).
+  // The Activity Bar has one AI tool (SPEC 4.2), and no panel of ready-made actions beside it.
   await expect(bar.locator('[data-panel^="ai"]')).toHaveCount(1);
+  await expect(bar.locator('[data-panel="actions"]')).toHaveCount(0);
   await expect(panel(page).getByRole('heading', { level: 2 })).toHaveText("צ'אט AI");
   await leave(page);
   await expect(panel(page)).toHaveCount(0);
@@ -122,12 +119,6 @@ test('one AI tool, with no duplicate chat buttons in the editor', async ({ page 
   ).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(panel(page)).toBeVisible();
-
-  // Ctrl+L puts the caret in the chat, from the Actions panel too.
-  await openTool(page, 'actions');
-  await page.getByTestId('stage-surface').focus();
-  await page.keyboard.press('Control+l');
-  await expect(input(page)).toBeFocused();
   expect(errors).toEqual([]);
 });
 
@@ -204,148 +195,7 @@ test('words selected in a text are what the next message is about (ADR-072)', as
   expect(errors).toEqual([]);
 });
 
-test('the Actions panel: the selection, then the slide, then the deck', async ({ page }) => {
-  const errors = collectErrors(page);
-  await openApp(page, { script: 'text-variations' });
-  await addTitle(page);
-  await openTool(page, 'actions');
-  const actions = page.getByTestId('ai-actions');
-  const groups = () =>
-    actions
-      .locator('[data-group]')
-      .evaluateAll((all) => all.map((g) => g.getAttribute('data-group')));
-  expect(await groups()).toEqual(['selection', 'slide', 'deck']);
-  const selection = actions.locator('[data-group="selection"]');
-  await expect(selection.getByRole('heading', { level: 3 })).toHaveText('מה שבחרתם');
-  await expect(
-    actions.locator('[data-group="slide"]').getByRole('heading', { level: 3 }),
-  ).toHaveText('שקף 1');
-
-  // Text: the wording actions and the editing ones.
-  for (const id of [
-    'variations',
-    'title',
-    'shorten',
-    'expand',
-    'fix',
-    'bullets',
-    'tone',
-    'translate',
-  ]) {
-    await expect(selection.locator(`[data-action="text.${id}"]`)).toBeEnabled();
-  }
-  await selection.getByRole('radio', { name: '6' }).click();
-  await runAction(page, 'text.variations');
-  await expect(page.getByTestId('chat-user')).toHaveText('6 ניסוחים אחרים');
-  await expect(cards(page)).toHaveCount(4);
-
-  // A direct instruction is applied by the agent, as one undo step of its turn.
-  await openTool(page, 'actions');
-  const depth = await undoDepth(page);
-  const turn = await runAction(page, 'text.shorten');
-  expect(await textOf(page, 'e_title')).toBe('תוכנית 2027');
-  expect(await undoDepth(page)).toBe(depth + 1);
-  await turn.getByTestId('undo-turn').click();
-  expect(await textOf(page, 'e_title')).toBe(TITLE);
-
-  // An image: its own actions, and the state of the image provider.
-  await addImage(page);
-  await openTool(page, 'actions');
-  await expect(selection.locator('[data-action="image.alternatives"]')).toBeEnabled();
-  await expect(selection.locator('[data-action^="text."]')).toHaveCount(0);
-  await expect(page.getByTestId('image-provider')).toHaveAttribute('data-state', 'ready');
-
-  // Several objects: no ready-made actions for them, and the chat for anything.
-  await select(page, ['e_title', 'e_picture']);
-  await expect(selection.getByTestId('no-actions')).toBeVisible();
-  // Nothing selected: the slide and the deck.
-  await select(page, []);
-  expect(await groups()).toEqual(['slide', 'deck']);
-  expect(errors).toEqual([]);
-});
-
-test('the actions of a slide are messages of the chat that name it, beside the controls that are not AI', async ({
-  page,
-}) => {
-  const errors = collectErrors(page);
-  await openApp(page, { script: 'slide-redesign' });
-  await addTitle(page, 'שלושת היעדים של 2027');
-  await select(page, []);
-  await openTool(page, 'actions');
-  const actions = page.getByTestId('ai-actions').locator('[data-group="slide"]');
-  for (const id of [
-    'slide.redesign',
-    'slide.visual',
-    'slide.image',
-    'slide.animate',
-    'slide.fix',
-    'slide.shorten',
-    'slide.split',
-    'slide.notes',
-    'slide.translate',
-  ]) {
-    await expect(actions.locator(`[data-action="${id}"]`)).toBeEnabled();
-  }
-
-  // The first turn of the script offers designs; the second writes speaker notes.
-  await runAction(page, 'slide.redesign');
-  await expect(cards(page)).toHaveCount(3);
-  await openTool(page, 'actions');
-  const turn = await runAction(page, 'slide.notes');
-  await expect(page.getByTestId('chat-user').nth(1)).toHaveText('הערות דובר לשקף 1');
-  await expect(turn).toContainText('עדכון שקף · שקף 1');
-  const notes = await page.evaluate(() => window.slidr!.bus.deck.slides[0]!.notes);
-  expect(JSON.stringify(notes)).toContain('לפתוח בכך שכל שלושת היעדים נמדדים');
-  // The whole turn is one undo step.
-  await turn.getByTestId('undo-turn').click();
-  expect(await page.evaluate(() => window.slidr!.bus.deck.slides[0]!.notes)).toBeUndefined();
-
-  // The controls that are not AI (AIS-04): the background and the transition, as in row B.
-  await openTool(page, 'actions');
-  await actions.getByRole('button', { name: 'רקע' }).click();
-  await expect(page.getByTestId('background-editor')).toBeVisible();
-  await page.keyboard.press('Escape');
-  await actions.getByTestId('transition-tool').click();
-  await expect(page.getByRole('radio', { name: 'עמעום' })).toBeVisible();
-  await page.getByRole('radio', { name: 'עמעום' }).click();
-  await page.keyboard.press('Escape');
-  expect(await page.evaluate(() => window.slidr!.bus.deck.slides[0]!.transition?.type)).toBe(
-    'fade',
-  );
-
-  // Splitting the slide adds one: the same chat does it, as it can change the whole deck.
-  await actions.locator('[data-action="slide.split"]').click();
-  await expect(chat(page)).toBeVisible();
-  await expect(page.getByTestId('chat-user').nth(2)).toHaveAttribute('data-action', 'slide.split');
-  await expect(page.getByTestId('chat-user').nth(2)).toHaveText('פיצול שקף 1 לשניים');
-  expect(errors).toEqual([]);
-});
-
-test('the actions of the deck, and the look of the deck beside them', async ({ page }) => {
-  const errors = collectErrors(page);
-  await openApp(page, { script: 'deck-build' });
-  await openTool(page, 'actions');
-  const actions = page.getByTestId('ai-actions').locator('[data-group="deck"]');
-  for (const id of ['translate', 'shorten', 'notes', 'improve', 'fix']) {
-    await expect(actions.locator(`[data-action="deck.${id}"]`)).toBeEnabled();
-  }
-  // The template gallery, the palettes and the font pairs (aifinish-look.spec.ts drives them).
-  for (const name of ['template', 'palette', 'fonts']) {
-    await expect(actions.locator(`section[data-look="${name}"]`)).toBeVisible();
-  }
-
-  // The language of a translation is chosen beside its button.
-  await actions.getByRole('combobox', { name: 'שפת היעד' }).click();
-  await page.getByRole('option', { name: 'ערבית' }).click();
-  await runAction(page, 'deck.translate');
-  await expect(page.getByTestId('chat-user')).toHaveAttribute('data-action', 'deck.translate');
-  await expect(page.getByTestId('chat-user')).toHaveText('תרגום המצגת לערבית');
-  expect(errors).toEqual([]);
-});
-
-test('the status bar says what the agent is doing, and the actions wait for it', async ({
-  page,
-}) => {
+test('the status bar says what the agent is doing', async ({ page }) => {
   await openApp(page, { script: 'text-variations', speed: 1 });
   await addTitle(page);
   const status = page.getByTestId('status-agent');
@@ -357,11 +207,6 @@ test('the status bar says what the agent is doing, and the actions wait for it',
   await input(page).press('Enter');
   await expect(status).toHaveAttribute('data-state', 'working');
   await expect(status).toContainText('הסוכן עובד');
-  // While the turn runs, the actions are off.
-  await openTool(page, 'actions');
-  await expect(page.locator('[data-action="text.shorten"]')).toBeDisabled();
-  await expect(page.getByTestId('ai-actions')).toContainText('הסוכן באמצע תור');
 
   await expect(status).toHaveAttribute('data-state', 'idle', { timeout: 15_000 });
-  await expect(page.locator('[data-action="text.shorten"]')).toBeEnabled();
 });

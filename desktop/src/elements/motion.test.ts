@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import {
   CommandBus,
+  CONTENT_LANGUAGES,
   createDeck,
   createElement,
   createSlide,
@@ -11,17 +12,29 @@ import {
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
 import { languages } from '../i18n';
-import { en, he } from './messages';
+import { en } from './messages';
 import { backgroundCommands, backgroundWith, motionElement, shownMotionBackground } from './motion';
-import { motionBackgrounds } from './motionBackgrounds';
+import { backgroundCatalog, backgroundsOf, motionBackgrounds } from './motionBackgrounds';
 import { GLINT, INK, inkOverrides } from './motionKit';
-import { MOTION_GROUPS, motionPictures, motionPieces, type LinePiece } from './motionPieces';
+import {
+  animationCatalog,
+  animationsOf,
+  MOTION_GROUPS,
+  motionName,
+  motionPictures,
+  motionPieces,
+  PIECE_ATTRIBUTE,
+  type LinePiece,
+} from './motionPieces';
 
 /*
  * The animations and the backgrounds of Elements (ADR-127): pictures that move by themselves,
  * drawn in the colours that stand for the theme's, and what a click puts on a slide. That they
- * survive the renderer's cleaning and move in a real browser is `motion.browser.test.ts`.
+ * survive the renderer's cleaning and move in a real browser is `motion.browser.test.ts`. They
+ * are the media library's (ADR-138): the catalog's checks are of the library as it is published.
  */
+
+await Promise.all([animationCatalog.load(), backgroundCatalog.load()]);
 
 const pieces = motionPieces();
 /** The animations that are pictures; the others are lines (ADR-131). */
@@ -42,22 +55,17 @@ const MOVES = /@keyframes|<animate(Motion|Transform)?\b/;
 const inks = new Set<string>([...Object.values(INK), GLINT]);
 
 describe('the catalog', () => {
-  it('names every animation and background once, in Hebrew and in English', () => {
+  it('names every animation and background once, in every language of the app', () => {
+    expect(pieces.length).toBeGreaterThan(0);
+    expect(backgrounds.length).toBeGreaterThan(0);
     expect(new Set(pieces.map((p) => p.id)).size).toBe(pieces.length);
     expect(new Set(backgrounds.map((b) => b.id)).size).toBe(backgrounds.length);
-    for (const piece of pieces) {
-      expect(MOTION_GROUPS).toContain(piece.group);
-      expect(he.animations.name).toHaveProperty(piece.id);
-      expect(en.animations.name).toHaveProperty(piece.id);
+    for (const item of [...pieces, ...backgrounds]) {
+      expect(Object.keys(item.name), item.id).toEqual([...CONTENT_LANGUAGES]);
     }
-    for (const background of backgrounds) {
-      expect(he.backgrounds.name).toHaveProperty(background.id);
-      expect(en.backgrounds.name).toHaveProperty(background.id);
-    }
-    // Every group has something in it, and the names are as many as the pieces.
+    for (const piece of pieces) expect(MOTION_GROUPS).toContain(piece.group);
+    // Every group has something in it.
     for (const group of MOTION_GROUPS) expect(pieces.some((p) => p.group === group)).toBe(true);
-    expect(Object.keys(he.animations.name)).toHaveLength(pieces.length);
-    expect(Object.keys(he.backgrounds.name)).toHaveLength(backgrounds.length);
   });
 
   it('offers the four motions of the reference deck as backgrounds', () => {
@@ -295,6 +303,130 @@ describe('a background on a slide', () => {
     expect(flipOf(ltr, waves)).toBe(true);
     // One that covers the slide stays as it is.
     expect(flipOf(ltr, network)).toBeUndefined();
+  });
+});
+
+describe('reading the catalogs of the library (ADR-138)', () => {
+  const name = { he: 'גלים', en: 'Waves', fr: 'Vagues' };
+  const picture = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20"><path/></svg>';
+  const line = {
+    points: [
+      { x: 0, y: 10 },
+      { x: 40, y: 10 },
+    ],
+    stroke: { color: { token: 'primary' }, width: 4, dash: 'dashed' },
+    startHead: 'none',
+    endHead: 'triangle',
+    curve: 'straight',
+    flow: { speed: 60 },
+  };
+
+  it('takes the backgrounds it can draw, in their order, each once', () => {
+    const read = backgroundsOf({
+      version: 1,
+      backgrounds: [
+        { id: 'b', name, animated: true, sided: false, markup: picture },
+        { id: 'a', name, animated: false, sided: true, markup: picture },
+        { id: 'b', name, animated: false, sided: false, markup: picture },
+        { id: 'unnamed', name: { he: 'רק עברית' }, animated: true, sided: true, markup: picture },
+        { id: 'not-a-picture', name, animated: true, sided: true, markup: '<div/>' },
+        { id: 'no-flags', name, markup: picture },
+      ],
+      later: 'a field of a later library',
+    });
+    expect(read.map((b) => [b.id, b.animated, b.sided])).toEqual([
+      ['b', true, false],
+      ['a', false, true],
+    ]);
+    expect(backgroundsOf(undefined)).toEqual([]);
+    expect(backgroundsOf({ backgrounds: 'none' })).toEqual([]);
+  });
+
+  it('takes pictures, lines and animated shapes, and names each picture by its animation', () => {
+    const read = animationsOf({
+      version: 1,
+      animations: [
+        { id: 'p', name, group: 'spin', size: { w: 40, h: 20 }, reads: false, markup: picture },
+        { id: 'l', name, group: 'lines', size: { w: 40, h: 20 }, reads: true, line },
+        {
+          id: 'grouped',
+          name,
+          group: 'nowhere',
+          size: { w: 1, h: 1 },
+          reads: false,
+          markup: picture,
+        },
+        { id: 'flat', name, group: 'spin', size: { w: 0, h: 20 }, reads: false, markup: picture },
+        {
+          id: 'bent',
+          name,
+          group: 'lines',
+          size: { w: 40, h: 20 },
+          reads: true,
+          line: { ...line, points: [] },
+        },
+      ],
+      shapes: [
+        {
+          id: 'ring',
+          name,
+          preset: 'ellipse',
+          side: 260,
+          look: 'dashed',
+          ink: 'primary',
+          ambient: { kind: 'spin', duration: 8000 },
+        },
+        {
+          id: 'arrow',
+          name,
+          preset: 'arrowRight',
+          side: 260,
+          aspect: 2,
+          look: 'fill',
+          ink: 'accent',
+          ambient: { kind: 'swing', duration: 2400 },
+          reads: true,
+        },
+        {
+          id: 'muddy',
+          name,
+          preset: 'ellipse',
+          side: 260,
+          look: 'fill',
+          ink: 'text',
+          ambient: { kind: 'spin', duration: 1 },
+        },
+        {
+          id: 'still',
+          name,
+          preset: 'ellipse',
+          side: 260,
+          look: 'fill',
+          ink: 'primary',
+          ambient: { kind: 'wobble', duration: 1 },
+        },
+      ],
+    });
+    expect(read.pieces.map((p) => [p.id, p.kind])).toEqual([
+      ['p', 'picture'],
+      ['l', 'line'],
+    ]);
+    const [p] = read.pieces;
+    expect(p?.kind === 'picture' && p.markup).toBe(
+      picture.replace('<svg ', `<svg `).replace('">', `" ${PIECE_ATTRIBUTE}="p">`),
+    );
+    expect(read.shapes.map((s) => s.id)).toEqual(['ring', 'arrow']);
+    expect(read.shapes[1]).toMatchObject({ aspect: 2, reads: true });
+    expect(animationsOf(null)).toEqual({ pieces: [], shapes: [] });
+  });
+
+  it('names an item in the language asked, else in English', () => {
+    const [background] = backgroundsOf({
+      backgrounds: [{ id: 'b', name, animated: true, sided: false, markup: picture }],
+    });
+    expect(motionName(background!, 'fr-CA')).toBe('Vagues');
+    expect(motionName(background!, 'he')).toBe('גלים');
+    expect(motionName(background!, 'ja')).toBe('Waves');
   });
 });
 

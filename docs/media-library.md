@@ -1,6 +1,6 @@
 # Media library
 
-The content the app offers is a library published apart from the app: the built-in templates and their photographs, the designs, card sets, shapes, graphics, frames, emoji and art of Elements, the icon sets and the fonts of decks. It is a site on the web, **https://media.slidr.studio**, and the app reads it while it runs. Nothing of it is built into the app or installed with it ([ADR-090](adr/ADR-090-media-library-on-the-web.md)). It lives in the R2 bucket of [Slidr Library](https://github.com/slidrhq/library)'s Worker, and media.slidr.studio is that bucket itself, through Cloudflare's cache, with no Worker on the way ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md); the library's README, "Serving the library"). Everything published reaches it through the library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md); the library's README, "Publishing the uploads"), and a publication empties the cache of the files it wrote. Releases before [ADR-112](adr/ADR-112-the-library-at-media-slidr-studio.md) read `https://slidr-media.pages.dev`, which no longer answers.
+The content the app offers is a library published apart from the app: the built-in templates and their photographs, the designs, card sets, shapes, graphics, frames, emoji, art, animations and backgrounds of Elements, the icon sets and the fonts of decks. It is a site on the web, **https://media.slidr.studio**, and the app reads it while it runs. Nothing of it is built into the app or installed with it ([ADR-090](adr/ADR-090-media-library-on-the-web.md)). It lives in the R2 bucket of [Slidr Library](https://github.com/slidrhq/library)'s Worker, and media.slidr.studio is that bucket itself, through Cloudflare's cache, with no Worker on the way ([ADR-113](adr/ADR-113-the-library-served-from-its-bucket.md); the library's README, "Serving the library"). Everything published reaches it through the library's API ([ADR-110](adr/ADR-110-library-published-through-its-api.md); the library's README, "Publishing the uploads"), and a publication empties the cache of the files it wrote. Releases before [ADR-112](adr/ADR-112-the-library-at-media-slidr-studio.md) read `https://slidr-media.pages.dev`, which no longer answers.
 
 ```text
 manifest.json                  every file below: its size and SHA-256
@@ -14,9 +14,11 @@ elements/designs/index.json    the ready-made slides of Elements, every one (ADR
 elements/designs/<language>/   the same, with the slides of that language alone        (written on publishing)
 elements/designs/revs.json     a word for each ready-made slide in each language       (written on publishing)
 elements/cards/catalog.json    the card sets
+elements/animations/catalog.json   the animations and the animated shapes of Elements (ADR-138)
+elements/backgrounds/catalog.json  the backgrounds of Elements (ADR-138)
 elements/catalogs/             shapes, graphics, frames and emoji, with their notices
 elements/art/                  the drawings of the art sets, with their notices
-tags/<kind>.json               the search tags of the icons, graphics, emoji, frames, shapes, card sets and designs
+tags/<kind>.json               the search tags of the icons, graphics, emoji, frames, shapes, card sets, designs, animations and backgrounds
 templates/catalog.json         the built-in templates with their samples, as authored
 templates/index.json           their ids in the order they are shown       (written on publishing)
 templates/<id>/template.json   each of them as a deck takes it              (written on publishing)

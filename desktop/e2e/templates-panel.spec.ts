@@ -379,7 +379,7 @@ test('the new fields of the theme read in English', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('a language offers the templates written in it: in the panel, on the welcome screen and in Actions', async ({
+test('a language offers the templates written in it: in the panel and on the welcome screen', async ({
   page,
 }) => {
   const errors = collectErrors(page);
@@ -419,11 +419,6 @@ test('a language offers the templates written in it: in the panel, on the welcom
   await expect.poll(() => idsOf(cards, 'data-template')).toEqual(german);
   await expect(page.getByTestId('template-slides')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/templates/language-panel-de.png' });
-
-  // The template gallery of Actions.
-  await page.getByTestId('activity-bar').locator('[data-panel="actions"]').click();
-  const looks = page.locator('section[data-look="template"] [data-template]');
-  await expect.poll(() => idsOf(looks, 'data-template')).toEqual(german);
 
   // The welcome screen, opened in German: its covers, and the count on the way to them.
   await page.goto('/?welcome');

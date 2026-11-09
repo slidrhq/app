@@ -10,7 +10,7 @@ import {
 } from '@slidr/model';
 import { describe, expect, it } from 'vitest';
 import { backgroundDrawing, markupAtSpeed, pieceSpeed } from '../elements/motion';
-import { motionBackgrounds } from '../elements/motionBackgrounds';
+import { backgroundCatalog, motionBackgrounds } from '../elements/motionBackgrounds';
 import { INK } from '../elements/motionKit';
 import {
   applyToAllCommands,
@@ -154,6 +154,9 @@ describe('apply to all slides', () => {
     expect(applyToAllCommands(bus.deck, 's1')).toEqual([]);
   });
 });
+
+// The backgrounds of Elements are the media library's (ADR-138), as it is published.
+await backgroundCatalog.load();
 
 describe('the drawing of a background (ADR-129)', () => {
   const deck = createDeck({ lang: 'he' });
