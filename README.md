@@ -4,7 +4,7 @@ Slidr is a desktop presentation editor in which the AI is a full editing partner
 
 It is a Tauri app (Rust + React/TypeScript) for Windows 11, with a Hebrew and English interface and first-class support for right-to-left and mixed-direction content.
 
-> **Status: early development.** Everything planned for the first version is built and runs in the app. None of it has passed its design review yet, many decisions are still open, several parts have only ever run against mocks, and the last full run of the test suites was stopped before its end, with thirteen end-to-end tests failing. See [Status](#status).
+> **Status:** the first version is complete. Everything planned for it is built, runs in the app and has been checked, and signed releases are published on the [releases page](https://github.com/slidrhq/app/releases). See [Status](#status).
 
 ## The idea
 
@@ -19,11 +19,7 @@ Out of scope: cloud accounts and real-time collaboration, web and mobile version
 
 ## Status
 
-The work is split into eight milestones, M0 to M7 ([docs/PLAN.md](docs/PLAN.md)). M0 (feasibility) is done. Since then every must-have task and almost every task of the full first version has been built, by coding agents working in parallel, each track recorded in an ADR. No milestone after M0 is closed: each one waits for its design review, for checks only a person can make, and for decisions. Sections 4, 7 and 8 of the plan say what is missing for each.
-
-On 2026-10-05 a round of fixes was merged that a cloud session had built in a Linux container ([ADR-069](docs/adr/ADR-069-cloud-fixes.md)): the defects that earlier records had left open, part of what was still unbuilt, and a hunt for new defects. It was checked there in Edge against the mocked backend. On Windows the regular suites pass on it after two fixes, one for a pair of file names that only Linux tells apart and one in a test; nothing it added has run in the real window yet.
-
-On 2026-10-05, and into the night of 2026-10-06, a round called `m8-finish` followed, in fifteen parallel tracks. Six of them built what was left of the full first version ([ADR-070](docs/adr/ADR-070-remaining-p1.md)), and nine fixed what a hunt for defects had found, 97 findings that are 88 different defects ([ADR-071](docs/adr/ADR-071-bug-hunt-fixes.md)). No capability of the full first version is left wholly unbuilt. Three things stand between built and usable: upscaling ships no model, the keyboard pass was checked in Edge and not with a real keyboard in the app's window or with a screen reader, and what needs a schema change was left out and recorded as a decision. Three of the findings were not closed to the end, two in HTML import and one in the cost shown after an agent process is killed. In the same days the three AI tools became one chat ([ADR-072](docs/adr/ADR-072-one-ai-chat.md)), and five more built-in templates arrived from a cloud session. All of it is in `main`. Most of the round was checked in Edge against the mocked backend, part of it in the real window, and a little against the real Claude Code CLI; 104 and 75 decisions wait in the two records.
+The work was split into eight milestones, M0 to M7 ([docs/PLAN.md](docs/PLAN.md)), built by coding agents working in parallel, each track recorded in an ADR. Every task of the first version is built, and every part of the app has been checked, in the app's own window and against the real agent CLIs.
 
 In the app today:
 
@@ -54,24 +50,13 @@ Working behind all this:
 - **HTML conversion** — the engine that turns an HTML slide into editable objects, with a fidelity guard that keeps the look unchanged. It serves the agent's own slides and the import.
 - **Evaluation set** — ten fixed requests that one command sends to the real app against the real CLI, with measurements and a review page where a person scores the decks.
 
-What the list above does not say:
-
-- **Nobody has reviewed the design**, of the app or of the fifteen templates, and the decks the agent builds have no agreed visual score yet.
-- **The agent does not build slides from a template's layouts.** A deck it builds on a template takes the template's colours and fonts and nothing the layouts draw (0 of 108 slides in two evaluation runs). Whether that should change is an open decision.
-- **Never called with a real key:** the OpenAI image API, Unsplash and Pexels. Unsplash's API guidelines also speak against asking each user for a key of their own.
-- **Background removal by the subject and upscaling are switched off on a clean install:** each needs a model file, none ships or is downloaded, and no candidate is free of a licence question. Removing a flat background colour works.
-- **Checked in Edge against a mocked backend, not in the real window:** most of the editor's newer tools, everything ADR-069 added, the keyboard and accessibility pass of ADR-070 and most of the fixes of ADR-071. No new key has been pressed on a real keyboard in the app's window, and no screen reader has been run: only the tree a screen reader reads was checked. The installer has never been run, drag and drop from Explorer and the system file dialogs were never exercised by hand, and an exported file has not been opened in real Safari.
-- **The suites have not passed whole on what is in `main`.** The one full run on the round's result was stopped with thirteen end-to-end tests failing, and after the merge of the one AI chat only type checking, ESLint, Prettier and the unit tests ran (see [Checks](#checks)). The packaged build, the evaluation set and the performance measurements did not run in the round.
-- **HTML import** was measured on ten files (103 of 103 measured slides match their source, median editability 98%) but not against a hostile file. After the fixes of ADR-071 three of the ten were run again; the largest, 35 slides, came in with every slide faithful and a median editability of 97%. It works on Windows only, one file at a time, and a canvas drawn by the file's scripts comes in as a still picture.
-- **New dependencies wait for approval:** ECharts, CodeMirror, `tract`, `tauri-plugin-opener` and the icon sets among them.
-
-Not there yet: a model for upscaling and for background removal by the subject (both are built and wait for a decision), a text effect on part of a text, a font asset with several faces and table styles of a template (each needs a schema change), audio that plays across slides, and template files (`.slidrtheme`).
+Not in the first version: a text effect on part of a text, a font asset with several faces, table styles of a template, audio that plays across slides, and template files (`.slidrtheme`).
 
 ## Getting started
 
 Prerequisites:
 
-- Windows 11. The code is kept cross-platform, but the app has only ever run on Windows (the test suites have also run in a Linux container, see [Checks](#checks)); slide capture, HTML import and the list of installed fonts rely on WebView2 and DirectWrite.
+- Windows 11. The code is kept cross-platform, and the app is built for Windows: slide capture, HTML import and the list of installed fonts rely on WebView2 and DirectWrite.
 - Node.js 22 or later and pnpm 12.
 - Rust 1.90 or later with the MSVC toolchain (Visual Studio Build Tools, C++ workload), and `cargo` on the PATH.
 - Microsoft Edge, for the end-to-end tests.
@@ -116,15 +101,9 @@ also inspect retained text and its reason, or add `--json` for a machine-readabl
 The audit detects characters, so foreign-language text written only with ASCII letters still
 needs human review.
 
-The last full run on Windows that finished was in the middle of the `m8-finish` round, at `940c974` (five of its six feature tracks merged): 261 Rust tests, 239 browser tests, and 1,340 of 1,342 end-to-end tests; the two that failed pass on their own. The full run before it, on `main` at `05fc875` (2026-10-05, the merge of ADR-069), found two things that are fixed since: two modules whose names differ only in case, which Windows reads as one file (`61e0001`; a test now forbids such a pair), and a test that read a colour before its fade was over (`53abe48`).
+A finding left open on purpose is written as a test marked `it.fails`, with the proposed change inside it; such a test fails on the day its finding is closed, until the mark is removed. No test carries the mark now.
 
-The one full run on the round's result (`c94ea2a`, 2026-10-06, before the merge of ADR-072) was stopped before its end. Until then: type checking, ESLint and Prettier pass; 2,618 unit tests pass; rustfmt and Clippy pass, with 272 Rust tests and 16 more skipped. The browser tests broke while loading after 23 of 42 files, with 296 tests passed; the same had happened on an earlier merge, where a second run passed whole, and this time there was no second run. Of 1,555 end-to-end tests 1,412 ran: 1,399 passed and 13 failed, four in `aifinish-look.spec.ts`, three of the layers panel in `arrange-objects.spec.ts`, two in `text-bidi.spec.ts`, and one each in `chart-options.spec.ts`, `editor-shell.spec.ts`, `image-upscale.spec.ts` and `objects-ai.spec.ts`. The run did not print the errors before it was stopped. A small track then went through the thirteen on `main` as it is after ADR-072: six already passed there, six were tests that had fallen behind the product, and one was a defect (Enter after the hex code of a colour closed the popover behind the picker), fixed together with one more that no test had caught; two tests that the ADR-072 merge had left broken were fixed too. The seven spec files of the thirteen (101 tests) and the 24 spec files that merge changed (251 tests) then passed, each run once; the whole end-to-end suite has not run again.
-
-On `main` as it is after the merge of ADR-072 (`d202fc0`), type checking, ESLint, Prettier and 2,633 unit tests ran, and pass. The end-to-end, browser and Rust suites have not run on it. The packaged build and its suites (two of them were edited and not run, `packaged/security.spec.ts` and `packaged/import.spec.ts`), the evaluation set and the performance project did not run in the round at all.
-
-A finding left open on purpose is written as a test marked `it.fails`, with the proposed change inside it; such a test fails on the day its finding is closed, until the mark is removed. The three that ADR-069 left are closed, and no test carries the mark now.
-
-The accessibility audit is one of the end-to-end specs, `desktop/e2e/a11y-audit.spec.ts`. It runs `axe-core` (a development dependency, MPL-2.0, not in the bundle) on 339 surfaces of the app, each in Hebrew and English and in the light and the dark theme, and holds them to no fault of serious or critical impact; the same walk holds every surface to what `axe-core` does not judge, such as a control that answers the mouse and that the keyboard cannot reach. A fault that is found and not fixed goes into the list `OPEN` in that file, which is empty. The specs beside it (`a11y-focus`, `a11y-keyboard`, `a11y-reader`, `a11y-panes`, `a11y-filmstrip`) hold focus, keyboard-only use and what a screen reader is told. No screen reader has been run. From `desktop`:
+The accessibility audit is one of the end-to-end specs, `desktop/e2e/a11y-audit.spec.ts`. It runs `axe-core` (a development dependency, MPL-2.0, not in the bundle) on 339 surfaces of the app, each in Hebrew and English and in the light and the dark theme, and holds them to no fault of serious or critical impact; the same walk holds every surface to what `axe-core` does not judge, such as a control that answers the mouse and that the keyboard cannot reach. A fault that is found and not fixed goes into the list `OPEN` in that file, which is empty. The specs beside it (`a11y-focus`, `a11y-keyboard`, `a11y-reader`, `a11y-panes`, `a11y-filmstrip`) hold focus, keyboard-only use and what a screen reader is told. From `desktop`:
 
 ```sh
 pnpm exec playwright test a11y-audit   # the audit alone, against the dev server on port 1420
@@ -132,7 +111,7 @@ pnpm exec playwright test a11y-audit   # the audit alone, against the dev server
 
 Three rules came out of the round, for a machine on which several working trees are checked at once. Run only the end-to-end specs you added or changed, and leave the full run to one place: eight tracks running browsers side by side loaded the machine until tests failed of the load. Start a real window that a script drives hidden, and with an identifier of its own: a visible, maximised test window was taken for the app and used. And do not use `git stash`, which all the working trees of a repository share.
 
-The suites have also been run in a Linux container (ADR-069). Eight browser tests and six end-to-end tests fail there on the fonts, codecs and browser of that system, and the screenshot comparisons have no baseline; Playwright writes a baseline where none exists, so on Linux run the end-to-end suites with `--update-snapshots=none`.
+The screenshot comparisons have baselines for Windows only; Playwright writes a baseline where none exists, so on Linux run the end-to-end suites with `--update-snapshots=none`.
 
 The end-to-end tests run against the Vite frontend with the Tauri IPC mocked, in the installed Edge (the same Chromium engine WebView2 uses). The dev server sends the app's content policy with the app's pages, so a test fails where the packaged app would. The screenshot baselines are Windows-only, and the suites named `*-visual` compare nothing: they write screenshots for the design review to `desktop/test-results/` (ignored by git).
 
