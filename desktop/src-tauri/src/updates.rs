@@ -18,7 +18,7 @@ use tauri::{AppHandle, Manager, Runtime};
 use tauri_plugin_updater::{Update, UpdaterExt};
 
 /// The identifier of the app that is released.
-const RELEASED: &str = "slidr.app";
+pub(crate) const RELEASED: &str = "slidr.app";
 
 /// An update downloaded and waiting for the app to close.
 #[derive(Default)]

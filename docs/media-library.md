@@ -101,6 +101,13 @@ New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Slidr' -Name MediaLibraryUrl `
   -PropertyType String -Value 'https://media.example.org/slidr/' -Force
 ```
 
+An installation whose library the organization chose, by a policy or by a file, also sends nothing to Slidr's authors: not the anonymous count of its starts that the published app sends ([ADR-142](adr/ADR-142-installations-and-starts-counted.md)). An organization that keeps the published library turns that count off with the DWORD value `SendUsageData` set to `0`, under the same key:
+
+```powershell
+New-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Slidr' -Name SendUsageData `
+  -PropertyType DWord -Value 0 -Force
+```
+
 ### An installer that carries the address
 
 An installed app also reads the library from a file beside `slidr.exe`, `media-library.json`: `{ "url": "https://media.example.org/slidr/" }`. The released installer writes that file, so a single installer that carries an address needs no build of the app:

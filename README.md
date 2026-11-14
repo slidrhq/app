@@ -154,6 +154,8 @@ pnpm release --bump      # raise the version by 0.1.0 first (0.1.0 → 0.2.0), i
 
 `release.mjs` refuses unless the three files that carry the version agree (`desktop/package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`), the tree is clean, `main` is level with `origin/main`, and the tag is new. The tag runs the [Release workflow](.github/workflows/release.yml) on the author's machine, so first log in to SimplySign Desktop and start the runner: it builds the installer, signing it and the binaries inside it with the project's certificate, signs it for the updater, writes `latest.json`, and makes a **draft** release with the three files. Download the installer from the draft, install it, and check it, then publish the draft (its edit page, or `gh release edit v<version> --draft=false --latest`). Only a published release reaches the updater. Publishing it also runs the [Site workflow](.github/workflows/site.yml), which points the download buttons of the homepage ([slidrhq/site](https://github.com/slidrhq/site)) at the new installer and publishes the site; it needs `SITE_DEPLOY_KEY`, the private half of a deploy key of slidrhq/site with write access.
 
+On the author's machine, `pnpm ship` does all of it from start to finish ([scripts/ship.mjs](scripts/ship.mjs); `--bump`, `--check` for `pnpm check:all` first, `--publish` to publish without asking, `--dry-run`). It signs a scratch file first, so an expired SimplySign session fails at once and not twelve minutes into the build, checks that the runner is registered to this repository, starts it with the machine's `PSModulePath` and stops it once the draft exists, sets `~/pnpm-workspace.yaml` aside while the build runs, then runs `release.mjs` and follows the build. It checks the draft's installer (the Authenticode signature, and the updater's signature against the key in `tauri.conf.json`) and `latest.json`, offers to install it, asks before it publishes, then follows the Site workflow and the site's deploy until the homepage and the updater's `latest.json` offer the new version. It goes on from where the release stands on GitHub, so after a failure, fix what it names and run it again.
+
 The repository's settings hold what the workflow needs:
 
 - the secret `TAURI_SIGNING_PRIVATE_KEY`, the private key of the updater, whose public half is in `tauri.conf.json` (`plugins.updater.pubkey`); the author keeps the file, `%USERPROFILE%\.tauri\slidr-updater.key`. Lost, it cannot be replaced: installed copies accept only updates signed with it.
@@ -271,15 +273,16 @@ Every member of the team uses multi-factor authentication on GitHub.
 
 ## Privacy policy
 
-Slidr has no account, collects no telemetry, and sends nothing to its authors. It connects to other systems only for what the user asks of it:
+Slidr has no account, and sends its authors one thing only: an anonymous count of its starts, which the user can turn off. Otherwise it connects to other systems only for what the user asks of it:
 
+- **Usage count** — each start sends `usage.slidr.studio`, hosted by Cloudflare ([Cloudflare's privacy policy](https://www.cloudflare.com/privacypolicy/)), a random ID made for the installation on its first start, the app's version, the operating system and the interface language. The server adds the country the request comes from and keeps no IP address; it counts installations and how many of them start each day, and forgets the days after 400 days. No file, slide, chat, prompt or key is ever sent. It is turned off in **Settings → General → Privacy**, and is never sent by an installation that reads an organization's own library or whose organization's policy turns it off (`SendUsageData` = 0, [docs/media-library.md](docs/media-library.md#a-policy-for-the-organization)). The server's code is in [usage/](usage/).
 - **Updates** — it asks [GitHub](https://github.com) whether a newer release exists ([GitHub's privacy statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)).
 - **Media library** — templates, designs, fonts and pictures are downloaded from `media.slidr.studio`, hosted by Cloudflare (R2) ([Cloudflare's privacy policy](https://www.cloudflare.com/privacypolicy/)), or from the address the installation names ([a library of your own](docs/media-library.md#a-library-of-your-own)).
 - **Stock photos** — a search sends its words to [Unsplash](https://unsplash.com/privacy) or [Pexels](https://www.pexels.com/privacy-policy/), with the user's own key.
 - **Images by AI** — the prompt goes to [OpenAI](https://openai.com/policies/privacy-policy/), with the user's own key.
 - **The AI chat** — the deck and the messages go to the agent CLI the user picked (Claude Code, Codex or GitHub Copilot CLI), under that service's terms and privacy policy.
 
-Each of these can be left unused: without a key the stock and image services are never called, and the chat runs only when the user writes to it.
+Each of these can be left unused: the usage count can be turned off, without a key the stock and image services are never called, and the chat runs only when the user writes to it.
 
 ## License
 

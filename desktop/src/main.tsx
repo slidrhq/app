@@ -24,6 +24,7 @@ import { startDocument } from './shell/fileActions';
 import './shell/plugins';
 import { RootErrorBoundary } from './shell/RootErrorBoundary';
 import { syncTheme } from './shell/store';
+import { startUsage } from './shell/usage';
 import { prefetchWhenIdle } from './shell/useMedia';
 
 reportUncaughtErrors();
@@ -45,9 +46,12 @@ const editor = createEditor({
 void startDocument(editor);
 // The organization's settings (ADR-117): the languages it offers, and the one it starts in. The
 // UI started in what the last start was told; without settings every language is offered again.
-void loadSystemSettings().then((policy) =>
+const languageOffered = loadSystemSettings().then((policy) =>
   offerLanguages(policy?.languages.offered, policy?.languages.default),
 );
+// The count of installations and of starts (ADR-142), in the language this start shows: the
+// core sends it unless the user or the organization turned it off.
+void Promise.allSettled([languageReady, languageOffered]).then(() => startUsage(currentLanguage()));
 // The media library is never waited for (docs/media-library.md): the catalogs of Elements are
 // read while the app is idle, after it has started, and each panel reads its own if it is opened
 // first. The core answers from what it kept, and says when the library changed meanwhile.

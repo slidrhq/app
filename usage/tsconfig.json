@@ -1,0 +1,11 @@
+{
+  // The Worker: Cloudflare's runtime has the web's APIs (Request, Response) and no DOM. Its test
+  // runs in the app's Vitest (`pnpm test` at the root).
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "WebWorker"],
+    "types": [],
+    "noEmit": true
+  },
+  "include": ["*.ts"]
+}

@@ -6,6 +6,7 @@ import {
   Icon,
   Select,
   Skeleton,
+  Switch,
   Tabs,
   TabsContent,
   TabsTile,
@@ -15,7 +16,11 @@ import { currentLanguage, nativeName, offeredLanguages, setLanguage, type Langua
 import {
   loadSettings,
   SETTINGS_PAGES,
+  SettingsCard,
+  SettingsItem,
   settingsPages,
+  updateSection,
+  useSection,
   useSettings,
   useSettingsSections,
   type SettingsPageId,
@@ -24,6 +29,7 @@ import {
 } from '../settings';
 import { setSettingsPage, useShell } from './store';
 import { ThemeChoice } from './ThemeChoice';
+import { USAGE_SECTION, usageBlocked } from './usage';
 
 /**
  * Settings (SPEC 4.2 ⚙, WG3-T08), a tab for each topic rather than one long column. General,
@@ -151,7 +157,7 @@ function Section({ section, children }: { section: SettingsSection; children: Re
   );
 }
 
-/** The shell's own tab: the theme and the language of the UI. */
+/** The shell's own tab: the theme and the language of the UI, and the count of starts. */
 function General() {
   const { t } = useTranslation();
   // `useTranslation` re-renders this tab when the language changes.
@@ -176,6 +182,47 @@ function General() {
         />
         <p className="px-1 text-xs text-ui-fg-muted">{t('settings.languageHint')}</p>
       </section>
+      <UsageChoice />
     </>
+  );
+}
+
+/**
+ * Whether the app counts its starts (ADR-142): on unless the user turned it off, and off with no
+ * way to turn it on where the organization turned it off. The default is not written, as the
+ * agent's web access is not.
+ */
+function UsageChoice() {
+  const { t } = useTranslation();
+  const loaded = useSettings((s) => s.loaded);
+  const usage = useSection(USAGE_SECTION);
+  const [blocked, setBlocked] = useState(false);
+  useEffect(() => {
+    let live = true;
+    void usageBlocked().then((value) => live && setBlocked(value));
+    return () => {
+      live = false;
+    };
+  }, []);
+  return (
+    <section className="flex flex-col gap-2" data-settings-section="usage">
+      <h4 className="px-1 text-xs font-semibold text-ui-fg-muted">{t('settings.privacy')}</h4>
+      <SettingsCard>
+        <SettingsItem>
+          <Switch
+            side="end"
+            label={t('settings.usage')}
+            hint={t(blocked ? 'settings.usageBlocked' : 'settings.usageHint')}
+            checked={!blocked && usage.send !== false}
+            disabled={blocked || !loaded}
+            onCheckedChange={(on) =>
+              void updateSection(USAGE_SECTION, { send: on ? undefined : false }).catch(
+                () => undefined,
+              )
+            }
+          />
+        </SettingsItem>
+      </SettingsCard>
+    </section>
   );
 }

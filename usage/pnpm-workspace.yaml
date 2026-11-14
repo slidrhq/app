@@ -1,0 +1,9 @@
+# Standalone install: this file makes pnpm treat usage/ as its own root, so the Worker's tools
+# (wrangler) touch neither the app's workspace nor its lockfile.
+packages:
+  - .
+
+# The Worker's runtime (workerd) and its bundler (esbuild) set up their binaries when installed.
+allowBuilds:
+  esbuild: true
+  workerd: true

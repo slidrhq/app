@@ -44,9 +44,9 @@ test('the settings are a tab for each topic, and a tab shows only its own sectio
   await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
   const tabs = page.getByRole('tablist', { name: 'נושאי ההגדרות' }).getByRole('tab');
   await expect(tabs).toHaveText(['כללי', 'סוכן', 'תמונות', 'גופנים', 'אודות']);
-  // The screen opens on its first topic: the theme and the language.
+  // The screen opens on its first topic: the theme, the language and the count of starts.
   await expect(tabs.first()).toHaveAttribute('aria-selected', 'true');
-  expect(await shown(page)).toEqual(['appearance', 'language']);
+  expect(await shown(page)).toEqual(['appearance', 'language', 'usage']);
 
   const sections = {
     agent: ['agent'],
@@ -115,6 +115,30 @@ test('the three switches write what a session reads, and a default is not writte
   expect(await stored(page)).toMatchObject({ outline: 'build' });
   await outline.click();
   expect(await stored(page)).toMatchObject({ outline: 'first' });
+});
+
+test('the count of starts is on until turned off, and on again writes no default (ADR-142)', async ({
+  page,
+}) => {
+  await openApp(page);
+  await page.getByTestId('activity-bar').locator('[data-panel="settings"]').click();
+  const usage = page
+    .locator('[data-settings-section="usage"]')
+    .getByRole('switch', { name: 'שליחת נתוני שימוש אנונימיים' });
+  await expect(usage).toBeChecked();
+  await expect(usage).toBeEnabled();
+  const section = () =>
+    page.evaluate(async (path) => {
+      const { pageSettings } = (await import(/* @vite-ignore */ path)) as typeof Settings;
+      return (await pageSettings.read()).usage;
+    }, '/src/settings/index.ts');
+
+  await usage.click();
+  await expect(usage).not.toBeChecked();
+  await expect.poll(section).toEqual({ send: false });
+  await usage.click();
+  await expect(usage).toBeChecked();
+  await expect.poll(section).toEqual({});
 });
 
 test('the model chosen in the settings is the one the chat shows', async ({ page }) => {

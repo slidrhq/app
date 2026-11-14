@@ -261,6 +261,17 @@ pub fn base_url() -> Option<Url> {
     )
 }
 
+/// Whether the organization chose the library of this installation: by policy, or by the
+/// installation's own file ([`ADDRESS_FILE`]). Such an installation may be on a network that is
+/// closed, and the app then calls nothing of its authors' (the usage count, ADR-142).
+pub fn chosen_by_organization() -> bool {
+    policy_url().is_some()
+        || std::env::current_exe()
+            .ok()
+            .and_then(|exe| exe.parent().map(|dir| dir.join(ADDRESS_FILE).exists()))
+            .unwrap_or(false)
+}
+
 /// The library an installed app reads: the copy a central policy names, else the one the
 /// installation's own file names ([`installed_base`]), else the published site. A policy value
 /// that names no address the app may read gives no library, as [`installed_base`] does for its

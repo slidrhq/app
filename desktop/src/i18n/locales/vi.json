@@ -2652,7 +2652,11 @@
       "themeLight": "Sáng",
       "themeDark": "Tối",
       "language": "Ngôn ngữ giao diện",
-      "languageHint": "Toàn bộ giao diện sẽ đổi chiều theo hướng viết của ngôn ngữ."
+      "languageHint": "Toàn bộ giao diện sẽ đổi chiều theo hướng viết của ngôn ngữ.",
+      "privacy": "Quyền riêng tư",
+      "usage": "Gửi dữ liệu sử dụng ẩn danh",
+      "usageHint": "Để biết có bao nhiêu người dùng Slidr. Mỗi lần khởi động, ứng dụng gửi một ID ngẫu nhiên của bản cài đặt này, phiên bản ứng dụng, hệ điều hành và ngôn ngữ giao diện. Không bao giờ gửi tệp, trang chiếu hay cuộc trò chuyện.",
+      "usageBlocked": "Tổ chức của bạn đã tắt tùy chọn này."
     },
     "status": {
       "slide": "Trang chiếu {{current}}/{{total}}",

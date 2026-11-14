@@ -15,6 +15,8 @@ export default defineConfig({
       'desktop/src/**/*.test.{ts,tsx}',
       'desktop/eval/**/*.test.{ts,tsx}',
       'desktop/build/**/*.test.{ts,tsx}',
+      // The Worker that counts installations (ADR-142); a standalone install of its own.
+      'usage/*.test.ts',
     ],
     // As on a Hebrew system, so that the UI starts in Hebrew (vitest.setup.ts).
     setupFiles: ['./vitest.setup.ts'],

@@ -2658,7 +2658,11 @@
       "themeLight": "Açık",
       "themeDark": "Koyu",
       "language": "Arayüz dili",
-      "languageHint": "Arayüzün tamamı, dilin yazım yönüne göre yansıtılır."
+      "languageHint": "Arayüzün tamamı, dilin yazım yönüne göre yansıtılır.",
+      "privacy": "Gizlilik",
+      "usage": "Anonim kullanım verileri gönder",
+      "usageHint": "Slidr’ı kaç kişinin kullandığını öğrenmek için. Her açılışta bu kurulumun rastgele bir kimliği, uygulama sürümü, işletim sistemi ve arayüz dili gönderilir. Asla dosyalar, slaytlar veya sohbetler gönderilmez.",
+      "usageBlocked": "Kuruluşunuz bu seçeneği kapattı."
     },
     "status": {
       "slide": "Slayt {{current}} / {{total}}",

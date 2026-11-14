@@ -2658,7 +2658,11 @@
       "themeLight": "Hell",
       "themeDark": "Dunkel",
       "language": "Sprache der Benutzeroberfläche",
-      "languageHint": "Die gesamte Oberfläche richtet sich nach der Schreibrichtung der Sprache aus."
+      "languageHint": "Die gesamte Oberfläche richtet sich nach der Schreibrichtung der Sprache aus.",
+      "privacy": "Datenschutz",
+      "usage": "Anonyme Nutzungsdaten senden",
+      "usageHint": "Zählt, wie viele Menschen Slidr verwenden. Bei jedem Start werden eine zufällige ID dieser Installation, die App-Version, das Betriebssystem und die Sprache der Benutzeroberfläche gesendet. Niemals Dateien, Folien oder Chats.",
+      "usageBlocked": "Ihre Organisation hat dies deaktiviert."
     },
     "status": {
       "slide": "Folie {{current}} von {{total}}",

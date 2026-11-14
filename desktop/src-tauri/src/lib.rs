@@ -22,6 +22,7 @@ mod storage;
 mod system_settings;
 mod templates;
 mod updates;
+mod usage;
 // The tool bridge. Its folder is the one place that names the protocol it speaks to agents
 // (API-02); the rest of the crate knows it by what it does.
 #[path = "mcp_bridge/mod.rs"]
@@ -108,6 +109,12 @@ pub fn run() {
             app.manage(Arc::new(import_window::ImportService::new()));
             app.manage(Arc::new(image_process::ImageProcessService::new(
                 image_process::places(app)?,
+            )));
+            // The count of installations and of starts (ADR-142): sent when the page says it
+            // has started, unless the user or the organization turned it off.
+            app.manage(Arc::new(usage::Usage::new(
+                &app.path().app_data_dir()?,
+                &app.config().identifier,
             )));
             updates::start(app.handle());
             show_window_anyway(app.handle());
@@ -204,6 +211,8 @@ pub fn run() {
             show_screen::show_screen_set,
             screen_color::screen_pick_color,
             system_settings::system_settings_read,
+            usage::usage_status,
+            usage::usage_start,
         ]))
         .build(tauri::generate_context!())
         .expect("failed to start the Slidr application")

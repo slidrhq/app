@@ -125,6 +125,11 @@ export const en: Messages<typeof he> = {
     themeDark: 'Dark',
     language: 'Interface language',
     languageHint: 'The whole interface mirrors to the language’s direction.',
+    privacy: 'Privacy',
+    usage: 'Send anonymous usage data',
+    usageHint:
+      'Counts how many people use Slidr. Each start sends a random ID of this installation, the app’s version, the operating system and the interface language. Never files, slides or chats.',
+    usageBlocked: 'Your organization turned this off.',
   },
   status: {
     slide: 'Slide {{current}} of {{total}}',

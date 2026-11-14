@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // The count of Slidr's installations and of their starts (worker.ts, ADR-142).
+  "name": "usage",
+  "main": "./worker.ts",
+  "compatibility_date": "2026-10-01",
+  // Its own address only: the app sends to https://usage.slidr.studio/v1/start, and nothing else
+  // answers (no workers.dev address).
+  "workers_dev": false,
+  "routes": [{ "pattern": "usage.slidr.studio", "custom_domain": true }],
+  // The installations and their days (schema.sql). `pnpm migrate` applies the schema.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "slidr-usage",
+      "database_id": "d171be86-eb8c-4fad-a3d4-84e841fb6f35",
+    },
+  ],
+  // Forgets the days older than 400 days (`forget`), once a day.
+  "triggers": { "crons": ["17 3 * * *"] },
+  // No logs of the requests: they would keep the addresses this Worker does not.
+  "observability": { "enabled": false },
+}

@@ -2652,7 +2652,11 @@
       "themeLight": "浅色",
       "themeDark": "深色",
       "language": "界面语言",
-      "languageHint": "整个界面会按照该语言的书写方向进行镜像。"
+      "languageHint": "整个界面会按照该语言的书写方向进行镜像。",
+      "privacy": "隐私",
+      "usage": "发送匿名使用数据",
+      "usageHint": "用于了解有多少人在使用 Slidr。每次启动时会发送此安装的随机 ID、应用版本、操作系统和界面语言。绝不发送文件、幻灯片或聊天内容。",
+      "usageBlocked": "你的组织已关闭此选项。"
     },
     "status": {
       "slide": "幻灯片第 {{current}} 张，共 {{total}} 张",

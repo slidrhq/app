@@ -2664,7 +2664,11 @@
       "themeLight": "Claro",
       "themeDark": "Oscuro",
       "language": "Idioma de la interfaz",
-      "languageHint": "Toda la interfaz se orienta según la dirección del idioma."
+      "languageHint": "Toda la interfaz se orienta según la dirección del idioma.",
+      "privacy": "Privacidad",
+      "usage": "Enviar datos de uso anónimos",
+      "usageHint": "Sirve para saber cuántas personas usan Slidr. Cada inicio envía un identificador aleatorio de esta instalación, la versión de la aplicación, el sistema operativo y el idioma de la interfaz. Nunca archivos, diapositivas ni chats.",
+      "usageBlocked": "Tu organización ha desactivado esta opción."
     },
     "status": {
       "slide": "Diapositiva {{current}} de {{total}}",

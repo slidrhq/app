@@ -2652,7 +2652,11 @@
       "themeLight": "Terang",
       "themeDark": "Gelap",
       "language": "Bahasa antarmuka",
-      "languageHint": "Seluruh antarmuka akan dicerminkan mengikuti arah bahasa tersebut."
+      "languageHint": "Seluruh antarmuka akan dicerminkan mengikuti arah bahasa tersebut.",
+      "privacy": "Privasi",
+      "usage": "Kirim data penggunaan anonim",
+      "usageHint": "Untuk mengetahui berapa banyak orang yang menggunakan Slidr. Setiap kali dimulai, aplikasi mengirim ID acak instalasi ini, versi aplikasi, sistem operasi, dan bahasa antarmuka. Tidak pernah file, slide, atau obrolan.",
+      "usageBlocked": "Organisasi Anda menonaktifkan opsi ini."
     },
     "status": {
       "slide": "Slide {{current}} dari {{total}}",

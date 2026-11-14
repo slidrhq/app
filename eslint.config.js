@@ -12,6 +12,8 @@ export default tseslint.config(
       '**/src-tauri/gen/**',
       '**/test-results/**',
       '**/playwright-report/**',
+      // What wrangler keeps of local runs of the usage Worker.
+      '**/.wrangler/**',
       'examples/**',
       // Spikes are throwaway feasibility code; their findings live in docs/adr.
       'spikes/**',

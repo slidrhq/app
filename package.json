@@ -21,6 +21,7 @@
     "test:browser": "vitest run --config vitest.browser.config.ts",
     "e2e": "pnpm --filter @slidr/desktop e2e",
     "release": "node release.mjs",
+    "ship": "node scripts/ship.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test",
     "check:rust": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
     "check:all": "pnpm check && pnpm check:rust"
